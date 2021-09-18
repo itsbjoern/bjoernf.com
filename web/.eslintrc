@@ -1,0 +1,35 @@
+{
+  "overrides": [
+    {
+      "files": [ "src/**/*.js" ]
+    }
+  ],
+  "env": {
+      "browser": true,
+      "es2021": true
+  },
+  "settings": {
+      "react": {
+          "version": "detect"
+      }
+  },
+  "extends": [
+      "plugin:react/recommended",
+      "eslint-config-prettier"
+  ],
+  "parserOptions": {
+      "parser": "babel-eslint",
+      "ecmaFeatures": {
+          "jsx": true
+      },
+      "ecmaVersion": 12,
+      "sourceType": "module"
+  },
+  "plugins": [
+      "react",
+      "eslint-plugin-prettier"
+  ],
+  "rules": {
+    "prettier/prettier": "warn"
+  }
+}
