@@ -79,6 +79,7 @@ target/
 .ipynb_checkpoints
 
 config/*.yaml
+public/
 
 
 

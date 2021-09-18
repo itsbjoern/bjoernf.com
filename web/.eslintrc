@@ -1,7 +1,7 @@
 {
   "overrides": [
     {
-      "files": [ "src/**/*.js" ]
+      "files": [ "app/**/*.js" ]
     }
   ],
   "env": {
@@ -30,6 +30,7 @@
       "eslint-plugin-prettier"
   ],
   "rules": {
-    "prettier/prettier": "warn"
+    "prettier/prettier": "warn",
+    "react/no-unescaped-entities": 0
   }
 }
