@@ -1,38 +1,27 @@
-
 from aiohttp import web
+from aiohttp_middlewares import cors_middleware
 
 
-async def handle_404(request):
-  return None
-  # return aiohttp_jinja2.render_template('404.html', request, {}, status=404)
+async def error_middleware(app, handler):
+  async def mid(request):
+    response = await handler(request)
+    if response.status == 500:
+      return response
+      # return web.json_response({'ok': False}, status=500)
+    return response
+  return mid
 
 
-async def handle_500(request):
-  return None
-  # return aiohttp_jinja2.render_template('500.html', request, {}, status=500)
-
-
-def create_error_middleware(overrides):
-  @web.middleware
-  async def error_middleware(request, handler):
-    try:
-      return await handler(request)
-    except web.HTTPException as ex:
-      override = overrides.get(ex.status)
-      if override:
-        return await override(request)
-
-      raise
-    except Exception:
-      request.protocol.logger.exception("Error handling request")
-      return await overrides[500](request)
-
-  return error_middleware
+async def easy_access_middleware(app, handler):
+  async def mid(request):
+    setattr(request, 'use', lambda x: request.app[x])
+    return await handler(request)
+  return mid
 
 
 def setup_middlewares(app):
-  error_middleware = create_error_middleware({
-    404: handle_404,
-    500: handle_500
-  })
-  app.middlewares.append(error_middleware)
+  app.middlewares.extend([
+    cors_middleware(allow_all=True),
+    error_middleware,
+    easy_access_middleware
+  ])

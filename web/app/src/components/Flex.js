@@ -1,4 +1,3 @@
-import React from 'react'
 import styled from 'styled-components'
 
 const translate = {
@@ -14,6 +13,7 @@ const translate = {
 
 export const Flex = styled.div`
   display: flex;
+  flex: ${({ flexed }) => (flexed ? 1 : 'initial')};
   align-items: ${({ align }) => translate[align || 'normal']};
   justify-content: ${({ justify }) => translate[justify || 'normal']};
   gap: ${({ gap }) => gap || 0}px;
@@ -25,8 +25,4 @@ export const Row = styled(Flex)`
 
 export const Column = styled(Flex)`
   flex-direction: column;
-`
-
-export const Flexed = styled.div`
-  flex: 1;
 `

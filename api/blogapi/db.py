@@ -3,7 +3,7 @@ import pymongo
 
 async def mongo_ctx(app):
   db = pymongo.MongoClient(host='127.0.0.1', port=27017)
-  app['db'] = db
+  app['db'] = db[app['config']['mongo']['db']]
 
   yield
 

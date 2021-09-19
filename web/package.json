@@ -93,9 +93,17 @@
   "babel": {
     "presets": [
       "react-app"
+    ],
+    "plugins": [
+      [
+        "babel-plugin-direct-import",
+        { "modules": ["@mui/material", "@mui/icons-material"] }
+      ]
     ]
   },
   "devDependencies": {
+    "babel-plugin-direct-import": "^0.9.2",
+    "babel-plugin-import": "^1.13.3",
     "eslint-config-prettier": "^8.3.0",
     "eslint-plugin-prettier": "^4.0.0",
     "prettier": "^2.4.1"

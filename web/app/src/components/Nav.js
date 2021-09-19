@@ -1,11 +1,12 @@
-import React from 'react'
+import React, { useContext } from 'react'
 
 import { Link, withRouter } from 'react-router-dom'
 import styled from 'styled-components'
 import { Button, Avatar, Divider, Chip } from '@mui/material'
 import { withTheme } from '@mui/styles'
-import { ArrowCircleUp, LinkedIn, GitHub } from '@mui/icons-material'
+import { ArrowCircleUp, LinkedIn, GitHub, Logout } from '@mui/icons-material'
 
+import { RequestContext } from 'app/providers/RequestProvider'
 import { Row, Column } from 'app/components/Flex'
 import { H3 } from 'app/components/Text'
 
@@ -19,6 +20,8 @@ const Header = withTheme(styled(Column)`
 `)
 
 const Nav = () => {
+  const { token, setToken } = useContext(RequestContext)
+
   return (
     <Header gap={15}>
       <Row justify="between" align="center">
@@ -46,25 +49,38 @@ const Nav = () => {
       </Row>
 
       <Divider />
-      <Row justify="end" gap={15}>
-        <Chip
-          component="a"
-          icon={<GitHub />}
-          href="https://github.com/BFriedrichs"
-          label="BFriedrichs"
-          variant="outlined"
-          clickable
-          target="_blank"
-        />
-        <Chip
-          component="a"
-          icon={<LinkedIn />}
-          href="https://linkedin.com/in/bjoern-friedrichs"
-          label="bjoern-friedrichs"
-          variant="outlined"
-          clickable
-          target="_blank"
-        />
+      <Row>
+        <Row justify="start" flexed>
+          {token ? (
+            <Chip
+              icon={<Logout fontSize="small" />}
+              label="Sign out"
+              clickable
+              variant="outlined"
+              onClick={() => setToken(null)}
+            />
+          ) : null}
+        </Row>
+        <Row justify="end" gap={15}>
+          <Chip
+            component="a"
+            icon={<GitHub />}
+            href="https://github.com/BFriedrichs"
+            label="BFriedrichs"
+            variant="outlined"
+            clickable
+            target="_blank"
+          />
+          <Chip
+            component="a"
+            icon={<LinkedIn />}
+            href="https://linkedin.com/in/bjoern-friedrichs"
+            label="bjoern-friedrichs"
+            variant="outlined"
+            clickable
+            target="_blank"
+          />
+        </Row>
       </Row>
     </Header>
   )
