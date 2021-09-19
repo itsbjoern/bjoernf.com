@@ -1,6 +1,11 @@
 import React, { useState } from 'react'
 import { BrowserRouter as Router, Switch, Route } from 'react-router-dom'
-import { Container, ThemeProvider, createTheme } from '@mui/material'
+import {
+  Container,
+  ThemeProvider,
+  Typography,
+  createTheme,
+} from '@mui/material'
 
 import themeTemplate from 'app/theme'
 
@@ -14,16 +19,20 @@ const App = () => {
   return (
     <Router>
       <ThemeProvider theme={theme}>
-        <Container>
+        <Container maxWidth="md">
           <Nav />
-          <Switch>
-            <Route exact path="/">
-              <Home />
-            </Route>
-            <Route exact path="/blog">
-              <Blog />
-            </Route>
-          </Switch>
+          <div style={{ padding: 15 }}>
+            <Typography>
+              <Switch>
+                <Route exact path="/">
+                  <Home />
+                </Route>
+                <Route exact path="/blog">
+                  <Blog />
+                </Route>
+              </Switch>
+            </Typography>
+          </div>
         </Container>
       </ThemeProvider>
     </Router>
