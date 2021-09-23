@@ -80,6 +80,7 @@ target/
 
 config/*.yaml
 public/
+blogapi/uploads
 
 
 
