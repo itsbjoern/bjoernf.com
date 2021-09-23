@@ -1,4 +1,4 @@
-import React, { useState, useCallback } from 'react'
+import React, { forwardRef, useContext, useState, useCallback } from 'react'
 import { Snackbar, Alert } from '@mui/material'
 
 export const NotificationContext = React.createContext(null)
@@ -34,6 +34,17 @@ const NotificationProvider = ({ children }) => {
       {children}
     </NotificationContext.Provider>
   )
+}
+
+export const withNotification = (cls) => {
+  const Wrapper = forwardRef((props, ref) => {
+    const context = useContext(NotificationContext)
+
+    return cls({ ...props, ...context, ref })
+  })
+  Wrapper.displayName = cls.displayName
+
+  return Wrapper
 }
 
 export default NotificationProvider

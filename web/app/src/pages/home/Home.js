@@ -1,20 +1,29 @@
-import React from 'react'
+import React, { useState, useEffect } from 'react'
 
-import { Divider } from '@mui/material'
+import { Divider, List } from '@mui/material'
+
+import { withRequest } from 'app/providers/RequestProvider'
+import { getPosts } from 'app/api/blog'
 
 import { Column } from 'app/components/Flex'
-import { H4 } from 'app/components/Text'
+import { H2, H4 } from 'app/components/Text'
 import Ref from 'app/components/Ref'
+import PostItem from 'app/components/PostItem'
 
-const Home = () => {
+const Home = ({ sendRequest }) => {
+  const [posts, setPosts] = useState([])
+
+  useEffect(() => {
+    sendRequest(getPosts()).then(({ posts }) => setPosts(posts))
+  }, [])
   return (
     <Column gap={30}>
       <span>
-        <H4>I am...</H4>
+        <H2>This is home</H2>
       </span>
       <span>
-        someone that likes to dabble and try things. And sometimes it just goes
-        unexpectedly well.
+        I am someone that likes to dabble and try things. And sometimes it just
+        goes unexpectedly well.
       </span>
       <span>
         As I finally came around to the idea of starting{' '}
@@ -32,7 +41,7 @@ const Home = () => {
         <Divider />
       </span>
       <span>
-        <H4>About me</H4>
+        <H4>Brief background</H4>
       </span>
       <span>
         I'm a software engineer, orginally from Germany and now living and
@@ -46,8 +55,21 @@ const Home = () => {
         the use of technology and being able to research Human Computer
         Interaction to this extent is a great experience.
       </span>
+      <span>
+        <Divider />
+      </span>
+      <span>
+        <H4 style={{ marginBottom: '20px' }}>Recent posts</H4>
+        <Column>
+          <List>
+            {posts.map((p) => (
+              <PostItem key={p._id} post={p} />
+            ))}
+          </List>
+        </Column>
+      </span>
     </Column>
   )
 }
 
-export default Home
+export default withRequest(Home)

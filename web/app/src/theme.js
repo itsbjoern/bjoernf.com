@@ -1,4 +1,7 @@
-// https://coolors.co/778da9-fce4d8-475841-db2955-3f403f
+/*
+  https://coolors.co/9e829c-381d2a-ff570a-eef1f3-3f403f
+*/
+import styled from 'styled-components'
 
 export default {
   typography: {
@@ -6,18 +9,30 @@ export default {
   },
   palette: {
     background: {
-      paper: '#FCE4D8',
+      default: '#f2f2f2',
+      paper: '#eef1f3',
       offset: '#778DA9',
     },
     primary: {
-      main: '#475841',
+      main: '#FF570A',
     },
     secondary: {
-      main: '#DB2955',
+      main: '#381D2A',
     },
     text: {
       primary: '#3F403F',
-      secondary: '#CED0CE',
+      secondary: '#9E829C',
     },
   },
 }
+
+export const morphMixin = `
+  border-radius: 10px;
+  box-shadow:  7px 7px 14px #e1e1e1,
+  -7px -7px 14px #ffffff;
+`
+
+export const Morph = styled.div`
+  padding: 10px;
+  ${morphMixin}
+`

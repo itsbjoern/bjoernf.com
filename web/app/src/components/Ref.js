@@ -17,21 +17,26 @@ const LinkRender = withTheme(({ theme, external, href, ...props }) =>
   )
 )
 
-const Ref = ({ text, href }) => (
-  <React.Fragment>
-    {' '}
-    <LinkRender external={href.slice(0, 1) !== '/'} href={href}>
-      {text}
-      <TransitEnterexit
-        color="primary"
-        sx={{
-          marginLeft: 0,
-          fontSize: '1rem',
-          transform: 'rotate(180deg)',
-        }}
-      />
-    </LinkRender>
-  </React.Fragment>
-)
+const Ref = ({ text, href }) => {
+  const isExternal = href.slice(0, 1) !== '/'
+  return (
+    <React.Fragment>
+      {' '}
+      <LinkRender external={isExternal} href={href}>
+        {text}
+        {isExternal ? (
+          <TransitEnterexit
+            color="primary"
+            sx={{
+              marginLeft: 0,
+              fontSize: '1rem',
+              transform: 'rotate(180deg)',
+            }}
+          />
+        ) : null}
+      </LinkRender>
+    </React.Fragment>
+  )
+}
 
 export default withRouter(Ref)

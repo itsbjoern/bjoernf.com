@@ -1,0 +1,132 @@
+import React from 'react'
+
+import { useActive, useChainedCommands, useCommands } from '@remirror/react'
+import { Button, ButtonGroup } from '@mui/material'
+import {
+  FormatBold,
+  FormatItalic,
+  FormatStrikethrough,
+  FormatUnderlined,
+  Redo,
+  Undo,
+  FormatListBulleted,
+  FormatListNumbered,
+  FormatSize,
+} from '@mui/icons-material'
+
+import styled from 'styled-components'
+import { Row } from 'app/components/Flex'
+
+const MenuButton = styled(Button)`
+  width: 45px;
+`
+
+const ToggleButton = ({ type, command, param, icon, variant: _, ...props }) => {
+  const { [type]: active } = useActive()
+  const { [command]: chain } = useChainedCommands()
+
+  return (
+    <MenuButton
+      variant={active(param) ? 'contained' : 'outlined'}
+      onClick={() => chain(param).run()}
+      {...props}
+    >
+      {icon}
+    </MenuButton>
+  )
+}
+
+const Menu = () => {
+  const { undo, redo } = useCommands()
+
+  return (
+    <Row
+      onMouseDown={(e) => {
+        e.preventDefault()
+        e.stopPropagation()
+      }}
+      justify="center"
+      style={{
+        position: 'sticky',
+        top: 10,
+        zIndex: 100,
+      }}
+    >
+      <Row
+        gap={15}
+        style={{
+          border: '0.5px solid rgba(0,0,0,0.2)',
+          padding: 10,
+          background: '#fff',
+          borderRadius: 5,
+        }}
+        wrapping
+      >
+        <ButtonGroup variant="outlined">
+          <MenuButton onClick={() => undo()}>
+            <Undo />
+          </MenuButton>
+          <MenuButton onClick={() => redo()}>
+            <Redo />
+          </MenuButton>
+        </ButtonGroup>
+        <ButtonGroup variant="outlined">
+          <ToggleButton
+            type="bold"
+            command="toggleBold"
+            icon={<FormatBold />}
+          />
+          <ToggleButton
+            type="italic"
+            command="toggleItalic"
+            icon={<FormatItalic />}
+          />
+          <ToggleButton
+            type="underline"
+            command="toggleUnderline"
+            icon={<FormatUnderlined />}
+          />
+          <ToggleButton
+            type="strike"
+            command="toggleStrike"
+            icon={<FormatStrikethrough />}
+          />
+        </ButtonGroup>
+        <ButtonGroup variant="outlined">
+          <ToggleButton
+            type="heading"
+            command="toggleHeading"
+            param={{ level: 1 }}
+            icon={<FormatSize sx={{ fontSize: 28 }} />}
+          />
+          <ToggleButton
+            type="heading"
+            command="toggleHeading"
+            param={{ level: 2 }}
+            icon={<FormatSize sx={{ fontSize: 23 }} />}
+          />
+          <ToggleButton
+            type="heading"
+            command="toggleHeading"
+            param={{ level: 3 }}
+            icon={<FormatSize sx={{ fontSize: 18 }} />}
+          />
+        </ButtonGroup>
+        <ButtonGroup variant="outlined">
+          <ToggleButton
+            type="bulletList"
+            command="toggleBulletList"
+            icon={<FormatListBulleted />}
+          />
+          <ToggleButton
+            type="orderedList"
+            command="toggleOrderedList"
+            icon={<FormatListNumbered />}
+          />
+        </ButtonGroup>
+      </Row>
+    </Row>
+  )
+}
+
+export default Menu

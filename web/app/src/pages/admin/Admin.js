@@ -1,12 +1,13 @@
-import React, { useContext } from 'react'
+import React, { useState, useEffect } from 'react'
 
 import { withRouter } from 'react-router-dom'
-import { Tabs, Tab } from '@mui/material'
+import { Tabs, Tab, List } from '@mui/material'
+import { getDrafts } from 'app/api/admin'
 
-import { RequestContext } from 'app/providers/RequestProvider'
+import { withRequest } from 'app/providers/RequestProvider'
 import { Row, Column } from 'app/components/Flex'
+import PostItem from 'app/components/PostItem'
 import Login from './Login'
-import BlogPostList from './tabs/BlogPostList'
 
 const LinkedTab = withRouter(({ label, index, history, ...props }) => (
   <Tab
@@ -33,11 +34,20 @@ const Panel = ({ children, value, index }) => {
   )
 }
 
-const Admin = ({ location, history }) => {
-  const { token } = useContext(RequestContext)
+const Admin = ({ location, history, token, sendRequest }) => {
+  const [draftPosts, setDraftPosts] = useState([])
+
   const hashSplit = location.hash?.split('-')
   const currentTab =
     hashSplit && hashSplit.length > 1 ? parseInt(hashSplit[1]) : 0
+
+  useEffect(() => {
+    if (token) {
+      sendRequest(getDrafts()).then(({ posts }) => {
+        setDraftPosts(posts)
+      })
+    }
+  }, [token])
 
   if (!token) {
     return <Login />
@@ -52,17 +62,19 @@ const Admin = ({ location, history }) => {
           aria-label="basic tabs"
         >
           <LinkedTab label="Main" index={0} />
-          <LinkedTab label="Blog" index={1} />
+          <LinkedTab label="Drafts" index={1} />
         </Tabs>
       </Row>
-      <Panel value={currentTab} index={0}>
-        Item One
-      </Panel>
+      <Panel value={currentTab} index={0}></Panel>
       <Panel value={currentTab} index={1}>
-        <BlogPostList />
+        <List>
+          {draftPosts.map((p) => (
+            <PostItem key={p._id} post={p} />
+          ))}
+        </List>
       </Panel>
     </Column>
   )
 }
 
-export default withRouter(Admin)
+export default withRouter(withRequest(Admin))

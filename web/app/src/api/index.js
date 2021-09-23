@@ -8,7 +8,7 @@ const buildRequest = (method, endpoint, data, headers) => {
     headers: headers,
   }
   if (data) {
-    requestData.body = JSON.stringify(data)
+    requestData.body = data
   }
   return requestData
 }
@@ -32,5 +32,9 @@ export const get = (endpoint) => {
 }
 
 export const post = (endpoint, data) => {
+  return buildRequest('POST', endpoint, JSON.stringify(data))
+}
+
+export const postRaw = (endpoint, data) => {
   return buildRequest('POST', endpoint, data)
 }

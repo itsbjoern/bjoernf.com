@@ -1,4 +1,4 @@
-import React, { useState, useCallback } from 'react'
+import React, { useState, useCallback, useContext, forwardRef } from 'react'
 
 import { request } from 'app/api'
 
@@ -8,7 +8,12 @@ const UserProvider = ({ children }) => {
   const [token, _setToken] = useState(localStorage.getItem('authToken'))
 
   const setToken = (newToken) => {
-    localStorage.setItem('authToken', newToken)
+    if (newToken) {
+      localStorage.setItem('authToken', newToken)
+    } else {
+      localStorage.removeItem('authToken')
+    }
+
     _setToken(newToken)
   }
 
@@ -28,6 +33,18 @@ const UserProvider = ({ children }) => {
       {children}
     </RequestContext.Provider>
   )
+}
+
+export const withRequest = (cls) => {
+  cls = cls.render || cls
+  const Wrapper = forwardRef((props, ref) => {
+    const context = useContext(RequestContext)
+
+    return cls({ ...props, ...context, ref })
+  })
+  Wrapper.displayName = cls.displayName
+
+  return Wrapper
 }
 
 export default UserProvider

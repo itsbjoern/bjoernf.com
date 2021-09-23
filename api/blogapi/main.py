@@ -18,6 +18,7 @@ async def init_app(argv, config='main.yaml'):
   app.cleanup_ctx.append(mongo_ctx)
   setup_routes(app)
   setup_middlewares(app)
+
   return app
 
 

@@ -1,16 +1,14 @@
-import React, { useState, useContext, useCallback } from 'react'
+import React, { useState, useCallback } from 'react'
 
 import { TextField, Button, InputAdornment } from '@mui/material'
 import { AccountCircle, VpnKey } from '@mui/icons-material'
 
 import { Flex, Column } from 'app/components/Flex'
-import { RequestContext } from 'app/providers/RequestProvider'
-import { NotificationContext } from 'app/providers/NotificationProvider'
+import { withRequest } from 'app/providers/RequestProvider'
+import { withNotification } from 'app/providers/NotificationProvider'
 import { login } from 'app/api/admin'
 
-const Login = () => {
-  const { sendRequest, setToken } = useContext(RequestContext)
-  const { createNotification } = useContext(NotificationContext)
+const Login = ({ sendRequest, setToken, createNotification }) => {
   const [username, setUsername] = useState('')
   const [password, setPassword] = useState('')
 
@@ -60,4 +58,4 @@ const Login = () => {
   )
 }
 
-export default Login
+export default withRequest(withNotification(Login))

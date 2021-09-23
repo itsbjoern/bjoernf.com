@@ -1,16 +1,27 @@
+import os
 import jwt
 import bcrypt
 import base64
 import json
 import bson
 from aiohttp import web
-from functools import partial
+import pathlib
+import pymongo
+import datetime
+import math
+
+PROJECT_ROOT = pathlib.Path(__file__).parent
+UPLOAD_FOLDER = PROJECT_ROOT / 'uploads'
 
 
 class ObjEnconder(json.JSONEncoder):
   def default(self, obj):
     if isinstance(obj, bson.ObjectId):
       return str(obj)
+    elif isinstance(obj, pymongo.cursor.Cursor):
+      return list(obj)
+    elif isinstance(obj, datetime.datetime):
+      return obj.timestamp()
 
     return json.JSONEncoder.default(self, obj)
 
@@ -23,11 +34,34 @@ def json_response(data):
   return web.json_response(data, dumps=dumps)
 
 
+def get_upload_path(path):
+  full_path = UPLOAD_FOLDER / path
+  os.makedirs(full_path.parent, exist_ok=True)
+  return full_path
+
+
 def auth(func):
-  def route(*args, **kwargs):
-    print(args, kwargs)
-    return func(*args, **kwargs)
+  def route(request):
+    if not request.get('user'):
+      raise web.HTTPForbidden(reason="No access")
+    return func(request)
   return route
+
+
+def paginate(coll, query, projection=None, page=1, limit=10, items_per_page=10):
+  cursor = None
+  num_pages = 1
+  current_page = 1
+
+  count = coll.count_documents(query)
+  num_pages = math.ceil(count / items_per_page)
+  skip = (page - 1) * items_per_page
+  current_page = 0 if skip == 0 else int(count / skip)
+  cursor = coll.find(query, projection) \
+               .skip(skip) \
+               .limit(min(limit, items_per_page))
+
+  return cursor, num_pages, current_page
 
 
 def generate_password_hash(password, salt_rounds=12):

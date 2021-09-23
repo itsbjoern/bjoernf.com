@@ -33,7 +33,13 @@
     "prettier/prettier": "warn",
     "react/no-unescaped-entities": 0,
     "react/prop-types": 0,
-    "no-unused-vars": "warn",
+    "no-unused-vars": ["warn", {
+      "vars": "all",
+      "args": "after-used",
+      "ignoreRestSiblings": false,
+      "varsIgnorePattern": "^_",
+      "argsIgnorePattern": "^_"
+    }],
     "no-undef": "error"
   }
 }

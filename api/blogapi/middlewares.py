@@ -1,5 +1,6 @@
 from aiohttp import web
 from aiohttp_middlewares import cors_middleware
+import socket
 
 
 async def error_middleware(app, handler):
@@ -19,9 +20,26 @@ async def easy_access_middleware(app, handler):
   return mid
 
 
+async def auth_middleware(app, handler):
+  async def mid(request):
+    request['user'] = None
+    auth_header = request.headers.get('Authorization', None)
+    if auth_header:
+      db = request.use('db')
+      user = db.users.find_one({'token': auth_header[7:]})
+
+      request['user'] = user
+    return await handler(request)
+  return mid
+
+
 def setup_middlewares(app):
+  local = 'http://' + socket.gethostbyname(socket.gethostname())
+  hosts = [local, app['config']['web_host']]
+  origins = [host + ':' + app['config']['web_host_port'] for host in hosts]
   app.middlewares.extend([
-    cors_middleware(allow_all=True),
     error_middleware,
-    easy_access_middleware
+    cors_middleware(origins=origins),
+    easy_access_middleware,
+    auth_middleware,
   ])
