@@ -12,6 +12,9 @@ import {
   FormatListBulleted,
   FormatListNumbered,
   FormatSize,
+  AlignHorizontalCenter,
+  AlignHorizontalLeft,
+  AlignHorizontalRight,
 } from '@mui/icons-material'
 
 import styled from 'styled-components'
@@ -27,7 +30,7 @@ const ToggleButton = ({ type, command, param, icon, variant: _, ...props }) => {
 
   return (
     <MenuButton
-      variant={active(param) ? 'contained' : 'outlined'}
+      variant={active?.(param) ? 'contained' : 'outlined'}
       onClick={() => chain(param).run()}
       {...props}
     >
@@ -38,7 +41,7 @@ const ToggleButton = ({ type, command, param, icon, variant: _, ...props }) => {
 
 const Menu = () => {
   const { undo, redo } = useCommands()
-
+  console.log(useActive())
   return (
     <Row
       onMouseDown={(e) => {
@@ -122,6 +125,26 @@ const Menu = () => {
             type="orderedList"
             command="toggleOrderedList"
             icon={<FormatListNumbered />}
+          />
+        </ButtonGroup>
+        <ButtonGroup variant="outlined">
+          <ToggleButton
+            type="nodeFormatting"
+            command="setTextAlignment"
+            param="left"
+            icon={<AlignHorizontalLeft />}
+          />
+          <ToggleButton
+            type="nodeFormatting"
+            command="setTextAlignment"
+            param="center"
+            icon={<AlignHorizontalCenter />}
+          />
+          <ToggleButton
+            type="nodeFormatting"
+            command="setTextAlignment"
+            param="right"
+            icon={<AlignHorizontalRight />}
           />
         </ButtonGroup>
       </Row>

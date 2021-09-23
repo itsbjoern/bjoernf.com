@@ -10,6 +10,9 @@ import {
   BulletListExtension,
   OrderedListExtension,
   LinkExtension,
+  NodeFormattingExtension,
+  CodeExtension,
+  CodeBlockExtension,
 } from 'remirror/extensions'
 // import { FileExtension } from '@remirror/extension-file'
 
@@ -65,6 +68,9 @@ const Editor = ({ content, onChange, upload, editable = true }) => {
     // new FileExtension({ uploadFileHandler: createFileUploadHandler(upload) }),
     new HeadingExtension(),
     new LinkExtension({ autoLink: true }),
+    new CodeBlockExtension(),
+    new CodeExtension(),
+    new NodeFormattingExtension(),
   ])
 
   const { manager, state, setState } = useRemirror({
