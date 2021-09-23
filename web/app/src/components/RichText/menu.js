@@ -22,6 +22,10 @@ import { Row } from 'app/components/Flex'
 
 const MenuButton = styled(Button)`
   width: 45px;
+
+  > svg {
+    height: 20px;
+  }
 `
 
 const ToggleButton = ({ type, command, param, icon, variant: _, ...props }) => {
@@ -41,7 +45,7 @@ const ToggleButton = ({ type, command, param, icon, variant: _, ...props }) => {
 
 const Menu = () => {
   const { undo, redo } = useCommands()
-  console.log(useActive())
+
   return (
     <Row
       onMouseDown={(e) => {

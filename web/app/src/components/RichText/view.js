@@ -23,6 +23,32 @@ const StyledEditor = withTheme(styled.div`
         display: none;
       }
     }
+
+    *:not(pre) > code {
+      font-size: 0.95rem;
+      background-color: rgba(255, 87, 10, 0.3);
+      padding: 1px 3px;
+      border-radius: 4px;
+    }
+
+    pre {
+      tab-size: 2;
+      padding: 17px 25px;
+      display: table;
+      padding-right: 100px;
+      max-width: 100%;
+      overflow: scroll;
+
+      border-radius: 8px;
+      background: #f2f2f2;
+      box-shadow: inset 6px 6px 12px #d5d5d5, inset -6px -6px 12px #ffffff;
+      code {
+        font-size: 0.95rem;
+        line-height: 0;
+        color: #444;
+      }
+    }
+
     &[contenteditable='true'] {
       box-sizing: border-box;
       white-space: pre-wrap;
