@@ -10,3 +10,7 @@ async def handler(request):
     return web.Response(
       text=fh.read(),
       content_type='text/html')
+
+
+async def not_found(request):
+  raise web.HTTPNotFound()

@@ -1,3 +1,6 @@
+public/
+blogapi/uploads
+
 # Byte-compiled / optimized / DLL files
 __pycache__/
 *.py[cod]
@@ -77,12 +80,6 @@ target/
 
 # Jupyter Notebook
 .ipynb_checkpoints
-
-config/*.yaml
-public/
-blogapi/uploads
-
-
 
 # IPython
 profile_default/

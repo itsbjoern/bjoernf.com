@@ -98,12 +98,18 @@ async def publish(request):
   summary = '.'.join(post['text'].split('.')[:3]) + '.'
   summary = remove_multi.sub(" ", summary).strip()
 
+  title = post.get('title')
+  html = post.get('html')
+
+  if not title or not html:
+    return web.HTTPBadRequest(reason="Title and text are required")
+
   version = {
-    'title': post['title'],
+    'title': title,
     'text': post['text'],
     'summary': summary,
-    'html': post['html'],
-    'tags': post['tags'],
+    'html': html,
+    'tags': post.get('tags'),
     'publishedAt': datetime.datetime.now(),
     'version': post.get('publishedVersion', {}).get('version', 0) + 1
   }

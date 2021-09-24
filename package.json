@@ -1,0 +1,7 @@
+{
+  "scripts": {
+    "start": "docker compose rm -f; docker volume prune -f; docker compose -f docker-compose.yml -f prod.yml up --build",
+    "dev": "docker compose rm -f; docker volume prune -f; docker compose -f docker-compose.yml -f dev.yml up --build",
+    "build": "docker compose rm -f; docker volume prune -f; docker compose build --no-cache"
+  }
+}

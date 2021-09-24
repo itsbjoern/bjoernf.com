@@ -1,5 +1,6 @@
 import pymongo
 
+from blogapi import util
 
 def ensure_index(db):
   db.posts.create_index(name='index1',
@@ -12,9 +13,15 @@ def ensure_index(db):
 
 
 async def mongo_ctx(app):
-  client = pymongo.MongoClient(host='127.0.0.1', port=27017)
-  db = client[app['config']['mongo']['db']]
+  client = pymongo.MongoClient(host=app['config']['mongo.host'], port=app['config']['mongo.port'])
+  db = client[app['config']['mongo.db']]
   ensure_index(db)
   app['db'] = db
+
+  if not db.users.find_one():
+    db.users.insert_one({
+      'username': app['config']['mongo.user.username'],
+      'password': util.generate_password_hash(app['config']['mongo.user.password'])
+    })
 
   yield

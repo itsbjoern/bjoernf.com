@@ -56,8 +56,8 @@ const App = () => {
                   style={{
                     paddingTop: 45,
                     paddingBottom: 45,
-                    paddingLeft: 10,
-                    paddingRight: 10,
+                    paddingLeft: 5,
+                    paddingRight: 5,
                   }}
                   flexed
                 >

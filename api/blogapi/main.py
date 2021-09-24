@@ -10,10 +10,10 @@ from blogapi.settings import get_config
 from blogapi import util
 
 
-async def init_app(argv, config='main.yaml'):
+async def init_app(argv):
   app = web.Application()
-  app['config'] = get_config(config)
-  app['auth'] = util.Auth(app['config']['jwt_secret'])
+  app['config'] = get_config()
+  app['auth'] = util.Auth(app['config']['jwt.secret'])
 
   app.cleanup_ctx.append(mongo_ctx)
   setup_routes(app)
@@ -23,16 +23,17 @@ async def init_app(argv, config='main.yaml'):
 
 
 async def get_app():
-  app = await init_app(sys.argv[1:], config='dev.yaml')
+  app = await init_app(sys.argv[1:])
   return app
 
 
 def main(argv):
+  logging.basicConfig(level=logging.DEBUG)
   app = init_app(argv)
   config = get_config()
   web.run_app(app,
-              host=config['host'],
-              port=config['port'])
+              host=config['connection.host'],
+              port=config['connection.port'])
 
 
 if __name__ == '__main__':

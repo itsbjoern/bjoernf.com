@@ -8,3 +8,4 @@ PyYAML==5.4.1
 pycodestyle==2.7.0
 autopep8==1.5.7
 bcrypt==3.2.0
+PyJWT==2.1.0

@@ -3,7 +3,7 @@ const apiUrl = process.env.REACT_APP_API_URL
 
 const buildRequest = (method, endpoint, data, headers) => {
   const requestData = {
-    url: apiUrl + endpoint,
+    url: apiUrl + '/api' + endpoint,
     method,
     headers: headers,
   }
