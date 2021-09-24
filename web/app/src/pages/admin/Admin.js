@@ -1,12 +1,14 @@
 import React, { useState, useEffect } from 'react'
 
 import { withRouter } from 'react-router-dom'
-import { Tabs, Tab, List } from '@mui/material'
-import { getDrafts } from 'app/api/admin'
+import { Button, Tabs, Tab, List } from '@mui/material'
+import { AddCircle } from '@mui/icons-material'
+import { getDrafts, createPost } from 'app/api/admin'
 
 import { withRequest } from 'app/providers/RequestProvider'
 import { Row, Column } from 'app/components/Flex'
 import PostItem from 'app/components/PostItem'
+import FloatAside from 'app/components/FloatAside'
 import Login from './Login'
 
 const LinkedTab = withRouter(({ label, index, history, ...props }) => (
@@ -67,11 +69,31 @@ const Admin = ({ location, history, token, sendRequest }) => {
       </Row>
       <Panel value={currentTab} index={0}></Panel>
       <Panel value={currentTab} index={1}>
-        <List>
-          {draftPosts.map((p) => (
-            <PostItem key={p._id} post={p} />
-          ))}
-        </List>
+        <FloatAside
+          menu={
+            token ? (
+              <Column>
+                <Button
+                  startIcon={<AddCircle />}
+                  variant="contained"
+                  onClick={() => {
+                    sendRequest(createPost()).then(({ post }) => {
+                      history.push(`/blog/${post._id}#edit`)
+                    })
+                  }}
+                >
+                  New post
+                </Button>
+              </Column>
+            ) : null
+          }
+        >
+          <List>
+            {draftPosts.map((p) => (
+              <PostItem key={p._id} post={p} />
+            ))}
+          </List>
+        </FloatAside>
       </Panel>
     </Column>
   )
