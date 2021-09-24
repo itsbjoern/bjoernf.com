@@ -8,7 +8,7 @@ compose.yml
 ---
 version: "2.1"
 services:
-  nginx:
+  nginx-proxy:
     image: nginxproxy/nginx-proxy
     container_name: nginx-proxy
     ports:
@@ -20,23 +20,32 @@ services:
       - html:/usr/share/nginx/html
       - /var/run/docker.sock:/tmp/docker.sock:ro
     restart: unless-stopped
-  acme:
+    network_mode: bridge
+  nginx-proxy-acme:
     image: nginxproxy/acme-companion
     container_name: nginx-proxy-acme
-    depends_on:
-      - nginx
     volumes_from:
-      - nginx
+      - nginx-proxy
     volumes:
-      - /var/run/docker.sock:/var/run/docker.sock:ro
+      - certs:/etc/nginx/certs:rw
       - acme:/etc/acme.sh
+      - /var/run/docker.sock:/var/run/docker.sock:ro
+    network_mode: bridge
     environment:
       DEFAULT_EMAIL: 05exhaust-beds@icloud.com
     restart: unless-stopped
 
 volumes:
-  certs: {}
-  vhost: {}
-  html: {}
-  acme: {}
+  conf:
+  vhost:
+  html:
+  dhparam:
+  certs:
+  acme:
+```
+
+### Create
+
+```
+  sudo docker-compose rm -f; sudo docker volume prune -f; sudo docker-compose -f docker-compose.yml -f prod.yml up -d --build
 ```

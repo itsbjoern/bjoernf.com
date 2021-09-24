@@ -4,6 +4,5 @@ RUN apk --no-cache add gcc musl-dev libffi-dev
 WORKDIR /api
 COPY requirements.txt requirements.txt
 RUN pip install -r requirements.txt
-EXPOSE 8000
 COPY blogapi blogapi
 CMD ["python", "-m", "blogapi"]

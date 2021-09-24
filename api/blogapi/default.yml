@@ -2,10 +2,7 @@
 connection:
   host: 127.0.0.1
   port: 8080
-
-web:
-  host: http://localhost
-  port: '3000'
+  webhost: http://localhost:3000
 
 jwt:
   secret: secret
