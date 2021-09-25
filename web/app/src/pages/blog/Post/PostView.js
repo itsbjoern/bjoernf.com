@@ -1,17 +1,10 @@
 import React from 'react'
 import moment from 'moment'
-import {
-  EmailShareButton,
-  LinkedinShareButton,
-  WhatsappShareButton,
-  TwitterShareButton,
-  EmailIcon,
-  LinkedinIcon,
-  WhatsappIcon,
-  TwitterIcon,
-} from 'react-share'
 
-import { template } from 'app/share'
+import { EmailIcon, LinkedinIcon, TwitterIcon, WhatsappIcon } from 'react-share'
+import { IconButton } from '@mui/material'
+
+import { emailLink, linkedinLink, whatsappLink, twitterLink } from 'app/share'
 
 import { Column, Row } from 'app/components/Flex'
 import { H2 } from 'app/components/Text'
@@ -19,34 +12,46 @@ import RichText from 'app/components/RichText'
 import Tag from 'app/components/Tag'
 import FloatAside from 'app/components/FloatAside'
 
+const ShareIcon = ({ href, size, Icon }) => (
+  <a href={href} target="_blank" rel="noreferrer">
+    <IconButton>
+      <Icon style={{ height: size - 16, width: size - 16 }} round />
+    </IconButton>
+  </a>
+)
+
 const PostView = ({ post }) => {
   const { draft, publishedVersion, createdAt } = post
   const { title, html, tags } = draft ? post : publishedVersion
   const url = window.location.href
-  const iconSize = 35
+  const iconSize = 45
 
   return (
     <FloatAside
-      width={30}
+      width={iconSize}
       gap={30}
       menu={
-        <Column>
-          <EmailShareButton subject={title} body={template({ url, title })}>
-            <EmailIcon size={iconSize} round />
-          </EmailShareButton>
-          <LinkedinShareButton
-            url={url}
-            title={title}
-            summary={template({ url, title, tags })}
-          >
-            <LinkedinIcon size={iconSize} round />
-          </LinkedinShareButton>
-          <TwitterShareButton url={template({ url, title })} hashtags={tags}>
-            <TwitterIcon size={iconSize} round />
-          </TwitterShareButton>
-          <WhatsappShareButton url={template({ url, title, tags })}>
-            <WhatsappIcon size={iconSize} round />
-          </WhatsappShareButton>
+        <Column gap={0}>
+          <ShareIcon
+            size={iconSize}
+            Icon={EmailIcon}
+            href={emailLink({ title, url, tags })}
+          />
+          <ShareIcon
+            size={iconSize}
+            Icon={LinkedinIcon}
+            href={linkedinLink({ title, url, tags })}
+          />
+          <ShareIcon
+            size={iconSize}
+            Icon={WhatsappIcon}
+            href={whatsappLink({ title, url, tags })}
+          />
+          <ShareIcon
+            size={iconSize}
+            Icon={TwitterIcon}
+            href={twitterLink({ title, url, tags })}
+          />
         </Column>
       }
       left={false}
