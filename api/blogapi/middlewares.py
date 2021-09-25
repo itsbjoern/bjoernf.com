@@ -1,5 +1,6 @@
 from aiohttp import web
 from aiohttp_middlewares import cors_middleware
+from aiohttp_middlewares.cors import DEFAULT_ALLOW_HEADERS
 import socket
 
 
@@ -38,7 +39,11 @@ def setup_middlewares(app):
   origins = [local, app['config']['connection.webhost']]
   app.middlewares.extend([
     error_middleware,
-    cors_middleware(origins=origins),
+    cors_middleware(
+      origins=origins,
+      allow_headers=[*DEFAULT_ALLOW_HEADERS, "Pageview-Id"],
+      expose_headers=['Pageview-Id']
+    ),
     easy_access_middleware,
     auth_middleware,
   ])

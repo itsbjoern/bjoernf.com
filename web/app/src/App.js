@@ -10,6 +10,7 @@ import styled from 'styled-components'
 
 import themeTemplate from 'app/theme'
 import { Column } from 'app/components/Flex'
+import Analytics from 'app/components/Analytics'
 
 import NotificationProvider from 'app/providers/NotificationProvider'
 import RequestProvider from 'app/providers/RequestProvider'
@@ -44,46 +45,49 @@ const AdaptiveContainer = styled(Container)`
 
 const App = () => {
   const [theme] = useState(() => createTheme(themeTemplate))
+
   return (
     <ThemeProvider theme={theme}>
       <AppStyle theme={theme}>
         <NotificationProvider>
           <RequestProvider>
             <Router>
-              <AdaptiveContainer maxWidth="md">
-                <Header />
-                <Column
-                  style={{
-                    paddingTop: 45,
-                    paddingBottom: 45,
-                    paddingLeft: 5,
-                    paddingRight: 5,
-                  }}
-                  flexed
-                >
-                  <Typography component={Column} flexed>
-                    <Switch>
-                      <Route exact path="/">
-                        <Home />
-                      </Route>
-                      <Route exact path="/blog">
-                        <Blog />
-                      </Route>
-                      <Route exact path="/blog/:id">
-                        <Post />
-                      </Route>
-                      <Route exact path="/projects">
-                        <Projects />
-                      </Route>
-                      <Route exact path="/admin">
-                        <Admin />
-                      </Route>
-                    </Switch>
-                  </Typography>
-                </Column>
-                <Footer />
-                <NavigationButtons mobile />
-              </AdaptiveContainer>
+              <Analytics>
+                <AdaptiveContainer maxWidth="md">
+                  <Header />
+                  <Column
+                    style={{
+                      paddingTop: 45,
+                      paddingBottom: 45,
+                      paddingLeft: 5,
+                      paddingRight: 5,
+                    }}
+                    flexed
+                  >
+                    <Typography component={Column} flexed>
+                      <Switch>
+                        <Route exact path="/">
+                          <Home />
+                        </Route>
+                        <Route exact path="/blog">
+                          <Blog />
+                        </Route>
+                        <Route exact path="/blog/:id">
+                          <Post />
+                        </Route>
+                        <Route exact path="/projects">
+                          <Projects />
+                        </Route>
+                        <Route exact path="/admin">
+                          <Admin />
+                        </Route>
+                      </Switch>
+                    </Typography>
+                  </Column>
+                  <Footer />
+                  <NavigationButtons mobile />
+                </AdaptiveContainer>
+              </Analytics>
             </Router>
           </RequestProvider>
         </NotificationProvider>

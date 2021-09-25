@@ -1,5 +1,5 @@
 import pathlib
-from .api import index, admin, blog
+from .api import index, admin, blog, analytics
 
 
 PROJECT_ROOT = pathlib.Path(__file__).parent
@@ -7,6 +7,8 @@ PROJECT_ROOT = pathlib.Path(__file__).parent
 
 def setup_routes(app):
   app.router.add_get('/', index.handler)
+
+  app.router.add_post('/api/heartbeat', analytics.heartbeat)
 
   app.router.add_get('/api/blog/posts', blog.get_all_posts_handler)
   app.router.add_get('/api/blog/posts/{id}', blog.get_post_handler)

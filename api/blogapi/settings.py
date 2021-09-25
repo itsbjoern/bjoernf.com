@@ -18,6 +18,8 @@ def update_with_env(config):
         for item in path[1:-1]:
           interim = interim.setdefault(item, {})
         interim[path[-1]] = val
+
+
 class Config(dict):
   def __getitem__(self, key):
     if key in self:
@@ -27,10 +29,11 @@ class Config(dict):
       config = self
       for key in path:
         config = config.get(key, None)
-        if config == None:
+        if config is None:
           raise KeyError()
       return config
     raise KeyError()
+
 
 def get_config():
   config = {}

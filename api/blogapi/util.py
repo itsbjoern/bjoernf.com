@@ -30,8 +30,8 @@ def dumps(data):
   return json.dumps(data, cls=ObjEnconder)
 
 
-def json_response(data):
-  return web.json_response(data, dumps=dumps)
+def json_response(data, **kwargs):
+  return web.json_response(data, dumps=dumps, **kwargs)
 
 
 def get_upload_path(path):

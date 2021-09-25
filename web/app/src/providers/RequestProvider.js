@@ -18,12 +18,12 @@ const UserProvider = ({ children }) => {
   }
 
   const sendRequest = useCallback(
-    ({ headers, ...payload }) => {
+    ({ headers, ...payload }, options) => {
       const rewrittenHeaders = headers || {}
       if (!!token) {
         rewrittenHeaders['Authorization'] = `Bearer ${token}`
       }
-      return request({ ...payload, headers: rewrittenHeaders })
+      return request({ ...payload, headers: rewrittenHeaders }, options)
     },
     [token]
   )
