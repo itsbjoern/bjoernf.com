@@ -21,6 +21,7 @@ import Blog from 'app/pages/blog/Blog'
 import Projects from 'app/pages/projects/Projects'
 import Post from 'app/pages/blog/Post'
 import Admin from 'app/pages/admin/Admin'
+import About from 'app/pages/about/About'
 
 import NavigationButtons from 'app/components/NavigationButtons'
 
@@ -80,6 +81,9 @@ const App = () => {
                         </Route>
                         <Route exact path="/admin">
                           <Admin />
+                        </Route>
+                        <Route exact path="/about">
+                          <About />
                         </Route>
                       </Switch>
                     </Typography>

@@ -23,7 +23,7 @@ const Ref = ({ text, href }) => {
     <React.Fragment>
       {' '}
       <LinkRender external={isExternal} href={href}>
-        {text}
+        {text || href}
         {isExternal ? (
           <TransitEnterexit
             color="primary"
