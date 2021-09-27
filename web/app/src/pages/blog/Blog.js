@@ -1,9 +1,10 @@
-import React, { useState, useEffect } from 'react'
+import React from 'react'
 import { List, Pagination, TextField, InputAdornment } from '@mui/material'
 import { Search } from '@mui/icons-material'
 
 import { withRouter } from 'react-router-dom'
 
+import { useSSR } from 'app/providers/SSRProvider'
 import { getPosts } from 'app/api/blog'
 import { withRequest } from 'app/providers/RequestProvider'
 import { withNotification } from 'app/providers/NotificationProvider'
@@ -30,21 +31,20 @@ const makeQuery = (page, search) => {
 }
 
 const Blog = ({ history, location, sendRequest, createNotification }) => {
-  const [posts, setPosts] = useState([])
-  const [pageCount, setPageCount] = useState(1)
-
   const query = new URLSearchParams(location.search)
   const currentPage = parseInt(query.get('page')) || 1
   const currentSearch = query.get('search') || ''
 
-  useEffect(() => {
-    sendRequest(getPosts({ page: currentPage, search: currentSearch }))
-      .then(({ posts, numPages }) => {
-        setPosts(posts)
-        setPageCount(numPages)
-      })
-      .catch((err) => createNotification(`Fetch failed: ${err}`, 'error'))
-  }, [currentPage, currentSearch])
+  const [data] = useSSR(
+    sendRequest(getPosts({ page: currentPage, search: currentSearch })),
+    {
+      deps: [currentPage, currentSearch],
+      init: {},
+      chainCatch: (err) => createNotification(`Fetch failed: ${err}`, 'error'),
+    }
+  )
+
+  const { posts = [], numPages } = data
 
   return (
     <Column>
@@ -85,7 +85,7 @@ const Blog = ({ history, location, sendRequest, createNotification }) => {
       <Pagination
         onChange={(event, value) => makeQuery(value, currentSearch)}
         page={currentPage}
-        count={pageCount}
+        count={numPages}
         color="primary"
       />
     </Column>

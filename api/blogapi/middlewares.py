@@ -23,7 +23,6 @@ async def easy_access_middleware(app, handler):
 
 async def auth_middleware(app, handler):
   async def mid(request):
-    request['user'] = None
     auth_header = request.headers.get('Authorization', None)
     if auth_header:
       db = request.use('db')

@@ -49,15 +49,11 @@ export const emailLink = (input) => {
   )
 }
 
-const isMobileOrTablet = () => {
-  return /(android|iphone|ipad|mobile)/i.test(navigator.userAgent)
-}
-
-export const whatsappLink = (input) => {
+export const whatsappLink = (input, mobile) => {
   const templated = template({ type: 'whatsapp', ...input })
   return (
     'https://' +
-    (isMobileOrTablet() ? 'api' : 'web') +
+    (mobile ? 'api' : 'web') +
     '.whatsapp.com/send' +
     objectToGetParams({
       text: templated,

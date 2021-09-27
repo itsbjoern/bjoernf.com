@@ -1,4 +1,4 @@
-import React, { useRef, useCallback, useState, useEffect } from 'react'
+import React, { useRef, useCallback, useState } from 'react'
 
 import { withRouter } from 'react-router-dom'
 import { getPost } from 'app/api/blog'
@@ -10,6 +10,7 @@ import {
 import { Alert, Button, FormControlLabel, Switch } from '@mui/material'
 import { Delete } from '@mui/icons-material'
 
+import { useSSR } from 'app/providers/SSRProvider'
 import { withRequest } from 'app/providers/RequestProvider'
 import { withNotification } from 'app/providers/NotificationProvider'
 import NotFound from 'app/pages/404'
@@ -32,15 +33,12 @@ const Post = ({
 
   const [loading, setLoading] = useState(true)
   const [editing, setEditing] = useState(location.hash === '#edit' && !!token)
-  const [post, setPost] = useState(null)
   const updateTimeout = useRef()
 
-  useEffect(() => {
-    sendRequest(getPost(postId))
-      .then(({ post }) => setPost(post))
-      .catch(() => {})
-      .finally(() => setLoading(false))
-  }, [])
+  const [post, setPost] = useSSR(sendRequest(getPost(postId)), {
+    chainThen: (data) => data.post,
+    chainFinally: () => setLoading(false),
+  })
 
   const updatePost = useCallback(
     (update) => {

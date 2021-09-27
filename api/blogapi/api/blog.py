@@ -52,7 +52,7 @@ async def get_post_handler(request):
   query = {'_id': bson.ObjectId(post_id), 'draft': False}
   projection = public_projection
 
-  if request['user']:
+  if request.get('user'):
     del query['draft']
     projection = None
 
@@ -67,7 +67,7 @@ async def get_tags(request):
   db = request.use('db')
 
   query = {}
-  if not request['user']:
+  if request.get('user'):
     query['draft'] = False
 
   tags = db.posts.distinct('tags', query)

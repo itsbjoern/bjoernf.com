@@ -4,6 +4,8 @@ import { withRouter } from 'react-router-dom'
 import { heartbeat } from 'app/api/analytics'
 import { withRequest } from 'app/providers/RequestProvider'
 
+import { isSSR } from 'app/util'
+
 const getTimezone = () => {
   try {
     return Intl.DateTimeFormat().resolvedOptions().timeZone
@@ -106,6 +108,10 @@ const buildAnalytics = ({ change }) => {
 
 const Analytics = ({ history, location, children, sendRequest }) => {
   useEffect(() => {
+    if (isSSR) {
+      return
+    }
+
     let prevLocation = null
     let pageViewId = null
     const listener = (change) => {

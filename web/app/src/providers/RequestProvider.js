@@ -1,17 +1,22 @@
 import React, { useState, useCallback, useContext, forwardRef } from 'react'
 
 import { request } from 'app/api'
+import { isSSR } from 'app/util'
 
 export const RequestContext = React.createContext(null)
 
 const UserProvider = ({ children }) => {
-  const [token, _setToken] = useState(localStorage.getItem('authToken'))
+  const [token, _setToken] = useState(
+    isSSR ? '' : localStorage.getItem('authToken')
+  )
 
   const setToken = (newToken) => {
-    if (newToken) {
-      localStorage.setItem('authToken', newToken)
-    } else {
-      localStorage.removeItem('authToken')
+    if (!isSSR) {
+      if (newToken) {
+        localStorage.setItem('authToken', newToken)
+      } else {
+        localStorage.removeItem('authToken')
+      }
     }
 
     _setToken(newToken)

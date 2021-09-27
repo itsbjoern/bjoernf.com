@@ -1,7 +1,7 @@
 /*
   https://coolors.co/9e829c-381d2a-ff570a-eef1f3-3f403f
 */
-import styled from 'styled-components'
+import styled from '@emotion/styled'
 
 export default {
   typography: {

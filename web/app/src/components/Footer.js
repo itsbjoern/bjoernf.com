@@ -1,7 +1,7 @@
 import React from 'react'
 
 import { withRouter } from 'react-router-dom'
-import styled from 'styled-components'
+import styled from '@emotion/styled'
 import { withTheme } from '@mui/styles'
 
 import { morphMixin } from 'app/theme'

@@ -1,10 +1,17 @@
 import React from 'react'
 
 import { withRouter } from 'react-router-dom'
-import styled from 'styled-components'
+import styled from '@emotion/styled'
 
 import { BottomNavigation, BottomNavigationAction } from '@mui/material'
 import { Home, Receipt, AccountTree } from '@mui/icons-material'
+import UnstyledLink from 'app/components/UnstyledLink'
+
+const FullButton = ({ to, ...props }) => (
+  <UnstyledLink to={to}>
+    <BottomNavigationAction {...props} />
+  </UnstyledLink>
+)
 
 const StyledNav = styled(BottomNavigation)`
   &&& {
@@ -23,22 +30,15 @@ const StyledNav = styled(BottomNavigation)`
 `
 
 const paths = ['/', '/blog', '/projects']
-const NavigationButtons = ({ location, history, mobile }) => {
+const NavigationButtons = ({ location, mobile }) => {
   const split = location.pathname.split('/')
   const menuIndex = split.length === 1 ? 0 : paths.indexOf('/' + split[1])
 
   return (
-    <StyledNav
-      showLabels
-      value={menuIndex}
-      onChange={(event, newValue) => {
-        history.push(paths[newValue])
-      }}
-      mobile={mobile ? 'true' : null}
-    >
-      <BottomNavigationAction label="Home" icon={<Home />} />
-      <BottomNavigationAction label="Blog" icon={<Receipt />} />
-      <BottomNavigationAction label="Projects" icon={<AccountTree />} />
+    <StyledNav showLabels value={menuIndex} mobile={mobile ? 'true' : null}>
+      <FullButton to={paths[0]} label="Home" icon={<Home />} />
+      <FullButton label="Blog" icon={<Receipt />} to={paths[1]} />
+      <FullButton label="Projects" icon={<AccountTree />} to={paths[2]} />
     </StyledNav>
   )
 }

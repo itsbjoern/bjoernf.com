@@ -1,14 +1,16 @@
 import React, { useState } from 'react'
-import { BrowserRouter as Router, Switch, Route } from 'react-router-dom'
+import { BrowserRouter, StaticRouter, Switch, Route } from 'react-router-dom'
+
 import {
   Container,
   ThemeProvider,
   Typography,
   createTheme,
 } from '@mui/material'
-import styled from 'styled-components'
+import styled from '@emotion/styled'
 
 import themeTemplate from 'app/theme'
+import { isSSR } from 'app/util'
 import { Column } from 'app/components/Flex'
 import Analytics from 'app/components/Analytics'
 
@@ -44,7 +46,17 @@ const AdaptiveContainer = styled(Container)`
   }
 `
 
-const App = () => {
+const SSRSupport = ({ ssr, children }) => {
+  return (
+    <StaticRouter location={ssr.rel_url} staticContext={ssr}>
+      {children}
+    </StaticRouter>
+  )
+}
+
+const RouterLayer = isSSR ? SSRSupport : BrowserRouter
+
+const App = (props) => {
   const [theme] = useState(() => createTheme(themeTemplate))
 
   return (
@@ -52,7 +64,7 @@ const App = () => {
       <AppStyle theme={theme}>
         <NotificationProvider>
           <RequestProvider>
-            <Router>
+            <RouterLayer ssr={props.ssr}>
               <Analytics>
                 <AdaptiveContainer maxWidth="md">
                   <Header />
@@ -92,7 +104,7 @@ const App = () => {
                   <NavigationButtons mobile />
                 </AdaptiveContainer>
               </Analytics>
-            </Router>
+            </RouterLayer>
           </RequestProvider>
         </NotificationProvider>
       </AppStyle>

@@ -1,7 +1,7 @@
 import React from 'react'
 
 import { withRouter } from 'react-router-dom'
-import styled from 'styled-components'
+import styled from '@emotion/styled'
 import { Avatar, Divider, Chip } from '@mui/material'
 import { withTheme } from '@mui/styles'
 import {

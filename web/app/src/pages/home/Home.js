@@ -1,7 +1,8 @@
-import React, { useState, useEffect } from 'react'
+import React from 'react'
 
 import { Divider, List } from '@mui/material'
 
+import { useSSR } from 'app/providers/SSRProvider'
 import { withRequest } from 'app/providers/RequestProvider'
 import { getPosts } from 'app/api/blog'
 
@@ -11,11 +12,11 @@ import Ref from 'app/components/Ref'
 import PostItem from 'app/components/PostItem'
 
 const Home = ({ sendRequest }) => {
-  const [posts, setPosts] = useState([])
+  const [posts] = useSSR(sendRequest(getPosts()), {
+    init: [],
+    chainThen: (data) => data.posts,
+  })
 
-  useEffect(() => {
-    sendRequest(getPosts()).then(({ posts }) => setPosts(posts))
-  }, [])
   return (
     <Column gap={30}>
       <span>

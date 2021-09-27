@@ -3,9 +3,9 @@ import React, { useState } from 'react'
 import { withTheme } from '@mui/styles'
 import { useRemirrorContext } from '@remirror/react'
 
-import styled from 'styled-components'
+import styled from '@emotion/styled'
 
-const StyledEditor = withTheme(styled.div`
+export const StyledEditor = withTheme(styled.div`
   .remirror-editor {
     box-sizing: border-box;
     position: relative;
@@ -33,7 +33,7 @@ const StyledEditor = withTheme(styled.div`
 
     pre {
       tab-size: 2;
-      padding: 17px 25px;
+      padding: 10px 15px;
       display: table;
       padding-right: 100px;
       max-width: 100%;
