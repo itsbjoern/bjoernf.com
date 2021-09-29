@@ -110,7 +110,7 @@ export const useSSR = (request, options) => {
       return [chainThen(resolvedData), setData]
     }
 
-    addResolve(pseudoId, request)
+    addResolve(pseudoId, request())
   }
 
   return [data, setData]
