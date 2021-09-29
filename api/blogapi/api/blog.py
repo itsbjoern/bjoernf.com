@@ -1,3 +1,4 @@
+import time
 from aiohttp import web
 import bson
 import pymongo
@@ -6,12 +7,12 @@ import re
 from blogapi import util
 
 
-public_projection = {'publishedVersion': 1, 'createdAt': 1, 'draft': True, 'tags': 1}
+public_projection = {'published': 1, 'createdAt': 1}
 
 
 async def get_all_posts_handler(request):
   db = request.use('db')
-  query = {'draft': False}
+  query = {'published': {'$exists': True}}
 
   projection = public_projection
   if request.get('user'):
@@ -24,9 +25,9 @@ async def get_all_posts_handler(request):
     query = {
       **query,
       '$or': [
-        {'publishedVersion.text': {'$regex': rgx}},
-        {'publishedVersion.title': {'$regex': rgx}},
-        {'publishedVersion.tags': {'$regex': rgx}}
+        {'published.text': {'$regex': rgx}},
+        {'published.title': {'$regex': rgx}},
+        {'published.tags': {'$regex': rgx}}
       ]
     }
 
@@ -49,11 +50,11 @@ async def get_post_handler(request):
     return web.HTTPBadRequest(reason="No post id")
 
   db = request.use('db')
-  query = {'_id': bson.ObjectId(post_id), 'draft': False}
+  query = {'_id': bson.ObjectId(post_id), 'published': {'$exists': True}}
   projection = public_projection
 
   if request.get('user'):
-    del query['draft']
+    del query['published']
     projection = None
 
   post = db.posts.find_one(query, projection)
@@ -66,10 +67,6 @@ async def get_post_handler(request):
 async def get_tags(request):
   db = request.use('db')
 
-  query = {}
-  if request.get('user'):
-    query['draft'] = False
-
-  tags = db.posts.distinct('tags', query)
+  tags = db.posts.distinct('published.tags')
 
   return util.json_response({'tags': tags})

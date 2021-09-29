@@ -28,7 +28,14 @@ const UserProvider = ({ children }) => {
       if (!!token) {
         rewrittenHeaders['Authorization'] = `Bearer ${token}`
       }
-      return request({ ...payload, headers: rewrittenHeaders }, options)
+      return request({ ...payload, headers: rewrittenHeaders }, options).catch(
+        (e) => {
+          if (e.status == 401) {
+            setToken(null)
+          }
+          return Promise.reject(e)
+        }
+      )
     },
     [token]
   )

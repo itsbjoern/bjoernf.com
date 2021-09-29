@@ -17,7 +17,9 @@ const Login = ({ sendRequest, setToken, createNotification }) => {
       .then((response) => {
         setToken(response.token)
       })
-      .catch((err) => createNotification(`Login failed: ${err}`, 'error'))
+      .catch((err) =>
+        createNotification(`Login failed: ${err.message}`, 'error')
+      )
   }, [username, password, sendRequest])
 
   return (

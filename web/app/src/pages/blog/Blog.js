@@ -1,6 +1,13 @@
-import React from 'react'
-import { List, Pagination, TextField, InputAdornment } from '@mui/material'
-import { Search } from '@mui/icons-material'
+import React, { useState } from 'react'
+import {
+  List,
+  Pagination,
+  TextField,
+  InputAdornment,
+  IconButton,
+  CircularProgress,
+} from '@mui/material'
+import { Search, Clear } from '@mui/icons-material'
 
 import { withRouter } from 'react-router-dom'
 
@@ -12,6 +19,7 @@ import { withNotification } from 'app/providers/NotificationProvider'
 import { Row, Column } from 'app/components/Flex'
 import { H2 } from 'app/components/Text'
 import PostItem from 'app/components/PostItem'
+import UnstyledLink from 'app/components/UnstyledLink'
 
 const makeQuery = (page, search) => {
   const params = {}
@@ -34,13 +42,18 @@ const Blog = ({ history, location, sendRequest, createNotification }) => {
   const query = new URLSearchParams(location.search)
   const currentPage = parseInt(query.get('page')) || 1
   const currentSearch = query.get('search') || ''
+  const [isLoading, setIsLoading] = useState(true)
 
   const [data] = useSSR(
-    sendRequest(getPosts({ page: currentPage, search: currentSearch })),
+    () => sendRequest(getPosts({ page: currentPage, search: currentSearch })),
     {
       deps: [currentPage, currentSearch],
       init: {},
-      chainCatch: (err) => createNotification(`Fetch failed: ${err}`, 'error'),
+      delay: 200,
+      chainFirst: () => setIsLoading(true),
+      chainCatch: (err) =>
+        createNotification(`Fetch failed: ${err.message}`, 'error'),
+      chainFinally: () => setIsLoading(false),
     }
   )
 
@@ -71,10 +84,23 @@ const Blog = ({ history, location, sendRequest, createNotification }) => {
                   <Search />
                 </InputAdornment>
               ),
+              endAdornment: (
+                <InputAdornment position="end">
+                  <UnstyledLink
+                    to="/blog"
+                    style={currentSearch ? {} : { visibility: 'hidden' }}
+                  >
+                    <IconButton edge="end" size="small">
+                      <Clear />
+                    </IconButton>
+                  </UnstyledLink>
+                </InputAdornment>
+              ),
             }}
           />
         </Row>
       </Row>
+      <Row justify="center">{isLoading ? <CircularProgress /> : null}</Row>
       <Column>
         <List>
           {posts.map((p) => (

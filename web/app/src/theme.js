@@ -9,7 +9,7 @@ export default {
   },
   palette: {
     background: {
-      default: '#f2f2f2',
+      default: '#f1f1f1',
       paper: '#eef1f3',
       offset: '#778DA9',
     },
@@ -26,10 +26,10 @@ export default {
   },
 }
 
-export const morphMixin = `
+export const morphMixin = (size = 7) => `
   border-radius: 10px;
-  box-shadow:  7px 7px 14px #e1e1e1,
-  -7px -7px 14px #ffffff;
+  box-shadow: ${size}px ${size}px ${size * 2}px #e1e1e1,
+  -${size}px -${size}px ${size * 2}px #ffffff;
 `
 
 export const Morph = styled.div`

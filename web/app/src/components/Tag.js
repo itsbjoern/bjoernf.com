@@ -1,16 +1,19 @@
 import React from 'react'
 
-import { Chip } from '@mui/material'
-import { withRouter } from 'react-router-dom'
+import { Chip, Button } from '@mui/material'
+import styled from '@emotion/styled'
+import UnstyledLink from 'app/components/UnstyledLink'
 
-const Tag = ({ name, onDelete, size, history }) => (
-  <Chip
-    style={{ padding: '4px' }}
-    size={size}
-    label={name}
-    onDelete={onDelete}
-    onClick={() => history.push(`/blog?search=${name}`)}
-  />
+const StyledChip = styled(Chip)`
+  padding: 4px;
+  text-transform: none;
+  cursor: pointer;
+`
+
+const Tag = ({ name, onDelete, size }) => (
+  <UnstyledLink to={`/blog?search=${name}`}>
+    <StyledChip as={Button} size={size} label={name} onDelete={onDelete} />
+  </UnstyledLink>
 )
 
-export default withRouter(Tag)
+export default Tag

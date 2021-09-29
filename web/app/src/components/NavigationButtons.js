@@ -8,7 +8,7 @@ import { Home, Receipt, AccountTree } from '@mui/icons-material'
 import UnstyledLink from 'app/components/UnstyledLink'
 
 const FullButton = ({ to, ...props }) => (
-  <UnstyledLink to={to}>
+  <UnstyledLink style={{ minWidth: 85, flex: 1 }} to={to}>
     <BottomNavigationAction {...props} />
   </UnstyledLink>
 )
@@ -36,7 +36,7 @@ const NavigationButtons = ({ location, mobile }) => {
 
   return (
     <StyledNav showLabels value={menuIndex} mobile={mobile ? 'true' : null}>
-      <FullButton to={paths[0]} label="Home" icon={<Home />} />
+      <FullButton label="Home" icon={<Home />} to={paths[0]} />
       <FullButton label="Blog" icon={<Receipt />} to={paths[1]} />
       <FullButton label="Projects" icon={<AccountTree />} to={paths[2]} />
     </StyledNav>

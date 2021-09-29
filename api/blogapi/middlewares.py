@@ -1,4 +1,5 @@
 from aiohttp import web
+from aiohttp.web_exceptions import HTTPException
 from aiohttp_middlewares import cors_middleware
 from aiohttp_middlewares.cors import DEFAULT_ALLOW_HEADERS
 import socket
@@ -6,11 +7,10 @@ import socket
 
 async def error_middleware(app, handler):
   async def mid(request):
-    response = await handler(request)
-    if response.status == 500:
-      return response
-      # return web.json_response({'ok': False}, status=500)
-    return response
+    try:
+      return await handler(request)
+    except HTTPException as e:
+      return web.Response(status=e.status, reason=e.reason, text=e.text)
   return mid
 
 
@@ -27,8 +27,10 @@ async def auth_middleware(app, handler):
     if auth_header:
       db = request.use('db')
       user = db.users.find_one({'token': auth_header[7:]})
-
-      request['user'] = user
+      if user:
+        request['user'] = user
+      else:
+        raise web.HTTPUnauthorized()
     return await handler(request)
   return mid
 
@@ -37,12 +39,12 @@ def setup_middlewares(app):
   local = 'http://' + socket.gethostbyname(socket.gethostname()) + ':3000'
   origins = [local, app['config']['connection.webhost']]
   app.middlewares.extend([
-    error_middleware,
     cors_middleware(
       origins=origins,
       allow_headers=[*DEFAULT_ALLOW_HEADERS, "Pageview-Id"],
       expose_headers=['Pageview-Id']
     ),
+    error_middleware,
     easy_access_middleware,
     auth_middleware,
   ])

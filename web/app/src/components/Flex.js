@@ -13,13 +13,14 @@ const translate = {
 
 export const Flex = styled.div`
   display: flex;
-  flex: ${({ flexed }) => (flexed ? 1 : 'initial')};
   align-items: ${({ align }) => translate[align || 'normal']};
   justify-content: ${({ justify }) => translate[justify || 'normal']};
+  ${({ flexed }) => (flexed ? `flex: 1;` : '')}
   ${({ wrapping }) => (wrapping ? `flex-wrap: wrap;` : '')}
   ${({ grow }) => (grow ? `flex-grow: ${grow};` : '')}
   ${({ shrink }) => (shrink ? `flex-shrink: ${shrink};` : '')}
-  gap: ${({ gap }) => gap || 0}px;
+  ${({ alignSelf }) => (alignSelf ? `align-self: ${alignSelf};` : '')}
+  ${({ gap }) => (gap ? `gap: ${gap || 0}px;` : '')}
 
   @media only screen and (max-width: 425px) {
     ${({ mobileWrapping }) => (mobileWrapping ? 'flex-wrap: wrap;' : '')}

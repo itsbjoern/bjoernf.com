@@ -24,4 +24,4 @@ function watch(dir, config) {
   )
 }
 
-watch(path.join(__dirname, '..', 'app', 'src')) //<- watching the ./watchme/ directory
+watch(path.join(__dirname, '..', 'node')) //<- watching the ./watchme/ directory

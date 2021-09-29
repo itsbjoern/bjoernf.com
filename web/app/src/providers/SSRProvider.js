@@ -1,4 +1,10 @@
-import React, { useState, useEffect, useContext, useRef } from 'react'
+import React, {
+  useState,
+  useEffect,
+  useContext,
+  useRef,
+  useCallback,
+} from 'react'
 import { isSSR } from 'app/util'
 
 export let SSRContext = null
@@ -54,12 +60,15 @@ const SSRProvider = ({ children }) => {
 
 export const useSSR = (request, options) => {
   const ssrDidChain = useRef(false)
+  const timeout = useRef()
   const { getResolvedData, addResolve, counter } = SSRContext
     ? useContext(SSRContext)
     : {}
   const {
     init = null,
     deps = [],
+    delay = null,
+    chainFirst,
     chainThen = (data) => data,
     chainCatch,
     chainFinally,
@@ -67,12 +76,27 @@ export const useSSR = (request, options) => {
 
   const [data, setData] = useState(init)
 
-  useEffect(() => {
-    request
+  const runFetch = useCallback(() => {
+    chainFirst && chainFirst()
+    request()
       .then((data) => setData(chainThen(data)))
       .catch(chainCatch)
       .finally(chainFinally)
   }, deps)
+
+  useEffect(() => {
+    if (delay) {
+      if (timeout.current) {
+        clearTimeout(timeout.current)
+      }
+      timeout.current = setTimeout(() => {
+        runFetch()
+        timeout.current = null
+      }, delay)
+    } else {
+      runFetch()
+    }
+  }, [runFetch, delay])
 
   // The SSR component return instantly, register requests with a counter for the current page and return
   if (isSSR) {

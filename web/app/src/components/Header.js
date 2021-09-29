@@ -22,7 +22,7 @@ import { morphMixin } from 'app/theme'
 const BG = withTheme(styled(Column)`
   background-color: ${({ theme }) => theme.palette.background.paper};
   padding: 15px;
-  ${morphMixin}
+  ${morphMixin()}
   border-radius: 0 0 10px 10px;
 `)
 

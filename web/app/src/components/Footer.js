@@ -11,7 +11,7 @@ import Ref from 'app/components/Ref'
 const BG = withTheme(styled(Column)`
   background-color: ${({ theme }) => theme.palette.background.paper};
   padding: 30px;
-  ${morphMixin}
+  ${morphMixin()}
   border-radius: 10px 10px 0 0;
 `)
 

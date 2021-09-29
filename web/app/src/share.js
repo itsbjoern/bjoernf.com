@@ -68,7 +68,7 @@ export const twitterLink = (input) => {
     objectToGetParams({
       url: input.url + '?utm_share=twitter',
       text: input.title,
-      hashtags: input.tags.length > 0 ? input.tags.join(',') : undefined,
+      hashtags: input.tags?.length > 0 ? input.tags.join(',') : undefined,
       related: undefined,
     })
   )

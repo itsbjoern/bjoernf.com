@@ -9,8 +9,6 @@ const UnstyledLink = styled(Link)`
     display: flex;
     align-items: center;
     text-decoration: none;
-    min-width: 85px;
-    flex: 1;
     color: initial;
   }
 `

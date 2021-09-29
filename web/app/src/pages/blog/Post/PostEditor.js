@@ -20,7 +20,6 @@ import Tag from 'app/components/Tag'
 
 const PostEditor = ({ post, updatePost, sendRequest }) => {
   const [newTag, setNewTag] = useState('')
-
   const [availableTags, setAvailableTags] = useState([])
 
   useEffect(() => {
@@ -28,6 +27,8 @@ const PostEditor = ({ post, updatePost, sendRequest }) => {
       setAvailableTags(tags)
     })
   }, [])
+
+  const { title, tags, html } = post.draft ?? post.published
 
   const uploadHandler = useCallback(
     (file) =>
@@ -58,11 +59,11 @@ const PostEditor = ({ post, updatePost, sendRequest }) => {
               onChange={(event) => setNewTag(event.target.value)}
               label="Add Tag"
               onKeyDown={(e) => {
-                if (newTag === '' || post.tags?.includes(newTag)) {
+                if (newTag === '' || tags?.includes(newTag)) {
                   return
                 }
                 if (e.key === 'Enter') {
-                  updatePost({ tags: [...(post.tags || []), newTag] })
+                  updatePost({ tags: [...(tags || []), newTag] })
                   setNewTag('')
                 }
               }}
@@ -80,23 +81,23 @@ const PostEditor = ({ post, updatePost, sendRequest }) => {
         />
         <IconButton
           size="small"
-          disabled={newTag === '' || post.tags?.includes(newTag)}
+          disabled={newTag === '' || tags?.includes(newTag)}
           onClick={() => {
-            updatePost({ tags: [...(post.tags || []), newTag] })
+            updatePost({ tags: [...(tags || []), newTag] })
             setNewTag('')
           }}
         >
           <ControlPoint />
         </IconButton>
         <Row gap={5} flexed wrapping>
-          {post.tags?.map((t, i) => {
+          {tags?.map((t, i) => {
             return (
               <Tag
                 key={t}
                 name={t}
                 onDelete={() => {
-                  post.tags.splice(i, 1)
-                  const newTags = [...post.tags]
+                  tags.splice(i, 1)
+                  const newTags = [...tags]
                   updatePost({ tags: newTags })
                 }}
               />
@@ -105,7 +106,7 @@ const PostEditor = ({ post, updatePost, sendRequest }) => {
         </Row>
       </Row>
       <TextField
-        value={post.title}
+        value={title}
         onChange={(event) => updatePost({ title: event.target.value })}
         label="Title"
         InputProps={{
@@ -116,11 +117,7 @@ const PostEditor = ({ post, updatePost, sendRequest }) => {
           ),
         }}
       />
-      <RichText
-        content={post.html}
-        onChange={updatePost}
-        upload={uploadHandler}
-      />
+      <RichText content={html} onChange={updatePost} upload={uploadHandler} />
     </Column>
   )
 }

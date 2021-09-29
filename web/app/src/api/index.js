@@ -23,7 +23,10 @@ export const request = ({ url, headers, ...rest }, options) => {
   })
     .then((response) => {
       if (response.status !== 200) {
-        return Promise.reject({ message: response.statusText })
+        return Promise.reject({
+          message: response.statusText,
+          status: response.status,
+        })
       }
       return response
         .json()
@@ -38,7 +41,7 @@ export const request = ({ url, headers, ...rest }, options) => {
         })
         .catch((err) => Promise.reject(err))
     })
-    .catch((err) => Promise.reject(err.message))
+    .catch((err) => Promise.reject(err))
 }
 
 export const get = (endpoint) => {

@@ -24,8 +24,8 @@ const ShareIcon = ({ href, size, Icon }) => (
 )
 
 const PostView = ({ post, staticContext }) => {
-  const { draft, publishedVersion, createdAt } = post
-  const { title, html, tags } = draft ? post : publishedVersion
+  const { draft, published, createdAt } = post
+  const { title, html, tags } = draft ?? published
   const url = isSSR ? staticContext.url : window.location.href
   const userAgent = isSSR ? staticContext.userAgent : navigator.userAgent
   const iconSize = 45

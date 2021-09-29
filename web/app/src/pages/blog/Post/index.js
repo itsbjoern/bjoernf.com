@@ -35,7 +35,7 @@ const Post = ({
   const [editing, setEditing] = useState(location.hash === '#edit' && !!token)
   const updateTimeout = useRef()
 
-  const [post, setPost] = useSSR(sendRequest(getPost(postId)), {
+  const [post, setPost] = useSSR(() => sendRequest(getPost(postId)), {
     chainThen: (data) => data.post,
     chainFinally: () => setLoading(false),
   })
@@ -62,7 +62,8 @@ const Post = ({
   const publishPost = useCallback(() => {
     sendRequest(publishPostAPI(post._id))
       .then(({ post: updatedPost }) => {
-        setPost({ ...post, ...updatedPost })
+        const { draft: _, ...newPost } = { ...post, ...updatedPost }
+        setPost(newPost)
         createNotification('Post published', 'success')
       })
       .catch(() => {
@@ -83,14 +84,10 @@ const Post = ({
       menu={
         token ? (
           <Column gap={20}>
-            <Alert
-              severity={post.draft || post.draftChanges ? 'warning' : 'success'}
-            >
+            <Alert severity={post.draft ? 'warning' : 'success'}>
               Status:{' '}
-              {post.draft
-                ? 'Draft'
-                : `Version ${post.publishedVersion.version}`}
-              {!post.draft && post.draftChanges ? ' (Changes)' : ''}
+              {!post.published ? 'Draft' : `Version ${post.published.version}`}
+              {post.published && post.draft ? ' (Changes)' : ''}
             </Alert>
             <Row justify="center">
               <FormControlLabel

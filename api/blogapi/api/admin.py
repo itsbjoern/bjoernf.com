@@ -40,7 +40,7 @@ async def login_handler(request):
 async def create_post(request):
   db = request.use('db')
 
-  insert = {'createdAt': datetime.datetime.now(), 'draft': True}
+  insert = {'createdAt': datetime.datetime.now(), 'draft': {}}
   op = db.posts.insert_one(insert)
 
   return util.json_response({'post': {'_id': op.inserted_id, **insert}})
@@ -49,7 +49,7 @@ async def create_post(request):
 @util.auth
 async def get_drafts(request):
   db = request.use('db')
-  query = {'draft': True}
+  query = {'draft': {'$exists': 1}}
 
   page = int(request.query.get('page', 1))
   limit = int(request.query.get('limit', 10))
@@ -73,7 +73,7 @@ async def update_post(request):
 
   db = request.use('db')
   the_update = {'updatedAt': datetime.datetime.now(),
-                'draftChanges': True, **data}
+                **{f'draft.{key}': val for key, val in data.items()}}
 
   op = db.posts.update_one({'_id': bson.ObjectId(post_id)},
                            {'$set': the_update})
@@ -94,30 +94,32 @@ async def publish(request):
   if not post:
     return web.HTTPNotFound(reason="Post does not exist")
 
+  draft = post.get('draft', None)
+  if not draft:
+    return web.HTTPBadRequest(reason="No staged changes found")
+
   remove_multi = re.compile(r"\s+")
-  summary = '.'.join(post['text'].split('.')[:3]) + '.'
+  summary = '.'.join(draft['text'].split('.')[:3]) + '.'
   summary = remove_multi.sub(" ", summary).strip()
 
-  title = post.get('title')
-  html = post.get('html')
+  title = draft.get('title')
+  html = draft.get('html')
 
   if not title or not html:
     return web.HTTPBadRequest(reason="Title and text are required")
 
   version = {
     'title': title,
-    'text': post['text'],
+    'text': draft['text'],
     'summary': summary,
     'html': html,
-    'tags': post.get('tags'),
+    'tags': draft.get('tags', []),
     'publishedAt': datetime.datetime.now(),
-    'version': post.get('publishedVersion', {}).get('version', 0) + 1
+    'version': post.get('published', {}).get('version', 0) + 1
   }
 
   db.posts.update_one({'_id': bson.ObjectId(post_id)},
-                      {'$set': {'draft': False,
-                                'draftChanges': False,
-                                'publishedVersion': version}})
+                      {'$unset': {'draft': True}, '$set': {'published': version}})
 
   post = db.posts.find_one({'_id': bson.ObjectId(post_id)})
   return util.json_response({'post': post})
@@ -134,9 +136,15 @@ async def unpublish(request):
   if not post:
     return web.HTTPNotFound(reason="Post does not exist")
 
+  update = None
+  if post.get('draft') is None:
+    update = [{'$set': {'draft': '$published'}}, {'$unset': {'published': 1}}]
+  else:
+    update = {'$unset': {'published': 1}}
   db.posts.update_one({'_id': bson.ObjectId(post_id)},
-                      {'$set': {'draft': True}})
+                      update)
 
+  post = db.posts.find_one(bson.ObjectId(post_id))
   return util.json_response({'post': post})
 
 
