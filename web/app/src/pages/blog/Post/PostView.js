@@ -37,7 +37,7 @@ const PostView = ({ post, staticContext }) => {
       width={iconSize}
       gap={30}
       menu={
-        <Column gap={0}>
+        <Column gap={0} mobileDirection="row">
           <ShareIcon
             size={iconSize}
             Icon={EmailIcon}

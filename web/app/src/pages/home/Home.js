@@ -50,7 +50,7 @@ const Home = ({ sendRequest }) => {
         <Ref text="Simply Do Ideas" href="https://simplydo.co.uk" />.
       </span>
       <span>
-        I am currently working on my PhD at{' '}
+        I am currently working on my research towards a PhD at{' '}
         <Ref text="Cardiff University" href="https://cardiff.ac.uk" /> (started
         in 2019). I have always been fascinated with the psychology surrounding
         the use of technology and being able to research Human Computer

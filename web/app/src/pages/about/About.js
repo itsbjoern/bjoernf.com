@@ -27,17 +27,21 @@ const About = () => {
         <H4>How it's made</H4>
       </span>
       <span>
-        This website is built using React and delivered using aiohttp and
+        This website is built using React and delivered using{' '}
+        <Ref text="aiohttp" href="https://docs.aiohttp.org/en/stable/" /> and
         supported by MongoDB. Everything is dockerised and I use this handy
         <Ref
           text="Let's Encrypt Companion"
           href="https://github.com/nginx-proxy/acme-companion"
         />
-        to do the signing legwork for me.
+        to do the signing legwork for me. You can visit <Ref href="/node" /> to
+        view a static server-side rendered version of this website (in case
+        javascript is disabled).
       </span>
       <span>
-        I generated my colors using{' '}
-        <Ref text="Coolors.co" href="https://coolors.co" />
+        My blog posts are written using a WYSIWYG editor made from{' '}
+        <Ref text="ReMirror" href="https://remirror.io/" />. I generated my
+        colors using <Ref text="Coolors.co" href="https://coolors.co" />
       </span>
       <span>
         The best part: All the code is public at{' '}

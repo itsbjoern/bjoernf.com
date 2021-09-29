@@ -39,7 +39,7 @@ const Inner = styled(Row)`
   padding: 15px 20px 0 25px;
 
   @media only screen and (max-width: 425px) {
-    padding: 10px 0;
+    padding: 0;
     width: 100%;
   }
 `
@@ -52,13 +52,19 @@ const PaperClip = withTheme(styled(Row)`
   border-radius: 10px 10px 0 0;
 
   @media only screen and (max-width: 425px) {
+    padding: 5px 0;
     flex: 1;
     box-shadow: none;
-    > div {
-      flex-direction: column-reverse;
-    }
   }
 `)
+
+const Control = styled(Row)`
+  @media only screen and (max-width: 425px) {
+    flex-direction: column-reverse;
+    padding-bottom: 8px;
+    margin-top: 20px;
+  }
+`
 
 const ClipOn = ({ children }) => (
   <Outer alignSelf="end">
@@ -75,22 +81,31 @@ const PostItem = ({ post }) => {
 
   return (
     <Column>
-      <ClipOn>
-        <Row gap={10}>
-          <Row gap={10}>
-            {tags
-              ? tags.map((t) => <Tag size="small" key={t} name={t} />)
-              : null}
-          </Row>
-          <Row>
-            <span style={{ fontSize: '1rem' }}>
-              {moment(createdAt * 1000).format('MMMM Do, YYYY')}
-            </span>
-          </Row>
+      <Control justify="end">
+        <Row gap={15} align="end">
+          {tags
+            ? tags.map((t) => (
+                <Tag
+                  style={{ zIndex: 10, paddingBottom: 6 }}
+                  size="small"
+                  key={t}
+                  name={t}
+                />
+              ))
+            : null}
         </Row>
-      </ClipOn>
+        <ClipOn>
+          <Row gap={10}>
+            <Row>
+              <span style={{ fontSize: '1rem' }}>
+                {moment(createdAt * 1000).format('MMMM Do, YYYY')}
+              </span>
+            </Row>
+          </Row>
+        </ClipOn>
+      </Control>
       <UnstyledLink to={`/blog/${post._id}` + (draft ? '#edit' : '')}>
-        <ListItem sx={{ padding: `0 0 15px 0` }}>
+        <ListItem sx={{ padding: `0 0 10px 0` }}>
           <ShadowButton>
             <Row justify="start" flexed gap={10} grow={10} mobileWrapping>
               {draft ? <PendingActions /> : null}

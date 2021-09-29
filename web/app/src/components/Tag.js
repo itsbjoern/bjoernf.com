@@ -10,8 +10,8 @@ const StyledChip = styled(Chip)`
   cursor: pointer;
 `
 
-const Tag = ({ name, onDelete, size }) => (
-  <UnstyledLink to={`/blog?search=${name}`}>
+const Tag = ({ name, onDelete, size, style }) => (
+  <UnstyledLink style={style} to={`/blog?search=${name}`}>
     <StyledChip as={Button} size={size} label={name} onDelete={onDelete} />
   </UnstyledLink>
 )

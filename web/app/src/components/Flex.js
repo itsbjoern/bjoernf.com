@@ -24,6 +24,9 @@ export const Flex = styled.div`
 
   @media only screen and (max-width: 425px) {
     ${({ mobileWrapping }) => (mobileWrapping ? 'flex-wrap: wrap;' : '')}
+    ${({ hideMobile }) => (hideMobile ? 'display: none;' : '')}
+    ${({ mobileDirection }) =>
+      mobileDirection ? `flex-direction: ${mobileDirection};` : ''}
   }
 `
 

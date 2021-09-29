@@ -42,8 +42,10 @@ const Post = ({
 
   const updatePost = useCallback(
     (update) => {
-      const data = post.draft ?? post.published
-      setPost({ ...post, draft: { ...data, ...update } })
+      setPost({
+        ...post,
+        draft: { ...post.published, ...post.draft, ...update },
+      })
       if (updateTimeout.current) {
         clearTimeout(updateTimeout.current)
         updateTimeout.current = null

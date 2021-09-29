@@ -64,7 +64,7 @@ const Blog = ({ history, location, sendRequest, createNotification }) => {
       <Row justify="between">
         <H2>Recent posts</H2>
 
-        <Row justify="end">
+        <Row justify="end" hideMobile>
           <TextField
             size="small"
             value={currentSearch}
