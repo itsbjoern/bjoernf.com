@@ -67,17 +67,17 @@ const App = (props) => {
             <RouterLayer ssr={props.ssr}>
               <Analytics>
                 <AdaptiveContainer maxWidth="md">
-                  <Header />
-                  <Column
-                    style={{
-                      paddingTop: 45,
-                      paddingBottom: 45,
-                      paddingLeft: 5,
-                      paddingRight: 5,
-                    }}
-                    flexed
-                  >
-                    <Typography component={Column} flexed>
+                  <Typography component={Column} flexed>
+                    <Header />
+                    <Column
+                      style={{
+                        paddingTop: 45,
+                        paddingBottom: 45,
+                        paddingLeft: 5,
+                        paddingRight: 5,
+                      }}
+                      flexed
+                    >
                       <Switch>
                         <Route exact path="/">
                           <Home />
@@ -98,10 +98,10 @@ const App = (props) => {
                           <About />
                         </Route>
                       </Switch>
-                    </Typography>
-                  </Column>
-                  <Footer />
-                  <NavigationButtons mobile />
+                    </Column>
+                    <Footer />
+                    <NavigationButtons mobile />
+                  </Typography>
                 </AdaptiveContainer>
               </Analytics>
             </RouterLayer>

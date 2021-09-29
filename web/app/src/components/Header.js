@@ -32,7 +32,7 @@ const Header = ({ history, token, setToken }) => {
       <Row justify="between" align="center">
         <Row align="center">
           <Avatar sx={{ width: 70, height: 70 }} src="/public/images/me.png" />
-          <Column justify="evenly" style={{ marginLeft: 10 }} gap={5}>
+          <Column justify="evenly" style={{ marginLeft: 10 }}>
             <H2>Björn Friedrichs</H2>
             <Row gap={5}>
               <ArrowCircleUp sx={{ fontSize: '1.2em' }} />

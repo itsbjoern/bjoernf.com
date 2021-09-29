@@ -80,7 +80,8 @@ async def update_post(request):
   if op.matched_count == 0:
     return web.HTTPNotFound(reason="Post does not exist")
 
-  return util.json_response({'post': the_update})
+  post = db.posts.find_one({'_id': bson.ObjectId(post_id)})
+  return util.json_response({'post': post})
 
 
 @util.auth
