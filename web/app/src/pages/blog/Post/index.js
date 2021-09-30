@@ -24,6 +24,16 @@ import { useDialog } from 'app/components/Dialog'
 import PostEditor from './PostEditor'
 import PostView from './PostView'
 
+const filterEmpty = (dict) =>
+  !dict
+    ? {}
+    : Object.entries(dict)
+        .filter(([_, v]) => !!v)
+        .reduce((p, [k, v]) => {
+          p[k] = v
+          return p
+        }, {})
+
 const Post = ({
   match,
   location,
@@ -35,7 +45,8 @@ const Post = ({
   const postId = match.params.id
 
   const [loading, setLoading] = useState(true)
-  const [editing, setEditing] = useState(location.hash === '#edit' && !!token)
+  const [isComparing, setIsComparing] = useState(false)
+  const editing = location.hash === '#edit' && !!token
   const updateTimeout = useRef()
 
   const [post, setPost] = useSSR(() => sendRequest(getPost(postId)), {
@@ -45,11 +56,12 @@ const Post = ({
 
   const updatePost = useCallback(
     (update) => {
+      console.log(update)
       setPost({
         ...post,
         draft: {
-          ...post.published,
-          ...post.draft,
+          ...filterEmpty(post.published),
+          ...filterEmpty(post.draft),
           ...update,
         },
       })
@@ -70,6 +82,7 @@ const Post = ({
     sendRequest(publishPostAPI(post._id))
       .then(({ post: updatedPost }) => {
         setPost(updatedPost)
+        history.push('#')
         createNotification('Post published', 'success')
       })
       .catch(() => {
@@ -139,12 +152,25 @@ const Post = ({
                   <Switch
                     checked={editing}
                     onChange={() => {
-                      setEditing(!editing)
                       history.push(!editing ? '#edit' : '#')
                     }}
                   />
                 }
                 label="Edit Mode"
+              />
+            </Row>
+            <Row justify="center">
+              <FormControlLabel
+                control={
+                  <Switch
+                    disabled={!post.draft || !post.published}
+                    checked={isComparing}
+                    onChange={() => {
+                      setIsComparing(!isComparing)
+                    }}
+                  />
+                }
+                label="Compare"
               />
             </Row>
             <Button
@@ -176,11 +202,32 @@ const Post = ({
       }
     >
       <Column>
-        {token && editing ? (
-          <PostEditor post={post} updatePost={updatePost} />
-        ) : (
-          <PostView post={post} />
-        )}
+        <Row gap={20}>
+          <Column flexed>
+            {token && editing ? (
+              <PostEditor post={post} updatePost={updatePost} />
+            ) : (
+              <PostView
+                postData={
+                  isComparing || !post.published
+                    ? { ...post.published, ...post.draft }
+                    : { ...post.published }
+                }
+                createdAt={post.createdAt}
+                hideShare={isComparing}
+              />
+            )}
+          </Column>
+          {isComparing ? (
+            <Column flexed>
+              <PostView
+                postData={post.published}
+                createdAt={post.createdAt}
+                hideShare
+              />
+            </Column>
+          ) : null}
+        </Row>
       </Column>
     </FloatAside>
   )

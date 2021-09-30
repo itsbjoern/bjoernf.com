@@ -33,17 +33,16 @@ export const StyledEditor = styled.div`
     pre {
       tab-size: 2;
       padding: 10px 15px;
-      display: table;
-      padding-right: 100px;
+      display: block;
       max-width: 100%;
-      overflow: scroll;
+      overflow: auto;
+      line-height: 1.2em;
 
       border-radius: 8px;
       background: #f2f2f2;
       box-shadow: inset 6px 6px 12px #d5d5d5, inset -6px -6px 12px #ffffff;
       code {
         font-size: 0.95rem;
-        line-height: 0;
         color: #444;
       }
     }
@@ -65,12 +64,12 @@ export const StyledEditor = styled.div`
         border: 2px solid ${({ theme }) => theme.palette.primary.main};
       }
     }
-    &[contenteditable='false'] {
-      ul,
-      ol {
-        text-align: left;
-      }
+
+    ul,
+    ol {
+      text-align: left;
     }
+
     img {
       max-width: 100%;
     }
@@ -79,6 +78,9 @@ export const StyledEditor = styled.div`
     }
     p {
       margin: 0;
+    }
+    p:empty {
+      margin: 1.6em 0;
     }
     a {
       text-decoration: none !important;

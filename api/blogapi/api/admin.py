@@ -71,6 +71,7 @@ async def update_post(request):
   if not post_id:
     return web.HTTPBadRequest(reason="No post id")
 
+  print(data)
   db = request.use('db')
   the_update = {'updatedAt': datetime.datetime.now(),
                 **{f'draft.{key}': val for key, val in data.items()}}
@@ -95,28 +96,32 @@ async def publish(request):
   if not post:
     return web.HTTPNotFound(reason="Post does not exist")
 
+  published = post.get('published', {})
   draft = post.get('draft', None)
   if draft is None:
     return web.HTTPBadRequest(reason="No staged changes found")
 
-  remove_multi = re.compile(r"\s+")
-  summary = '.'.join(draft['text'].split('.')[:3]) + '.'
-  summary = remove_multi.sub(" ", summary).strip()
-
-  title = draft.get('title')
-  html = draft.get('html')
+  title = draft.get('title') or published.get('title')
+  html = draft.get('html') or published.get('html')
+  text = draft.get('text') or published.get('text')
 
   if not title or not html:
     return web.HTTPBadRequest(reason="Title and text are required")
 
+  remove_multi = re.compile(r"\s+")
+  summary = '.'.join(text.split('.')[:3]) + '.'
+  summary = remove_multi.sub(" ", summary).strip()
+  tags = draft.get('tags') or published.get('tags')
+  print(title, html, text, summary, tags)
+
   version = {
     'title': title,
-    'text': draft['text'],
+    'text': text,
     'summary': summary,
     'html': html,
-    'tags': draft.get('tags', []),
+    'tags': tags,
     'publishedAt': datetime.datetime.now(),
-    'version': post.get('published', {}).get('version', 0) + 1
+    'version': published.get('version', 0) + 1
   }
 
   db.posts.update_one({'_id': bson.ObjectId(post_id)},
@@ -142,7 +147,7 @@ async def unpublish(request):
 
   update = None
   if post.get('draft') is None:
-    update = [{'$set': {'draft': '$published'}}, {'$unset': {'published': 1}}]
+    update = [{'$set': {'draft': '$published'}}, {'$unset': 'published'}]
   else:
     update = {'$unset': {'published': 1}}
   db.posts.update_one({'_id': bson.ObjectId(post_id)},

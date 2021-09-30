@@ -75,6 +75,7 @@ const App = (props) => {
                         paddingBottom: 45,
                         paddingLeft: 5,
                         paddingRight: 5,
+                        maxWidth: '100vw',
                       }}
                       flexed
                     >

@@ -28,7 +28,11 @@ const PostEditor = ({ post, updatePost, sendRequest }) => {
     })
   }, [])
 
-  const { title = '', tags = [], html = '' } = post.draft ?? post.published
+  const {
+    title = '',
+    tags = [],
+    html = '',
+  } = { ...post.published, ...post.draft }
   const uploadHandler = useCallback(
     (file) =>
       sendRequest(upload(post._id, file)).then(({ src, fileName }) => {
@@ -49,7 +53,7 @@ const PostEditor = ({ post, updatePost, sendRequest }) => {
           size="small"
           freeSolo={true}
           value={newTag}
-          options={availableTags}
+          options={availableTags || []}
           disablePortal={true}
           onChange={(event, name) => setNewTag(name)}
           renderInput={({ InputProps, ...rest }) => (

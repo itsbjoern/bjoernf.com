@@ -4,6 +4,7 @@ import styled from '@emotion/styled'
 
 const Sticky = styled.div`
   ${(props) => `
+    ${props.hideMenu ? 'display: none;' : ''}
     @media only screen and (max-width: 425px) {
       margin-bottom: 20px;
     }
@@ -35,10 +36,17 @@ const Wrapper = styled.div`
   flex-direction: column;
 `
 
-const FloatAside = ({ children, menu, width = 200, left = true, gap = 50 }) => {
+const FloatAside = ({
+  children,
+  menu,
+  hideMenu,
+  width = 200,
+  left = true,
+  gap = 50,
+}) => {
   return (
     <Wrapper>
-      <Sticky width={width} gap={gap} left={left}>
+      <Sticky hideMenu={hideMenu} width={width} gap={gap} left={left}>
         {menu}
       </Sticky>
       {children}

@@ -23,9 +23,9 @@ const ShareIcon = ({ href, size, Icon }) => (
   </a>
 )
 
-const PostView = ({ post, staticContext }) => {
-  const { draft, published, createdAt } = post
-  const { title, html, tags } = draft ?? published
+const PostView = ({ postData, createdAt, hideShare, staticContext }) => {
+  const { title, html, tags } = postData
+  console.log(postData)
   const url = isSSR ? staticContext.url : window.location.href
   const userAgent = isSSR ? staticContext.userAgent : navigator.userAgent
   const iconSize = 45
@@ -34,6 +34,7 @@ const PostView = ({ post, staticContext }) => {
 
   return (
     <FloatAside
+      hideMenu={hideShare}
       width={iconSize}
       gap={30}
       menu={
@@ -74,16 +75,12 @@ const PostView = ({ post, staticContext }) => {
           </div>
         </Row>
         <H2>{title}</H2>
-        {isSSR ? (
-          <StyledEditor>
-            <div
-              className="remirror-editor"
-              dangerouslySetInnerHTML={{ __html: html }}
-            />
-          </StyledEditor>
-        ) : (
-          <RichText content={html} editable={false} />
-        )}
+        <StyledEditor>
+          <div
+            className="remirror-editor"
+            dangerouslySetInnerHTML={{ __html: html }}
+          />
+        </StyledEditor>
       </Column>
     </FloatAside>
   )
