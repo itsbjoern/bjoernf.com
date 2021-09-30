@@ -1,7 +1,6 @@
 import React from 'react'
 
 import { ListItem, ListItemButton } from '@mui/material'
-import { withTheme } from '@mui/styles'
 import { PendingActions } from '@mui/icons-material'
 import moment from 'moment'
 import styled from '@emotion/styled'
@@ -12,7 +11,11 @@ import { H4 } from 'app/components/Text'
 import Tag from 'app/components/Tag'
 import UnstyledLink from 'app/components/UnstyledLink'
 
-const ShadowButton = withTheme(styled(ListItemButton)`
+const Title = styled(H4)`
+  color: ${({ theme }) => theme.palette.primary.main};
+`
+
+const ShadowButton = styled(ListItemButton)`
   &&& {
     padding-bottom: 10px;
     padding-right: 10%;
@@ -21,7 +24,7 @@ const ShadowButton = withTheme(styled(ListItemButton)`
 
     ${morphMixin()}
   }
-`)
+`
 
 const Outer = styled(Row)`
   z-index: 5;
@@ -44,7 +47,7 @@ const Inner = styled(Row)`
   }
 `
 
-const PaperClip = withTheme(styled(Row)`
+const PaperClip = styled(Row)`
   background-color: ${({ theme }) => theme.palette.background.default};
   z-index: 5;
   padding: 5px 10px;
@@ -56,7 +59,7 @@ const PaperClip = withTheme(styled(Row)`
     flex: 1;
     box-shadow: none;
   }
-`)
+`
 
 const Control = styled(Row)`
   @media only screen and (max-width: 425px) {
@@ -104,13 +107,16 @@ const PostItem = ({ post }) => {
           </Row>
         </ClipOn>
       </Control>
-      <UnstyledLink to={`/blog/${post._id}` + (draft ? '#edit' : '')}>
+      <UnstyledLink
+        delay={300}
+        to={`/blog/${post._id}` + (draft ? '#edit' : '')}
+      >
         <ListItem sx={{ padding: `0 0 10px 0` }}>
           <ShadowButton>
             <Row justify="start" flexed gap={10} grow={10} mobileWrapping>
               {draft ? <PendingActions /> : null}
               <Column gap={10}>
-                <H4>{title || 'No title'}</H4>
+                <Title>{title || 'No title'}</Title>
 
                 <span style={{ fontSize: '0.9em' }}>{summary}</span>
               </Column>

@@ -1,11 +1,10 @@
 import React, { useState } from 'react'
 
-import { withTheme } from '@mui/styles'
 import { useRemirrorContext } from '@remirror/react'
 
 import styled from '@emotion/styled'
 
-export const StyledEditor = withTheme(styled.div`
+export const StyledEditor = styled.div`
   .remirror-editor {
     box-sizing: border-box;
     position: relative;
@@ -93,7 +92,7 @@ export const StyledEditor = withTheme(styled.div`
       max-width: 100%;
     }
   }
-`)
+`
 
 const View = () => {
   const { getRootProps } = useRemirrorContext()

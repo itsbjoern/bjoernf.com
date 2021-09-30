@@ -2,18 +2,17 @@ import React from 'react'
 
 import { withRouter } from 'react-router-dom'
 import styled from '@emotion/styled'
-import { withTheme } from '@mui/styles'
 
 import { morphMixin } from 'app/theme'
 import { Row, Column } from 'app/components/Flex'
 import Ref from 'app/components/Ref'
 
-const BG = withTheme(styled(Column)`
+const BG = styled(Column)`
   background-color: ${({ theme }) => theme.palette.background.paper};
   padding: 30px;
   ${morphMixin()}
   border-radius: 10px 10px 0 0;
-`)
+`
 
 const Footer = () => {
   return (
