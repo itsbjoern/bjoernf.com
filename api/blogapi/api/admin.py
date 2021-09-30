@@ -96,7 +96,7 @@ async def publish(request):
     return web.HTTPNotFound(reason="Post does not exist")
 
   draft = post.get('draft', None)
-  if not draft:
+  if draft is None:
     return web.HTTPBadRequest(reason="No staged changes found")
 
   remove_multi = re.compile(r"\s+")
@@ -137,6 +137,9 @@ async def unpublish(request):
   if not post:
     return web.HTTPNotFound(reason="Post does not exist")
 
+  if post.get('published') is None:
+    return web.HTTPBadRequest(reason="Post is not published")
+
   update = None
   if post.get('draft') is None:
     update = [{'$set': {'draft': '$published'}}, {'$unset': {'published': 1}}]
@@ -146,6 +149,24 @@ async def unpublish(request):
                       update)
 
   post = db.posts.find_one(bson.ObjectId(post_id))
+  return util.json_response({'post': post})
+
+
+@util.auth
+async def delete_post(request):
+  post_id = request.match_info.get('id', None)
+  if not post_id:
+    return web.HTTPBadRequest(reason="No post id")
+
+  db = request.use('db')
+  post = db.posts.find_one({'_id': bson.ObjectId(post_id)})
+  if not post:
+    return web.HTTPNotFound(reason="Post does not exist")
+
+  if post.get('published') is not None:
+    return web.HTTPBadRequest(reason="Cannot delete published posts")
+
+  db.posts.delete_one({'_id': bson.ObjectId(post_id)})
   return util.json_response({'post': post})
 
 

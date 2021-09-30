@@ -111,12 +111,8 @@ let transformConf = {
           cacheCompression: false,
           plugins: [
             [
-              require.resolve('babel-plugin-styled-components'),
-              {
-                ssr: true,
-                displayName: true,
-                preprocess: false,
-              },
+              require.resolve('babel-plugin-direct-import'),
+              { modules: ['@mui/material', '@mui/icons-material'] },
             ],
           ],
           presets: [

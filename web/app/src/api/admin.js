@@ -1,4 +1,4 @@
-import { get, post, postRaw } from 'app/api'
+import { get, post, deleteCall, postRaw } from 'app/api'
 
 export const login = (username, password) => {
   return post('/admin/login', { username, password })
@@ -22,6 +22,10 @@ export const publishPost = (postId) => {
 
 export const unpublishPost = (postId) => {
   return post(`/admin/posts/${postId}/unpublish`)
+}
+
+export const deletePost = (postId) => {
+  return deleteCall(`/admin/posts/${postId}`)
 }
 
 export const upload = (postId, file) => {

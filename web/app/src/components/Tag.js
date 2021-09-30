@@ -11,7 +11,7 @@ const StyledChip = styled(Chip)`
 `
 
 const Tag = ({ name, onDelete, size, style }) => (
-  <UnstyledLink style={style} to={`/blog?search=${name}`}>
+  <UnstyledLink style={style} to={onDelete ? null : `/blog?search=${name}`}>
     <StyledChip as={Button} size={size} label={name} onDelete={onDelete} />
   </UnstyledLink>
 )

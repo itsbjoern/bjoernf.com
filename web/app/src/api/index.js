@@ -52,6 +52,10 @@ export const post = (endpoint, data) => {
   return buildRequest('POST', endpoint, JSON.stringify(data))
 }
 
+export const deleteCall = (endpoint, data) => {
+  return buildRequest('DELETE', endpoint, data, data && JSON.stringify(data))
+}
+
 export const postRaw = (endpoint, data) => {
   return buildRequest('POST', endpoint, data)
 }

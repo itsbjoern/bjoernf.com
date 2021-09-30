@@ -5,6 +5,8 @@ import { getPost } from 'app/api/blog'
 import {
   updatePost as updatePostAPI,
   publishPost as publishPostAPI,
+  unpublishPost as unpublishPostAPI,
+  deletePost as deletePostAPI,
 } from 'app/api/admin'
 
 import { Alert, Button, FormControlLabel, Switch } from '@mui/material'
@@ -17,6 +19,7 @@ import NotFound from 'app/pages/404'
 
 import { Row, Column } from 'app/components/Flex'
 import FloatAside from 'app/components/FloatAside'
+import { useDialog } from 'app/components/Dialog'
 
 import PostEditor from './PostEditor'
 import PostView from './PostView'
@@ -44,19 +47,20 @@ const Post = ({
     (update) => {
       setPost({
         ...post,
-        draft: { ...post.published, ...post.draft, ...update },
+        draft: {
+          ...post.published,
+          ...post.draft,
+          ...update,
+        },
       })
       if (updateTimeout.current) {
         clearTimeout(updateTimeout.current)
         updateTimeout.current = null
       }
       updateTimeout.current = setTimeout(() => {
-        sendRequest(updatePostAPI(post._id, update)).then(
-          ({ post: updatedPost }) => {
-            createNotification('Post saved', 'success', 1000)
-            setPost({ ...post, ...updatedPost })
-          }
-        )
+        sendRequest(updatePostAPI(post._id, update)).then(({ post: _ }) => {
+          createNotification('Post saved', 'success', 1000)
+        })
       }, 700)
     },
     [post]
@@ -65,14 +69,48 @@ const Post = ({
   const publishPost = useCallback(() => {
     sendRequest(publishPostAPI(post._id))
       .then(({ post: updatedPost }) => {
-        const { draft: _, ...newPost } = { ...post, ...updatedPost }
-        setPost(newPost)
+        setPost(updatedPost)
         createNotification('Post published', 'success')
       })
       .catch(() => {
         createNotification('Publish failed', 'error')
       })
   }, [post])
+
+  const unpublishPost = useCallback(() => {
+    sendRequest(unpublishPostAPI(post._id))
+      .then(({ post: updatedPost }) => {
+        setPost(updatedPost)
+        createNotification('Post published', 'success')
+      })
+      .catch(() => {
+        createNotification('Publish failed', 'error')
+      })
+  }, [post])
+
+  const deletePost = useCallback(() => {
+    sendRequest(deletePostAPI(post._id))
+      .then(() => {
+        createNotification('Post deleted', 'success')
+        history.push('/admin#tab-1')
+      })
+      .catch((e) => {
+        createNotification(e.message, 'error')
+      })
+  }, [post])
+
+  const [PublishDialog, openPublishDialog] = useDialog(
+    'Are you sure you want to publish this post? This will make it available to the public.',
+    publishPost
+  )
+  const [UnPublishDialog, openUnPublishDialog] = useDialog(
+    'Are you sure you want to unpublish this post? Readers will be unable to access it.',
+    unpublishPost
+  )
+  const [DeleteDialog, openDeleteDialog] = useDialog(
+    'Are you sure you want to delete this post? This will remove it permanently.',
+    deletePost
+  )
 
   if (loading) {
     return null
@@ -87,6 +125,9 @@ const Post = ({
       menu={
         token ? (
           <Column gap={20}>
+            <PublishDialog />
+            <UnPublishDialog />
+            <DeleteDialog />
             <Alert severity={post.draft ? 'warning' : 'success'}>
               Status:{' '}
               {!post.published ? 'Draft' : `Version ${post.published.version}`}
@@ -106,13 +147,30 @@ const Post = ({
                 label="Edit Mode"
               />
             </Row>
-            <Button variant="contained" onClick={() => publishPost()}>
+            <Button
+              variant="contained"
+              onClick={openPublishDialog}
+              disabled={!post.draft?.text || !post.draft?.title}
+            >
               Publish
             </Button>
-
-            <Button variant="contained" color="secondary">
-              <Delete />
-            </Button>
+            {post.published ? (
+              <Button
+                variant="contained"
+                color="secondary"
+                onClick={openUnPublishDialog}
+              >
+                Un-publish
+              </Button>
+            ) : (
+              <Button
+                variant="contained"
+                color="secondary"
+                onClick={openDeleteDialog}
+              >
+                <Delete />
+              </Button>
+            )}
           </Column>
         ) : null
       }

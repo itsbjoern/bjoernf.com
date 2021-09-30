@@ -28,7 +28,7 @@ const PostEditor = ({ post, updatePost, sendRequest }) => {
     })
   }, [])
 
-  const { title, tags, html } = post.draft ?? post.published
+  const { title = '', tags = [], html = '' } = post.draft ?? post.published
   const uploadHandler = useCallback(
     (file) =>
       sendRequest(upload(post._id, file)).then(({ src, fileName }) => {

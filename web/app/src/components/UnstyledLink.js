@@ -13,8 +13,11 @@ const UnstyledLink = styled(Link)`
   }
 `
 
-const ConsiderSSR = ({ to, ...props }) => (
-  <UnstyledLink to={(isSSR ? '/node' : '') + to} {...props} />
-)
+const ConsiderSSR = ({ to, ...props }) =>
+  typeof to !== 'string' ? (
+    <div {...props} />
+  ) : (
+    <UnstyledLink to={(isSSR ? '/node' : '') + to} {...props} />
+  )
 
 export default ConsiderSSR

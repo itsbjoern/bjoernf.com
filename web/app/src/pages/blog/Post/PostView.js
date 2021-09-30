@@ -69,7 +69,9 @@ const PostView = ({ post, staticContext }) => {
               ? tags.map((t) => <Tag size="small" key={t} name={t} />)
               : null}
           </Row>
-          <div>Published {moment(createdAt * 1000).format('MMMM Do YYYY')}</div>
+          <div>
+            Published {moment(createdAt * 1000).format('MMMM Do, YYYY')}
+          </div>
         </Row>
         <H2>{title}</H2>
         {isSSR ? (

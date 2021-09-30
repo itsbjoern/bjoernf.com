@@ -18,8 +18,9 @@ def setup_routes(app):
   app.router.add_get('/api/admin/posts', admin.get_drafts)
   app.router.add_post('/api/admin/posts', admin.create_post)
   app.router.add_post('/api/admin/posts/{id}', admin.update_post)
+  app.router.add_delete('/api/admin/posts/{id}', admin.delete_post)
   app.router.add_post('/api/admin/posts/{id}/publish', admin.publish)
-  app.router.add_delete('/api/admin/posts/{id}/unpublish', admin.unpublish)
+  app.router.add_post('/api/admin/posts/{id}/unpublish', admin.unpublish)
   app.router.add_post('/api/admin/posts/{id}/upload', admin.upload)
 
   app.router.add_static('/public/',
