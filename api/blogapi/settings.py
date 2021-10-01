@@ -23,7 +23,7 @@ def update_with_env(config):
 class Config(dict):
   def __getitem__(self, key):
     if key in self:
-      return self[key]
+      return super().__getitem__(key)
     if '.' in key:
       path = key.split('.')
       config = self

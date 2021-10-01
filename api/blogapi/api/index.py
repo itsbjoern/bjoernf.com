@@ -1,11 +1,10 @@
 import pathlib
 import json
+import os
 from aiohttp import web, ClientSession
 
 PROJECT_ROOT = pathlib.Path(__file__).parent.parent
 BUILD_ROOT = PROJECT_ROOT / 'public'
-SOURCE_ROOT = PROJECT_ROOT.parent.parent / 'web' / 'node'
-
 
 async def handler(request):
   with open(BUILD_ROOT / 'index.html', 'r') as fh:
@@ -22,13 +21,16 @@ async def node_handler(request):
 
   session = ClientSession()
   data = None
-  async with session.post('http://127.0.0.1:9009/render',
+  node_addr = request.app['config']['node.address']
+  node_port = request.app['config']['node.port']
+  async with session.post(f'http://{node_addr}:{node_port}/render',
                           data=req_data,
                           headers={'Content-Type': 'application/json'}) as resp:
     data = await resp.json()
   await session.close()
 
-  with open(SOURCE_ROOT / 'index.html', 'r') as fh:
+  node_dir = request.app['config']['node.dir']
+  with open(os.path.join(node_dir, 'index.html'), 'r') as fh:
     index = fh.read()
     root_tag = '<div id="root">{}</div>'
     page = index.replace(root_tag.format(''),

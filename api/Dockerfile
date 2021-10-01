@@ -5,4 +5,5 @@ WORKDIR /api
 COPY requirements.txt requirements.txt
 RUN pip install -r requirements.txt
 COPY blogapi blogapi
+RUN mkdir -p /api/blogapi/uploads
 CMD ["python", "-m", "blogapi"]

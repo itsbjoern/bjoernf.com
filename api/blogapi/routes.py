@@ -32,7 +32,7 @@ def setup_routes(app):
                         name='uploads')
 
   app.router.add_static('/node/public/',
-                        path=PROJECT_ROOT.parent.parent / 'web' / 'node',
+                        path=app['config']['node.dir'],
                         name='node-public')
 
   app.router.add_get('/api/{tail:.*}', index.not_found)

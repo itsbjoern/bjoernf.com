@@ -1,25 +1,64 @@
 version: "3.9"
 services:
-  web:
+  build-web:
     build: ./web
     volumes:
       - app-volume:/api
+      - web-volume:/web
+    links:
+      - api
     environment:
-      REACT_APP_API_URL: http://localhost:8080
+      REACT_APP_API_URL: http://api:8080
+    networks:
+      - default
+  render-server:
+    expose:
+      - 9009
+    build:
+      context: ./web
+      dockerfile: Dockerfile
+    volumes:
+      - web-volume:/web
+    working_dir: /web/render-server
+    command: ['./start.sh']
+    networks:
+      - default
+    restart: unless-stopped
   api:
     build: ./api
+    restart: unless-stopped
     links:
       - mongo
+      - render-server
     volumes:
       - app-volume:/api
+      - web-volume:/web
     depends_on:
       - mongo
+      - render-server
     environment:
       API_CONNECTION_HOST: 0.0.0.0
       API_CONNECTION_PORT: '8080'
       API_MONGO_HOST: mongo
+      API_NODE_DIR: /web/node
+      API_NODE_ADDRESS: render-server
+      LETSENCRYPT_TEST: "true"
+    networks:
+      - default
+      - nginx-proxy
   mongo:
     image: mongo
+    restart: unless-stopped
+    networks:
+      - default
 
 volumes:
   app-volume: {}
+  web-volume: {}
+
+networks:
+  default:
+    name: app-network
+    driver: bridge
+  nginx-proxy:
+    external: true

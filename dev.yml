@@ -1,11 +1,7 @@
 
 services:
   api:
-    volumes:
-      - ./api:/api
-      - app-volume:/api
     ports:
       - 8080:8080
-  web:
-    environment:
-      REACT_APP_API_URL: http://localhost:9991
+    expose:
+      - 8080

@@ -8,7 +8,7 @@ var argv = require('yargs')
   .option('a', {
     alias: 'address',
     description: "Specify the server's address",
-    default: '127.0.0.1',
+    default: '0.0.0.0',
   })
   .help('h')
   .alias('h', 'help')
@@ -21,12 +21,7 @@ const express = require('express')
 const bodyParser = require('body-parser')
 const ReactDOMServer = require('react-dom/server')
 
-const { createSSRContext, default: AppServer } = require(path.join(
-  __dirname,
-  '..',
-  'node',
-  'AppServer.js'
-))
+const nodePath = path.join(__dirname, '..', 'node')
 
 const spawn = require('child_process').spawn
 
@@ -51,6 +46,11 @@ const createApp = () => {
       global.fetch = nodeFetch.default
       global.Headers = nodeFetch.Headers
     }
+
+    const { createSSRContext, default: AppServer } = require(path.join(
+      nodePath,
+      'AppServer.js'
+    ))
 
     try {
       const { resolveData } = createSSRContext()

@@ -19,14 +19,11 @@ const path = require('path')
 const webpack = require('webpack')
 const MiniCssExtractPlugin = require('mini-css-extract-plugin')
 const HtmlWebpackPlugin = require('html-webpack-plugin')
-const SpeedMeasurePlugin = require('speed-measure-webpack-plugin')
 const InterpolateHtmlPlugin = require('react-dev-utils/InterpolateHtmlPlugin')
 const HtmlWebpackExcludeAssetsPlugin = require('./HtmlWebpackExcludeAssetsPlugin')
 const paths = require('../config/paths')
 const checkRequiredFiles = require('react-dev-utils/checkRequiredFiles')
 const formatWebpackMessages = require('react-dev-utils/formatWebpackMessages')
-const TerserPlugin = require('terser-webpack-plugin')
-const smp = new SpeedMeasurePlugin()
 
 // Warn and crash if required files are missing
 if (!checkRequiredFiles([paths.appHtml, paths.appIndexJs])) {

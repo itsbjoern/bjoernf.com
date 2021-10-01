@@ -1,5 +1,5 @@
 public/
-blogapi/uploads
+blogapi/uploads/
 
 # Byte-compiled / optimized / DLL files
 __pycache__/
