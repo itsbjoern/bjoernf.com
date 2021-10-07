@@ -29,12 +29,14 @@ async def node_handler(request):
     data = await resp.json()
   await session.close()
 
-  node_dir = request.app['config']['node.dir']
-  with open(os.path.join(node_dir, 'index.html'), 'r') as fh:
+  with open(os.path.join(BUILD_ROOT, 'index-node.html'), 'r') as fh:
     index = fh.read()
-    root_tag = '<div id="root">{}</div>'
-    page = index.replace(root_tag.format(''),
-                         root_tag.format(data['markup']))
+    css_folder = BUILD_ROOT / 'static' / 'css'
+    css_file = [f for f in os.listdir(css_folder) if f.endswith('.css')][0]
+    page = index
+    page = page.replace('__CSS_URL__', f'/public/static/css/{css_file}')
+    page = page.replace('__SITE_CONTENT__', data['markup'])
+
     return web.Response(
       text=page,
       content_type='text/html')

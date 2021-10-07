@@ -31,10 +31,6 @@ def setup_routes(app):
                         path=PROJECT_ROOT / 'uploads',
                         name='uploads')
 
-  app.router.add_static('/node/public/',
-                        path=app['config']['node.dir'],
-                        name='node-public')
-
   app.router.add_get('/api/{tail:.*}', index.not_found)
   app.router.add_get('/node', index.node_handler)
   app.router.add_get('/node/{tail:.*}', index.node_handler)

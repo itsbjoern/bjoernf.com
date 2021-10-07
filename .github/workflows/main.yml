@@ -1,0 +1,137 @@
+name: CI
+
+on:
+  push:
+    branches: [ main ]
+  workflow_dispatch:
+
+jobs:
+  build:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v2
+      - uses: actions/setup-node@v2
+        with:
+          node-version: '14'
+
+      - name: Cache node modules
+        uses: actions/cache@v2
+        env:
+          cache-name: cache-node-modules
+        with:
+          # npm cache files are stored in `~/.npm` on Linux/macOS
+          path: ~/.npm
+          key: ${{ runner.os }}-build-${{ env.cache-name }}-${{ hashFiles('**/package-lock.json') }}
+          restore-keys: |
+            ${{ runner.os }}-build-${{ env.cache-name }}-
+            ${{ runner.os }}-build-
+            ${{ runner.os }}-
+
+      - name: Cache requirements
+        uses: actions/cache@v2
+        env:
+          cache-name: cache-pip-requirements
+        with:
+          # npm cache files are stored in `~/.npm` on Linux/macOS
+          path: ~/.npm
+          key: ${{ runner.os }}-build-${{ env.cache-name }}-${{ hashFiles('**/requirements.txt') }}
+          restore-keys: |
+            ${{ runner.os }}-build-${{ env.cache-name }}-
+            ${{ runner.os }}-build-
+            ${{ runner.os }}-
+
+      - name: Install and build web
+        working-directory: ./web
+        env:
+          REACT_APP_API_URL: https://bjornf.dev
+        run: |
+          npm install
+          node scripts/build.js
+          node scripts/build-node.js
+
+      - name: Move builds
+        run: |
+          rsync -avz ./web/build/ ./api/blogapi/public/
+          rsync -avz ./web/node/ ./render-server/node/
+
+      - name: Build api
+        working-directory: ./api
+        run: |
+          docker build -t bjornf-api .
+
+          mkdir -p ~/images
+          docker save -o ~/images/api.tar bjornf-api
+
+      - name: Build render server
+        working-directory: ./render-server
+        run: |
+          docker build -t bjornf-render-server .
+
+          docker save -o ~/images/render-server.tar bjornf-render-server
+
+      - name: Install SSH key
+        uses: shimataro/ssh-key-action@v2
+        with:
+          key: ${{ secrets.SSH_KEY }}
+          known_hosts: 'placeholder'
+
+      - name: Adding Known Hosts
+        run: ssh-keyscan -H ${{ secrets.SSH_HOST }} >> ~/.ssh/known_hosts
+
+      - name: Take down server
+        uses: appleboy/ssh-action@master
+        with:
+          host: ${{ secrets.SSH_HOST }}
+          username: ${{ secrets.SSH_USERNAME }}
+          key: ${{ secrets.SSH_KEY }}
+          script: |
+            mkdir -p ~/bjornf.dev
+            cd ~/bjornf.dev
+            sudo docker-compose down || true
+            sudo docker-compose rm -f || true
+
+      - name: Copy files
+        run: |
+          rsync ./docker-compose.yml ${{ secrets.SSH_USERNAME }}@${{ secrets.SSH_HOST }}:/home/${{ secrets.SSH_USERNAME }}/bjornf.dev/docker-compose.yml
+          rsync -avz ~/images/ ${{ secrets.SSH_USERNAME }}@${{ secrets.SSH_HOST }}:/home/${{ secrets.SSH_USERNAME }}/bjornf.dev/images
+
+      - name: Load images
+        uses: appleboy/ssh-action@master
+        with:
+          host: ${{ secrets.SSH_HOST }}
+          username: ${{ secrets.SSH_USERNAME }}
+          key: ${{ secrets.SSH_KEY }}
+          script: |
+            sudo docker load -i ~/bjornf.dev/images/api.tar
+            sudo docker load -i ~/bjornf.dev/images/render-server.tar
+
+      - name: Restart server
+        uses: appleboy/ssh-action@master
+        with:
+          host: ${{ secrets.SSH_HOST }}
+          username: ${{ secrets.SSH_USERNAME }}
+          key: ${{ secrets.SSH_KEY }}
+          script: |
+            cd ~/bjornf.dev
+            cat >prod.yml <<EOL
+            services:
+              mongo:
+                volumes:
+                  - /home/${{ secrets.SSH_USERNAME }}/bjornf.dev/mongo-data:/data/db
+              api:
+                volumes:
+                  - /home/${{ secrets.SSH_USERNAME }}/bjornf.dev/api-uploads:/api/blogapi/uploads
+                environment:
+                  VIRTUAL_HOST: ${{ secrets.SSH_HOST }}
+                  VIRTUAL_PORT: 80
+                  LETSENCRYPT_HOST: ${{ secrets.SSH_HOST }}
+                  API_CONNECTION_PORT: 80
+                  API_CONNECTION_WEBHOST: https://${{ secrets.SSH_HOST }}
+                  API_JWT_SECRET: ${{ secrets.JWT_SECRET }}
+                  API_MONGO_USER_PASSWORD: ${{ secrets.MONGO_USER_PASSWORD }}
+                  LETSENCRYPT_TEST: "true"
+                expose:
+                  - 80
+            EOL
+
+            sudo docker-compose -f docker-compose.yml -f prod.yml up -d

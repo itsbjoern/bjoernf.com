@@ -21,7 +21,7 @@ const express = require('express')
 const bodyParser = require('body-parser')
 const ReactDOMServer = require('react-dom/server')
 
-const nodePath = path.join(__dirname, '..', 'node')
+const nodePath = path.join(__dirname, 'node')
 
 const spawn = require('child_process').spawn
 
@@ -30,6 +30,9 @@ require('@babel/core')
 
 const ADDRESS = argv.address
 const PORT = argv.port
+
+// Internal network only, we don't really care about certs
+process.env.NODE_TLS_REJECT_UNAUTHORIZED = "0";
 
 const createApp = () => {
   const app = express()
