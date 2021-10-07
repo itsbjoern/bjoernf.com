@@ -8,21 +8,6 @@ export default {
     fontSize: 16,
     fontFamily:
       "'Raleway', '-apple-system', 'BlinkMacSystemFont', 'Helvetica Neue', 'Arial', 'sans-serif'",
-    h1: {
-      fontFamily: 'Comfortaa',
-    },
-    h2: {
-      fontFamily: 'Comfortaa',
-    },
-    h3: {
-      fontFamily: 'Comfortaa',
-    },
-    h4: {
-      fontFamily: 'Comfortaa',
-    },
-    h5: {
-      fontFamily: 'Comfortaa',
-    },
   },
   palette: {
     background: {
