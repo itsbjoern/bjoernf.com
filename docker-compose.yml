@@ -21,7 +21,6 @@ services:
       API_CONNECTION_PORT: '8080'
       API_MONGO_HOST: mongo
       API_NODE_ADDRESS: render-server
-      LETSENCRYPT_TEST: "true"
     networks:
       - default
       - nginx-proxy
