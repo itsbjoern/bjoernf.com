@@ -14,6 +14,7 @@ import {
 } from '@mui/material'
 import { ExpandMore } from '@mui/icons-material'
 
+import { isSSR } from 'app/util'
 import { Column } from 'app/components/Flex'
 import { H4 } from 'app/components/Text'
 import Ref from 'app/components/Ref'
@@ -65,7 +66,7 @@ const About = () => {
         information of an individual across multiple sessions or websites (no
         setting of cookies or application storage).
       </span>
-      <Accordion>
+      <Accordion defaultExpanded={isSSR}>
         <AccordionSummary
           expandIcon={<ExpandMore />}
           aria-controls="panel1a-content"
