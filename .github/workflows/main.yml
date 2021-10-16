@@ -129,7 +129,6 @@ jobs:
                   API_CONNECTION_WEBHOST: https://${{ secrets.SSH_HOST }}
                   API_JWT_SECRET: ${{ secrets.JWT_SECRET }}
                   API_MONGO_USER_PASSWORD: ${{ secrets.MONGO_USER_PASSWORD }}
-                  LETSENCRYPT_TEST: "true"
                 expose:
                   - 80
             EOL
