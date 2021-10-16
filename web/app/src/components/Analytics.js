@@ -115,6 +115,9 @@ const Analytics = ({ history, location, children, sendRequest }) => {
     let prevLocation = null
     let pageViewId = null
     const listener = (change) => {
+      if (change.pathname.indexOf('/node/') !== -1) {
+        return
+      }
       if (prevLocation === change.pathname) {
         return
       }
