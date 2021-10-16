@@ -27,7 +27,24 @@
     <title>React App</title>
   </head>
   <body>
-    <noscript>You need to enable JavaScript to run this app.</noscript>
+    <noscript>
+      <style>
+        .center-noscript {
+          width: 100vw;
+          height: 100vh;
+          display: flex;
+          flex-direction: column;
+          align-items: center;
+          justify-content: center;
+        }
+      </style>
+      <div class="center-noscript">
+        <h1>JavaScript disabled :(</h1>
+        <span>This website functions best with JavaScript enabled</span>
+        <span>Proceed to <a href="/node">/node</a> for a readable experience.</span>
+      </div>
+
+    </noscript>
     <div id="root"></div>
     <!--
       This HTML file is a template.
