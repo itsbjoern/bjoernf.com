@@ -71,7 +71,6 @@ async def update_post(request):
   if not post_id:
     return web.HTTPBadRequest(reason="No post id")
 
-  print(data)
   db = request.use('db')
   the_update = {'updatedAt': datetime.datetime.now(),
                 **{f'draft.{key}': val for key, val in data.items()}}
@@ -112,7 +111,6 @@ async def publish(request):
   summary = '.'.join(text.split('.')[:3]) + '.'
   summary = remove_multi.sub(" ", summary).strip()
   tags = draft.get('tags') or published.get('tags')
-  print(title, html, text, summary, tags)
 
   version = {
     'title': title,
@@ -204,6 +202,8 @@ async def upload(request):
           break
       size += len(chunk)
       f.write(chunk)
+
+  util.compress_image(str(upload_path))
 
   return util.json_response({
     'src': f'/uploads/{post_id}/{file_name}',

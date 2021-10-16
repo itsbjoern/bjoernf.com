@@ -1,5 +1,7 @@
 import pathlib
+import os
 from .api import index, admin, blog, analytics
+from blogapi import util
 
 
 PROJECT_ROOT = pathlib.Path(__file__).parent
@@ -22,6 +24,10 @@ def setup_routes(app):
   app.router.add_post('/api/admin/posts/{id}/publish', admin.publish)
   app.router.add_post('/api/admin/posts/{id}/unpublish', admin.unpublish)
   app.router.add_post('/api/admin/posts/{id}/upload', admin.upload)
+
+  for pth, _, fnames in os.walk(PROJECT_ROOT / 'public' / 'images'):
+    for fname in fnames:
+      util.compress_image(os.path.join(pth, fname))
 
   app.router.add_static('/public/',
                         path=PROJECT_ROOT / 'public',

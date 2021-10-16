@@ -56,7 +56,6 @@ const Post = ({
 
   const updatePost = useCallback(
     (update) => {
-      console.log(update)
       setPost({
         ...post,
         draft: {

@@ -24,7 +24,6 @@ const ShareIcon = ({ href, size, Icon }) => (
 
 const PostView = ({ postData, createdAt, hideShare, staticContext }) => {
   const { title, html, tags } = postData
-  console.log(postData)
   const url = isSSR ? staticContext.url : window.location.href
   const userAgent = isSSR ? staticContext.userAgent : navigator.userAgent
   const iconSize = 45

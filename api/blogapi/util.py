@@ -9,6 +9,8 @@ import pathlib
 import pymongo
 import datetime
 import math
+import shutil
+from PIL import Image
 
 PROJECT_ROOT = pathlib.Path(__file__).parent
 UPLOAD_FOLDER = PROJECT_ROOT / 'uploads'
@@ -47,6 +49,25 @@ def auth(func):
     return func(request)
   return route
 
+
+def compress_image(path):
+  if path.endswith('.backup'):
+    return
+  backup_path = path + '.backup'
+  file_path = path
+  if os.path.exists(path + '.backup'):
+    file_path = backup_path
+  img = Image.open(file_path)
+  scale = 800
+  ar = scale / max(*img.size, scale)
+  new_size = [int(le * ar) for le in img.size]
+
+  shutil.move(path, backup_path)
+  try:
+    img = img.resize(new_size, Image.ANTIALIAS)
+    img.save(path, quality=90, optimize=True)
+  except:
+    shutil.move(backup_path, path)
 
 def paginate(coll, query, projection=None, page=1, limit=10, items_per_page=10):
   cursor = None
