@@ -50,7 +50,11 @@ const getScreen = () => {
   return {
     width: screen.width,
     height: screen.height,
-    orientation: screen.orientation.type?.split('-')[0],
+    orientation:
+      screen.orientation?.type?.split('-')[0] ||
+      window.innerWidth > window.innerHeight
+        ? 'landscape'
+        : 'portrait',
   }
 }
 
