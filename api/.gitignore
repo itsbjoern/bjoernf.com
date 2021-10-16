@@ -1,4 +1,6 @@
 blogapi/uploads
+blogapi/public/*
+!blogapi/public/index-node.html
 
 # Byte-compiled / optimized / DLL files
 __pycache__/

@@ -92,19 +92,19 @@ const app = createApp()
 let server = http.Server(app)
 startListen(server)
 
-if (process.env.NODE_ENV === 'development') {
-  const watch = spawn('node', ['watcher.js'])
+// if (process.env.NODE_ENV === 'development') {
+//   const watch = spawn('node', ['watcher.js'])
 
-  const restart = () => {
-    server.close(() => {
-      server = http.Server(app)
-      startListen(server)
-    })
-  }
+//   const restart = () => {
+//     server.close(() => {
+//       server = http.Server(app)
+//       startListen(server)
+//     })
+//   }
 
-  watch.stdout.on('data', restart)
+//   watch.stdout.on('data', restart)
 
-  // watch.stderr.on('data', restart)
+//   // watch.stderr.on('data', restart)
 
-  watch.on('close', () => server.close())
-}
+//   watch.on('close', () => server.close())
+// }

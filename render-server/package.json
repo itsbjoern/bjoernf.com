@@ -11,8 +11,8 @@
     "react-dom": "^17.0.2"
   },
   "scripts": {
-    "start": "NODE_ENV=development node index.js",
+    "start": "yarn run link && NODE_ENV=development node index.js",
     "deploy": "NODE_ENV=production node index.js",
-    "link": "npm link ../node_modules/react ../node_modules/react-dom"
+    "link": "npm link ../web/node_modules/react ../web/node_modules/react-dom"
   }
 }

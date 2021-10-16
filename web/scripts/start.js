@@ -13,9 +13,11 @@ process.on('unhandledRejection', err => {
 
 // Ensure environment variables are read.
 require('../config/env');
+process.env.BUILD_PATH = 'dist'
 
-
+const path = require('path');
 const fs = require('fs');
+const fsExtra = require('fs-extra');
 const chalk = require('react-dev-utils/chalk');
 const webpack = require('webpack');
 const WebpackDevServer = require('webpack-dev-server');
@@ -89,7 +91,7 @@ checkBrowsers(paths.appPath, isInteractive)
     const urls = prepareUrls(
       protocol,
       HOST,
-      port,
+      8000,
       paths.publicUrlOrPath.slice(0, -1)
     );
     const devSocket = {
@@ -109,6 +111,11 @@ checkBrowsers(paths.appPath, isInteractive)
       tscCompileOnError,
       webpack,
     });
+
+    compiler.hooks.afterCompile.tap('CopyPublic', (params) => {
+      copyPublicFolder()
+    })
+
     // Load proxy config
     const proxySetting = require(paths.appPackageJson).proxy;
     const proxyConfig = prepareProxy(
@@ -164,3 +171,13 @@ checkBrowsers(paths.appPath, isInteractive)
     }
     process.exit(1);
   });
+
+function copyPublicFolder() {
+  fsExtra.copySync(paths.appPublic, paths.appBuild, {
+    dereference: true,
+    filter: file => {
+      console.log(file)
+      return file !== paths.appHtml
+    }
+  });
+}

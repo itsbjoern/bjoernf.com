@@ -1,0 +1,5 @@
+{
+  "scripts": {
+    "start": "ln -sf $(pwd)/../web/dist/* ./blogapi/public/ && adev runserver blogapi"
+  }
+}

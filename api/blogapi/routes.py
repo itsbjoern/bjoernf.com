@@ -6,6 +6,7 @@ PROJECT_ROOT = pathlib.Path(__file__).parent
 
 
 def setup_routes(app):
+
   app.router.add_get('/', index.handler)
 
   app.router.add_post('/api/heartbeat', analytics.heartbeat)
@@ -25,7 +26,8 @@ def setup_routes(app):
 
   app.router.add_static('/public/',
                         path=PROJECT_ROOT / 'public',
-                        name='public')
+                        name='public',
+                        follow_symlinks=app['config'].get('dev', False))
 
   app.router.add_static('/uploads/',
                         path=PROJECT_ROOT / 'uploads',
