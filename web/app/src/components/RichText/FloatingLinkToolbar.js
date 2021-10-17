@@ -17,7 +17,6 @@ import {
   useExtension,
   useUpdateReason,
 } from '@remirror/react'
-import styled from '@emotion/styled'
 
 function useLinkShortcut() {
   const [linkShortcut, setLinkShortcut] = useState()
