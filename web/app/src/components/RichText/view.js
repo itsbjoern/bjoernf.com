@@ -72,6 +72,10 @@ export const StyledEditor = styled.div`
       text-align: left;
     }
 
+    ol {
+      list-style-position: inside;
+    }
+
     img {
       max-width: 100%;
     }
