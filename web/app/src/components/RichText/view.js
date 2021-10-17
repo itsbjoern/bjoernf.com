@@ -26,7 +26,7 @@ export const StyledEditor = styled.div`
 
     *:not(pre) > code {
       font-size: 0.97rem;
-      background-color: rgb(251 160 118 / 17%;
+      background-color: rgb(251 160 118 / 17%);
       padding: 1px 3px;
       border-radius: 4px;
     }
@@ -70,10 +70,15 @@ export const StyledEditor = styled.div`
     ul,
     ol {
       text-align: left;
+      padding-inline-start: 20px;
     }
 
     ol {
       list-style-position: inside;
+
+      p {
+        display: inline;
+      }
     }
 
     img {
