@@ -22,6 +22,7 @@ import Analytics from 'app/components/Analytics'
 
 import NotificationProvider from 'app/providers/NotificationProvider'
 import RequestProvider from 'app/providers/RequestProvider'
+import NoJsBanner from 'app/components/NoJsBanner'
 import Header from 'app/components/Header'
 import Footer from 'app/components/Footer'
 import Home from 'app/pages/home/Home'
@@ -93,44 +94,47 @@ const App = (props) => {
             <RouterLayer ssr={props.ssr}>
               <HistoryLayer>
                 <Analytics>
-                  <AdaptiveContainer maxWidth="md">
-                    <Typography component={Column} flexed>
-                      <Header />
-                      <Column
-                        style={{
-                          paddingTop: 45,
-                          paddingBottom: 45,
-                          paddingLeft: 5,
-                          paddingRight: 5,
-                          maxWidth: '100vw',
-                        }}
-                        flexed
-                      >
-                        <Switch>
-                          <Route exact path="/">
-                            <Home />
-                          </Route>
-                          <Route exact path="/blog">
-                            <Blog />
-                          </Route>
-                          <Route exact path="/blog/:id">
-                            <Post />
-                          </Route>
-                          <Route exact path="/projects">
-                            <Projects />
-                          </Route>
-                          <Route exact path="/admin">
-                            <Admin />
-                          </Route>
-                          <Route exact path="/about">
-                            <About />
-                          </Route>
-                        </Switch>
-                      </Column>
-                      <Footer />
-                      <NavigationButtons mobile />
-                    </Typography>
-                  </AdaptiveContainer>
+                  <Column flexed>
+                    <NoJsBanner />
+                    <AdaptiveContainer maxWidth="md">
+                      <Typography component={Column} flexed>
+                        <Header />
+                        <Column
+                          style={{
+                            paddingTop: 45,
+                            paddingBottom: 45,
+                            paddingLeft: 5,
+                            paddingRight: 5,
+                            maxWidth: '100vw',
+                          }}
+                          flexed
+                        >
+                          <Switch>
+                            <Route exact path="/">
+                              <Home />
+                            </Route>
+                            <Route exact path="/blog">
+                              <Blog />
+                            </Route>
+                            <Route exact path="/blog/:id">
+                              <Post />
+                            </Route>
+                            <Route exact path="/projects">
+                              <Projects />
+                            </Route>
+                            <Route exact path="/admin">
+                              <Admin />
+                            </Route>
+                            <Route exact path="/about">
+                              <About />
+                            </Route>
+                          </Switch>
+                        </Column>
+                        <Footer />
+                        <NavigationButtons mobile />
+                      </Typography>
+                    </AdaptiveContainer>
+                  </Column>
                 </Analytics>
               </HistoryLayer>
             </RouterLayer>

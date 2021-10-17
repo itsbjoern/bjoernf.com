@@ -13,6 +13,7 @@ import { Alert, Button, FormControlLabel, Switch } from '@mui/material'
 import { Delete } from '@mui/icons-material'
 
 import { useSSR } from 'app/providers/SSRProvider'
+import { isSSR } from 'app/util'
 import { withRequest } from 'app/providers/RequestProvider'
 import { withNotification } from 'app/providers/NotificationProvider'
 import NotFound from 'app/pages/404'
@@ -51,8 +52,10 @@ const Post = ({
 
   const [post, setPost] = useSSR(() => sendRequest(getPost(postId)), {
     chainThen: (data) => {
-      const title = (data.post.published ?? data.post.draft).title
-      document.title = `${title} - Björn F`
+      if (!isSSR) {
+        const title = (data.post.published ?? data.post.draft).title
+        document.title = `${title} - Björn F`
+      }
       return data.post
     },
     chainFinally: () => setLoading(false),
