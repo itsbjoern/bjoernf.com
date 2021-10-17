@@ -50,7 +50,11 @@ const Post = ({
   const updateTimeout = useRef()
 
   const [post, setPost] = useSSR(() => sendRequest(getPost(postId)), {
-    chainThen: (data) => data.post,
+    chainThen: (data) => {
+      const title = (data.post.published ?? data.post.draft).title
+      document.title = `${title} - Björn F`
+      return data.post
+    },
     chainFinally: () => setLoading(false),
   })
 

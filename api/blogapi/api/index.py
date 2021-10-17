@@ -1,16 +1,41 @@
 import pathlib
 import json
+import bson
 import os
+import re
 from aiohttp import web, ClientSession
 
 PROJECT_ROOT = pathlib.Path(__file__).parent.parent
 BUILD_ROOT = PROJECT_ROOT / 'public'
 
 
+def inject_title(request, content):
+  url = str(request.path)
+  url = url.replace('/node', '')
+  match = re.match(r'/blog/[a-z0-9]+', url)
+  title = '{} - Björn F'
+  if url == '/':
+    title = title.format('Home')
+  elif match:
+    db = request.use('db')
+    post_id = match.group(0).split('/')[-1]
+    post = db.posts.find_one({'_id': bson.ObjectId(post_id)})
+    if post:
+      post_title = post.get('published', post.get('draft', {})).get('title', 'Blog')
+      title = title.format(post_title)
+    else:
+      title = title.format('Blog')
+  else:
+    title = title.format(url[1:].split('/')[0].capitalize())
+  content = content.replace('__SITE_TITLE__', title)
+  return content
+
 async def handler(request):
   with open(BUILD_ROOT / 'index.html', 'r') as fh:
+    page = fh.read()
+    page = inject_title(request, page)
     return web.Response(
-      text=fh.read(),
+      text=page,
       content_type='text/html')
 
 
@@ -31,10 +56,10 @@ async def node_handler(request):
   await session.close()
 
   with open(os.path.join(BUILD_ROOT, 'index-node.html'), 'r') as fh:
-    index = fh.read()
+    page = fh.read()
+    page = inject_title(request, page)
     css_folder = BUILD_ROOT / 'static' / 'css'
     css_file = [f for f in os.listdir(css_folder) if f.endswith('.css')][0]
-    page = index
     page = page.replace('__CSS_URL__', f'/public/static/css/{css_file}')
     page = page.replace('__SITE_CONTENT__', data['markup'])
 

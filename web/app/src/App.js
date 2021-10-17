@@ -1,5 +1,11 @@
-import React, { useState } from 'react'
-import { BrowserRouter, StaticRouter, Switch, Route } from 'react-router-dom'
+import React, { useEffect, useState } from 'react'
+import {
+  BrowserRouter,
+  StaticRouter,
+  Switch,
+  Route,
+  withRouter,
+} from 'react-router-dom'
 
 import {
   Container,
@@ -56,6 +62,26 @@ const SSRSupport = ({ ssr, children }) => {
 
 const RouterLayer = isSSR ? SSRSupport : BrowserRouter
 
+const HistoryLayer = withRouter(({ children, history }) => {
+  useEffect(() => {
+    const unsub = history.listen((location) => {
+      const path = location.pathname
+      let title = ''
+      if (path === '/') {
+        title = 'Home'
+      } else {
+        const firstItem = path.split('/')[1]
+        title = firstItem.charAt(0).toUpperCase() + firstItem.slice(1)
+      }
+
+      document.title = `${title} - Björn F`
+    })
+    return unsub
+  }, [])
+
+  return children
+})
+
 const App = (props) => {
   const [theme] = useState(() => createTheme(themeTemplate))
 
@@ -65,46 +91,48 @@ const App = (props) => {
         <NotificationProvider>
           <RequestProvider>
             <RouterLayer ssr={props.ssr}>
-              <Analytics>
-                <AdaptiveContainer maxWidth="md">
-                  <Typography component={Column} flexed>
-                    <Header />
-                    <Column
-                      style={{
-                        paddingTop: 45,
-                        paddingBottom: 45,
-                        paddingLeft: 5,
-                        paddingRight: 5,
-                        maxWidth: '100vw',
-                      }}
-                      flexed
-                    >
-                      <Switch>
-                        <Route exact path="/">
-                          <Home />
-                        </Route>
-                        <Route exact path="/blog">
-                          <Blog />
-                        </Route>
-                        <Route exact path="/blog/:id">
-                          <Post />
-                        </Route>
-                        <Route exact path="/projects">
-                          <Projects />
-                        </Route>
-                        <Route exact path="/admin">
-                          <Admin />
-                        </Route>
-                        <Route exact path="/about">
-                          <About />
-                        </Route>
-                      </Switch>
-                    </Column>
-                    <Footer />
-                    <NavigationButtons mobile />
-                  </Typography>
-                </AdaptiveContainer>
-              </Analytics>
+              <HistoryLayer>
+                <Analytics>
+                  <AdaptiveContainer maxWidth="md">
+                    <Typography component={Column} flexed>
+                      <Header />
+                      <Column
+                        style={{
+                          paddingTop: 45,
+                          paddingBottom: 45,
+                          paddingLeft: 5,
+                          paddingRight: 5,
+                          maxWidth: '100vw',
+                        }}
+                        flexed
+                      >
+                        <Switch>
+                          <Route exact path="/">
+                            <Home />
+                          </Route>
+                          <Route exact path="/blog">
+                            <Blog />
+                          </Route>
+                          <Route exact path="/blog/:id">
+                            <Post />
+                          </Route>
+                          <Route exact path="/projects">
+                            <Projects />
+                          </Route>
+                          <Route exact path="/admin">
+                            <Admin />
+                          </Route>
+                          <Route exact path="/about">
+                            <About />
+                          </Route>
+                        </Switch>
+                      </Column>
+                      <Footer />
+                      <NavigationButtons mobile />
+                    </Typography>
+                  </AdaptiveContainer>
+                </Analytics>
+              </HistoryLayer>
             </RouterLayer>
           </RequestProvider>
         </NotificationProvider>
