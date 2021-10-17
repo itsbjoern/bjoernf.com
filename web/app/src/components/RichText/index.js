@@ -17,8 +17,9 @@ import {
 // import { FileExtension } from '@remirror/extension-file'
 
 import { VideoExtension } from './extensions/video'
+import FloatingLinkToolbar from './FloatingLinkToolbar'
 
-import { Remirror, useRemirror } from '@remirror/react'
+import { Remirror, useRemirror, ThemeProvider } from '@remirror/react'
 
 import { Column } from 'app/components/Flex'
 
@@ -80,31 +81,34 @@ const Editor = ({ content, onChange, upload, editable = true }) => {
   })
 
   return (
-    <Remirror
-      editable={editable}
-      manager={manager}
-      initialContent={state}
-      placeholder="Start your post..."
-      onChange={(parameter) => {
-        const { state, tr } = parameter
-        setState(state)
+    <ThemeProvider>
+      <Remirror
+        editable={editable}
+        manager={manager}
+        initialContent={state}
+        placeholder="Start your post..."
+        onChange={(parameter) => {
+          const { state, tr } = parameter
+          setState(state)
 
-        if (parameter.internalUpdate) return
-        if (!tr?.steps?.length) return
-        if (!editable) return
+          if (parameter.internalUpdate) return
+          if (!tr?.steps?.length) return
+          if (!editable) return
 
-        onChange &&
-          onChange({
-            html: parameter.helpers.getHTML(),
-            text: parameter.helpers.getText(),
-          })
-      }}
-    >
-      <Column gap={20}>
-        {editable ? <EditorMenu /> : null}
-        <EditorView />
-      </Column>
-    </Remirror>
+          onChange &&
+            onChange({
+              html: parameter.helpers.getHTML(),
+              text: parameter.helpers.getText(),
+            })
+        }}
+      >
+        <Column gap={20}>
+          {editable ? <EditorMenu /> : null}
+          {editable ? <FloatingLinkToolbar /> : null}
+          <EditorView />
+        </Column>
+      </Remirror>
+    </ThemeProvider>
   )
 }
 

@@ -8,6 +8,7 @@ export const StyledEditor = styled.div`
   .remirror-editor {
     box-sizing: border-box;
     position: relative;
+    box-shadow: none;
     border: none;
     line-height: 1.6em;
     width: 100%;
@@ -62,6 +63,7 @@ export const StyledEditor = styled.div`
       &:focus {
         padding: 9px;
         border: 2px solid ${({ theme }) => theme.palette.primary.main};
+        box-shadow: none;
       }
     }
 
