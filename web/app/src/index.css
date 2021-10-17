@@ -69,4 +69,7 @@ html {
 .remirror-theme {
   --rmr-color-primary: #FF570A;
   --rmr-color-hover-primary: #FF570A;
+  --rmr-font-family-default: inherit;
+  --rmr-font-family-heading: inherit;
+  --rmr-font-family-mono: inherit;
 }
