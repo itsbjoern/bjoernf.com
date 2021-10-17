@@ -25,8 +25,8 @@ export const StyledEditor = styled.div`
     }
 
     *:not(pre) > code {
-      font-size: 0.95rem;
-      background-color: rgba(255, 87, 10, 0.3);
+      font-size: 0.97rem;
+      background-color: rgb(251 160 118 / 17%;
       padding: 1px 3px;
       border-radius: 4px;
     }
