@@ -115,6 +115,9 @@ checkBrowsers(paths.appPath, isInteractive)
     compiler.hooks.afterCompile.tap('CopyPublic', (params) => {
       copyPublicFolder()
     })
+    compiler.hooks.beforeCompile.tap('RemoveBefore', (params) => {
+      deleteOld()
+    })
 
     // Load proxy config
     const proxySetting = require(paths.appPackageJson).proxy;
@@ -172,11 +175,21 @@ checkBrowsers(paths.appPath, isInteractive)
     process.exit(1);
   });
 
+const removeRegex = /[.]js(on)?([.]map)?$/
+function deleteOld() {
+  try {
+    fsExtra.readdirSync(paths.appBuild)
+      .filter(f => removeRegex.test(f))
+      .map(f => fsExtra.unlinkSync(paths.appBuild + '/' + f))
+  } catch (e) {
+    console.log(e)
+  }
+}
+
 function copyPublicFolder() {
   fsExtra.copySync(paths.appPublic, paths.appBuild, {
     dereference: true,
     filter: file => {
-      console.log(file)
       return file !== paths.appHtml
     }
   });
