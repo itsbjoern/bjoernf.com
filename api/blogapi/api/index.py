@@ -59,8 +59,12 @@ async def node_handler(request):
     page = fh.read()
     page = inject_title(request, page)
     css_folder = BUILD_ROOT / 'static' / 'css'
-    css_file = [f for f in os.listdir(css_folder) if f.endswith('.css')][0]
-    page = page.replace('__CSS_URL__', f'/public/static/css/{css_file}')
+    css_files = [f for f in os.listdir(css_folder) if f.endswith('.css')]
+    css_tags = ''
+    css_template = '<link href="/public/static/css/{}" rel="stylesheet">'
+    for css_file in css_files:
+      css_tags += '\n' + css_template.format(css_file)
+    page = page.replace('__CSS_TAGS__', css_tags)
     page = page.replace('__SITE_CONTENT__', data['markup'])
 
     return web.Response(
