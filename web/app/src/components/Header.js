@@ -11,6 +11,7 @@ import {
   AdminPanelSettings,
 } from '@mui/icons-material'
 
+import { publicUrl } from 'app/util'
 import { withRequest } from 'app/providers/RequestProvider'
 import { Row, Column } from 'app/components/Flex'
 import { H2 } from 'app/components/Text'
@@ -30,7 +31,10 @@ const Header = ({ history, token, setToken }) => {
     <BG gap={15}>
       <Row justify="between" align="center">
         <Row align="center">
-          <Avatar sx={{ width: 70, height: 70 }} src="/public/images/me.png" />
+          <Avatar
+            sx={{ width: 70, height: 70 }}
+            src={`${publicUrl}/images/me.png`}
+          />
           <Column justify="evenly" style={{ marginLeft: 10 }}>
             <H2>Björn Friedrichs</H2>
             <Row gap={5}>
