@@ -19,7 +19,7 @@ const chalk = require('react-dev-utils/chalk')
 const fs = require('fs-extra')
 const bfj = require('bfj')
 const webpack = require('webpack')
-const configFactory = require('../config/webpack.config.old')
+const configFactory = require('../config/webpack.config')
 const paths = require('../config/paths')
 const checkRequiredFiles = require('react-dev-utils/checkRequiredFiles')
 const formatWebpackMessages = require('react-dev-utils/formatWebpackMessages')
@@ -60,7 +60,6 @@ checkBrowsers(paths.appPath, isInteractive)
   .then((previousFileSizes) => {
     // Remove all content but keep the directory so that
     // if you're in it, you don't end up in Trash
-    fs.emptyDirSync(paths.appBuild)
     // Merge with the public folder
     copyPublicFolder()
     // Start the webpack build

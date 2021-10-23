@@ -30,7 +30,9 @@
       "eslint-plugin-prettier"
   ],
   "globals": {
-    "global": true
+    "global": true,
+    "process": true,
+    "require": true,
   },
   "rules": {
     "prettier/prettier": "warn",
