@@ -221,5 +221,6 @@ module.exports = function (webpackEnv, isNode) {
     },
     target: isNode ? 'node' : 'web',
     externals: isNode ? ['react', 'react-dom'] : {},
+    performance: false,
   }
 }
