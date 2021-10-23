@@ -7,7 +7,6 @@ import { withRouter } from 'react-router-dom'
 
 import { emailLink, linkedinLink, whatsappLink, twitterLink } from 'app/share'
 
-import { isSSR } from 'app/util'
 import { Column, Row } from 'app/components/Flex'
 import { H2 } from 'app/components/Text'
 import { StyledEditor } from 'app/components/RichText/view'
