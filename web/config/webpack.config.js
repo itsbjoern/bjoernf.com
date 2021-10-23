@@ -199,7 +199,7 @@ module.exports = function (webpackEnv, isNode) {
       path: isEnvDevelopment
         ? path.resolve(__dirname, '..', 'dist')
         : paths.appBuild,
-      filename: `static/js/[name]${ext}.js`,
+      filename: `static/js/[name]${isNode ? '' : ext}.js`,
       globalObject: 'this',
       publicPath: '/public/',
       devtoolModuleFilenameTemplate: !isEnvDevelopment
@@ -208,7 +208,7 @@ module.exports = function (webpackEnv, isNode) {
               .relative(paths.appSrc, info.absoluteResourcePath)
               .replace(/\\/g, '/')
         : (info) => path.resolve(info.absoluteResourcePath).replace(/\\/g, '/'),
-      ...(isNode ? { libraryTarget: 'umd' } : {}),
+      ...(isNode ? { libraryTarget: 'commonjs' } : {}),
     },
     node: {
       module: 'empty',
@@ -221,7 +221,10 @@ module.exports = function (webpackEnv, isNode) {
       child_process: 'empty',
     },
     target: isNode ? 'node' : 'web',
-    externals: isNode ? ['react', 'react-dom', nodeExternals()] : {},
+    externals: [
+      ...(isNode && isEnvDevelopment ? ['react', 'react-dom'] : []),
+      ...(isNode ? ['bufferutil', 'utf-8-validate'] : []),
+    ],
     performance: false,
   }
 }
