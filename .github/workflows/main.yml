@@ -27,23 +27,11 @@ jobs:
             ${{ runner.os }}-build-
             ${{ runner.os }}-
 
-      - name: Cache requirements
-        uses: actions/cache@v2
-        env:
-          cache-name: cache-pip-requirements
-        with:
-          # npm cache files are stored in `~/.npm` on Linux/macOS
-          path: ~/.npm
-          key: ${{ runner.os }}-build-${{ env.cache-name }}-${{ hashFiles('**/requirements.txt') }}
-          restore-keys: |
-            ${{ runner.os }}-build-${{ env.cache-name }}-
-            ${{ runner.os }}-build-
-            ${{ runner.os }}-
-
       - name: Install and build web
         working-directory: ./web
         env:
           REACT_APP_API_URL: https://bjornf.dev
+          PUBLIC_URL: https://static.bjornf.dev
         run: |
           npm install
           node scripts/build.js
@@ -51,8 +39,13 @@ jobs:
 
       - name: Move builds
         run: |
-          rsync -avz ./web/build/ ./api/blogapi/public/
+          mkdir -p ./api/blogapi/public
+          mkdir -p ./static/data
+
+          rsync -avz ./web/build/index.html ./api/blogapi/public/index.html
+          rsync -avz ./web/build/robots.txt ./api/blogapi/public/robots.txt
           rsync -avz ./web/build/ ./render-server/dist/
+          rsync -avz ./web/build/ ./static/data/
 
       - name: Build api
         working-directory: ./api
@@ -68,6 +61,13 @@ jobs:
           docker build -t bjornf-render-server .
 
           docker save -o ~/images/render-server.tar bjornf-render-server
+
+      - name: Build static
+        working-directory: ./static
+        run: |
+          docker build -t bjornf-static .
+
+          docker save -o ~/images/static.tar bjornf-static
 
       - name: Install SSH key
         uses: shimataro/ssh-key-action@v2
@@ -104,6 +104,7 @@ jobs:
           script: |
             sudo docker load -i ~/bjornf.dev/images/api.tar
             sudo docker load -i ~/bjornf.dev/images/render-server.tar
+            sudo docker load -i ~/bjornf.dev/images/static.tar
 
       - name: Restart server
         uses: appleboy/ssh-action@master
@@ -129,6 +130,13 @@ jobs:
                   API_CONNECTION_WEBHOST: https://${{ secrets.SSH_HOST }}
                   API_JWT_SECRET: ${{ secrets.JWT_SECRET }}
                   API_MONGO_USER_PASSWORD: ${{ secrets.MONGO_USER_PASSWORD }}
+                expose:
+                  - 80
+              static:
+                environment:
+                  VIRTUAL_HOST: static.${{ secrets.SSH_HOST }}
+                  VIRTUAL_PORT: 80
+                  LETSENCRYPT_HOST: static.${{ secrets.SSH_HOST }}
                 expose:
                   - 80
             EOL

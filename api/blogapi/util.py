@@ -13,7 +13,6 @@ import shutil
 from PIL import Image
 
 PROJECT_ROOT = pathlib.Path(__file__).parent
-UPLOAD_FOLDER = PROJECT_ROOT / 'uploads'
 
 
 class ObjEnconder(json.JSONEncoder):
@@ -36,12 +35,6 @@ def json_response(data, **kwargs):
   return web.json_response(data, dumps=dumps, **kwargs)
 
 
-def get_upload_path(path):
-  full_path = UPLOAD_FOLDER / path
-  os.makedirs(full_path.parent, exist_ok=True)
-  return full_path
-
-
 def auth(func):
   def route(request):
     if not request.get('user'):
@@ -51,6 +44,7 @@ def auth(func):
 
 
 def compress_image(path):
+  path = str(path)
   if path.endswith('.backup'):
     return
   backup_path = path + '.backup'

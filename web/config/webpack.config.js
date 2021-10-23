@@ -200,7 +200,7 @@ module.exports = function (webpackEnv, isNode) {
         : paths.appBuild,
       filename: `static/js/[name]${isNode ? '' : ext}.js`,
       globalObject: 'this',
-      publicPath: '/public/',
+      publicPath: paths.publicUrlOrPath,
       devtoolModuleFilenameTemplate: !isEnvDevelopment
         ? (info) =>
             path

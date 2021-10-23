@@ -8,8 +8,6 @@ PROJECT_ROOT = pathlib.Path(__file__).parent
 
 
 def setup_routes(app):
-  app.router.add_get('/', index.handler)
-
   app.router.add_post('/api/heartbeat', analytics.heartbeat)
 
   app.router.add_get('/api/blog/posts', blog.get_all_posts_handler)
@@ -24,19 +22,27 @@ def setup_routes(app):
   app.router.add_post('/api/admin/posts/{id}/publish', admin.publish)
   app.router.add_post('/api/admin/posts/{id}/unpublish', admin.unpublish)
   app.router.add_post('/api/admin/posts/{id}/upload', admin.upload)
+  app.router.add_get('/api/{tail:.*}', index.not_found)
 
-  for pth, _, fnames in os.walk(PROJECT_ROOT / 'public' / 'images'):
+  app.router.add_get('/', index.handler)
+
+  static_path_str = app['config']['paths.static']
+  static_path = pathlib.Path(static_path_str)
+  if static_path_str[0] != '/':
+    static_path = PROJECT_ROOT / static_path
+
+  for pth, _, fnames in os.walk(static_path / 'images'):
     for fname in fnames:
       util.compress_image(os.path.join(pth, fname))
 
-  app.router.add_static('/public/',
-                        path=PROJECT_ROOT / 'public',
-                        name='public',
-                        follow_symlinks=app['config'].get('dev', False))
+  if app['config']['dev']:
+    app.router.add_static('/public/',
+                          path=PROJECT_ROOT / 'public',
+                          name='public',
+                          follow_symlinks=True)
 
-  app.router.add_static('/uploads/',
-                        path=PROJECT_ROOT / 'uploads',
-                        name='uploads')
+    app.router.add_static('/uploads/',
+                          path=PROJECT_ROOT / 'uploads',
+                          name='uploads')
 
-  app.router.add_get('/api/{tail:.*}', index.not_found)
   app.router.add_get('/{tail:.*}', index.handler)

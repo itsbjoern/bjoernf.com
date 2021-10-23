@@ -24,11 +24,22 @@ services:
     networks:
       - default
       - nginx-proxy
+    volumes:
+      - staticvolume:/app/blogapi/public
   mongo:
     image: mongo
     restart: unless-stopped
     networks:
       - default
+  static:
+    image: bjornf-static
+    volumes:
+      - staticvolume:/usr/share/nginx/html
+    networks:
+      - nginx-proxy
+
+volumes:
+  staticvolume:
 
 networks:
   default:

@@ -74,7 +74,7 @@ const HistoryLayer = withRouter(({ children, history }) => {
         title = firstItem.charAt(0).toUpperCase() + firstItem.slice(1)
       }
 
-      document.title = `${title} - Björn F`
+      document.title = `${title} - Björn Friedrichs`
     })
     return unsub
   }, [])

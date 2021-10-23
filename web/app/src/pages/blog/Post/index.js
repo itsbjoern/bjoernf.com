@@ -53,7 +53,7 @@ const Post = ({
     chainSuccess: (data) => {
       if (!isSSR) {
         const title = (data.post.published ?? data.post.draft).title
-        document.title = `${title} - Björn F`
+        document.title = `${title} - Björn Friedrichs`
       }
       return data.post
     },
