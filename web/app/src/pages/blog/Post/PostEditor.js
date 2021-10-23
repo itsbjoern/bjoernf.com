@@ -23,7 +23,7 @@ const PostEditor = ({ post, updatePost, sendRequest }) => {
   const [availableTags, setAvailableTags] = useState([])
 
   useEffect(() => {
-    sendRequest(getTags()).then(({ tags }) => {
+    sendRequest(getTags()).success(({ tags }) => {
       setAvailableTags(tags)
     })
   }, [])
@@ -35,7 +35,7 @@ const PostEditor = ({ post, updatePost, sendRequest }) => {
   } = { ...post.published, ...post.draft }
   const uploadHandler = useCallback(
     (file) =>
-      sendRequest(upload(post._id, file)).then(({ src, fileName }) => {
+      sendRequest(upload(post._id, file)).success(({ src, fileName }) => {
         if (isDev) {
           src = 'http://127.0.0.1:8000' + src
         }

@@ -1,4 +1,10 @@
-import React, { useState, useCallback, useContext, forwardRef } from 'react'
+import React, {
+  useState,
+  useEffect,
+  useCallback,
+  useContext,
+  forwardRef,
+} from 'react'
 
 import { request } from 'app/api'
 import { isSSR } from 'app/util'
@@ -6,9 +12,10 @@ import { isSSR } from 'app/util'
 export const RequestContext = React.createContext(null)
 
 const UserProvider = ({ children }) => {
-  const [token, _setToken] = useState(
-    isSSR ? '' : localStorage.getItem('authToken')
-  )
+  const [token, _setToken] = useState('')
+  useEffect(() => {
+    setToken(localStorage.getItem('authToken'))
+  })
 
   const setToken = (newToken) => {
     if (!isSSR) {
@@ -25,17 +32,21 @@ const UserProvider = ({ children }) => {
   const sendRequest = useCallback(
     ({ headers, ...payload }, options) => {
       const rewrittenHeaders = headers || {}
-      if (!!token) {
-        rewrittenHeaders['Authorization'] = `Bearer ${token}`
+      const currentToken =
+        token ||
+        (global.localStorage && global.localStorage.getItem('authToken'))
+      if (!!currentToken) {
+        rewrittenHeaders['Authorization'] = `Bearer ${currentToken}`
       }
-      return request({ ...payload, headers: rewrittenHeaders }, options).catch(
-        (e) => {
-          if (e.status == 401) {
-            setToken(null)
-          }
-          return Promise.reject(e)
+      return request(
+        { ...payload, headers: rewrittenHeaders },
+        options
+      ).failure((e) => {
+        if (e.status == 401) {
+          setToken(null)
         }
-      )
+        return { error: e }
+      })
     },
     [token]
   )

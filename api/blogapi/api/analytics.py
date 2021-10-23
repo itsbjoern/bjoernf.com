@@ -59,54 +59,46 @@ async def heartbeat(request):
   data['viewId'] = bson.ObjectId(pageview_id)
 
   db = request.use('db')
+  current = db.analytics.find_one({'_id': bson.ObjectId(pageview_id)})
+  if not current:
+    return util.json_response({'ok': True}, headers=headers)
+
+  update = {'$set': {}}
+
+  for key, value in data.items():
+    if value is not None:
+      update['$set'][key] = value
+
   user_id = request.get('user', {}).get('_id', None)
   if user_id:
-    data['isAdmin'] = True
+    update['$set']['isAdmin'] = True
 
-  if len(data.get('sources', {})) == 0:
-    del data['sources']
+  if not current.get('jsEnabled', False):
+    update['$set']['jsEnabled'] = True
 
-  for key in list(data.keys()):
-    if data.get(key, None) is None:
-      del data[key]
-
-  if 'timezone' in data:
+  if 'timezone' in data and 'timzone' not in current:
     country_code = TIMEZONE_DATA.get(data['timezone'])
     if country_code:
       data['countryCode'] = country_code
       data['country'] = COUNTRY_DATA.get(country_code, None)
-      db.analytics.update_many({'viewId': data['viewId'], 'timezone': {'$exists': False}}, {'$set': {
-        'country': data['country'],
-        'countryCode': data['countryCode'],
-        'timezone': data['timezone']
-      }})
+      update['$set']['country'] = data['country']
+      update['$set']['countryCode'] = data['countryCode']
+      update['$set']['timezone'] = data['timezone']
 
-  if 'datetime' in data:
-    parsed_time = datetime.datetime.strptime(data['datetime'], "%Y-%m-%dT%H:%M:%S.%fZ")
-    data['createdAt'] = parsed_time
-    del data['datetime']
+  now = datetime.datetime.utcnow()
+  paths = current['paths']
+  duration = now - paths[-1]['visitedAt']
+  update['$set'][f'paths.{len(paths)-1}'] = duration.total_seconds()
 
-    try:
-      last_event = next(db.analytics.find({'viewId': bson.ObjectId(pageview_id)}).sort('_id', -1).limit(1))
-      if last_event:
-        duration = data['createdAt'] - last_event['createdAt']
-        db.analytics.update_one({'_id': last_event['_id']}, {'$set': {'duration': duration.total_seconds()}})
-    except StopIteration:
-      pass
-
-  db.analytics.insert_one(data)
+  db.analytics.update_one({'_id': current['_id']}, update)
   return util.json_response({'ok': True}, headers=headers)
 
 
 async def analytics_middleware(app, handler):
   async def mid(request):
-    response = await handler(request)
+
     path = request.path
     pageview_id = request.headers.get('Pageview-Id', str(bson.ObjectId()))
-    response.headers['Pageview-Id'] = pageview_id
-    if not path.startswith('/node'):
-      return response
-
     user_agent = request.headers.get('user-agent')
     parsed = httpagentparser.detect(user_agent)
     os = parsed.get('platform', {}).get('name', None)
@@ -118,36 +110,41 @@ async def analytics_middleware(app, handler):
     sources = {key.replace('utm_', ''): value for key, value in request.query.items() if key.startswith('utm_')}
     db = request.use('db')
 
-    data = {
-      'createdAt': datetime.datetime.now(),
-      'viewId': bson.ObjectId(pageview_id),
-      'sources': sources,
-      'os': os,
-      'path': path.replace('/node', ''),
-      'usesNode': True,
-      'browser': {
-        'name': browser_name,
-        'version': browser_version
-      },
-      'referer': referer,
-      'userAgent': user_agent
-    }
+    current = db.analytics.find_one({'_id': bson.ObjectId(pageview_id)})
+    now = datetime.datetime.utcnow()
+    if not current:
+      data = {
+        'createdAt': now,
+        'viewId': bson.ObjectId(pageview_id),
+        'sources': sources,
+        'os': os,
+        'paths': [{'url':path, 'visitedAt': now}],
+        'jsEnabled': False,
+        'browser': {
+          'name': browser_name,
+          'version': browser_version
+        },
+        'referer': referer,
+        'userAgent': user_agent
+      }
 
-    if request.get('user'):
-      data['isAdmin'] = True
+      if request.get('user'):
+        data['isAdmin'] = True
 
-    if bot:
-      data['isProbablyBot'] = True
+      if bot:
+        data['isProbablyBot'] = True
 
-    try:
-      last_event = next(db.analytics.find({'viewId': bson.ObjectId(pageview_id)}).sort('_id', -1).limit(1))
-      if last_event:
-        duration = data['createdAt'] - last_event['createdAt']
-        db.analytics.update_one({'_id': last_event['_id']}, {'$set': {'duration': duration.total_seconds()}})
-    except StopIteration:
-      pass
+      db.analytics.insert_one(data)
+    else:
+      # avoid double logging path
+      js_enabled = current.get('jsEnabled', False)
+      if not js_enabled:
+        paths = current['paths']
+        duration = now - paths[-1]['visitedAt']
+        db.analytics.update_one({'_id': current['_id']}, {'$set': {f'paths.{len(paths)-1}': duration.total_seconds()}})
 
-    db.analytics.insert_one(data)
+    response = await handler(request)
+    response.headers['Pageview-Id'] = pageview_id
 
     return response
   return mid

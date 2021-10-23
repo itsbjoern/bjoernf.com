@@ -9,12 +9,14 @@ PROJECT_ROOT = pathlib.Path(__file__).parent.parent
 BUILD_ROOT = PROJECT_ROOT / 'public'
 
 
-def inject_title(request, content):
+def inject_title(request, content, form=None):
   url = str(request.path)
   url = url.replace('/node', '')
   match = re.match(r'/blog/[a-z0-9]+', url)
   title = '{} - Björn F'
-  if url == '/':
+  if form is not None:
+    title = title.format(form)
+  elif url == '/':
     title = title.format('Home')
   elif match:
     db = request.use('db')
@@ -31,46 +33,49 @@ def inject_title(request, content):
   return content
 
 async def handler(request):
-  with open(BUILD_ROOT / 'index.html', 'r') as fh:
-    page = fh.read()
-    page = inject_title(request, page)
-    return web.Response(
-      text=page,
-      content_type='text/html')
-
-
-async def node_handler(request):
-  rel_url = str(request.rel_url)[5:] or '/'
-  url = str(request.url)[5:]
+  url = str(request.rel_url)
   user_agent = request.headers['User-Agent']
-  req_data = json.dumps({'url': url, 'rel_url': rel_url, 'userAgent': user_agent})
+  req_data = json.dumps({'url': url, 'absUrl': str(request.url), 'userAgent': user_agent})
+
+  node_addr = request.app['config']['node.address']
+  node_port = request.app['config']['node.port']
 
   session = ClientSession()
   data = None
-  node_addr = request.app['config']['node.address']
-  node_port = request.app['config']['node.port']
   async with session.post(f'http://{node_addr}:{node_port}/render',
                           data=req_data,
                           headers={'Content-Type': 'application/json'}) as resp:
     data = await resp.json()
   await session.close()
 
-  with open(os.path.join(BUILD_ROOT, 'index-node.html'), 'r') as fh:
+  if 'markup' not in data:
+    print(data)
+    return await not_found_html(request)
+
+  with open(os.path.join(BUILD_ROOT, 'index.html'), 'r') as fh:
     page = fh.read()
     page = inject_title(request, page)
-    css_folder = BUILD_ROOT / 'static' / 'css'
-    css_files = [f for f in os.listdir(css_folder) if f.endswith('.css')]
-    css_tags = ''
-    css_template = '<link href="/public/static/css/{}" rel="stylesheet">'
-    for css_file in css_files:
-      css_tags += '\n' + css_template.format(css_file)
-    page = page.replace('__CSS_TAGS__', css_tags)
-    page = page.replace('__SITE_CONTENT__', data['markup'])
+
+    page = page.replace('<div id="root"></div>', '<div id="root">{}</div>'.format(data['markup']))
+    page = page.replace('__SCRIPT_DATA__', data.get('extraScript', ''))
+
+  return web.Response(
+    text=page,
+    content_type='text/html')
+
+
+async def not_found(request):
+    raise web.HTTPNotFound()
+
+
+async def not_found_html(request):
+  with open(os.path.join(BUILD_ROOT, 'index.html'), 'r') as fh:
+    page = fh.read()
+    page = inject_title(request, page, 'Not found')
+
+    page = page.replace('<div id="root"></div>', '<div id="root">{}</div>'.format('404 Page not found'))
+    page = page.replace('__SCRIPT_DATA__', '')
 
     return web.Response(
       text=page,
       content_type='text/html')
-
-
-async def not_found(request):
-  raise web.HTTPNotFound()

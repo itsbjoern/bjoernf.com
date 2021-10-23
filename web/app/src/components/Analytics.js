@@ -119,9 +119,6 @@ const Analytics = ({ history, location, children, sendRequest }) => {
     let prevLocation = null
     let pageViewId = null
     const listener = (change) => {
-      if (change.pathname.indexOf('/node/') !== -1) {
-        return
-      }
       if (prevLocation === change.pathname) {
         return
       }
@@ -133,9 +130,11 @@ const Analytics = ({ history, location, children, sendRequest }) => {
         }
       }
 
-      sendRequest(requestData, { returnHeaders: true }).then(({ headers }) => {
-        pageViewId = headers['pageview-id'] || null
-      })
+      sendRequest(requestData, { returnHeaders: true }).success(
+        ({ headers }) => {
+          pageViewId = headers['pageview-id'] || null
+        }
+      )
 
       prevLocation = change.pathname
     }

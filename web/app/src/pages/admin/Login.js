@@ -14,10 +14,10 @@ const Login = ({ sendRequest, setToken, createNotification }) => {
 
   const tryLogin = useCallback(() => {
     sendRequest(login(username, password))
-      .then((response) => {
+      .success((response) => {
         setToken(response.token)
       })
-      .catch((err) =>
+      .failure((err) =>
         createNotification(`Login failed: ${err.message}`, 'error')
       )
   }, [username, password, sendRequest])

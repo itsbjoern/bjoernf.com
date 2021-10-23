@@ -14,7 +14,7 @@ import PostItem from 'app/components/PostItem'
 const Home = ({ sendRequest }) => {
   const [posts] = useSSR(() => sendRequest(getPosts()), {
     init: [],
-    chainThen: (data) => data.posts,
+    chainSuccess: (data) => data.posts,
   })
 
   return (

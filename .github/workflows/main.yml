@@ -52,7 +52,7 @@ jobs:
       - name: Move builds
         run: |
           rsync -avz ./web/build/ ./api/blogapi/public/
-          rsync -avz ./web/node/ ./render-server/node/
+          rsync -avz ./web/build/ ./render-server/dist/
 
       - name: Build api
         working-directory: ./api

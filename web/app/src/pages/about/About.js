@@ -1,4 +1,4 @@
-import React from 'react'
+import React, { useState } from 'react'
 
 import {
   Divider,
@@ -14,7 +14,6 @@ import {
 } from '@mui/material'
 import { ExpandMore } from '@mui/icons-material'
 
-import { isSSR } from 'app/util'
 import { Column } from 'app/components/Flex'
 import { H4 } from 'app/components/Text'
 import Ref from 'app/components/Ref'
@@ -22,6 +21,8 @@ import Ref from 'app/components/Ref'
 import collectionData from './collectionData'
 
 const About = () => {
+  const [isExpanded, setExpanded] = useState(true)
+
   return (
     <Column gap={30}>
       <span>
@@ -35,9 +36,8 @@ const About = () => {
           text="Let's Encrypt Companion"
           href="https://github.com/nginx-proxy/acme-companion"
         />
-        to do the signing legwork for me. You can visit <Ref href="/node" /> to
-        view a static server-side rendered version of this website (in case
-        javascript is disabled).
+        to do the signing legwork for me. You can visit any page with JavaScript
+        disabled to view a static server-side rendered version of this website.
       </span>
       <span>
         My blog posts are written using a WYSIWYG editor made from{' '}
@@ -66,11 +66,14 @@ const About = () => {
         information of an individual across multiple sessions or websites (no
         setting of cookies or application storage).
       </span>
-      <Accordion defaultExpanded={isSSR}>
+      <Accordion expanded={isExpanded}>
         <AccordionSummary
           expandIcon={<ExpandMore />}
           aria-controls="panel1a-content"
           id="panel1a-header"
+          onClick={() => {
+            setExpanded(!isExpanded)
+          }}
         >
           Check the data I collect
         </AccordionSummary>

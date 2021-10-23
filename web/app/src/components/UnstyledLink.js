@@ -2,8 +2,6 @@ import React, { useRef } from 'react'
 import { Link } from 'react-router-dom'
 import styled from '@emotion/styled'
 
-import { isSSR } from 'app/util'
-
 const UnstyledLink = styled(Link)`
   &&& {
     display: flex;
@@ -22,7 +20,7 @@ const ConsiderSSR = ({ to, delay, ...props }) => {
 
   return (
     <UnstyledLink
-      to={(isSSR ? '/node' : '') + to}
+      to={to}
       onClick={(e) => {
         if (timeout.current) {
           timeout.current = null

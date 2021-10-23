@@ -1,4 +1,4 @@
-import React, { useState } from 'react'
+import React, { useState, useEffect } from 'react'
 import {
   BoldExtension,
   UnderlineExtension,
@@ -19,7 +19,14 @@ import {
 import { VideoExtension } from './extensions/video'
 import FloatingLinkToolbar from './FloatingLinkToolbar'
 
-import { Remirror, useRemirror, ThemeProvider } from '@remirror/react'
+import {
+  Remirror,
+  useRemirror,
+  ThemeProvider,
+  useKeymap,
+} from '@remirror/react'
+
+import { getTextSelection } from '@remirror/core'
 
 import { Column } from 'app/components/Flex'
 
@@ -32,7 +39,7 @@ const createUploadHandler = (upload) => (uploads) => {
     ({ file, progress }) =>
       () =>
         new Promise((resolve) => {
-          return upload(file, progress).then((result) => {
+          return upload(file, progress).success((result) => {
             completed += 1
             progress(completed / uploads.length)
             resolve(result)
@@ -55,7 +62,22 @@ const createUploadHandler = (upload) => (uploads) => {
 //   }
 // }
 
+// Hooks can be added to the context without the need for creating custom components
+const hooks = [
+  () => {
+    const onTab = (props) => {
+      const { tr, dispatch, state } = props
+      const selection = state.selection
+      const { from, to } = getTextSelection(selection ?? tr.selection, tr.doc)
+      dispatch(tr.insertText('  ', from, to))
+    }
+    useKeymap('Tab', onTab)
+  },
+]
+
 const Editor = ({ content, onChange, upload, editable = true }) => {
+  const [didRender, setDidRender] = useState(false)
+  const [internalContent, setInternalContent] = useState(content)
   const [extensions] = useState(() => [
     new BoldExtension(),
     new UnderlineExtension(),
@@ -74,15 +96,24 @@ const Editor = ({ content, onChange, upload, editable = true }) => {
     new NodeFormattingExtension(),
   ])
 
-  const { manager, state, setState } = useRemirror({
+  const remirror = useRemirror({
     extensions,
     content,
     stringHandler: 'html',
   })
+  const { manager, state, setState, getContext } = remirror
+
+  useEffect(() => {
+    if (didRender && internalContent !== content) {
+      const context = getContext()
+      context.setContent(content)
+    }
+  }, [content])
 
   return (
     <ThemeProvider>
       <Remirror
+        hooks={hooks}
         editable={editable}
         manager={manager}
         initialContent={state}
@@ -91,13 +122,19 @@ const Editor = ({ content, onChange, upload, editable = true }) => {
           const { state, tr } = parameter
           setState(state)
 
+          if (parameter.firstRender && !didRender) {
+            setDidRender(true)
+          }
+
           if (parameter.internalUpdate) return
           if (!tr?.steps?.length) return
           if (!editable) return
 
+          const html = parameter.helpers.getHTML()
+          setInternalContent(html)
           onChange &&
             onChange({
-              html: parameter.helpers.getHTML(),
+              html,
               text: parameter.helpers.getText(),
             })
         }}
@@ -112,4 +149,4 @@ const Editor = ({ content, onChange, upload, editable = true }) => {
   )
 }
 
-export default Editor
+export default React.memo(Editor)

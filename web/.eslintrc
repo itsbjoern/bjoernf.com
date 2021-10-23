@@ -29,6 +29,9 @@
       "react",
       "eslint-plugin-prettier"
   ],
+  "globals": {
+    "global": true
+  },
   "rules": {
     "prettier/prettier": "warn",
     "react/no-unescaped-entities": 0,

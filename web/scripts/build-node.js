@@ -1,4 +1,3 @@
-/* eslint-disable no-undef */
 'use strict'
 
 // Do this as the first thing so that any code reading it knows the right env.
@@ -13,188 +12,199 @@ process.on('unhandledRejection', (err) => {
 })
 
 // Ensure environment variables are read.
-// require('../config/env')
+require('../config/env')
 
 const path = require('path')
+const chalk = require('react-dev-utils/chalk')
+const fs = require('fs-extra')
+const bfj = require('bfj')
 const webpack = require('webpack')
-const MiniCssExtractPlugin = require('mini-css-extract-plugin')
-const HtmlWebpackPlugin = require('html-webpack-plugin')
-const InterpolateHtmlPlugin = require('react-dev-utils/InterpolateHtmlPlugin')
-const HtmlWebpackExcludeAssetsPlugin = require('./HtmlWebpackExcludeAssetsPlugin')
+const configFactory = require('../config/webpack.config.old')
 const paths = require('../config/paths')
 const checkRequiredFiles = require('react-dev-utils/checkRequiredFiles')
 const formatWebpackMessages = require('react-dev-utils/formatWebpackMessages')
+const printHostingInstructions = require('react-dev-utils/printHostingInstructions')
+const FileSizeReporter = require('react-dev-utils/FileSizeReporter')
+const printBuildError = require('react-dev-utils/printBuildError')
+
+const measureFileSizesBeforeBuild = FileSizeReporter.measureFileSizesBeforeBuild
+const printFileSizesAfterBuild = FileSizeReporter.printFileSizesAfterBuild
+const useYarn = fs.existsSync(paths.yarnLockFile)
+
+// These sizes are pretty large. We'll warn for bundles exceeding them.
+const WARN_AFTER_BUNDLE_GZIP_SIZE = 512 * 1024
+const WARN_AFTER_CHUNK_GZIP_SIZE = 1024 * 1024
+
+const isInteractive = process.stdout.isTTY
 
 // Warn and crash if required files are missing
 if (!checkRequiredFiles([paths.appHtml, paths.appIndexJs])) {
   process.exit(1)
 }
 
-// const getClientEnvironment = require('../config/env')
-// const env = getClientEnvironment(paths.publicUrlOrPath.slice(0, -1))
+const argv = process.argv.slice(2)
+const writeStatsJson = argv.indexOf('--stats') !== -1
 
-const getClientEnvironment = require('../config/env')
-const env = getClientEnvironment(paths.publicUrlOrPath.slice(0, -1))
+// Generate configuration
+const config = configFactory('production', true)
 
-let transformConf = {
-  entry: path.join(paths.appSrc, 'AppServer.js'),
-  resolve: {
-    alias: {
-      app: path.resolve('app/src/'),
-      // Support React Native Web
-      // https://www.smashingmagazine.com/2016/08/a-glimpse-into-the-future-with-react-native-for-web/
-      'react-native': 'react-native-web',
-      // Allows for better profiling with ReactDevTools
+// We require that you explicitly set browsers and do not fall back to
+// browserslist defaults.
+const { checkBrowsers } = require('react-dev-utils/browsersHelper')
+checkBrowsers(paths.appPath, isInteractive)
+  .then(() => {
+    // First, read the current file sizes in build directory.
+    // This lets us display how much they changed later.
+    return measureFileSizesBeforeBuild(paths.appBuild)
+  })
+  .then((previousFileSizes) => {
+    // Remove all content but keep the directory so that
+    // if you're in it, you don't end up in Trash
+    fs.emptyDirSync(paths.appBuild)
+    // Merge with the public folder
+    copyPublicFolder()
+    // Start the webpack build
+    return build(previousFileSizes)
+  })
+  .then(
+    ({ stats, previousFileSizes, warnings }) => {
+      if (warnings.length) {
+        console.log(chalk.yellow('Compiled with warnings.\n'))
+        console.log(warnings.join('\n\n'))
+        console.log(
+          '\nSearch for the ' +
+            chalk.underline(chalk.yellow('keywords')) +
+            ' to learn more about each warning.'
+        )
+        console.log(
+          'To ignore, add ' +
+            chalk.cyan('// eslint-disable-next-line') +
+            ' to the line before.\n'
+        )
+      } else {
+        console.log(chalk.green('Compiled successfully.\n'))
+      }
+
+      console.log('File sizes after gzip:\n')
+      printFileSizesAfterBuild(
+        stats,
+        previousFileSizes,
+        paths.appBuild,
+        WARN_AFTER_BUNDLE_GZIP_SIZE,
+        WARN_AFTER_CHUNK_GZIP_SIZE
+      )
+      console.log()
+
+      const appPackage = require(paths.appPackageJson)
+      const publicUrl = paths.publicUrlOrPath
+      const publicPath = config.output.publicPath
+      const buildFolder = path.relative(process.cwd(), paths.appBuild)
+      printHostingInstructions(
+        appPackage,
+        publicUrl,
+        publicPath,
+        buildFolder,
+        useYarn
+      )
     },
-  },
-  // optimization: {
-  //   minimize: true,
-  //   minimizer: [
-  //     // This is only used in production mode
-  //     new TerserPlugin({
-  //       terserOptions: {
-  //         parse: {
-  //           // We want terser to parse ecma 8 code. However, we don't want it
-  //           // to apply any minification steps that turns valid ecma 5 code
-  //           // into invalid ecma 5 code. This is why the 'compress' and 'output'
-  //           // sections only apply transformations that are ecma 5 safe
-  //           // https://github.com/facebook/create-react-app/pull/4234
-  //           ecma: 8,
-  //         },
-  //         compress: {
-  //           ecma: 5,
-  //           warnings: false,
-  //           // Disabled because of an issue with Uglify breaking seemingly valid code:
-  //           // https://github.com/facebook/create-react-app/issues/2376
-  //           // Pending further investigation:
-  //           // https://github.com/mishoo/UglifyJS2/issues/2011
-  //           comparisons: false,
-  //           // Disabled because of an issue with Terser breaking valid code:
-  //           // https://github.com/facebook/create-react-app/issues/5250
-  //           // Pending further investigation:
-  //           // https://github.com/terser-js/terser/issues/120
-  //           inline: 2,
-  //         },
-  //         mangle: {
-  //           safari10: true,
-  //         },
-  //         // Added for profiling in devtools
-  //         keep_classnames: false,
-  //         keep_fnames: false,
-  //         output: {
-  //           ecma: 5,
-  //           comments: false,
-  //           // Turned on because emoji and regex is not minified properly using default
-  //           // https://github.com/facebook/create-react-app/issues/2488
-  //           ascii_only: true,
-  //         },
-  //       },
-  //       sourceMap: false,
-  //     }),
-  //   ],
-  // },
-  module: {
-    rules: [
-      {
-        test: /\.(js|mjs|jsx|ts|tsx)$/,
-        include: paths.appSrc,
-        loader: require.resolve('babel-loader'),
-        options: {
-          babelrc: false,
-          configFile: false,
-          compact: false,
-          cacheDirectory: true,
-          // See #6846 for context on why cacheCompression is disabled
-          cacheCompression: false,
-          plugins: [
-            [
-              require.resolve('babel-plugin-direct-import'),
-              { modules: ['@mui/material', '@mui/icons-material'] },
-            ],
-          ],
-          presets: [
-            [
-              require.resolve('babel-preset-react-app'),
-              {
-                runtime: 'automatic',
-              },
-            ],
-          ],
-        },
-      },
-      {
-        test: /\.css$/,
-        use: [
-          {
-            loader: MiniCssExtractPlugin.loader,
+    (err) => {
+      const tscCompileOnError = process.env.TSC_COMPILE_ON_ERROR === 'true'
+      if (tscCompileOnError) {
+        console.log(
+          chalk.yellow(
+            'Compiled with the following type errors (you may want to check these before deploying your app):\n'
+          )
+        )
+        printBuildError(err)
+      } else {
+        console.log(chalk.red('Failed to compile.\n'))
+        printBuildError(err)
+        process.exit(1)
+      }
+    }
+  )
+  .catch((err) => {
+    if (err && err.message) {
+      console.log(err.message)
+    }
+    process.exit(1)
+  })
 
-            options: paths.publicUrlOrPath.startsWith('.')
-              ? { publicPath: '../../' }
-              : {},
-          },
+// Create the production build and print the deployment instructions.
+function build(previousFileSizes) {
+  console.log('Creating an optimized production build...')
 
-          {
-            loader: require.resolve('css-loader'),
-          },
-        ],
-      },
-      {
-        test: /\.(png|woff|woff2|eot|ttf|svg)$/,
-        loader: 'url-loader?limit=100000',
-      },
-    ],
-  },
-  plugins: [
-    new HtmlWebpackPlugin({
-      inject: true,
-      template: paths.appHtml,
-      excludeAssets: [/\*.js$/],
-      minify: {
-        removeComments: true,
-        collapseWhitespace: true,
-        removeRedundantAttributes: true,
-        useShortDoctype: true,
-        removeEmptyAttributes: true,
-        removeStyleLinkTypeAttributes: true,
-        keepClosingSlash: true,
-        minifyJS: true,
-        minifyCSS: true,
-        minifyURLs: true,
-      },
-    }),
-    new HtmlWebpackExcludeAssetsPlugin(),
-    new InterpolateHtmlPlugin(HtmlWebpackPlugin, env.raw),
-    new webpack.DefinePlugin(env.stringified),
-    new webpack.IgnorePlugin(/^\.\/locale$/, /moment$/),
-    new webpack.IgnorePlugin(/canvas/, /jsdom$/),
-    new MiniCssExtractPlugin({
-      // Options similar to the same options in webpackOptions.output
-      // both options are optional
-      filename: 'static/css/[name].css',
-    }),
-  ],
-  output: {
-    path: path.resolve(__dirname, '..', 'node'),
-    filename: 'AppServer.js',
-    globalObject: 'this',
-    publicPath: '/node/public/',
-    libraryTarget: 'umd',
-    library: '',
-  },
-  externals: {
-    react: 'react',
-    'react-dom': 'react-dom',
-  },
-  target: 'node',
+  const compiler = webpack(config)
+  return new Promise((resolve, reject) => {
+    compiler.run((err, stats) => {
+      let messages
+      if (err) {
+        if (!err.message) {
+          return reject(err)
+        }
+
+        let errMessage = err.message
+
+        // Add additional information for postcss errors
+        if (Object.prototype.hasOwnProperty.call(err, 'postcssNode')) {
+          errMessage +=
+            '\nCompileError: Begins at CSS selector ' +
+            err['postcssNode'].selector
+        }
+
+        messages = formatWebpackMessages({
+          errors: [errMessage],
+          warnings: [],
+        })
+      } else {
+        messages = formatWebpackMessages(
+          stats.toJson({ all: false, warnings: true, errors: true })
+        )
+      }
+      if (messages.errors.length) {
+        // Only keep the first error. Others are often indicative
+        // of the same problem, but confuse the reader with noise.
+        if (messages.errors.length > 1) {
+          messages.errors.length = 1
+        }
+        return reject(new Error(messages.errors.join('\n\n')))
+      }
+      if (
+        process.env.CI &&
+        (typeof process.env.CI !== 'string' ||
+          process.env.CI.toLowerCase() !== 'false') &&
+        messages.warnings.length
+      ) {
+        console.log(
+          chalk.yellow(
+            '\nTreating warnings as errors because process.env.CI = true.\n' +
+              'Most CI servers set it automatically.\n'
+          )
+        )
+        return reject(new Error(messages.warnings.join('\n\n')))
+      }
+
+      const resolveArgs = {
+        stats,
+        previousFileSizes,
+        warnings: messages.warnings,
+      }
+
+      if (writeStatsJson) {
+        return bfj
+          .write(paths.appBuild + '/bundle-stats.json', stats.toJson())
+          .then(() => resolve(resolveArgs))
+          .catch((error) => reject(new Error(error)))
+      }
+
+      return resolve(resolveArgs)
+    })
+  })
 }
 
-const compiler = webpack(transformConf)
-compiler.run((err, stats) => {
-  if (err) {
-    console.log(err)
-  }
-  const messages = formatWebpackMessages(
-    stats.toJson({ all: false, warnings: true, errors: true })
-  )
-  console.log(messages.errors)
-})
+function copyPublicFolder() {
+  fs.copySync(paths.appPublic, paths.appBuild, {
+    dereference: true,
+    filter: (file) => file !== paths.appHtml,
+  })
+}

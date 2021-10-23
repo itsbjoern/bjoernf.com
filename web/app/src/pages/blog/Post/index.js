@@ -44,14 +44,13 @@ const Post = ({
   token,
 }) => {
   const postId = match.params.id
-
-  const [loading, setLoading] = useState(true)
+  const [loading, setLoading] = useState(false)
   const [isComparing, setIsComparing] = useState(false)
-  const editing = location.hash === '#edit' && !!token
+  const editing = location.pathname.endsWith('/edit') && !!token
   const updateTimeout = useRef()
 
   const [post, setPost] = useSSR(() => sendRequest(getPost(postId)), {
-    chainThen: (data) => {
+    chainSuccess: (data) => {
       if (!isSSR) {
         const title = (data.post.published ?? data.post.draft).title
         document.title = `${title} - Björn F`
@@ -63,60 +62,60 @@ const Post = ({
 
   const updatePost = useCallback(
     (update) => {
-      setPost({
-        ...post,
+      setPost((prevPost) => ({
+        ...prevPost,
         draft: {
-          ...filterEmpty(post.published),
-          ...filterEmpty(post.draft),
+          ...filterEmpty(prevPost.published),
+          ...filterEmpty(prevPost.draft),
           ...update,
         },
-      })
+      }))
       if (updateTimeout.current) {
         clearTimeout(updateTimeout.current)
         updateTimeout.current = null
       }
       updateTimeout.current = setTimeout(() => {
-        sendRequest(updatePostAPI(post._id, update)).then(({ post: _ }) => {
+        sendRequest(updatePostAPI(postId, update)).success(({ post: _ }) => {
           createNotification('Post saved', 'success', 1000)
         })
       }, 700)
     },
-    [post]
+    [postId]
   )
 
   const publishPost = useCallback(() => {
-    sendRequest(publishPostAPI(post._id))
-      .then(({ post: updatedPost }) => {
+    sendRequest(publishPostAPI(postId))
+      .success(({ post: updatedPost }) => {
         setPost(updatedPost)
         history.push('#')
         createNotification('Post published', 'success')
       })
-      .catch(() => {
+      .failure(() => {
         createNotification('Publish failed', 'error')
       })
-  }, [post])
+  }, [postId])
 
   const unpublishPost = useCallback(() => {
-    sendRequest(unpublishPostAPI(post._id))
-      .then(({ post: updatedPost }) => {
+    sendRequest(unpublishPostAPI(postId))
+      .success(({ post: updatedPost }) => {
         setPost(updatedPost)
         createNotification('Post published', 'success')
       })
-      .catch(() => {
+      .failure(() => {
         createNotification('Publish failed', 'error')
       })
-  }, [post])
+  }, [postId])
 
   const deletePost = useCallback(() => {
-    sendRequest(deletePostAPI(post._id))
-      .then(() => {
+    sendRequest(deletePostAPI(postId))
+      .success(() => {
         createNotification('Post deleted', 'success')
         history.push('/admin#tab-1')
       })
-      .catch((e) => {
+      .failure((e) => {
         createNotification(e.message, 'error')
       })
-  }, [post])
+  }, [postId])
 
   const [PublishDialog, openPublishDialog] = useDialog(
     'Are you sure you want to publish this post? This will make it available to the public.',
@@ -158,7 +157,9 @@ const Post = ({
                   <Switch
                     checked={editing}
                     onChange={() => {
-                      history.push(!editing ? '#edit' : '#')
+                      history.push(
+                        `/blog/${post._id}/` + (!editing ? 'edit' : '')
+                      )
                     }}
                   />
                 }

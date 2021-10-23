@@ -22,7 +22,6 @@ import Analytics from 'app/components/Analytics'
 
 import NotificationProvider from 'app/providers/NotificationProvider'
 import RequestProvider from 'app/providers/RequestProvider'
-import NoJsBanner from 'app/components/NoJsBanner'
 import Header from 'app/components/Header'
 import Footer from 'app/components/Footer'
 import Home from 'app/pages/home/Home'
@@ -55,7 +54,7 @@ const AdaptiveContainer = styled(Container)`
 
 const SSRSupport = ({ ssr, children }) => {
   return (
-    <StaticRouter location={ssr.rel_url} staticContext={ssr}>
+    <StaticRouter location={ssr.url} context={ssr}>
       {children}
     </StaticRouter>
   )
@@ -95,7 +94,6 @@ const App = (props) => {
               <HistoryLayer>
                 <Analytics>
                   <Column flexed>
-                    <NoJsBanner />
                     <AdaptiveContainer maxWidth="md">
                       <Typography component={Column} flexed>
                         <Header />
@@ -116,7 +114,7 @@ const App = (props) => {
                             <Route exact path="/blog">
                               <Blog />
                             </Route>
-                            <Route exact path="/blog/:id">
+                            <Route path="/blog/:id">
                               <Post />
                             </Route>
                             <Route exact path="/projects">

@@ -40,7 +40,7 @@ async def login_handler(request):
 async def create_post(request):
   db = request.use('db')
 
-  insert = {'createdAt': datetime.datetime.now(), 'draft': {}}
+  insert = {'createdAt': datetime.datetime.utcnow(), 'draft': {}}
   op = db.posts.insert_one(insert)
 
   return util.json_response({'post': {'_id': op.inserted_id, **insert}})
@@ -72,7 +72,7 @@ async def update_post(request):
     return web.HTTPBadRequest(reason="No post id")
 
   db = request.use('db')
-  the_update = {'updatedAt': datetime.datetime.now(),
+  the_update = {'updatedAt': datetime.datetime.utcnow(),
                 **{f'draft.{key}': val for key, val in data.items()}}
 
   op = db.posts.update_one({'_id': bson.ObjectId(post_id)},
@@ -118,7 +118,7 @@ async def publish(request):
     'summary': summary,
     'html': html,
     'tags': tags,
-    'publishedAt': datetime.datetime.now(),
+    'publishedAt': datetime.datetime.utcnow(),
     'version': published.get('version', 0) + 1
   }
 

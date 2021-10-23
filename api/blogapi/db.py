@@ -11,6 +11,9 @@ def ensure_index(db):
   db.posts.create_index(name='index2',
                         keys=[('createdAt', pymongo.DESCENDING)])
 
+  db.analytics.create_index(name='views', keys=[('viewId', pymongo.DESCENDING)])
+  db.analytics.create_index(name='views2', keys=[('viewId', pymongo.DESCENDING), ('jsEnabled', pymongo.DESCENDING)])
+
 
 async def mongo_ctx(app):
   client = pymongo.MongoClient(host=app['config']['mongo.host'], port=app['config']['mongo.port'])

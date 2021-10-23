@@ -42,7 +42,7 @@ const Blog = ({ history, location, sendRequest, createNotification }) => {
   const query = new URLSearchParams(location.search)
   const currentPage = parseInt(query.get('page')) || 1
   const currentSearch = query.get('search') || ''
-  const [isLoading, setIsLoading] = useState(true)
+  const [isLoading, setIsLoading] = useState(false)
 
   const [data] = useSSR(
     () => sendRequest(getPosts({ page: currentPage, search: currentSearch })),
@@ -51,7 +51,7 @@ const Blog = ({ history, location, sendRequest, createNotification }) => {
       init: {},
       delay: 200,
       chainFirst: () => setIsLoading(true),
-      chainCatch: (err) =>
+      chainFailure: (err) =>
         createNotification(`Fetch failed: ${err.message}`, 'error'),
       chainFinally: () => setIsLoading(false),
     }
@@ -63,7 +63,7 @@ const Blog = ({ history, location, sendRequest, createNotification }) => {
     <Column>
       <Row justify="between">
         <H2>Recent posts</H2>
-
+        {isLoading ? <CircularProgress size={35} /> : null}
         <Row justify="end" hideMobile>
           <TextField
             size="small"
@@ -100,7 +100,7 @@ const Blog = ({ history, location, sendRequest, createNotification }) => {
           />
         </Row>
       </Row>
-      <Row justify="center">{isLoading ? <CircularProgress /> : null}</Row>
+      <Row justify="center"></Row>
       <Column>
         <List>
           {posts.map((p) => (

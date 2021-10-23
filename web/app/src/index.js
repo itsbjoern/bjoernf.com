@@ -2,12 +2,12 @@ import React from 'react'
 import ReactDOM from 'react-dom'
 import './index.css'
 import 'remirror/styles/all.css'
-import App from './App'
+import AppServer from './AppServer'
 import reportWebVitals from './reportWebVitals'
 
-ReactDOM.render(
+ReactDOM.hydrate(
   <React.StrictMode>
-    <App />
+    <AppServer />
   </React.StrictMode>,
   document.getElementById('root')
 )

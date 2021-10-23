@@ -107,10 +107,7 @@ const PostItem = ({ post }) => {
           </Row>
         </ClipOn>
       </Control>
-      <UnstyledLink
-        delay={300}
-        to={`/blog/${post._id}` + (draft ? '#edit' : '')}
-      >
+      <UnstyledLink delay={300} to={`/blog/${post._id}`}>
         <ListItem sx={{ padding: `0 0 10px 0` }}>
           <ShadowButton>
             <Row justify="start" flexed gap={10} grow={10} mobileWrapping>

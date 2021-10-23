@@ -21,9 +21,19 @@ const express = require('express')
 const bodyParser = require('body-parser')
 const ReactDOMServer = require('react-dom/server')
 
-const nodePath = path.join(__dirname, 'node')
 
 const spawn = require('child_process').spawn
+const nodePath = path.join(__dirname, 'dist')
+const appServerPath = path.join(
+  nodePath,
+  'static',
+  'js',
+  'AppServer.js'
+)
+const distLoad = require(appServerPath)
+
+let AppServer = distLoad.default
+let createSSRContext = distLoad.createSSRContext
 
 // Ensure support for loading files that contain ES6+7 & JSX
 require('@babel/core')
@@ -50,11 +60,6 @@ const createApp = () => {
       global.Headers = nodeFetch.Headers
     }
 
-    const { createSSRContext, default: AppServer } = require(path.join(
-      nodePath,
-      'AppServer.js'
-    ))
-
     try {
       const { resolveData } = createSSRContext()
 
@@ -62,12 +67,17 @@ const createApp = () => {
       const RenderComponent = React.createElement(AppServer, props)
 
       const _prepRun = ReactDOMServer.renderToString(RenderComponent)
-      const _resolvedData = await resolveData()
+      const resolvedData = await resolveData()
+
+      const extraScript = `
+      window.__RESOLVED_DATA = JSON.parse(atob("${btoa(JSON.stringify(resolvedData))}"));
+      `;
 
       const html = ReactDOMServer.renderToString(RenderComponent)
 
       res.json({
         markup: html,
+        extraScript
       })
     } catch (e) {
       console.log(e)
@@ -81,6 +91,11 @@ const createApp = () => {
 }
 
 const startListen = (server) => {
+  delete require.cache[Object.keys(require.cache).find(k => k.endsWith('AppServer.js'))]
+  const reload = require(appServerPath)
+  AppServer = reload.default
+  createSSRContext = reload.createSSRContext
+
   server.listen(PORT, ADDRESS, function () {
     console.log(
       'React render server listening at http://' + ADDRESS + ':' + PORT
@@ -92,19 +107,19 @@ const app = createApp()
 let server = http.Server(app)
 startListen(server)
 
-// if (process.env.NODE_ENV === 'development') {
-//   const watch = spawn('node', ['watcher.js'])
+if (process.env.NODE_ENV === 'development') {
+  const watch = spawn('node', ['watcher.js'])
 
-//   const restart = () => {
-//     server.close(() => {
-//       server = http.Server(app)
-//       startListen(server)
-//     })
-//   }
+  const restart = () => {
+    server.close(() => {
+      server = http.Server(app)
+      startListen(server)
+    })
+  }
 
-//   watch.stdout.on('data', restart)
+  watch.stdout.on('data', restart)
 
-//   // watch.stderr.on('data', restart)
+  // watch.stderr.on('data', restart)
 
-//   watch.on('close', () => server.close())
-// }
+  watch.on('close', () => server.close())
+}

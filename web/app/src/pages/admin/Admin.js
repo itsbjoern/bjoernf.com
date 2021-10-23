@@ -45,7 +45,7 @@ const Admin = ({ location, history, token, sendRequest }) => {
 
   useEffect(() => {
     if (token) {
-      sendRequest(getDrafts()).then(({ posts }) => {
+      sendRequest(getDrafts()).success(({ posts }) => {
         setDraftPosts(posts)
       })
     }
@@ -77,8 +77,8 @@ const Admin = ({ location, history, token, sendRequest }) => {
                   startIcon={<AddCircle />}
                   variant="contained"
                   onClick={() => {
-                    sendRequest(createPost()).then(({ post }) => {
-                      history.push(`/blog/${post._id}#edit`)
+                    sendRequest(createPost()).success(({ post }) => {
+                      history.push(`/blog/${post._id}/edit`)
                     })
                   }}
                 >

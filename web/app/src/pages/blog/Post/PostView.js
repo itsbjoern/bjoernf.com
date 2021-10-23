@@ -1,4 +1,4 @@
-import React from 'react'
+import React, { useState } from 'react'
 import moment from 'moment'
 
 import { EmailIcon, LinkedinIcon, TwitterIcon, WhatsappIcon } from 'react-share'
@@ -24,8 +24,11 @@ const ShareIcon = ({ href, size, Icon }) => (
 
 const PostView = ({ postData, createdAt, hideShare, staticContext }) => {
   const { title, html, tags } = postData
-  const url = isSSR ? staticContext.url : window.location.href
-  const userAgent = isSSR ? staticContext.userAgent : navigator.userAgent
+  const [url] = useState(staticContext?.absUrl || global.window.location.href)
+  const [userAgent] = useState(
+    staticContext?.userAgent || global.navigator.userAgent
+  )
+
   const iconSize = 45
 
   const isMobile = /(android|iphone|ipad|mobile)/i.test(userAgent)
