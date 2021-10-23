@@ -8,7 +8,6 @@ const InterpolateHtmlPlugin = require('react-dev-utils/InterpolateHtmlPlugin')
 const getClientEnvironment = require('./env')
 const TerserPlugin = require('terser-webpack-plugin')
 const OptimizeCSSAssetsPlugin = require('optimize-css-assets-webpack-plugin')
-const nodeExternals = require('webpack-node-externals')
 
 const modules = require('./modules')
 const paths = require('./paths')
@@ -221,10 +220,9 @@ module.exports = function (webpackEnv, isNode) {
       child_process: 'empty',
     },
     target: isNode ? 'node' : 'web',
-    externals: [
-      ...(isNode && isEnvDevelopment ? ['react', 'react-dom'] : []),
-      ...(isNode ? ['bufferutil', 'utf-8-validate'] : []),
-    ],
+    externals: isNode
+      ? ['react', 'react-dom', 'bufferutil', 'utf-8-validate']
+      : [],
     performance: false,
   }
 }

@@ -44,7 +44,7 @@ class Hydrate():
     path = str(self.request.path)
     match = re.match(r'/blog/[a-z0-9]+', path)
 
-    title = '{} - Björn F'
+    title = '{} - Björn Friedrichs'
     description = 'Personal website and blog by Björn Friedrichs'
     img = 'https://bjornf.dev/public/images/og_img.png'
     url = self.request.url
