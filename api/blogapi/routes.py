@@ -1,13 +1,23 @@
 import pathlib
 import os
 from .api import index, admin, blog, analytics
-from blogapi import util
+import shutil
+
+from aiohttp import web
 
 
 PROJECT_ROOT = pathlib.Path(__file__).parent
+CACHE_ROOT = PROJECT_ROOT / 'node_cache'
 
+def reset_cache():
+  if os.path.isdir(CACHE_ROOT):
+    shutil.rmtree(CACHE_ROOT)
+  os.makedirs(CACHE_ROOT, exist_ok=True)
 
 def setup_routes(app):
+  reset_cache()
+  app.router.add_get('/favicon.ico', index.get_favicon)
+
   app.router.add_post('/api/heartbeat', analytics.heartbeat)
 
   app.router.add_get('/api/blog/posts', blog.get_all_posts_handler)

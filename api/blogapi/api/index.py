@@ -2,15 +2,24 @@ import pathlib
 import json
 import os
 from aiohttp import web, ClientSession
+from requests.utils import quote
 
 from blogapi.api import hydrations
 
 PROJECT_ROOT = pathlib.Path(__file__).parent.parent
 BUILD_ROOT = PROJECT_ROOT / 'public'
-
+CACHE_ROOT = PROJECT_ROOT / 'node_cache'
 
 async def handler(request):
   url = str(request.rel_url)
+
+  cache_url = CACHE_ROOT / quote(url.replace('/', '-'))
+  if os.path.isfile(cache_url):
+    with open(cache_url) as fh:
+      return web.Response(
+        text=fh.read(),
+        content_type='text/html')
+
   user_agent = request.headers['User-Agent']
   req_data = json.dumps({'url': url, 'absUrl': str(request.url), 'userAgent': user_agent})
 
@@ -33,6 +42,9 @@ async def handler(request):
   index.hydrate('html', data['markup'])
   index.hydrate('title')
 
+  with open(cache_url, 'w+') as fh:
+    fh.write(index.page)
+
   return web.Response(
     text=index.page,
     content_type='text/html')
@@ -51,3 +63,7 @@ async def not_found_html(request):
   return web.Response(
     text=index.page,
     content_type='text/html')
+
+async def get_favicon(request):
+  favicon = PROJECT_ROOT / 'public' / 'favicons' / 'favicon.ico'
+  return web.FileResponse(favicon)
