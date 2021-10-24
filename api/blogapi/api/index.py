@@ -2,7 +2,7 @@ import pathlib
 import json
 import os
 from aiohttp import web, ClientSession
-from requests.utils import quote
+import urllib.parse
 
 from blogapi.api import hydrations
 
@@ -13,7 +13,7 @@ CACHE_ROOT = PROJECT_ROOT / 'node_cache'
 async def handler(request):
   url = str(request.rel_url)
 
-  cache_url = CACHE_ROOT / quote(url.replace('/', '-'))
+  cache_url = CACHE_ROOT / urllib.parse.quote(url, safe='')
   if os.path.isfile(cache_url):
     with open(cache_url) as fh:
       return web.Response(
