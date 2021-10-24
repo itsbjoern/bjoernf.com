@@ -26,15 +26,6 @@ def setup_routes(app):
 
   app.router.add_get('/', index.handler)
 
-  static_path_str = app['config']['paths.static']
-  static_path = pathlib.Path(static_path_str)
-  if static_path_str[0] != '/':
-    static_path = PROJECT_ROOT / static_path
-
-  for pth, _, fnames in os.walk(static_path / 'images'):
-    for fname in fnames:
-      util.compress_image(os.path.join(pth, fname))
-
   if app['config']['dev']:
     app.router.add_static('/public/',
                           path=PROJECT_ROOT / 'public',

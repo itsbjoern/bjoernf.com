@@ -1,3 +1,0 @@
-cat << 'EOF' >static.bjornf.dev_location
-gzip_static on;
-EOF

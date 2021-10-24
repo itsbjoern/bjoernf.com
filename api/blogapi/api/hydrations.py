@@ -46,7 +46,7 @@ class Hydrate():
 
     title = '{} - Björn Friedrichs'
     description = 'Personal website and blog by Björn Friedrichs'
-    img = 'https://static.bjornf.dev/images/og_img.png'
+    img = 'https://images.bjornf.dev/images/og_img.png'
     url = self.request.url
     if title_override is not None:
       title = title.format(title_override)

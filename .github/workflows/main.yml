@@ -6,7 +6,7 @@ on:
   workflow_dispatch:
 
 jobs:
-  build:
+  build-web:
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v2
@@ -27,47 +27,100 @@ jobs:
             ${{ runner.os }}-build-
             ${{ runner.os }}-
 
-      - name: Install and build web
+      - name: Npm install
+        working-directory: ./web
+        run: |
+          npm install
+
+      - name: Build
         working-directory: ./web
         env:
           REACT_APP_API_URL: https://bjornf.dev
           PUBLIC_URL: https://static.bjornf.dev
         run: |
-          npm install
-          node scripts/build.js
-          node scripts/build-node.js
+          node scripts/build.js &
+          PID_WEB=$!
 
-      - name: Move builds
+          node scripts/build-node.js &
+          PID_NODE=$!
+
+          wait $PID_WEB
+          wait $PID_NODE
+
+      - uses: actions/upload-artifact@v1
+        with:
+          name: web-build
+          path: web/build/
+
+  build-images:
+    needs: build-web
+    runs-on: ubuntu-latest
+    strategy:
+      matrix:
+        name: [api, render-server, static, image-server]
+
+    steps:
+      - uses: actions/checkout@v2
+
+      - name: Create folder
+        run: |
+          mkdir -p ./build
+
+      - uses: actions/download-artifact@v2
+        with:
+          name: web-build
+          path: build/
+
+      - name: Move builds (api)
+        if: matrix.name == 'api'
         run: |
           mkdir -p ./api/blogapi/public
+          rsync -avz ./build/index.html ./api/blogapi/public/index.html
+          rsync -avz ./build/robots.txt ./api/blogapi/public/robots.txt
+
+      - name: Move builds (render-server)
+        if: matrix.name == 'render-server'
+        run: |
+          rsync -avz ./build/ ./render-server/dist/
+
+      - name: Move builds (static)
+        if: matrix.name == 'static'
+        run: |
           mkdir -p ./static/data
+          rsync -avz ./build/ ./static/data/
 
-          rsync -avz ./web/build/index.html ./api/blogapi/public/index.html
-          rsync -avz ./web/build/robots.txt ./api/blogapi/public/robots.txt
-          rsync -avz ./web/build/ ./render-server/dist/
-          rsync -avz ./web/build/ ./static/data/
-
-      - name: Build api
-        working-directory: ./api
+      - name: Build image
+        working-directory: ./${{ matrix.name }}
         run: |
-          docker build -t bjornf-api .
+          docker build -t bjornf-${{ matrix.name }} .
 
-          mkdir -p ~/images
-          docker save -o ~/images/api.tar bjornf-api
+          mkdir -p ../images
+          docker save -o ../images/${{matrix.name}}.tar bjornf-${{matrix.name}}
 
-      - name: Build render server
-        working-directory: ./render-server
+      - uses: actions/upload-artifact@v1
+        with:
+          name: ${{ matrix.name }}-image
+          path: images/${{matrix.name}}.tar
+
+  restart-server:
+    needs: build-images
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v2
+      - name: Create folder
         run: |
-          docker build -t bjornf-render-server .
+          mkdir -p ./images
 
-          docker save -o ~/images/render-server.tar bjornf-render-server
+      - name: Remove web build artifact
+        uses: geekyeggo/delete-artifact@1-glob-support
+        with:
+          useGlob: false
+          name: web-build
 
-      - name: Build static
-        working-directory: ./static
-        run: |
-          docker build -t bjornf-static .
-
-          docker save -o ~/images/static.tar bjornf-static
+      - name: Download all images
+        uses: actions/download-artifact@v2
+        with:
+          path: images/
 
       - name: Install SSH key
         uses: shimataro/ssh-key-action@v2
@@ -93,18 +146,22 @@ jobs:
       - name: Copy files
         run: |
           rsync ./docker-compose.yml ${{ secrets.SSH_USERNAME }}@${{ secrets.SSH_HOST }}:/home/${{ secrets.SSH_USERNAME }}/bjornf.dev/docker-compose.yml
-          rsync -avz ~/images/ ${{ secrets.SSH_USERNAME }}@${{ secrets.SSH_HOST }}:/home/${{ secrets.SSH_USERNAME }}/bjornf.dev/images
+          rsync -avz images/ ${{ secrets.SSH_USERNAME }}@${{ secrets.SSH_HOST }}:/home/${{ secrets.SSH_USERNAME }}/bjornf.dev/images
 
       - name: Load images
         uses: appleboy/ssh-action@master
+        env:
+          IMAGES: api render-server static image-server
         with:
           host: ${{ secrets.SSH_HOST }}
           username: ${{ secrets.SSH_USERNAME }}
+          envs: IMAGES
           key: ${{ secrets.SSH_KEY }}
           script: |
-            sudo docker load -i ~/bjornf.dev/images/api.tar
-            sudo docker load -i ~/bjornf.dev/images/render-server.tar
-            sudo docker load -i ~/bjornf.dev/images/static.tar
+            for IMAGE in $IMAGES
+            do
+              sudo docker load -i ~/bjornf.dev/images/$IMAGE-image/$IMAGE.tar
+            done
 
       - name: Restart server
         uses: appleboy/ssh-action@master
@@ -120,8 +177,6 @@ jobs:
                 volumes:
                   - /home/${{ secrets.SSH_USERNAME }}/bjornf.dev/mongo-data:/data/db
               api:
-                volumes:
-                  - /home/${{ secrets.SSH_USERNAME }}/bjornf.dev/api-uploads:/api/blogapi/uploads
                 environment:
                   VIRTUAL_HOST: ${{ secrets.SSH_HOST }}
                   VIRTUAL_PORT: 80
@@ -130,15 +185,43 @@ jobs:
                   API_CONNECTION_WEBHOST: https://${{ secrets.SSH_HOST }}
                   API_JWT_SECRET: ${{ secrets.JWT_SECRET }}
                   API_MONGO_USER_PASSWORD: ${{ secrets.MONGO_USER_PASSWORD }}
+                  API_DEV: "false"
                 expose:
                   - 80
               static:
+                volumes:
+                  - /home/${{ secrets.SSH_USERNAME }}/bjornf.dev/api-uploads:/usr/share/nginx/html/uploads
                 environment:
                   VIRTUAL_HOST: static.${{ secrets.SSH_HOST }}
                   VIRTUAL_PORT: 80
                   LETSENCRYPT_HOST: static.${{ secrets.SSH_HOST }}
                 expose:
                   - 80
+              image-server:
+                environment:
+                  VIRTUAL_HOST: images.${{ secrets.SSH_HOST }}
+                  VIRTUAL_PORT: 80
+                  LETSENCRYPT_HOST: images.${{ secrets.SSH_HOST }}
+                expose:
+                  - 80
             EOL
 
             sudo docker-compose -f docker-compose.yml -f prod.yml up -d
+            sudo docker system prune -f
+
+  cleanup:
+    needs: restart-server
+    runs-on: ubuntu-latest
+    if: always()
+    steps:
+      - uses: geekyeggo/delete-artifact@1-glob-support
+        if: always()
+        with:
+          useGlob: true
+          name: |
+            *-image
+      - uses: geekyeggo/delete-artifact@1-glob-support
+        if: always()
+        with:
+          useGlob: false
+          name: web-build

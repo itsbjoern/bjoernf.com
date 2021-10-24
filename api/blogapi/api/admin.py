@@ -195,12 +195,7 @@ async def upload(request):
   ext = field.filename.split('.')[-1]
   file_name = f'{str(bson.ObjectId())}.{ext}'
 
-  static_path_str = request.app['config']['paths.static']
-  static_path = pathlib.Path(static_path_str)
-  if static_path_str[0] != '/':
-    static_path = PROJECT_ROOT / static_path
-
-  upload_path = static_path / 'uploads' / post_id
+  upload_path = PROJECT_ROOT / 'public' / 'uploads' / post_id
   os.makedirs(upload_path, exist_ok=True)
 
   save_path = os.path.join(upload_path, file_name)
@@ -213,10 +208,11 @@ async def upload(request):
       size += len(chunk)
       f.write(chunk)
 
-  util.compress_image(save_path)
+  upload_src = request.app['config']['connection.webhost'].replace('https://', 'https://images.')
+  upload_src += f'/uploads/{post_id}/{file_name}'
 
   return util.json_response({
-    'src': f'/uploads/{post_id}/{file_name}',
+    'src': upload_src,
     'fileSize': size,
     'fileName': file_name
   })

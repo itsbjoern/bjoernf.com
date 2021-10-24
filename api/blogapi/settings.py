@@ -10,6 +10,11 @@ BASE_DIR = pathlib.Path(__file__).parent
 def update_with_env(config):
   for key, val in os.environ.items():
     if key.startswith('API_'):
+      if val == 'true' or val == 'True':
+        val = True
+      elif val == 'false' or val == 'False':
+        val = False
+
       path = key[4:].lower().split('_')
       if len(path) == 1:
         config[path[0]] = val
