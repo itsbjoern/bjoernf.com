@@ -96,6 +96,8 @@ async def heartbeat(request):
 
 async def analytics_middleware(app, handler):
   async def mid(request):
+    if request.headers.get('user-agent') == 'Node;https://bjornf.dev':
+      return await handler(request)
 
     path = request.path
     pageview_id = request.headers.get('Pageview-Id', str(bson.ObjectId()))

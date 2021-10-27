@@ -38,6 +38,9 @@ const UserProvider = ({ children }) => {
       if (!!currentToken) {
         rewrittenHeaders['Authorization'] = `Bearer ${currentToken}`
       }
+      if (isSSR) {
+        rewrittenHeaders['user-agent'] = 'Node;https://bjornf.dev'
+      }
       return request(
         { ...payload, headers: rewrittenHeaders },
         options
