@@ -91,11 +91,11 @@ jobs:
           mkdir -p ./static/static
           rsync -avz ./build/static/ ./static/data/
 
-        - name: Move builds (image-server)
-          if: matrix.name == 'image-server'
-          run: |
-            mkdir -p ./image-server/images
-            rsync -avz ./build/images/ ./static/images/
+      - name: Move builds (image-server)
+        if: matrix.name == 'image-server'
+        run: |
+          mkdir -p ./image-server/images
+          rsync -avz ./build/images/ ./static/images/
 
       - name: Build image
         working-directory: ./${{ matrix.name }}
