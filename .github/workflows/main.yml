@@ -74,7 +74,8 @@ jobs:
       - name: Move builds (api)
         if: matrix.name == 'api'
         run: |
-          mkdir -p ./api/blogapi/public
+          mkdir -p ./api/blogapi/dist/public
+          mkdir -p ./api/blogapi/dist/images
           rsync -avz ./build/public/ ./api/blogapi/dist/public/
           rsync -avz ./build/images/ ./api/blogapi/dist/images/
 
