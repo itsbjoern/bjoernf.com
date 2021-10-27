@@ -75,19 +75,20 @@ jobs:
         if: matrix.name == 'api'
         run: |
           mkdir -p ./api/blogapi/public
-          rsync -avz ./build/index.html ./api/blogapi/public/index.html
-          rsync -avz ./build/robots.txt ./api/blogapi/public/robots.txt
+          rsync -avz ./build/public/ ./api/blogapi/dist/public/
+          rsync -avz ./build/images/ ./api/blogapi/dist/images/
 
       - name: Move builds (render-server)
         if: matrix.name == 'render-server'
         run: |
-          rsync -avz ./build/ ./render-server/dist/
+          mkdir -p ./render-server/dist/static
+          rsync -avz ./build/static/ ./render-server/dist/static/
 
       - name: Move builds (static)
         if: matrix.name == 'static'
         run: |
-          mkdir -p ./static/data
-          rsync -avz ./build/ ./static/data/
+          mkdir -p ./static/static
+          rsync -avz ./build/static/ ./static/data/
 
       - name: Build image
         working-directory: ./${{ matrix.name }}
@@ -183,14 +184,15 @@ jobs:
                   LETSENCRYPT_HOST: ${{ secrets.SSH_HOST }}
                   API_CONNECTION_PORT: 80
                   API_CONNECTION_WEBHOST: https://${{ secrets.SSH_HOST }}
+                  API_CONNECTION_IMAGEHOST: https://images.${{ secrets.SSH_HOST }}
                   API_JWT_SECRET: ${{ secrets.JWT_SECRET }}
                   API_MONGO_USER_PASSWORD: ${{ secrets.MONGO_USER_PASSWORD }}
                   API_DEV: "false"
                 expose:
                   - 80
-              static:
                 volumes:
-                  - /home/${{ secrets.SSH_USERNAME }}/bjornf.dev/api-uploads:/usr/share/nginx/html/uploads
+                  - /home/${{ secrets.SSH_USERNAME }}/bjornf.dev/api-uploads:/api/blogapi/dist/uploads
+              static:
                 environment:
                   VIRTUAL_HOST: static.${{ secrets.SSH_HOST }}
                   VIRTUAL_PORT: 80

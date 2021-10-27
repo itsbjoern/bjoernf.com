@@ -1,4 +1,5 @@
 blogapi/uploads
+blogapi/images
 blogapi/node_cache
 blogapi/public/*
 !blogapi/public/index-node.html

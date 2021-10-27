@@ -172,6 +172,7 @@ module.exports = function (webpackEnv, isNode) {
           new HtmlWebpackPlugin({
             inject: true,
             template: paths.appHtml,
+            filename: 'public/index.html',
             minify: {
               removeComments: true,
               collapseWhitespace: true,

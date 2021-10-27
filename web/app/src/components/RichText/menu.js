@@ -104,19 +104,19 @@ const Menu = () => {
             type="heading"
             command="toggleHeading"
             param={{ level: 1 }}
-            icon={<FormatSize sx={{ fontSize: 28 }} />}
+            icon={<FormatSize sx={{ fontSize: 20 }} />}
           />
           <ToggleButton
             type="heading"
             command="toggleHeading"
             param={{ level: 2 }}
-            icon={<FormatSize sx={{ fontSize: 23 }} />}
+            icon={<FormatSize sx={{ fontSize: 16 }} />}
           />
           <ToggleButton
             type="heading"
             command="toggleHeading"
             param={{ level: 3 }}
-            icon={<FormatSize sx={{ fontSize: 18 }} />}
+            icon={<FormatSize sx={{ fontSize: 12 }} />}
           />
         </ButtonGroup>
         <ButtonGroup variant="outlined">

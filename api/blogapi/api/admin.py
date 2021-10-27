@@ -3,12 +3,9 @@ import datetime
 import bson
 import os
 import re
-import pathlib
 import pymongo
 
 from blogapi import util
-
-PROJECT_ROOT = pathlib.Path(__file__).parent.parent
 
 
 async def login_handler(request):
@@ -195,7 +192,7 @@ async def upload(request):
   ext = field.filename.split('.')[-1]
   file_name = f'{str(bson.ObjectId())}.{ext}'
 
-  upload_path = PROJECT_ROOT / 'public' / 'uploads' / post_id
+  upload_path = request.app['config']['paths.uploads'] / post_id
   os.makedirs(upload_path, exist_ok=True)
 
   save_path = os.path.join(upload_path, file_name)
@@ -208,9 +205,7 @@ async def upload(request):
       size += len(chunk)
       f.write(chunk)
 
-  upload_src = request.app['config']['connection.webhost'].replace('https://', 'https://images.')
-  upload_src += f'/uploads/{post_id}/{file_name}'
-
+  upload_src = request.app['config']['connection.imagehost'] + f'/uploads/{post_id}/{file_name}'
   return util.json_response({
     'src': upload_src,
     'fileSize': size,

@@ -86,7 +86,10 @@ const Editor = ({ content, onChange, upload, editable = true }) => {
     new ListItemExtension(),
     new BulletListExtension(),
     new OrderedListExtension(),
-    new ImageExtension({ uploadHandler: createUploadHandler(upload) }),
+    new ImageExtension({
+      uploadHandler: createUploadHandler(upload),
+      enableResizing: true,
+    }),
     new VideoExtension({ uploadHandler: createUploadHandler(upload) }),
     // new FileExtension({ uploadFileHandler: createFileUploadHandler(upload) }),
     new HeadingExtension(),

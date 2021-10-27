@@ -6,6 +6,7 @@ from aiohttp import web
 from blogapi.db import mongo_ctx
 from blogapi.middlewares import setup_middlewares
 from blogapi.routes import setup_routes
+from blogapi.paths import setup_paths
 from blogapi.settings import get_config
 from blogapi import util
 
@@ -15,6 +16,7 @@ async def init_app(argv):
   app['config'] = get_config()
   app['auth'] = util.Auth(app['config']['jwt.secret'])
 
+  setup_paths(app)
   app.cleanup_ctx.append(mongo_ctx)
   setup_routes(app)
   setup_middlewares(app)

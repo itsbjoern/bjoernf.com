@@ -1,11 +1,6 @@
 import re
 import bson
 import os
-import pathlib
-
-
-PROJECT_ROOT = pathlib.Path(__file__).parent.parent
-BUILD_ROOT = PROJECT_ROOT / 'public'
 
 
 template = """
@@ -75,7 +70,8 @@ class Hydrate():
 class IndexHydrate(Hydrate):
   def __init__(self, request):
     page = None
-    with open(os.path.join(BUILD_ROOT, 'index.html'), 'r') as fh:
+    build_root = request.app['config']['paths.public']
+    with open(os.path.join(build_root, 'index.html'), 'r') as fh:
       page = fh.read()
 
     super().__init__(request, page)

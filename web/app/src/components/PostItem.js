@@ -20,9 +20,14 @@ const ShadowButton = styled(ListItemButton)`
     padding-bottom: 10px;
     padding-right: 10%;
     min-height: 77px;
-    background-color: ${({ theme }) => theme.palette.background.default};
+    background-color: ${({ theme }) => theme.palette.background.paper};
+    position: relative;
 
     ${morphMixin()}
+
+    .MuiTouchRipple-root > span > span {
+      background-color: ${({ theme }) => theme.palette.secondary.main};
+    }
   }
 `
 
@@ -48,11 +53,12 @@ const Inner = styled(Row)`
 `
 
 const PaperClip = styled(Row)`
-  background-color: ${({ theme }) => theme.palette.background.default};
+  background-color: ${({ theme }) => theme.palette.background.paper};
   z-index: 5;
-  padding: 5px 10px;
   ${morphMixin()}
+  padding: 8px 8px 0px 12px;
   border-radius: 10px 10px 0 0;
+  gap: 15px;
 
   @media only screen and (max-width: 425px) {
     padding: 5px 0;
@@ -70,7 +76,7 @@ const Control = styled(Row)`
 `
 
 const ClipOn = ({ children }) => (
-  <Outer alignSelf="end">
+  <Outer>
     <Inner>
       <PaperClip>{children}</PaperClip>
     </Inner>
@@ -84,26 +90,27 @@ const PostItem = ({ post }) => {
 
   return (
     <Column>
-      <Control justify="end">
-        <Row gap={15} align="end">
-          {tags
-            ? tags.map((t) => (
-                <Tag
-                  style={{ zIndex: 10, paddingBottom: 6 }}
-                  size="small"
-                  key={t}
-                  name={t}
-                />
-              ))
-            : null}
-        </Row>
+      <Control justify="start">
         <ClipOn>
           <Row gap={10}>
             <Row>
-              <span style={{ fontSize: '1rem' }}>
+              <span style={{ fontSize: '0.9rem' }}>
                 {moment(createdAt * 1000).format('MMMM Do, YYYY')}
               </span>
             </Row>
+          </Row>
+          <Row gap={8} align="end">
+            {tags
+              ? tags.map((t) => (
+                  <Tag
+                    style={{ zIndex: 10 }}
+                    sx={{ fontSize: '0.6rem', minWidth: 0, minHeight: 0 }}
+                    size="small"
+                    key={t}
+                    name={t}
+                  />
+                ))
+              : null}
           </Row>
         </ClipOn>
       </Control>

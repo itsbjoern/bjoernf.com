@@ -5,17 +5,13 @@ import shutil
 
 from aiohttp import web
 
-
-PROJECT_ROOT = pathlib.Path(__file__).parent
-CACHE_ROOT = PROJECT_ROOT / 'node_cache'
-
-def reset_cache():
-  if os.path.isdir(CACHE_ROOT):
-    shutil.rmtree(CACHE_ROOT)
-  os.makedirs(CACHE_ROOT, exist_ok=True)
+def reset_cache(app):
+  if os.path.isdir(app['config']['paths.cache']):
+    shutil.rmtree(app['config']['paths.cache'])
+  os.makedirs(app['config']['paths.cache'], exist_ok=True)
 
 def setup_routes(app):
-  reset_cache()
+  reset_cache(app)
   app.router.add_get('/favicon.ico', index.get_favicon)
 
   app.router.add_post('/api/heartbeat', analytics.heartbeat)
@@ -37,13 +33,23 @@ def setup_routes(app):
   app.router.add_get('/', index.handler)
 
   if app['config']['dev']:
-    app.router.add_static('/public/',
-                          path=PROJECT_ROOT / 'public',
+    app.router.add_static('/public/static',
+                          path=app['config']['paths.static'],
+                          name='static',
+                          follow_symlinks=True)
+
+    app.router.add_static('/public/images',
+                          path=app['config']['paths.images'],
+                          name='images',
+                          follow_symlinks=True)
+
+    app.router.add_static('/public',
+                          path=app['config']['paths.public'],
                           name='public',
                           follow_symlinks=True)
 
     app.router.add_static('/uploads/',
-                          path=PROJECT_ROOT / 'uploads',
+                          path=app['config']['paths.uploads'],
                           name='uploads')
 
   app.router.add_get('/{tail:.*}', index.handler)

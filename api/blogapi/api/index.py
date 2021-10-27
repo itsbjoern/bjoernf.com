@@ -6,15 +6,13 @@ import urllib.parse
 
 from blogapi.api import hydrations
 
-PROJECT_ROOT = pathlib.Path(__file__).parent.parent
-BUILD_ROOT = PROJECT_ROOT / 'public'
-CACHE_ROOT = PROJECT_ROOT / 'node_cache'
 
 async def handler(request):
   url = str(request.rel_url)
 
-  cache_url = CACHE_ROOT / urllib.parse.quote(url, safe='')
-  if os.path.isfile(cache_url):
+  cache_url = request.app['config']['paths.cache'] / urllib.parse.quote(url, safe='')
+  is_dev = request.app['config']['dev']
+  if not is_dev and os.path.isfile(cache_url):
     with open(cache_url) as fh:
       return web.Response(
         text=fh.read(),
@@ -65,5 +63,5 @@ async def not_found_html(request):
     content_type='text/html')
 
 async def get_favicon(request):
-  favicon = PROJECT_ROOT / 'public' / 'favicons' / 'favicon.ico'
+  favicon = request.app['config']['paths.public'] / 'favicons' / 'favicon.ico'
   return web.FileResponse(favicon)

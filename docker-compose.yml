@@ -25,7 +25,8 @@ services:
       - default
       - nginx-proxy
     volumes:
-      - staticvolume:/api/blogapi/public
+      - staticvolume:/api/blogapi/dist/public
+      - uploadvolume:/api/blogapi/dist/uploads
   mongo:
     image: mongo
     restart: unless-stopped
@@ -40,12 +41,15 @@ services:
   image-server:
     image: bjornf-image-server
     volumes:
-      - staticvolume:/data
+      - imagevolume:/dist/images
+      - uploadvolume:/dist/uploads
     networks:
       - nginx-proxy
 
 volumes:
   staticvolume:
+  imagevolume:
+  uploadvolume:
 
 networks:
   default:

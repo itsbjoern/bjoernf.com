@@ -1,5 +1,5 @@
 {
   "scripts": {
-    "start": "find ./blogapi/public/ -maxdepth 1 -type l -delete && ln -sf $(pwd)/../web/dist/* ./blogapi/public/ && adev runserver blogapi"
+    "start": "find ./blogapi/dist/ -maxdepth 1 -type l -delete && ln -sf $(pwd)/../web/dist/* ./blogapi/dist/ && adev runserver blogapi"
   }
 }

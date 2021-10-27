@@ -5,13 +5,9 @@ import base64
 import json
 import bson
 from aiohttp import web
-import pathlib
 import pymongo
 import datetime
 import math
-import shutil
-
-PROJECT_ROOT = pathlib.Path(__file__).parent
 
 
 class ObjEnconder(json.JSONEncoder):

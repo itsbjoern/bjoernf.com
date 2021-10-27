@@ -22,6 +22,9 @@ ul {
   padding-inline-start: 30px;
 }
 
+html {
+  width: 100vw;
+}
 body {
   min-height: 100vh;
   display: flex;

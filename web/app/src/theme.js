@@ -12,7 +12,7 @@ export default {
   palette: {
     background: {
       default: '#f1f1f1',
-      paper: '#eef1f3',
+      paper: '#f5f5f5',
       offset: '#778DA9',
     },
     primary: {
@@ -28,9 +28,9 @@ export default {
   },
 }
 
-export const morphMixin = (size = 7) => `
+export const morphMixin = (size = 5) => `
   border-radius: 10px;
-  box-shadow: ${size}px ${size}px ${size * 2}px #e1e1e1,
+  box-shadow: ${size}px ${size}px ${size * 2}px #e3e3e3,
   -${size}px -${size}px ${size * 2}px #ffffff;
 `
 

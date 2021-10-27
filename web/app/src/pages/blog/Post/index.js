@@ -183,7 +183,11 @@ const Post = ({
             <Button
               variant="contained"
               onClick={openPublishDialog}
-              disabled={!post.draft?.text || !post.draft?.title}
+              disabled={
+                post.draft?.text === post.published?.text &&
+                post.draft?.title === post.draft?.title &&
+                post.draft?.tags?.length === post.published?.tags?.length
+              }
             >
               Publish
             </Button>
