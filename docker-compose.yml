@@ -41,14 +41,12 @@ services:
   image-server:
     image: bjornf-image-server
     volumes:
-      - imagevolume:/dist/images
       - uploadvolume:/dist/uploads
     networks:
       - nginx-proxy
 
 volumes:
   staticvolume:
-  imagevolume:
   uploadvolume:
 
 networks:

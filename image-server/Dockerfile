@@ -6,4 +6,4 @@ WORKDIR /image-server
 COPY requirements.txt requirements.txt
 RUN pip install -r requirements.txt
 COPY server server
-CMD ["python", "-m", "server"]
+CMD ["./start.sh"]
