@@ -10,3 +10,4 @@ autopep8==1.5.7
 bcrypt==3.2.0
 PyJWT==2.1.0
 httpagentparser==1.9.1
+feedgen==0.9.0

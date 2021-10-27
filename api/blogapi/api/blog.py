@@ -41,7 +41,7 @@ async def get_all_posts_handler(request):
   posts, num_pages, current_page = paginated
   posts = posts.sort('createdAt', pymongo.DESCENDING)
 
-  return util.json_response({'posts': posts, 'numPages': num_pages, 'page': current_page})
+  return util.json_response({'posts': list(posts), 'numPages': num_pages, 'page': current_page})
 
 
 async def get_post_handler(request):
