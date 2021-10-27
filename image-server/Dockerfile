@@ -7,4 +7,5 @@ COPY requirements.txt requirements.txt
 RUN pip install -r requirements.txt
 COPY server server
 COPY start.sh start.sh
+COPY images images
 CMD ["./start.sh"]
