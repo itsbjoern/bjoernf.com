@@ -75,9 +75,7 @@ jobs:
         if: matrix.name == 'api'
         run: |
           mkdir -p ./api/blogapi/dist/public
-          mkdir -p ./api/blogapi/dist/images
           rsync -avz ./build/public/ ./api/blogapi/dist/public/
-          rsync -avz ./build/images/ ./api/blogapi/dist/images/
 
       - name: Move builds (render-server)
         if: matrix.name == 'render-server'
@@ -95,7 +93,7 @@ jobs:
         if: matrix.name == 'image-server'
         run: |
           mkdir -p ./image-server/images
-          rsync -avz ./build/images/ ./static/images/
+          rsync -avz ./build/images/ ./image-server/images/
 
       - name: Build image
         working-directory: ./${{ matrix.name }}
