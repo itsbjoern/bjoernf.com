@@ -81,7 +81,7 @@ jobs:
   build-images:
     needs:
       - build-web
-      - cache-api-base
+      - build-api-base
     runs-on: ubuntu-latest
     strategy:
       matrix:
