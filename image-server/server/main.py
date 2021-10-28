@@ -17,8 +17,9 @@ async def init_app(argv, is_dev=True):
   return app
 
 async def get_app():
-  os.makedirs('./server/uploads', exist_ok=True)
-  os.makedirs('./server/images', exist_ok=True)
+  os.makedirs('./server/dist/uploads', exist_ok=True)
+  os.makedirs('./server/dist/images', exist_ok=True)
+  os.makedirs('./server/dist/cache', exist_ok=True)
   app = await init_app(sys.argv[1:])
   return app
 
@@ -26,6 +27,7 @@ async def get_app():
 def main(argv):
   os.makedirs('/dist/images', exist_ok=True)
   os.makedirs('/dist/uploads', exist_ok=True)
+  os.makedirs('/dist/cache', exist_ok=True)
 
   logging.basicConfig(level=logging.DEBUG)
   app = init_app(argv, is_dev=False)

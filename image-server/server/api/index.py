@@ -24,11 +24,11 @@ async def handler(request):
     quality=quality
   )
 
-  root = pathlib.Path(__file__).parent.parent if request.app['dev'] else '/dist'
+  root = pathlib.Path(__file__).parent.parent if request.app['dev'] else '/'
 
   add = '_'.join([f'{k}={v}' for k, v in sorted(options.items())])
   compressed_name = img_path.replace('.'+img_path.split('.')[-1], f'_{add}.'+ext).replace('/', '-')
-  compressed_path = os.path.join(root, compressed_name)
+  compressed_path = os.path.join(root, 'dist', 'cache', compressed_name)
   if os.path.isfile(compressed_path):
     return web.FileResponse(compressed_path)
 
