@@ -256,6 +256,8 @@ jobs:
                   LETSENCRYPT_HOST: images.${{ secrets.SSH_HOST }}
                 expose:
                   - 80
+                volumes:
+                  - /home/${{ secrets.SSH_USERNAME }}/bjornf.dev/api-uploads:/dist/uploads
             EOL
 
             sudo docker-compose -f docker-compose.yml -f prod.yml up -d
