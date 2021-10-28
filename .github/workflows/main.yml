@@ -110,12 +110,12 @@ jobs:
 
       - name: Create folder
         run: |
-          mkdir -p ./build
+          mkdir -p ./dist
 
       - uses: actions/download-artifact@v2
         with:
           name: web-build
-          path: build/
+          path: dist/
 
       - name: Move builds (api)
         if: matrix.name == 'api'
@@ -127,19 +127,19 @@ jobs:
         if: matrix.name == 'render-server'
         run: |
           mkdir -p ./render-server/dist/static
-          rsync -avz ./build/static/ ./render-server/dist/static/
+          rsync -avz ./dist/static/ ./render-server/dist/static/
 
       - name: Move builds (static)
         if: matrix.name == 'static'
         run: |
           mkdir -p ./static/static
-          rsync -avz ./build/static/ ./static/data/
+          rsync -avz ./dist/static/ ./static/data/
 
       - name: Move builds (image-server)
         if: matrix.name == 'image-server'
         run: |
           mkdir -p ./image-server/images
-          rsync -avz ./build/images/ ./image-server/images/
+          rsync -avz ./dist/images/ ./image-server/images/
 
       - name: Build image
         working-directory: ./${{ matrix.name }}
