@@ -63,6 +63,8 @@ services:
   mongo:
     image: mongo
     restart: unless-stopped
+    volumes:
+      - ./dist/mongo-data:/data/db
     networks:
       - default
   static:

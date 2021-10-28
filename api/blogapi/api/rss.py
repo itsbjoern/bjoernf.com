@@ -19,26 +19,29 @@ async def create_feed(request):
   config = request.app['config']
   url = config['connection.webhost']
 
-  root = ET.Element("rss")
+  root = ET.Element("rss", {
+     'xmlns:dc': "http://purl.org/dc/elements/1.1/",'xmlns:content': "http://purl.org/rss/1.0/modules/content/",'xmlns:atom': "http://www.w3.org/2005/Atom",
+     'version': "2.0"
+  })
   channel = ET.SubElement(root, "channel")
-  ET.SubElement(channel, 'title').text = cdata('Posts | Björn Friedrichs')
+  ET.SubElement(channel, 'title').text = cdata('Blog | Björn Friedrichs')
   ET.SubElement(channel, 'description').text = 'A mere stream of thoughts'
   ET.SubElement(channel, 'link').text = url
-  ET.SubElement(channel, 'lastBuildDate').text = posts[0]['published']['publishedAt']
+  ET.SubElement(channel, 'lastBuildDate').text = posts[0]['published']['publishedAt'].isoformat()
 
   for post in posts:
-    item = ET.SubElement(root, "item")
+    if 'published' not in post:
+      continue
+    item = ET.SubElement(channel, "item")
     ET.SubElement(item, 'title').text = cdata(post['published']['title'])
     ET.SubElement(item, 'link').text = f'{url}/post/{post["_id"]}'
-    ET.SubElement(item, 'guid', isPermaLink=False).text = f'{url}/post/{post["_id"]}'
-    ET.SubElement(item, 'pubDate').text = post['published']['publishedAt']
-    ET.SubElement(item, 'description').text = post['summary']
-    ET.SubElement(item, 'content:encoded').text = post['published']['html']
+    ET.SubElement(item, 'guid', isPermaLink="false").text = f'{url}/post/{post["_id"]}'
+    ET.SubElement(item, 'pubDate').text = post['published']['publishedAt'].isoformat()
+    ET.SubElement(item, 'description').text = valid_xml_char_ordinal(post['published']['summary'])
+    ET.SubElement(item, 'content:encoded').text = valid_xml_char_ordinal(post['published']['html'])
 
-    fe.description(valid_xml_char_ordinal(post['published']['summary']))
-    fe.link(href=f'{url}/post/{post["_id"]}')
-
+  xml_response = ET.tostring(root).decode()
   return web.Response(
-    text=ET.tostring(root),
+    text=xml_response,
     content_type='text/xml'
   )
