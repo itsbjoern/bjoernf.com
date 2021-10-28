@@ -10,6 +10,7 @@ services:
       dockerfile: Dockerfile-start
     volumes:
       - ./dist/:/web/dist
+      - ./web/app/src/:/web/app/src
   web-node:
     environment:
       REACT_APP_API_URL: http://localhost:8080
@@ -20,6 +21,7 @@ services:
       dockerfile: Dockerfile-start-node
     volumes:
       - ./dist/:/web/dist
+      - ./web/app/src/:/web/app/src
   render-server:
     environment:
       REACT_APP_API_URL: http://localhost:8080
@@ -37,6 +39,7 @@ services:
   api:
     build: ./api
     restart: unless-stopped
+    command: yarn start
     ports:
       - 8080:8080
     links:
@@ -54,6 +57,7 @@ services:
     networks:
       - default
     volumes:
+      - ./api/blogapi/:/api/blogapi
       - ./dist/public/:/api/blogapi/dist/public
       - ./dist/uploads/:/api/blogapi/dist/uploads
   mongo:

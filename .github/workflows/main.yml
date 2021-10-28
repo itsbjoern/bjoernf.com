@@ -59,9 +59,9 @@ jobs:
       - name: Build
         working-directory: ./web
         env:
-          REACT_APP_API_URL: https://{{ secrets.SSH_HOST }}
-          PUBLIC_URL: https://static.{{ secrets.SSH_HOST }}
-          IMAGE_URL: https://images.{{ secrets.SSH_HOST }}
+          REACT_APP_API_URL: https://${{ secrets.SSH_HOST }}
+          PUBLIC_URL: https://static.${{ secrets.SSH_HOST }}
+          IMAGE_URL: https://images.${{ secrets.SSH_HOST }}
         run: |
           node scripts/build.js &
           PID_WEB=$!

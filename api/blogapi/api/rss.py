@@ -24,14 +24,14 @@ async def create_feed(request):
   ET.SubElement(channel, 'title').text = cdata('Posts | Björn Friedrichs')
   ET.SubElement(channel, 'description').text = 'A mere stream of thoughts'
   ET.SubElement(channel, 'link').text = url
-  ET.SubElement(channel, 'lastBuildDate').text = posts[0]['publishedAt']
+  ET.SubElement(channel, 'lastBuildDate').text = posts[0]['published']['publishedAt']
 
   for post in posts:
     item = ET.SubElement(root, "item")
     ET.SubElement(item, 'title').text = cdata(post['published']['title'])
     ET.SubElement(item, 'link').text = f'{url}/post/{post["_id"]}'
     ET.SubElement(item, 'guid', isPermaLink=False).text = f'{url}/post/{post["_id"]}'
-    ET.SubElement(item, 'pubDate').text = post['publishedAt']
+    ET.SubElement(item, 'pubDate').text = post['published']['publishedAt']
     ET.SubElement(item, 'description').text = post['summary']
     ET.SubElement(item, 'content:encoded').text = post['published']['html']
 
