@@ -2,9 +2,9 @@ version: "3.9"
 services:
   web:
     environment:
-      REACT_APP_API_URL: http://localhost:8080
-      PUBLIC_URL: http://localhost:8090
-      IMAGE_URL: http://localhost:8091
+      REACT_APP_API_URL: http://localhost:8000
+      PUBLIC_URL: http://localhost:8010
+      IMAGE_URL: http://localhost:8011
     build:
       context: ./web
       dockerfile: Dockerfile-start
@@ -13,9 +13,9 @@ services:
       - ./web/app/src/:/web/app/src
   web-node:
     environment:
-      REACT_APP_API_URL: http://localhost:8080
-      PUBLIC_URL: http://localhost:8090
-      IMAGE_URL: http://localhost:8091
+      REACT_APP_API_URL: http://localhost:8000
+      PUBLIC_URL: http://localhost:8010
+      IMAGE_URL: http://localhost:8011
     build:
       context: ./web
       dockerfile: Dockerfile-start-node
@@ -24,9 +24,9 @@ services:
       - ./web/app/src/:/web/app/src
   render-server:
     environment:
-      REACT_APP_API_URL: http://localhost:8080
-      PUBLIC_URL: http://localhost:8090
-      IMAGE_URL: http://localhost:8091
+      REACT_APP_API_URL: http://localhost:8000
+      PUBLIC_URL: http://localhost:8010
+      IMAGE_URL: http://localhost:8011
     build: ./render-server
     command: yarn start
     expose:
@@ -39,9 +39,9 @@ services:
   api:
     build: ./api
     restart: unless-stopped
-    command: yarn start
+    command: adev runserver blogapi
     ports:
-      - 8080:8080
+      - 8000:8000
     links:
       - mongo
       - render-server
@@ -49,9 +49,9 @@ services:
       - mongo
     environment:
       API_CONNECTION_HOST: 0.0.0.0
-      API_CONNECTION_PORT: '8080'
-      API_CONNECTION_WEBHOST: http://127.0.0.1:8080
-      API_CONNECTION_IMAGEHOST: http://127.0.0.1:8091
+      API_CONNECTION_PORT: '8000'
+      API_CONNECTION_WEBHOST: http://127.0.0.1:8000
+      API_CONNECTION_IMAGEHOST: http://127.0.0.1:8011
       API_MONGO_HOST: mongo
       API_NODE_ADDRESS: render-server
     networks:
@@ -68,7 +68,7 @@ services:
   static:
     build: ./static
     ports:
-      - 8090:80
+      - 8010:80
     volumes:
       - ./dist/public:/usr/share/nginx/html/
       - ./dist/static:/usr/share/nginx/html/static/
@@ -80,7 +80,7 @@ services:
   image-server:
     build: ./image-server
     ports:
-      - 8091:80
+      - 8011:80
     volumes:
       - ./dist/uploads/:/dist/uploads
       - ./dist/images/:/dist/images

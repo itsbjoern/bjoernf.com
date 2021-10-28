@@ -75,7 +75,7 @@ jobs:
       - uses: actions/upload-artifact@v1
         with:
           name: web-build
-          path: web/build/
+          path: web/dist/
 
   build-images:
     needs:
@@ -230,9 +230,9 @@ jobs:
                   - /home/${{ secrets.SSH_USERNAME }}/bjornf.dev/mongo-data:/data/db
               render-server:
                 environment:
-                  REACT_APP_API_URL: http://localhost:8080
-                  PUBLIC_URL: http://localhost:8090
-                  IMAGE_URL: http://localhost:8091
+                  REACT_APP_API_URL: https://${{ secrets.SSH_HOST }}
+                  PUBLIC_URL: https://static.${{ secrets.SSH_HOST }}
+                  IMAGE_URL: https://images.${{ secrets.SSH_HOST }}
               api:
                 environment:
                   VIRTUAL_HOST: ${{ secrets.SSH_HOST }}
