@@ -32,7 +32,7 @@ async def handler(request):
   if os.path.isfile(compressed_path):
     return web.FileResponse(compressed_path)
 
-  img_path = os.path.join(root, img_path)
+  img_path = os.path.join(root, 'dist', img_path)
   if not os.path.isfile(img_path):
     return web.HTTPNotFound()
   if not formats.get(ext):
