@@ -1,0 +1,89 @@
+version: "3.9"
+services:
+  web:
+    environment:
+      REACT_APP_API_URL: http://localhost:8080
+      PUBLIC_URL: http://localhost:8090
+      IMAGE_URL: http://localhost:8091
+    build:
+      context: ./web
+      dockerfile: Dockerfile-start
+    volumes:
+      - ./dist/:/web/dist
+  web-node:
+    environment:
+      REACT_APP_API_URL: http://localhost:8080
+      PUBLIC_URL: http://localhost:8090
+      IMAGE_URL: http://localhost:8091
+    build:
+      context: ./web
+      dockerfile: Dockerfile-start-node
+    volumes:
+      - ./dist/:/web/dist
+  render-server:
+    environment:
+      REACT_APP_API_URL: http://localhost:8080
+      PUBLIC_URL: http://localhost:8090
+      IMAGE_URL: http://localhost:8091
+    build: ./render-server
+    command: yarn start
+    expose:
+      - 9009
+    networks:
+      - default
+    volumes:
+      - ./dist/static/:/render-server/dist/static
+    restart: unless-stopped
+  api:
+    build: ./api
+    restart: unless-stopped
+    ports:
+      - 8080:8080
+    links:
+      - mongo
+      - render-server
+    depends_on:
+      - mongo
+    environment:
+      API_CONNECTION_HOST: 0.0.0.0
+      API_CONNECTION_PORT: '8080'
+      API_CONNECTION_WEBHOST: http://127.0.0.1:8080
+      API_CONNECTION_IMAGEHOST: http://127.0.0.1:8091
+      API_MONGO_HOST: mongo
+      API_NODE_ADDRESS: render-server
+    networks:
+      - default
+    volumes:
+      - ./dist/public/:/api/blogapi/dist/public
+      - ./dist/uploads/:/api/blogapi/dist/uploads
+  mongo:
+    image: mongo
+    restart: unless-stopped
+    networks:
+      - default
+  static:
+    build: ./static
+    ports:
+      - 8090:80
+    volumes:
+      - ./dist/public:/usr/share/nginx/html/
+      - ./dist/static:/usr/share/nginx/html/static/
+      - type: bind
+        source: ./static/dev.conf
+        target: /etc/nginx/conf.d/default.conf
+    networks:
+      - default
+  image-server:
+    build: ./image-server
+    ports:
+      - 8091:80
+    volumes:
+      - ./dist/uploads/:/dist/uploads
+      - ./dist/images/:/dist/images
+    networks:
+      - default
+
+networks:
+  default:
+    name: app-network
+    driver: bridge

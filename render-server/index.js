@@ -30,10 +30,10 @@ const appServerPath = path.join(
   'js',
   'AppServer.js'
 )
-const distLoad = require(appServerPath)
-
-let AppServer = distLoad.default
-let createSSRContext = distLoad.createSSRContext
+let distLoad = null
+try {
+  let distLoad = require(appServerPath)
+} catch (e) {}
 
 // Ensure support for loading files that contain ES6+7 & JSX
 require('@babel/core')
@@ -60,6 +60,12 @@ const createApp = () => {
       global.Headers = nodeFetch.Headers
     }
 
+    if (!distLoad) {
+      distLoad = require(appServerPath)
+    }
+
+    const AppServer = distLoad.default
+    const createSSRContext = distLoad.createSSRContext
     try {
       const { resolveData } = createSSRContext()
 
@@ -92,9 +98,7 @@ const createApp = () => {
 
 const startListen = (server) => {
   delete require.cache[Object.keys(require.cache).find(k => k.endsWith('AppServer.js'))]
-  const reload = require(appServerPath)
-  AppServer = reload.default
-  createSSRContext = reload.createSSRContext
+  distLoad = require(appServerPath)
 
   server.listen(PORT, ADDRESS, function () {
     console.log(
@@ -107,19 +111,19 @@ const app = createApp()
 let server = http.Server(app)
 startListen(server)
 
-if (process.env.NODE_ENV === 'development') {
-  const watch = spawn('node', ['watcher.js'])
+// if (process.env.NODE_ENV === 'development') {
+//   const watch = spawn('node', ['watcher.js'])
 
-  const restart = () => {
-    server.close(() => {
-      server = http.Server(app)
-      startListen(server)
-    })
-  }
+//   const restart = () => {
+//     server.close(() => {
+//       server = http.Server(app)
+//       startListen(server)
+//     })
+//   }
 
-  watch.stdout.on('data', restart)
+//   watch.stdout.on('data', restart)
 
-  // watch.stderr.on('data', restart)
+//   // watch.stderr.on('data', restart)
 
-  watch.on('close', () => server.close())
-}
+//   watch.on('close', () => server.close())
+// }

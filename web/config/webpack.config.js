@@ -196,9 +196,7 @@ module.exports = function (webpackEnv, isNode) {
           }),
         ],
     output: {
-      path: isEnvDevelopment
-        ? path.resolve(__dirname, '..', 'dist')
-        : paths.appBuild,
+      path: paths.appBuild,
       filename: `static/js/[name]${isNode ? '' : ext}.js`,
       globalObject: 'this',
       publicPath: paths.publicUrlOrPath,

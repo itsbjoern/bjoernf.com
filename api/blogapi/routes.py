@@ -33,24 +33,4 @@ def setup_routes(app):
   app.router.add_get('/rss', rss.create_feed)
   app.router.add_get('/', index.handler)
 
-  if app['config']['dev']:
-    app.router.add_static('/public/static',
-                          path=app['config']['paths.static'],
-                          name='static',
-                          follow_symlinks=True)
-
-    app.router.add_static('/public/images',
-                          path=app['config']['paths.images'],
-                          name='images',
-                          follow_symlinks=True)
-
-    app.router.add_static('/public',
-                          path=app['config']['paths.public'],
-                          name='public',
-                          follow_symlinks=True)
-
-    app.router.add_static('/uploads/',
-                          path=app['config']['paths.uploads'],
-                          name='uploads')
-
   app.router.add_get('/{tail:.*}', index.handler)

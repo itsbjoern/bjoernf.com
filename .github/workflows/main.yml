@@ -59,8 +59,9 @@ jobs:
       - name: Build
         working-directory: ./web
         env:
-          REACT_APP_API_URL: https://bjornf.dev
-          PUBLIC_URL: https://static.bjornf.dev
+          REACT_APP_API_URL: https://{{ secrets.SSH_HOST }}
+          PUBLIC_URL: https://static.{{ secrets.SSH_HOST }}
+          IMAGE_URL: https://images.{{ secrets.SSH_HOST }}
         run: |
           node scripts/build.js &
           PID_WEB=$!
@@ -120,7 +121,7 @@ jobs:
         if: matrix.name == 'api'
         run: |
           mkdir -p ./api/blogapi/dist/public
-          rsync -avz ./build/public/ ./api/blogapi/dist/public/
+          rsync -avz ./dist/public/ ./api/blogapi/dist/public/
 
       - name: Move builds (render-server)
         if: matrix.name == 'render-server'
@@ -227,6 +228,11 @@ jobs:
               mongo:
                 volumes:
                   - /home/${{ secrets.SSH_USERNAME }}/bjornf.dev/mongo-data:/data/db
+              render-server:
+                environment:
+                  REACT_APP_API_URL: http://localhost:8080
+                  PUBLIC_URL: http://localhost:8090
+                  IMAGE_URL: http://localhost:8091
               api:
                 environment:
                   VIRTUAL_HOST: ${{ secrets.SSH_HOST }}

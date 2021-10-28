@@ -1,4 +1,4 @@
-from feedgen.feed import FeedGenerator
+import xml.etree.cElementTree as ET
 from aiohttp import web
 import re
 
@@ -7,39 +7,38 @@ from blogapi.api import blog
 def valid_xml_char_ordinal(text):
   return re.sub(u'[^\u0020-\uD7FF\u0009\u000A\u000D\uE000-\uFFFD\U00010000-\U0010FFFF]+', '', text)
 
+def cdata(text):
+  return f'<![CDATA[ {text} ]]>'
+
 async def create_feed(request):
-  page = int(request.query.get('page', 1))
+  page = int(request.query.get('limit', 100))
   post_response = await blog.get_all_posts_handler(request)
   posts = post_response.json['posts']
   num_pages = post_response.json['numPages']
 
   config = request.app['config']
-  fg = FeedGenerator()
   url = config['connection.webhost']
-  fg.id(url + '/')
-  fg.title(f'Posts | Björn Friedrichs | Page {page}')
-  fg.description('A mere stream of thoughts')
-  fg.author({'name':'Björn Friedrichs'})
-  fg.link(href=url, rel='alternate')
-  fg.link(href=str(request.url), rel='self')
 
-  fg.link(href=url + f'/rss', rel='first')
-  if page != num_pages:
-    fg.link(href=url + f'/rss?page={page+1}', rel='next')
-  if page != 1:
-    fg.link(href=url + f'/rss?page={page-1}', rel='previous')
-  fg.link(href=url + f'/rss?page={num_pages}', rel='last')
-
-  fg.language('en')
+  root = ET.Element("rss")
+  channel = ET.SubElement(root, "channel")
+  ET.SubElement(channel, 'title').text = cdata('Posts | Björn Friedrichs')
+  ET.SubElement(channel, 'description').text = 'A mere stream of thoughts'
+  ET.SubElement(channel, 'link').text = url
+  ET.SubElement(channel, 'lastBuildDate').text = posts[0]['publishedAt']
 
   for post in posts:
-    fe = fg.add_entry()
-    fe.id(f'{url}/post/{post["_id"]}')
-    fe.title(valid_xml_char_ordinal(post['published']['title']))
+    item = ET.SubElement(root, "item")
+    ET.SubElement(item, 'title').text = cdata(post['published']['title'])
+    ET.SubElement(item, 'link').text = f'{url}/post/{post["_id"]}'
+    ET.SubElement(item, 'guid', isPermaLink=False).text = f'{url}/post/{post["_id"]}'
+    ET.SubElement(item, 'pubDate').text = post['publishedAt']
+    ET.SubElement(item, 'description').text = post['summary']
+    ET.SubElement(item, 'content:encoded').text = post['published']['html']
+
     fe.description(valid_xml_char_ordinal(post['published']['summary']))
     fe.link(href=f'{url}/post/{post["_id"]}')
 
   return web.Response(
-    text=fg.atom_str(pretty=True).decode(),
+    text=ET.tostring(root),
     content_type='text/xml'
   )

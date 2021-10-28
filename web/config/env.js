@@ -62,6 +62,7 @@ const REACT_APP = /^REACT_APP_/i
 
 function getClientEnvironment(publicUrl) {
   const nodeEnv = process.env.NODE_ENV || 'development'
+  const isDev = nodeEnv === 'development'
 
   const raw = Object.keys(process.env)
     .filter((key) => REACT_APP.test(key))
@@ -79,7 +80,7 @@ function getClientEnvironment(publicUrl) {
         // This should only be used as an escape hatch. Normally you would put
         // images into the `src` and `import` them in code to get their paths.
         PUBLIC_URL: publicUrl,
-        IMAGE_URL: publicUrl.replace('static.', 'images.'),
+        IMAGE_URL: process.env.IMAGE_URL || publicUrl,
         // We support configuring the sockjs pathname during development.
         // These settings let a developer run multiple simultaneous projects.
         // They are used as the connection `hostname`, `pathname` and `port`
