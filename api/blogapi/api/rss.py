@@ -1,5 +1,6 @@
 import xml.etree.cElementTree as ET
 from aiohttp import web
+from email import utils
 import re
 
 from blogapi.api import blog
@@ -27,7 +28,7 @@ async def create_feed(request):
   ET.SubElement(channel, 'title').text = cdata('Blog | Björn Friedrichs')
   ET.SubElement(channel, 'description').text = 'A mere stream of thoughts'
   ET.SubElement(channel, 'link').text = url
-  ET.SubElement(channel, 'lastBuildDate').text = posts[0]['published']['publishedAt'].isoformat()
+  ET.SubElement(channel, 'lastBuildDate').text = utils.format_datetime(posts[0]['published']['publishedAt'])
 
   for post in posts:
     if 'published' not in post:
@@ -36,7 +37,7 @@ async def create_feed(request):
     ET.SubElement(item, 'title').text = cdata(post['published']['title'])
     ET.SubElement(item, 'link').text = f'{url}/post/{post["_id"]}'
     ET.SubElement(item, 'guid', isPermaLink="false").text = f'{url}/post/{post["_id"]}'
-    ET.SubElement(item, 'pubDate').text = post['published']['publishedAt'].isoformat()
+    ET.SubElement(item, 'pubDate').text = utils.format_datetime(post['published']['publishedAt'])
     ET.SubElement(item, 'description').text = valid_xml_char_ordinal(post['published']['summary'])
     ET.SubElement(item, 'content:encoded').text = valid_xml_char_ordinal(post['published']['html'])
 
