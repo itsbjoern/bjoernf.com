@@ -132,7 +132,7 @@ jobs:
       - name: Move builds (static)
         if: matrix.name == 'static'
         run: |
-          rsync -avz ./dist/static/ ./render-server/html/
+          rsync -avz ./dist/static/ ./static/html/
 
       - name: Move builds (image-server)
         if: matrix.name == 'image-server'
