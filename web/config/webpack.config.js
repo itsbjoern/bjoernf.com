@@ -13,6 +13,25 @@ const htmlWebpackInjectAttributesPlugin = require('html-webpack-inject-attribute
 const modules = require('./modules')
 const paths = require('./paths')
 
+class RewritePathPlugin {
+  apply (compiler) {
+    compiler.hooks.compilation.tap('RewritePathPlugin', (compilation) => {
+      HtmlWebpackPlugin.getHooks(compilation).beforeAssetTagGeneration.tapAsync(
+        'RewritePathPlugin',
+        (data, cb) => {
+          data.assets.js = data.assets.js.map(s => {
+            return s.replace('/static', '');
+          })
+          data.assets.css = data.assets.css.map(s => {
+            return s.replace('/static', '');
+          })
+          cb(null, data)
+        }
+      )
+    })
+  }
+}
+
 module.exports = function (webpackEnv, isNode) {
   const env = getClientEnvironment(paths.publicUrlOrPath.slice(0, -1))
   const isEnvDevelopment = webpackEnv === 'development'
@@ -205,6 +224,7 @@ module.exports = function (webpackEnv, isNode) {
             crossorigin: true,
             async: true,
           }),
+          new RewritePathPlugin(),
           new webpack.DefinePlugin(env.stringified),
           new webpack.IgnorePlugin(/^\.\/locale$/, /moment$/),
           new webpack.IgnorePlugin(/canvas/, /jsdom$/),

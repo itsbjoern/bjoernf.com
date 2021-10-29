@@ -58,6 +58,7 @@ services:
       API_CONNECTION_HOST: 0.0.0.0
       API_CONNECTION_PORT: '8000'
       API_CONNECTION_WEBHOST: http://127.0.0.1:8000
+      API_CONNECTION_STATICHOST: http://127.0.0.1:8010
       API_CONNECTION_IMAGEHOST: http://127.0.0.1:8011
       API_MONGO_HOST: mongo
       API_NODE_ADDRESS: render-server
@@ -79,8 +80,7 @@ services:
     ports:
       - 8010:80
     volumes:
-      - ./dist/public:/usr/share/nginx/html/
-      - ./dist/static:/usr/share/nginx/html/static/
+      - ./dist/static:/usr/share/nginx/html/
       - type: bind
         source: ./static/dev.conf
         target: /etc/nginx/conf.d/default.conf

@@ -64,5 +64,4 @@ async def not_found_html(request):
     content_type='text/html')
 
 async def get_favicon(request):
-  favicon = request.app['config']['paths.public'] / 'favicons' / 'favicon.ico'
-  return web.FileResponse(favicon)
+  raise web.HTTPFound(request.app['config']['connection.statichost'] + '/favicons/favicon.ico')

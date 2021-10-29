@@ -126,14 +126,13 @@ jobs:
       - name: Move builds (render-server)
         if: matrix.name == 'render-server'
         run: |
-          mkdir -p ./render-server/dist/static
-          rsync -avz ./dist/static/ ./render-server/dist/static/
+          mkdir -p ./render-server/dist/static/js
+          rsync -avz ./dist/static/js/ ./render-server/dist/static/js/
 
       - name: Move builds (static)
         if: matrix.name == 'static'
         run: |
-          mkdir -p ./static/static
-          rsync -avz ./dist/static/ ./static/data/
+          rsync -avz ./dist/static/ /usr/share/nginx/html/
 
       - name: Move builds (image-server)
         if: matrix.name == 'image-server'
@@ -241,6 +240,7 @@ jobs:
                   API_CONNECTION_PORT: 80
                   API_CONNECTION_WEBHOST: https://${{ secrets.SSH_HOST }}
                   API_CONNECTION_IMAGEHOST: https://images.${{ secrets.SSH_HOST }}
+                  API_CONNECTION_STATICHOST: https://static.${{ secrets.SSH_HOST }}
                   API_JWT_SECRET: ${{ secrets.JWT_SECRET }}
                   API_MONGO_USER_PASSWORD: ${{ secrets.MONGO_USER_PASSWORD }}
                   API_DEV: "false"
