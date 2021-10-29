@@ -28,6 +28,9 @@ export const createSSRContext = () => {
           .success((data) => {
             resolvedData[name] = data
           })
+          .failure((e) => {
+            console.log(e)
+          })
           .finally(() => {
             isDone[i] = true
             if (isDone.every((e) => e)) {

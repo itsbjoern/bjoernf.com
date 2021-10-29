@@ -40,8 +40,9 @@ async def handler(request):
   index.hydrate('html', data['markup'])
   index.hydrate('title')
 
-  with open(cache_url, 'w+') as fh:
-    fh.write(index.page)
+  if not is_dev:
+    with open(cache_url, 'w+') as fh:
+      fh.write(index.page)
 
   return web.Response(
     text=index.page,

@@ -11,22 +11,27 @@ services:
     volumes:
       - ./dist/:/web/dist
       - ./web/app/src/:/web/app/src
+      - ./web/scripts/:/web/scripts
+      - ./web/config/:/web/config
+    networks:
+      - default
   web-node:
     environment:
-      REACT_APP_API_URL: http://localhost:8000
+      REACT_APP_API_URL: http://api:8000
       PUBLIC_URL: http://localhost:8010
       IMAGE_URL: http://localhost:8011
     build:
       context: ./web
-      dockerfile: Dockerfile-start-node
+      dockerfile: Dockerfile-start
+    command: yarn run start-node
     volumes:
       - ./dist/:/web/dist
       - ./web/app/src/:/web/app/src
+      - ./web/scripts/:/web/scripts
+      - ./web/config/:/web/config
+    networks:
+      - default
   render-server:
-    environment:
-      REACT_APP_API_URL: http://localhost:8000
-      PUBLIC_URL: http://localhost:8010
-      IMAGE_URL: http://localhost:8011
     build: ./render-server
     command: yarn start
     expose:
@@ -35,16 +40,18 @@ services:
       - default
     volumes:
       - ./dist/static/:/render-server/dist/static
+      - type: bind
+        source: ./render-server/index.js
+        target: /render-server/index.js
     restart: unless-stopped
   api:
     build: ./api
     restart: unless-stopped
     command: adev runserver blogapi
+    expose:
+      - 8000
     ports:
       - 8000:8000
-    links:
-      - mongo
-      - render-server
     depends_on:
       - mongo
     environment:
@@ -91,5 +98,4 @@ services:
 
 networks:
   default:
-    name: app-network
     driver: bridge

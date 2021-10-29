@@ -8,6 +8,7 @@ const InterpolateHtmlPlugin = require('react-dev-utils/InterpolateHtmlPlugin')
 const getClientEnvironment = require('./env')
 const TerserPlugin = require('terser-webpack-plugin')
 const OptimizeCSSAssetsPlugin = require('optimize-css-assets-webpack-plugin')
+const htmlWebpackInjectAttributesPlugin = require('html-webpack-inject-attributes-plugin')
 
 const modules = require('./modules')
 const paths = require('./paths')
@@ -104,6 +105,19 @@ module.exports = function (webpackEnv, isNode) {
           },
         }),
       ],
+      ...(isNode ? {} : {
+        splitChunks: {
+          chunks: 'all',
+          cacheGroups: {
+            remirrorChunk: {
+              enforce: true,
+              test: /[\\/]node_modules[\\/](@remirror|remirror|y-prosemirror|prosemirror-[^\/]*)[\\/]/,
+              name: 'remirrorChunk',
+              chunks: 'all',
+            }
+          }
+        },
+      })
     },
     module: {
       rules: [
@@ -187,7 +201,10 @@ module.exports = function (webpackEnv, isNode) {
             },
           }),
           new InterpolateHtmlPlugin(HtmlWebpackPlugin, env.raw),
-
+          new htmlWebpackInjectAttributesPlugin({
+            crossorigin: true,
+            async: true,
+          }),
           new webpack.DefinePlugin(env.stringified),
           new webpack.IgnorePlugin(/^\.\/locale$/, /moment$/),
           new webpack.IgnorePlugin(/canvas/, /jsdom$/),
@@ -197,6 +214,7 @@ module.exports = function (webpackEnv, isNode) {
         ],
     output: {
       path: paths.appBuild,
+      crossOriginLoading: 'anonymous',
       filename: `static/js/[name]${isNode ? '' : ext}.js`,
       globalObject: 'this',
       publicPath: paths.publicUrlOrPath,
