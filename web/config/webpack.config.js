@@ -20,10 +20,10 @@ class RewritePathPlugin {
         'RewritePathPlugin',
         (data, cb) => {
           data.assets.js = data.assets.js.map(s => {
-            return s.replace('/static', '');
+            return s.replace('static/', '');
           })
           data.assets.css = data.assets.css.map(s => {
-            return s.replace('/static', '');
+            return s.replace('static/', '');
           })
           cb(null, data)
         }
