@@ -1,6 +1,6 @@
-import pathlib
 import json
 import os
+import bson
 from aiohttp import web, ClientSession
 import urllib.parse
 
@@ -40,6 +40,9 @@ async def handler(request):
   index.hydrate('html', data['markup'])
   index.hydrate('title')
 
+  viewid = str(bson.ObjectId())
+  index.hydrate('viewid', viewid)
+
   if not is_dev:
     with open(cache_url, 'w+') as fh:
       fh.write(index.page)
@@ -62,6 +65,7 @@ async def not_found_html(request):
   return web.Response(
     text=index.page,
     content_type='text/html')
+
 
 async def get_favicon(request):
   raise web.HTTPFound(request.app['config']['connection.statichost'] + '/favicons/favicon.ico')

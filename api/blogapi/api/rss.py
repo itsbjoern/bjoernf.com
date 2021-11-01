@@ -5,24 +5,28 @@ import re
 
 from blogapi.api import blog
 
+
 def valid_xml_char_ordinal(text):
   return re.sub(u'[^\u0020-\uD7FF\u0009\u000A\u000D\uE000-\uFFFD\U00010000-\U0010FFFF]+', '', text)
+
 
 def cdata(text):
   return f'<![CDATA[ {text} ]]>'
 
+
 async def create_feed(request):
-  page = int(request.query.get('limit', 100))
+  request.query['limit'] = 100
   post_response = await blog.get_all_posts_handler(request)
   posts = post_response.json['posts']
-  num_pages = post_response.json['numPages']
 
   config = request.app['config']
   url = config['connection.webhost']
 
   root = ET.Element("rss", {
-     'xmlns:dc': "http://purl.org/dc/elements/1.1/",'xmlns:content': "http://purl.org/rss/1.0/modules/content/",'xmlns:atom': "http://www.w3.org/2005/Atom",
-     'version': "2.0"
+    'xmlns:dc': "http://purl.org/dc/elements/1.1/",
+    'xmlns:content': "http://purl.org/rss/1.0/modules/content/",
+    'xmlns:atom': "http://www.w3.org/2005/Atom",
+    'version': "2.0"
   })
   channel = ET.SubElement(root, "channel")
   ET.SubElement(channel, 'title').text = cdata('Blog | Björn Friedrichs')

@@ -50,21 +50,27 @@ def check_data(data, schema):
       raise web.HTTPBadRequest()
 
 
+def get_view_id():
+  pass
+
+
 async def heartbeat(request):
   data = await request.json()
+  viewid = request.match.get('viewid')
+  referer = request.headers.get('referer', '')
+  config = request.app['config']
+  if referer.startswith(config['connection.webhost']):
+    pass
+
   check_data(data, schema_template)
 
-  pageview_id = request.headers.get('Pageview-Id', str(bson.ObjectId()))
-  headers = {'Pageview-Id': pageview_id}
-  data['viewId'] = bson.ObjectId(pageview_id)
-
+  pageview_id = request.match.get('viewid', str(bson.ObjectId()))
   db = request.use('db')
-  current = db.analytics.find_one({'_id': bson.ObjectId(pageview_id)})
+  current = db.analytics.find_one({'viewId': bson.ObjectId(pageview_id)})
   if not current:
-    return util.json_response({'ok': True}, headers=headers)
+    return util.json_response({'ok': False})
 
   update = {'$set': {}}
-
   for key, value in data.items():
     if value is not None:
       update['$set'][key] = value
@@ -88,19 +94,24 @@ async def heartbeat(request):
   now = datetime.datetime.utcnow()
   paths = current['paths']
   duration = now - paths[-1]['visitedAt']
-  update['$set'][f'paths.{len(paths)-1}'] = duration.total_seconds()
+  update['$set'][f'paths.{len(paths)-1}.length'] = duration.total_seconds()
+  update['$push'] = {'paths': {
+    'url': data['path'],
+    'visitedAt': now
+  }}
 
   db.analytics.update_one({'_id': current['_id']}, update)
-  return util.json_response({'ok': True}, headers=headers)
+  return util.json_response({'ok': True, 'viewId': pageview_id})
 
 
 async def analytics_middleware(app, handler):
   async def mid(request):
-    if request.headers.get('user-agent') == 'Node;https://bjornf.dev':
+    path = request.path
+
+    if request.headers.get('user-agent') == 'Node;https://bjornf.dev' or path.startswith('/api'):
       return await handler(request)
 
-    path = request.path
-    pageview_id = request.headers.get('Pageview-Id', str(bson.ObjectId()))
+    pageview_id = request.headers.get('pageview-id', str(bson.ObjectId()))
     user_agent = request.headers.get('user-agent')
     parsed = httpagentparser.detect(user_agent)
     os = parsed.get('platform', {}).get('name', None)
@@ -109,10 +120,12 @@ async def analytics_middleware(app, handler):
     browser_version = parsed.get('browser', {}).get('version', '').split('.')[0]
 
     referer = request.headers.get('Referer')
-    sources = {key.replace('utm_', ''): value for key, value in request.query.items() if key.startswith('utm_')}
+    sources = {
+      key.replace('utm_', ''): value for key, value in request.query.items() if key.startswith('utm_')
+    }
     db = request.use('db')
 
-    current = db.analytics.find_one({'_id': bson.ObjectId(pageview_id)})
+    current = db.analytics.find_one({'viewId': bson.ObjectId(pageview_id)})
     now = datetime.datetime.utcnow()
     if not current:
       data = {
@@ -120,7 +133,7 @@ async def analytics_middleware(app, handler):
         'viewId': bson.ObjectId(pageview_id),
         'sources': sources,
         'os': os,
-        'paths': [{'url':path, 'visitedAt': now}],
+        'paths': [{'url': path, 'visitedAt': now}],
         'jsEnabled': False,
         'browser': {
           'name': browser_name,
@@ -143,10 +156,12 @@ async def analytics_middleware(app, handler):
       if not js_enabled:
         paths = current['paths']
         duration = now - paths[-1]['visitedAt']
-        db.analytics.update_one({'_id': current['_id']}, {'$set': {f'paths.{len(paths)-1}': duration.total_seconds()}})
+        db.analytics.update_one({'_id': current['_id']},
+                                {'$set': {f'paths.{len(paths)-1}.length': duration.total_seconds()},
+                                 '$push': {'paths': {'url': path, 'visitedAt': now}}})
 
     response = await handler(request)
-    response.headers['Pageview-Id'] = pageview_id
+    response.headers['pageview-id'] = pageview_id
 
     return response
   return mid

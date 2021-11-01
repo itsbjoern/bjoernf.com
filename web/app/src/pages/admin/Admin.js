@@ -10,6 +10,7 @@ import { Row, Column } from 'app/components/Flex'
 import PostItem from 'app/components/PostItem'
 import FloatAside from 'app/components/FloatAside'
 import Login from './Login'
+import Analytics from './Analytics'
 
 const LinkedTab = withRouter(({ label, index, history, ...props }) => (
   <Tab
@@ -63,8 +64,9 @@ const Admin = ({ location, history, token, sendRequest }) => {
           onChange={(evt, newTab) => history.push(`#tab-${newTab}`)}
           aria-label="basic tabs"
         >
-          <LinkedTab label="Main" index={0} />
+          <LinkedTab label="Dashboard" index={0} />
           <LinkedTab label="Drafts" index={1} />
+          <LinkedTab label="Analytics" index={2} />
         </Tabs>
       </Row>
       <Panel value={currentTab} index={0}></Panel>
@@ -94,6 +96,9 @@ const Admin = ({ location, history, token, sendRequest }) => {
             ))}
           </List>
         </FloatAside>
+      </Panel>
+      <Panel value={currentTab} index={2}>
+        <Analytics />
       </Panel>
     </Column>
   )

@@ -126,7 +126,7 @@ const Analytics = ({ history, location, children, sendRequest }) => {
       const requestData = heartbeat(analytics)
       if (pageViewId) {
         requestData.headers = {
-          'Pageview-Id': pageViewId,
+          'pageview-id': pageViewId,
         }
       }
 

@@ -19,6 +19,7 @@ template = """
   <meta prefix="og: http://ogp.me/ns#" name="og:site_name" content="{title}">
 """
 
+
 class Hydrate():
   def __init__(self, request, page):
     self.request = request
@@ -34,6 +35,8 @@ class Hydrate():
       self.page = self.page.replace('__SCRIPT_DATA__', content)
     elif attr == 'meta':
       self.page = self.page.replace('__META_TAGS__', template.format(**self.get_meta()))
+    elif attr == 'viewid':
+      self.page = self.page.replace('__VIEW_ID__', content)
 
   def get_meta(self, title_override=None):
     path = str(self.request.path)
@@ -75,4 +78,3 @@ class IndexHydrate(Hydrate):
       page = fh.read()
 
     super().__init__(request, page)
-

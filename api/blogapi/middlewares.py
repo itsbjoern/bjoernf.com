@@ -4,8 +4,6 @@ from aiohttp_middlewares import cors_middleware
 from aiohttp_middlewares.cors import DEFAULT_ALLOW_HEADERS
 import socket
 
-from blogapi.api import analytics
-
 
 async def error_middleware(app, handler):
   async def mid(request):
@@ -43,11 +41,10 @@ def setup_middlewares(app):
   app.middlewares.extend([
     cors_middleware(
       origins=origins,
-      allow_headers=[*DEFAULT_ALLOW_HEADERS, "Pageview-Id"],
-      expose_headers=['Pageview-Id']
+      allow_headers=[*DEFAULT_ALLOW_HEADERS, "pageview-id"],
+      expose_headers=['pageview-id']
     ),
     error_middleware,
     easy_access_middleware,
     auth_middleware,
-    analytics.analytics_middleware,
   ])

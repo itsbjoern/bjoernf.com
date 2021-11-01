@@ -14,16 +14,16 @@ const modules = require('./modules')
 const paths = require('./paths')
 
 class RewritePathPlugin {
-  apply (compiler) {
+  apply(compiler) {
     compiler.hooks.compilation.tap('RewritePathPlugin', (compilation) => {
       HtmlWebpackPlugin.getHooks(compilation).beforeAssetTagGeneration.tapAsync(
         'RewritePathPlugin',
         (data, cb) => {
-          data.assets.js = data.assets.js.map(s => {
-            return s.replace('static/', '');
+          data.assets.js = data.assets.js.map((s) => {
+            return s.replace('static/', '')
           })
-          data.assets.css = data.assets.css.map(s => {
-            return s.replace('static/', '');
+          data.assets.css = data.assets.css.map((s) => {
+            return s.replace('static/', '')
           })
           cb(null, data)
         }
@@ -124,19 +124,21 @@ module.exports = function (webpackEnv, isNode) {
           },
         }),
       ],
-      ...(isNode ? {} : {
-        splitChunks: {
-          chunks: 'all',
-          cacheGroups: {
-            remirrorChunk: {
-              enforce: true,
-              test: /[\\/]node_modules[\\/](@remirror|remirror|y-prosemirror|prosemirror-[^\/]*)[\\/]/,
-              name: 'remirrorChunk',
+      ...(isNode
+        ? {}
+        : {
+            splitChunks: {
               chunks: 'all',
-            }
-          }
-        },
-      })
+              cacheGroups: {
+                adminVendor: {
+                  enforce: true,
+                  test: /[\\/]node_modules[\\/](@remirror|remirror|y-prosemirror|prosemirror-[^\/]*|@nivo)[\\/]/,
+                  name: 'adminVendor',
+                  chunks: 'all',
+                },
+              },
+            },
+          }),
     },
     module: {
       rules: [
