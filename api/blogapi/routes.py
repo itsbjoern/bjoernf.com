@@ -15,7 +15,7 @@ def setup_routes(app):
   reset_cache(app)
   app.router.add_get('/favicon.ico', index.get_favicon)
 
-  app.router.add_post('/analytics/heartbeat/{viewid}', analytics.heartbeat)
+  app.router.add_post('/api/heartbeat', analytics.heartbeat)
 
   app.router.add_get('/api/blog/posts', blog.get_all_posts_handler)
   app.router.add_get('/api/blog/posts/{id}', blog.get_post_handler)

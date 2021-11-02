@@ -117,25 +117,17 @@ const Analytics = ({ history, location, children, sendRequest }) => {
     }
 
     let prevLocation = null
-    let pageViewId = null
     const listener = (change) => {
       if (prevLocation === change.pathname) {
         return
       }
       const analytics = buildAnalytics({ change })
       const requestData = heartbeat(analytics)
-      if (pageViewId) {
-        requestData.headers = {
-          'pageview-id': pageViewId,
-        }
+      requestData.headers = {
+        'pageview-id': window.viewId,
       }
 
-      sendRequest(requestData, { returnHeaders: true }).success(
-        ({ headers }) => {
-          pageViewId = headers['pageview-id'] || null
-        }
-      )
-
+      sendRequest(requestData).success(() => {})
       prevLocation = change.pathname
     }
     listener(location)

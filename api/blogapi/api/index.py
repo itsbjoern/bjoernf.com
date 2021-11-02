@@ -1,10 +1,9 @@
 import json
 import os
-import bson
 from aiohttp import web, ClientSession
 import urllib.parse
 
-from blogapi.api import hydrations
+from blogapi.api import hydrations, analytics
 
 
 async def handler(request):
@@ -40,8 +39,8 @@ async def handler(request):
   index.hydrate('html', data['markup'])
   index.hydrate('title')
 
-  viewid = str(bson.ObjectId())
-  index.hydrate('viewid', viewid)
+  journey = analytics.create_journey(request)
+  index.hydrate('viewid', str(journey['viewId']))
 
   if not is_dev:
     with open(cache_url, 'w+') as fh:

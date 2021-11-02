@@ -50,26 +50,21 @@ def check_data(data, schema):
       raise web.HTTPBadRequest()
 
 
-def get_view_id():
-  pass
-
-
 async def heartbeat(request):
   data = await request.json()
-  viewid = request.match.get('viewid')
-  referer = request.headers.get('referer', '')
-  config = request.app['config']
-  if referer.startswith(config['connection.webhost']):
-    pass
 
   check_data(data, schema_template)
 
-  pageview_id = request.match.get('viewid', str(bson.ObjectId()))
+  pageview_id = request.headers.get('pageview-id')
+  if pageview_id is None:
+    return util.json_response({'ok': False})
   db = request.use('db')
   current = db.analytics.find_one({'viewId': bson.ObjectId(pageview_id)})
   if not current:
     return util.json_response({'ok': False})
 
+  path = data['path']
+  del data['path']
   update = {'$set': {}}
   for key, value in data.items():
     if value is not None:
@@ -91,77 +86,67 @@ async def heartbeat(request):
       update['$set']['countryCode'] = data['countryCode']
       update['$set']['timezone'] = data['timezone']
 
-  now = datetime.datetime.utcnow()
   paths = current['paths']
-  duration = now - paths[-1]['visitedAt']
-  update['$set'][f'paths.{len(paths)-1}.length'] = duration.total_seconds()
-  update['$push'] = {'paths': {
-    'url': data['path'],
-    'visitedAt': now
-  }}
+  if paths[-1]['url'] != path:
+    now = datetime.datetime.utcnow()
+    duration = now - paths[-1]['visitedAt']
+    update['$set'][f'paths.{len(paths)-1}.length'] = duration.total_seconds()
+    update['$set'][f'paths.{len(paths)}'] = {
+      'url': path,
+      'visitedAt': now
+    }
 
   db.analytics.update_one({'_id': current['_id']}, update)
   return util.json_response({'ok': True, 'viewId': pageview_id})
 
 
-async def analytics_middleware(app, handler):
-  async def mid(request):
-    path = request.path
+def create_journey(request):
+  path = str(request.path)
 
-    if request.headers.get('user-agent') == 'Node;https://bjornf.dev' or path.startswith('/api'):
-      return await handler(request)
+  if request.headers.get('user-agent') == 'Node;https://bjornf.dev':
+    return None
 
-    pageview_id = request.headers.get('pageview-id', str(bson.ObjectId()))
-    user_agent = request.headers.get('user-agent')
-    parsed = httpagentparser.detect(user_agent)
-    os = parsed.get('platform', {}).get('name', None)
-    bot = parsed.get('bot', False)
-    browser_name = parsed.get('browser', {}).get('name', None)
-    browser_version = parsed.get('browser', {}).get('version', '').split('.')[0]
+  referer = request.headers.get('referer', '')
+  config = request.app['config']
+  unique = True
+  if referer.startswith(config['connection.webhost']):
+    unique = False
 
-    referer = request.headers.get('Referer')
-    sources = {
-      key.replace('utm_', ''): value for key, value in request.query.items() if key.startswith('utm_')
+  pageview_id = request.headers.get('pageview-id', str(bson.ObjectId()))
+  user_agent = request.headers.get('user-agent')
+  parsed = httpagentparser.detect(user_agent)
+  os = parsed.get('platform', {}).get('name', None)
+  bot = parsed.get('bot', False)
+  browser_name = parsed.get('browser', {}).get('name', None)
+  browser_version = parsed.get('browser', {}).get('version', '').split('.')[0]
+
+  referer = request.headers.get('Referer')
+  sources = {
+    key.replace('utm_', ''): value for key, value in request.query.items() if key.startswith('utm_')
+  }
+  db = request.use('db')
+
+  current = db.analytics.find_one({'viewId': bson.ObjectId(pageview_id)})
+  now = datetime.datetime.utcnow()
+  if not current:
+    current = {
+      'createdAt': now,
+      'viewId': bson.ObjectId(pageview_id),
+      'sources': sources,
+      'os': os,
+      'paths': [{'url': path, 'visitedAt': now}],
+      'isUnique': unique,
+      'jsEnabled': False,
+      'browser': {
+        'name': browser_name,
+        'version': browser_version
+      },
+      'referer': referer,
+      'userAgent': user_agent
     }
-    db = request.use('db')
 
-    current = db.analytics.find_one({'viewId': bson.ObjectId(pageview_id)})
-    now = datetime.datetime.utcnow()
-    if not current:
-      data = {
-        'createdAt': now,
-        'viewId': bson.ObjectId(pageview_id),
-        'sources': sources,
-        'os': os,
-        'paths': [{'url': path, 'visitedAt': now}],
-        'jsEnabled': False,
-        'browser': {
-          'name': browser_name,
-          'version': browser_version
-        },
-        'referer': referer,
-        'userAgent': user_agent
-      }
+    if bot:
+      current['isProbablyBot'] = True
 
-      if request.get('user'):
-        data['isAdmin'] = True
-
-      if bot:
-        data['isProbablyBot'] = True
-
-      db.analytics.insert_one(data)
-    else:
-      # avoid double logging path
-      js_enabled = current.get('jsEnabled', False)
-      if not js_enabled:
-        paths = current['paths']
-        duration = now - paths[-1]['visitedAt']
-        db.analytics.update_one({'_id': current['_id']},
-                                {'$set': {f'paths.{len(paths)-1}.length': duration.total_seconds()},
-                                 '$push': {'paths': {'url': path, 'visitedAt': now}}})
-
-    response = await handler(request)
-    response.headers['pageview-id'] = pageview_id
-
-    return response
-  return mid
+    db.analytics.insert_one(current)
+  return current

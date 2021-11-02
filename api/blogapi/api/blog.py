@@ -10,7 +10,7 @@ from blogapi import util
 public_projection = {'published': 1, 'createdAt': 1}
 
 
-async def get_all_posts_handler(request):
+async def get_all_posts_handler(request, return_all=False):
   db = request.use('db')
   query = {'published': {'$exists': True}}
 
@@ -39,6 +39,9 @@ async def get_all_posts_handler(request):
                             projection=projection)
 
   posts, num_pages, current_page = paginated
+  if return_all:
+    posts = db.posts.find(query, projection)
+
   posts = posts.sort('createdAt', pymongo.DESCENDING)
 
   return util.json_response({'posts': list(posts), 'numPages': num_pages, 'page': current_page})

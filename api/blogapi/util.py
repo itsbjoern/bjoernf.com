@@ -25,11 +25,13 @@ class ObjEnconder(json.JSONEncoder):
 def dumps(data):
   return json.dumps(data, cls=ObjEnconder)
 
+
 class JsonResponse(web.Response):
   def __init__(self, data, *, text=None, status=200, reason=None, headers=None, content_type="application/json"):
     text = dumps(data)
     super().__init__(text=text, body=None, status=status, reason=reason, headers=headers, content_type=content_type)
     self.json = data
+
 
 def json_response(data, **kwargs):
   return JsonResponse(data, **kwargs)
@@ -41,6 +43,7 @@ def auth(func):
       raise web.HTTPForbidden(reason="No access")
     return func(request)
   return route
+
 
 def paginate(coll, query, projection=None, page=1, limit=10, items_per_page=10):
   cursor = None
