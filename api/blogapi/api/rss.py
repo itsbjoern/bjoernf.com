@@ -26,8 +26,13 @@ def valid_xml_char_ordinal(text):
 
 def CDATA(text=None):
   element = ET.Element('![CDATA[')
-  element.text = text
+  element.text = valid_xml_char_ordinal(text)
   return element
+
+
+def with_cdata(element, text):
+  cdata = CDATA(text)
+  element.append(cdata)
 
 
 async def create_feed(request):
@@ -45,10 +50,8 @@ async def create_feed(request):
     'version': "2.0"
   })
   channel = ET.SubElement(root, "channel")
-  title_el = ET.SubElement(channel, 'title')
-  title_el.append(CDATA('Björn Friedrichs\' Blog'))
-  desc_el = ET.SubElement(channel, 'description')
-  desc_el.append(CDATA('A mere stream of thoughts'))
+  with_cdata(ET.SubElement(channel, 'title'), 'Björn Friedrichs\' Blog')
+  with_cdata(ET.SubElement(channel, 'description'), 'A mere stream of thoughts')
   ET.SubElement(channel, 'link').text = url
   ET.SubElement(channel, 'lastBuildDate').text = utils.format_datetime(posts[0]['published']['publishedAt'])
 
@@ -56,12 +59,11 @@ async def create_feed(request):
     if 'published' not in post:
       continue
     item = ET.SubElement(channel, "item")
-    sub_title_el = ET.SubElement(item, 'title')
-    sub_title_el.append(CDATA(post['published']['title']))
+    with_cdata(ET.SubElement(item, 'title'), post['published']['title'])
+    with_cdata(ET.SubElement(item, 'description'), post['published']['summary'])
     ET.SubElement(item, 'link').text = f'{url}/post/{post["_id"]}'
     ET.SubElement(item, 'guid', isPermaLink="false").text = f'{url}/post/{post["_id"]}'
     ET.SubElement(item, 'pubDate').text = utils.format_datetime(post['published']['publishedAt'])
-    ET.SubElement(item, 'description').text = valid_xml_char_ordinal(post['published']['summary'])
     ET.SubElement(item, 'content:encoded').text = valid_xml_char_ordinal(post['published']['html'])
 
   xml_response = ET.tostring(root, encoding='utf-8').decode()

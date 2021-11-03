@@ -126,8 +126,8 @@ jobs:
       - name: Move builds (render-server)
         if: matrix.name == 'render-server'
         run: |
-          mkdir -p ./render-server/dist/static/js
-          rsync -avz ./dist/static/js/ ./render-server/dist/static/js/
+          mkdir -p ./render-server/js
+          rsync -avz ./dist/static/js/ ./render-server/js/
 
       - name: Move builds (static)
         if: matrix.name == 'static'

@@ -3,5 +3,6 @@ FROM node:16-alpine
 WORKDIR /render-server
 COPY package.json package.json
 RUN yarn
-COPY . .
-CMD ["yarn", "run", "deploy"]
+COPY index.js index.js
+COPY start.sh start.sh
+CMD ["./start.sh"]
