@@ -22,9 +22,9 @@ const Analytics = ({ sendRequest }) => {
 
   useEffect(() => {
     if (includeAdmin) {
-      setViews(fetchedViews)
+      setViews(fetchedViews.filter((v) => !v.isProbablyBot))
     } else {
-      setViews(fetchedViews.filter((v) => !v.isAdmin))
+      setViews(fetchedViews.filter((v) => !v.isAdmin && !v.isProbablyBot))
     }
   }, [fetchedViews, includeAdmin])
 
