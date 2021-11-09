@@ -174,12 +174,10 @@ module.exports = function (webpackEnv, isNode) {
           use: [
             {
               loader: MiniCssExtractPlugin.loader,
-
               options: paths.publicUrlOrPath.startsWith('.')
                 ? { publicPath: '../../' }
                 : {},
             },
-
             {
               loader: require.resolve('css-loader'),
             },
