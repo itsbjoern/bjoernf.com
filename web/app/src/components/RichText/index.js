@@ -27,6 +27,7 @@ import {
 } from '@remirror/react'
 
 import { getTextSelection } from '@remirror/core'
+import { findNodeAtSelection } from '@remirror/core-utils'
 
 import { Column } from 'app/components/Flex'
 
@@ -68,8 +69,14 @@ const hooks = [
     const onTab = (props) => {
       const { tr, dispatch, state } = props
       const selection = state.selection
-      const { from, to } = getTextSelection(selection ?? tr.selection, tr.doc)
-      dispatch(tr.insertText('  ', from, to))
+      const node = findNodeAtSelection(selection)
+      if (node && node.node.type.name === 'codeBlock') {
+        const { from, to } = getTextSelection(selection ?? tr.selection, tr.doc)
+
+        dispatch(tr.insertText('  ', from, to))
+        return true
+      }
+      return false
     }
     useKeymap('Tab', onTab)
   },

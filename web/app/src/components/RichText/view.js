@@ -70,11 +70,15 @@ export const StyledEditor = styled.div`
     ul,
     ol {
       text-align: left;
-      padding-inline-start: 20px;
+    }
+
+    ul {
+      padding-inline-start: 30px;
     }
 
     ol {
       list-style-position: inside;
+      padding-inline-start: 7px;
 
       p {
         display: inline;

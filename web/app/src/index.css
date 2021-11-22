@@ -18,10 +18,6 @@
   box-sizing: border-box;
 }
 
-ul {
-  padding-inline-start: 30px;
-}
-
 html {
   width: 100vw;
 }
