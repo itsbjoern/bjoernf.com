@@ -1,4 +1,5 @@
 from aiohttp import web
+import bson
 from blogapi import util
 
 
@@ -28,3 +29,16 @@ async def login_handler(request):
   db.users.update_one({'_id': user['_id']}, {'$set': {'token': token}})
 
   return util.json_response({'user': user, 'token': token})
+
+
+@util.auth
+async def change_password(request):
+  db = request.use('db')
+
+  data = await request.json()
+  user = request.get('user')
+  hashed = util.generate_password_hash(data['password'])
+
+  db.users.update_one({'_id': bson.ObjectId(user['_id'])}, {'$set': {'password': hashed}})
+
+  return util.json_response({})

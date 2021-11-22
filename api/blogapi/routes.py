@@ -22,6 +22,7 @@ def setup_routes(app):
   app.router.add_get('/api/blog/tags', blog.get_tags)
 
   app.router.add_post('/api/admin/index/login', admin.index.login_handler)
+  app.router.add_post('/api/admin/index/changePassword', admin.index.change_password)
   app.router.add_get('/api/admin/blog/posts', admin.blog.get_drafts)
   app.router.add_post('/api/admin/blog/posts', admin.blog.create_post)
   app.router.add_post('/api/admin/blog/posts/{id}', admin.blog.update_post)

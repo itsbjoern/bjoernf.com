@@ -9,6 +9,7 @@ import { withRequest } from 'app/providers/RequestProvider'
 import { Row, Column } from 'app/components/Flex'
 import PostItem from 'app/components/PostItem'
 import FloatAside from 'app/components/FloatAside'
+import Dashboard from './Dashboard'
 import Login from './Login'
 import Analytics from './Analytics'
 
@@ -69,7 +70,9 @@ const Admin = ({ location, history, token, sendRequest }) => {
           <LinkedTab label="Analytics" index={2} />
         </Tabs>
       </Row>
-      <Panel value={currentTab} index={0}></Panel>
+      <Panel value={currentTab} index={0}>
+        <Dashboard />
+      </Panel>
       <Panel value={currentTab} index={1}>
         <FloatAside
           menu={

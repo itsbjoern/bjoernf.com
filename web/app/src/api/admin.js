@@ -4,6 +4,10 @@ export const login = (username, password) => {
   return post('/admin/index/login', { username, password })
 }
 
+export const changePassword = (password) => {
+  return post('/admin/index/changePassword', { password })
+}
+
 export const getDrafts = ({ page = 1, limit = 10 } = {}) => {
   return get(`/admin/blog/posts?page=${page}&limit=${limit}`)
 }
