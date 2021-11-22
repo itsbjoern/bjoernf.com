@@ -55,7 +55,7 @@ class Hydrate():
       post_id = match.group(0).split('/')[-1]
       post = db.posts.find_one({'_id': bson.ObjectId(post_id)})
       if post:
-        post_title = post.get('published', post.get('draft', {})).get('title', 'Blog')
+        post_title = post.get('published', {}).get('title', 'Blog')
         title = title.format(post_title)
       else:
         title = title.format('Blog')
