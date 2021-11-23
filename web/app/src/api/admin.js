@@ -32,6 +32,10 @@ export const deletePost = (postId) => {
   return deleteCall(`/admin/blog/posts/${postId}`)
 }
 
+export const deleteDraft = (postId) => {
+  return deleteCall(`/admin/blog/posts/${postId}/draft`)
+}
+
 export const upload = (postId, file) => {
   const formData = new FormData()
   formData.append('data', file)

@@ -27,6 +27,7 @@ def setup_routes(app):
   app.router.add_post('/api/admin/blog/posts', admin.blog.create_post)
   app.router.add_post('/api/admin/blog/posts/{id}', admin.blog.update_post)
   app.router.add_delete('/api/admin/blog/posts/{id}', admin.blog.delete_post)
+  app.router.add_delete('/api/admin/blog/posts/{id}/draft', admin.blog.delete_draft)
   app.router.add_post('/api/admin/blog/posts/{id}/publish', admin.blog.publish)
   app.router.add_post('/api/admin/blog/posts/{id}/unpublish', admin.blog.unpublish)
   app.router.add_post('/api/admin/blog/posts/{id}/upload', admin.blog.upload)

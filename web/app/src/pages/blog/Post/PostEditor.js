@@ -12,8 +12,6 @@ import { withRequest } from 'app/providers/RequestProvider'
 import { getTags } from 'app/api/blog'
 import { upload } from 'app/api/admin'
 
-import { isDev } from 'app/util'
-
 import { Row, Column } from 'app/components/Flex'
 import RichText from 'app/components/RichText'
 import Tag from 'app/components/Tag'
@@ -24,7 +22,7 @@ const PostEditor = ({ post, updatePost, sendRequest }) => {
 
   useEffect(() => {
     sendRequest(getTags()).success(({ tags }) => {
-      setAvailableTags(tags)
+      setAvailableTags(tags ?? [])
     })
   }, [])
 

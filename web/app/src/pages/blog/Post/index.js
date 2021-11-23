@@ -7,6 +7,7 @@ import {
   publishPost as publishPostAPI,
   unpublishPost as unpublishPostAPI,
   deletePost as deletePostAPI,
+  deleteDraft as deleteDraftAPI,
 } from 'app/api/admin'
 
 import { Alert, Button, FormControlLabel, Switch } from '@mui/material'
@@ -117,6 +118,17 @@ const Post = ({
       })
   }, [postId])
 
+  const deleteDraft = useCallback(() => {
+    sendRequest(deleteDraftAPI(postId))
+      .success(({ post }) => {
+        createNotification('Draft deleted', 'success')
+        setPost(post)
+      })
+      .failure((e) => {
+        createNotification(e.message, 'error')
+      })
+  }, [postId])
+
   const [PublishDialog, openPublishDialog] = useDialog(
     'Are you sure you want to publish this post? This will make it available to the public.',
     publishPost
@@ -129,6 +141,10 @@ const Post = ({
     'Are you sure you want to delete this post? This will remove it permanently.',
     deletePost
   )
+  const [DeleteDraftDialog, openDeleteDraftDialog] = useDialog(
+    'Are you sure you want to delete the draft for this post? This will remove it permanently.',
+    deleteDraft
+  )
 
   if (loading) {
     return null
@@ -138,6 +154,12 @@ const Post = ({
     return <NotFound />
   }
 
+  const draftEqualsLive =
+    !post.draft ||
+    (post.draft?.text === post.published?.text &&
+      post.draft?.title === post.draft?.title &&
+      post.draft?.tags?.length === post.published?.tags?.length)
+
   return (
     <FloatAside
       menu={
@@ -145,6 +167,7 @@ const Post = ({
           <Column gap={20}>
             <PublishDialog />
             <UnPublishDialog />
+            <DeleteDraftDialog />
             <DeleteDialog />
             <Alert severity={post.draft ? 'warning' : 'success'}>
               Status:{' '}
@@ -183,22 +206,28 @@ const Post = ({
             <Button
               variant="contained"
               onClick={openPublishDialog}
-              disabled={
-                post.draft?.text === post.published?.text &&
-                post.draft?.title === post.draft?.title &&
-                post.draft?.tags?.length === post.published?.tags?.length
-              }
+              disabled={draftEqualsLive}
             >
               Publish
             </Button>
             {post.published ? (
-              <Button
-                variant="contained"
-                color="secondary"
-                onClick={openUnPublishDialog}
-              >
-                Un-publish
-              </Button>
+              <>
+                <Button
+                  disabled={draftEqualsLive}
+                  variant="contained"
+                  color="secondary"
+                  onClick={openDeleteDraftDialog}
+                >
+                  Discard changes
+                </Button>
+                <Button
+                  variant="contained"
+                  color="secondary"
+                  onClick={openUnPublishDialog}
+                >
+                  Un-publish
+                </Button>
+              </>
             ) : (
               <Button
                 variant="contained"

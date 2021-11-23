@@ -57,6 +57,20 @@ async def update_post(request):
 
 
 @util.auth
+async def delete_draft(request):
+  post_id = request.match_info.get('id', None)
+  if not post_id:
+    return web.HTTPBadRequest(reason="No post id")
+
+  db = request.use('db')
+  db.posts.update_one({'_id': bson.ObjectId(post_id)},
+                      {'$unset': {'draft': 1}})
+  post = db.posts.find_one({'_id': bson.ObjectId(post_id)})
+
+  return util.json_response({'post': post})
+
+
+@util.auth
 async def publish(request):
   post_id = request.match_info.get('id', None)
   if not post_id:
