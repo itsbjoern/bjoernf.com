@@ -24,7 +24,7 @@ import { PasteRule } from '@remirror/pm/paste-rules'
 import { insertPoint } from '@remirror/pm/transform'
 import { ExtensionImageTheme } from '@remirror/theme'
 
-import { ResizableImageView } from './resizable-image-view'
+import { ResizableImageView } from '@remirror/extension-image'
 
 export class VideoExtension extends NodeExtension {
   constructor(options) {
@@ -218,8 +218,8 @@ export function isVideoFileType(file) {
  */
 function getDimensions(element) {
   let { width, height } = element.style
-  width = width ?? element.getAttribute('width') ?? ''
-  height = height ?? element.getAttribute('height') ?? ''
+  width = element.getAttribute('width') ?? width ?? ''
+  height = element.getAttribute('height') ?? height ?? ''
 
   return { width, height }
 }

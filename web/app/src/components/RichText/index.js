@@ -5,7 +5,6 @@ import {
   ItalicExtension,
   StrikeExtension,
   HeadingExtension,
-  ImageExtension,
   ListItemExtension,
   BulletListExtension,
   OrderedListExtension,
@@ -17,6 +16,7 @@ import {
 // import { FileExtension } from '@remirror/extension-file'
 
 import { VideoExtension } from './extensions/video'
+import { ImageExtension } from './extensions/fixed-image'
 import FloatingLinkToolbar from './FloatingLinkToolbar'
 
 import {
