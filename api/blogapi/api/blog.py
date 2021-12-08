@@ -1,7 +1,10 @@
 import time
 from aiohttp import web
+import aiohttp
 import bson
 import pymongo
+from pymongo.collation import Collation
+
 import re
 
 from blogapi import util
@@ -20,6 +23,7 @@ async def get_all_posts_handler(request, return_all=False):
 
   page = int(request.query.get('page', 1))
   search = request.query.get('search', '')
+  tags = request.query.getall('tags', None)
   if search != '':
     rgx = re.compile(search, re.I)
     query = {
@@ -28,6 +32,13 @@ async def get_all_posts_handler(request, return_all=False):
         {'published.text': {'$regex': rgx}},
         {'published.title': {'$regex': rgx}},
         {'published.tags': {'$regex': rgx}}
+      ]
+    }
+  elif tags:
+    query = {
+      **query,
+      '$or': [
+        {'published.tags': {'$in': tags}}
       ]
     }
 
@@ -40,7 +51,7 @@ async def get_all_posts_handler(request, return_all=False):
 
   posts, num_pages, current_page = paginated
   if return_all:
-    posts = db.posts.find(query, projection)
+    posts = db.posts.find(query, projection).collation(Collation(locale='en', strength=2))
 
   posts = posts.sort('createdAt', pymongo.DESCENDING)
 

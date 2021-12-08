@@ -1,16 +1,22 @@
 import pymongo
+from pymongo.collation import Collation
 
 from blogapi import util
 
 def ensure_index(db):
   db.posts.create_index(name='index1',
                         keys=[
-                          ('publishedVersion.text', pymongo.TEXT),
+                          ('published.text', pymongo.TEXT),
                         ],
                         default_language='english')
   db.posts.create_index(name='index2',
                         keys=[('createdAt', pymongo.DESCENDING)])
-
+  db.posts.create_index(name='index3',
+                        keys=[
+                          ('published.tags', pymongo.DESCENDING),
+                        ],
+                        default_language='english',
+                        collation=Collation(locale='en', strength=2))
   db.analytics.create_index(name='views', keys=[('viewId', pymongo.DESCENDING)])
   db.analytics.create_index(name='views2', keys=[('viewId', pymongo.DESCENDING), ('jsEnabled', pymongo.DESCENDING)])
 

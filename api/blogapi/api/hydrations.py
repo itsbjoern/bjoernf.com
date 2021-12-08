@@ -24,7 +24,6 @@ class Hydrate():
   def __init__(self, request, page):
     self.request = request
     self.page = page
-    self.hydrate('meta')
 
   def hydrate(self, attr, content=None):
     if attr == 'title':
@@ -34,7 +33,8 @@ class Hydrate():
     elif attr == 'script':
       self.page = self.page.replace('__SCRIPT_DATA__', content)
     elif attr == 'meta':
-      self.page = self.page.replace('__META_TAGS__', template.format(**self.get_meta()))
+      content = content or ""
+      self.page = self.page.replace('__META_TAGS__', template.format(**self.get_meta()) + content)
     elif attr == 'viewid':
       self.page = self.page.replace('__VIEW_ID__', content)
 

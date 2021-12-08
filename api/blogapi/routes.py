@@ -37,6 +37,9 @@ def setup_routes(app):
   app.router.add_get('/api/{tail:.*}', index.not_found)
 
   app.router.add_get('/rss', rss.create_feed)
+  app.router.add_get('/rss.xml', rss.create_feed)
+  app.router.add_get('/rss/{tag}', rss.create_feed)
+  app.router.add_get('/rss/{tag}.xml', rss.create_feed)
   app.router.add_get('/', index.handler)
 
   app.router.add_get('/{tail:.*}', index.handler)

@@ -5,6 +5,7 @@ import urllib.parse
 
 from blogapi.api import hydrations, analytics
 
+tag_template = '<link rel="alternate" type="application/rss+xml" title="Björn Friedrichs\' Blog{}" href="/rss{}.xml" />'
 
 async def handler(request):
   url = str(request.rel_url)
@@ -38,6 +39,16 @@ async def handler(request):
   index.hydrate('script', data.get('extraScript', ''))
   index.hydrate('html', data['markup'])
   index.hydrate('title')
+
+  extra_meta = tag_template.format('', '')
+  if url == '/':
+    db = request.use('db')
+    tags = db.posts.distinct('published.tags')
+
+    for tag in tags:
+      extra_meta += '\n' + tag_template.format(f' | {tag.capitalize()}', f'/{tag.lower()}')
+  index.hydrate('meta', extra_meta)
+
 
   journey = analytics.create_journey(request)
   index.hydrate('viewid', str(journey['viewId']))

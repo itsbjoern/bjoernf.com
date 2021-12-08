@@ -36,6 +36,11 @@ def with_cdata(element, text):
 
 
 async def create_feed(request):
+  tag = request.match_info.get('tag', None)
+  if tag:
+    request = request.clone(rel_url=f'?tags={tag}')
+    setattr(request, 'use', lambda x: request.app[x])
+
   # request.query['limit'] = 100
   post_response = await blog.get_all_posts_handler(request, return_all=True)
   posts = post_response.json['posts']
@@ -50,10 +55,15 @@ async def create_feed(request):
     'version': "2.0"
   })
   channel = ET.SubElement(root, "channel")
-  with_cdata(ET.SubElement(channel, 'title'), 'Björn Friedrichs\' Blog')
+  title = 'Björn Friedrichs\' Blog'
+  if tag:
+    title += f' | {tag.capitalize()}'
+
+  with_cdata(ET.SubElement(channel, 'title'), title)
   with_cdata(ET.SubElement(channel, 'description'), 'A mere stream of thoughts')
   ET.SubElement(channel, 'link').text = url
-  ET.SubElement(channel, 'lastBuildDate').text = utils.format_datetime(posts[0]['published']['publishedAt'])
+  if len(posts) > 0:
+    ET.SubElement(channel, 'lastBuildDate').text = utils.format_datetime(posts[0]['published']['publishedAt'])
 
   for post in posts:
     if 'published' not in post:
