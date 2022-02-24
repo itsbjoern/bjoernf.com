@@ -12,7 +12,7 @@ import Ref from 'app/components/Ref'
 import PostItem from 'app/components/PostItem'
 
 const Home = ({ sendRequest }) => {
-  const [posts] = useSSR(() => sendRequest(getPosts()), {
+  const [posts] = useSSR(() => sendRequest(getPosts({ page: 1, limit: 2, search: '' })), {
     init: [],
     chainSuccess: (data) => data.posts,
   })
