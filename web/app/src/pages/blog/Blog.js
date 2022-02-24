@@ -55,7 +55,7 @@ const Blog = ({ history, location, sendRequest, createNotification, staticContex
     () => sendRequest(getPosts({ page: currentPage, search: currentSearch })),
     {
       deps: [currentPage, currentSearch],
-      init: {},
+      init: {posts: new Array(5).fill({_id: '?'}), numPages: 1},
       delay: 200,
       chainFirst: () => setIsLoading(true),
       chainFailure: (err) =>
@@ -154,8 +154,8 @@ const Blog = ({ history, location, sendRequest, createNotification, staticContex
       <Row justify="center"></Row>
       <Column>
         <List>
-          {posts.map((p) => (
-            <PostItem key={p._id} post={p} />
+          {posts.map((p, i) => (
+            <PostItem key={p._id === '?' ? i : p._id} post={p} />
           ))}
         </List>
       </Column>

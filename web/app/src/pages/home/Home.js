@@ -13,7 +13,7 @@ import PostItem from 'app/components/PostItem'
 
 const Home = ({ sendRequest }) => {
   const [posts] = useSSR(() => sendRequest(getPosts({ page: 1, limit: 2, search: '' })), {
-    init: [],
+    init: new Array(2).fill({_id: '?'}),
     chainSuccess: (data) => data.posts,
   })
 
@@ -63,8 +63,8 @@ const Home = ({ sendRequest }) => {
         <H4 style={{ marginBottom: '20px' }}>Recent posts</H4>
         <Column>
           <List>
-            {posts.map((p) => (
-              <PostItem key={p._id} post={p} />
+            {posts.map((p, i) => (
+              <PostItem key={p._id === '?' ? i : p._id} post={p} />
             ))}
           </List>
         </Column>

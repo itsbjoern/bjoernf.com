@@ -1,6 +1,6 @@
 import React from 'react'
 
-import { ListItem, ListItemButton } from '@mui/material'
+import { ListItem, ListItemButton, Skeleton } from '@mui/material'
 import { PendingActions } from '@mui/icons-material'
 import moment from 'moment'
 import styled from '@emotion/styled'
@@ -84,6 +84,34 @@ const ClipOn = ({ children }) => (
 )
 
 const PostItem = ({ post }) => {
+  const isSkeleton = post._id === '?'
+  if (isSkeleton) {
+    return (
+      <Column>
+        <Control justify="start">
+          <ClipOn>
+            <Row gap={10} align="center">
+              <Skeleton animation="wave" height={15} width={100} />
+              <Skeleton animation="wave" height={15} width={50} />
+            </Row>
+          </ClipOn>
+        </Control>
+        <ListItem sx={{ padding: `0 0 10px 0` }}>
+          <ShadowButton>
+            <Row justify="start" flexed gap={10} grow={10} mobileWrapping>
+              <Column gap={10}>
+                <Title><Skeleton animation="wave" height={30} width={120} /></Title>
+                <Skeleton animation="wave" height={10} width={240} />
+                <Skeleton animation="wave" height={10} width={220} />
+              </Column>
+            </Row>
+          </ShadowButton>
+        </ListItem>
+      </Column>
+    )
+  }
+
+
   const { draft, published, createdAt } = post
   const { title, tags } = draft ?? published
   const summary = draft ? draft.text?.slice(0, 100) : published.summary
