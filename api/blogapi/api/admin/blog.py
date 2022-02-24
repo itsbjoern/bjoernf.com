@@ -89,6 +89,7 @@ async def publish(request):
   title = draft.get('title') or published.get('title')
   html = draft.get('html') or published.get('html')
   text = draft.get('text') or published.get('text')
+  published_date = published.get('publishedAt', datetime.datetime.utcnow())
 
   if not title or not html:
     return web.HTTPBadRequest(reason="Title and text are required")
@@ -104,7 +105,7 @@ async def publish(request):
     'summary': summary,
     'html': html,
     'tags': tags,
-    'publishedAt': datetime.datetime.utcnow(),
+    'publishedAt': published_date,
     'version': published.get('version', 0) + 1
   }
 
