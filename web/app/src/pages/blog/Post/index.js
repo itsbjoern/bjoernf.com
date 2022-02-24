@@ -1,4 +1,4 @@
-import React, { useRef, useCallback, useState } from 'react'
+import React, { useRef, useEffect, useCallback, useState } from 'react'
 
 import { withRouter } from 'react-router-dom'
 import { getPost } from 'app/api/blog'
@@ -49,6 +49,7 @@ const Post = ({
   const [isComparing, setIsComparing] = useState(false)
   const editing = location.pathname.endsWith('/edit') && !!token
   const updateTimeout = useRef()
+  const queuedUpdate = useRef()
 
   const [post, setPost] = useSSR(() => sendRequest(getPost(postId)), {
     chainSuccess: (data) => {
@@ -60,32 +61,49 @@ const Post = ({
     },
     chainFinally: () => setLoading(false),
   })
+  const update = post?.draft;
 
-  const updatePost = useCallback(
-    (update) => {
-      setPost((prevPost) => ({
-        ...prevPost,
-        draft: {
-          ...filterEmpty(prevPost.published),
-          ...filterEmpty(prevPost.draft),
-          ...update,
-        },
-      }))
-      if (updateTimeout.current) {
-        clearTimeout(updateTimeout.current)
-        updateTimeout.current = null
-      }
-      updateTimeout.current = setTimeout(() => {
-        sendRequest(updatePostAPI(postId, update)).success(({ post: _ }) => {
-          createNotification('Post saved', 'success', 1000)
-        })
-      }, 700)
-    },
-    [postId]
-  )
+  const updatePost = useCallback((update) => {
+    setPost((prevPost) => ({
+      ...prevPost,
+      draft: {
+        ...filterEmpty(prevPost.published),
+        ...filterEmpty(prevPost.draft),
+        ...update,
+      },
+    }))
+  }, [postId])
+
+  useEffect(() => {
+    if (!update) {
+      return
+    }
+
+    if (updateTimeout.current) {
+      clearTimeout(updateTimeout.current)
+      updateTimeout.current = null
+    }
+
+    const { title, tags, html, text } = update;
+    queuedUpdate.current = (then) => {
+      sendRequest(updatePostAPI(postId, { title, tags, html, text })).success(({ post: _ }) => {
+        createNotification('Post saved', 'success', 1000)
+        if (then) {
+          then()
+        }
+      })
+    }
+
+    updateTimeout.current = setTimeout(() => {
+     if (queuedUpdate.current) {
+      queuedUpdate.current()
+     }
+    }, 700)
+  }, [update])
 
   const publishPost = useCallback(() => {
-    sendRequest(publishPostAPI(postId))
+    const doPublish = () => {
+      sendRequest(publishPostAPI(postId))
       .success(({ post: updatedPost }) => {
         setPost(updatedPost)
         history.push('#')
@@ -94,6 +112,13 @@ const Post = ({
       .failure(() => {
         createNotification('Publish failed', 'error')
       })
+    }
+
+    if (queuedUpdate.current) {
+      queuedUpdate.current(doPublish)
+    } else {
+      doPublish()
+    }
   }, [postId])
 
   const unpublishPost = useCallback(() => {
