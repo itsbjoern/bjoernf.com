@@ -73,8 +73,8 @@ async def create_feed(request):
     item = ET.SubElement(channel, "item")
     with_cdata(ET.SubElement(item, 'title'), post['published']['title'])
     with_cdata(ET.SubElement(item, 'description'), post['published']['summary'])
-    ET.SubElement(item, 'link').text = f'{url}/post/{post["_id"]}'
-    ET.SubElement(item, 'guid', isPermaLink="false").text = f'{url}/post/{post["_id"]}'
+    ET.SubElement(item, 'link').text = f'{url}/blog/{post["_id"]}'
+    ET.SubElement(item, 'guid', isPermaLink="false").text = f'{url}/blog/{post["_id"]}'
     ET.SubElement(item, 'pubDate').text = utils.format_datetime(post['published']['publishedAt'])
     ET.SubElement(item, 'content:encoded').text = valid_xml_char_ordinal(post['published']['html'])
 
