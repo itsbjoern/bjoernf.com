@@ -59,6 +59,10 @@ const createApp = () => {
       global.fetch = nodeFetch.default
       global.Headers = nodeFetch.Headers
     }
+    if (process.env.NODE_ENV === 'development') {
+      delete require.cache[Object.keys(require.cache).find(k => k.endsWith('AppServer.js'))]
+      distLoad = null
+    }
 
     if (!distLoad) {
       distLoad = require(appServerPath)

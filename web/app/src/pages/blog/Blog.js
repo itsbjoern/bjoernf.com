@@ -1,4 +1,4 @@
-import React, { useState } from 'react'
+import React, { useEffect, useState, useRef } from 'react'
 import {
   List,
   Pagination,
@@ -6,8 +6,12 @@ import {
   InputAdornment,
   IconButton,
   CircularProgress,
+  Button,
+  Box,
+  Popover,
+  Input
 } from '@mui/material'
-import { Search, Clear } from '@mui/icons-material'
+import { Search, Clear, RssFeed, ContentCopy } from '@mui/icons-material'
 
 import { withRouter } from 'react-router-dom'
 
@@ -38,11 +42,14 @@ const makeQuery = (page, search) => {
   )
 }
 
-const Blog = ({ history, location, sendRequest, createNotification }) => {
+const Blog = ({ history, location, sendRequest, createNotification, staticContext }) => {
   const query = new URLSearchParams(location.search)
   const currentPage = parseInt(query.get('page')) || 1
   const currentSearch = query.get('search') || ''
   const [isLoading, setIsLoading] = useState(false)
+  const [anchorEl, setAnchorEl] = useState(null)
+  const rssRef = useRef()
+  const url = staticContext?.absUrl || global.window.location.origin
 
   const [data] = useSSR(
     () => sendRequest(getPosts({ page: currentPage, search: currentSearch })),
@@ -57,12 +64,56 @@ const Blog = ({ history, location, sendRequest, createNotification }) => {
     }
   )
 
+  useEffect(() => {
+    if (anchorEl) {
+      setTimeout(() => {
+        rssRef?.current.select()
+      }, 50)
+    }
+  }, [anchorEl, rssRef])
+
   const { posts = [], numPages } = data
 
   return (
     <Column>
       <Row justify="between">
-        <H2>Recent posts</H2>
+        <Row align="center" gap={10}>
+          <H2>Recent posts</H2>
+          <Row>
+            <Button size="small" variant="text" startIcon={<RssFeed fontSize="7px" />} onClick={(e) => {
+              if (anchorEl) {
+                setAnchorEl(null)
+              } else {
+                setAnchorEl(e.currentTarget)
+              }
+            }}>
+              Feed
+            </Button>
+            <Popover
+              open={!!anchorEl}
+              anchorEl={anchorEl}
+              onClose={() => setAnchorEl(null)}
+              anchorOrigin={{
+                vertical: 'bottom',
+                horizontal: 'left',
+              }}
+            >
+              <Row style={{ padding: 10 }} gap={10}>
+                <Input value={url + '/rss'} disableUnderline inputRef={rssRef} onClick={(e) => e.target.select()}/>
+                <IconButton size="small" onClick={async () => {
+                  try {
+                    await navigator.clipboard.writeText(url + '/rss');
+                    createNotification('Copied to clipboard');
+                  } catch (err) {
+                    createNotification('Copy to clipboard failed', 'error');
+                  }
+                }}>
+                  <ContentCopy />
+                </IconButton>
+              </Row>
+            </Popover>
+          </Row>
+        </Row>
         {isLoading ? <CircularProgress size={35} /> : null}
         <Row justify="end" hideMobile>
           <TextField

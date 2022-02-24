@@ -41,12 +41,11 @@ async def handler(request):
   index.hydrate('title')
 
   extra_meta = tag_template.format('', '')
-  if url == '/':
-    db = request.use('db')
-    tags = db.posts.distinct('published.tags')
+  db = request.use('db')
+  tags = db.posts.distinct('published.tags')
 
-    for tag in tags:
-      extra_meta += '\n' + tag_template.format(f' | {tag.capitalize()}', f'/{tag.lower()}')
+  for tag in tags:
+    extra_meta += '\n' + tag_template.format(f' | {tag.capitalize()}', f'/{tag.lower()}')
   index.hydrate('meta', extra_meta)
 
 

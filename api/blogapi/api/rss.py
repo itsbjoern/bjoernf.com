@@ -38,6 +38,8 @@ def with_cdata(element, text):
 async def create_feed(request):
   tag = request.match_info.get('tag', None)
   if tag:
+    if tag.endswith('.xml'):
+      tag = tag[:-4]
     request = request.clone(rel_url=f'?tags={tag}')
     setattr(request, 'use', lambda x: request.app[x])
 

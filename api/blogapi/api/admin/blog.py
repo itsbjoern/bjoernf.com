@@ -97,7 +97,7 @@ async def publish(request):
   remove_multi = re.compile(r"\s+")
   summary = '.'.join(text.split('.')[:3]) + '.'
   summary = remove_multi.sub(" ", summary).strip()
-  tags = draft.get('tags') or published.get('tags')
+  tags = draft.get('tags') or published.get('tags', [])
 
   version = {
     'title': title,
