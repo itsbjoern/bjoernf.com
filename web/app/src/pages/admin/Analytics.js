@@ -21,11 +21,7 @@ const Analytics = ({ sendRequest }) => {
   }, [])
 
   useEffect(() => {
-    if (includeAdmin) {
-      setViews(fetchedViews.filter((v) => !v.isProbablyBot))
-    } else {
-      setViews(fetchedViews.filter((v) => !v.isAdmin && !v.isProbablyBot))
-    }
+    setViews(fetchedViews.filter((v) => (includeAdmin || !v.isAdmin) && !v.isProbablyBot && v.jsEnabled))
   }, [fetchedViews, includeAdmin])
 
   if (!views) {
