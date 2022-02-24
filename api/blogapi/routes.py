@@ -14,6 +14,8 @@ def reset_cache(app):
 def setup_routes(app):
   reset_cache(app)
   app.router.add_get('/favicon.ico', index.get_favicon)
+  app.router.add_get('/robots.txt', index.get_robots)
+  app.router.add_get('/sitemap.xml', index.get_sitemap)
 
   app.router.add_post('/api/heartbeat', analytics.heartbeat)
 

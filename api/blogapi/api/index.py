@@ -78,3 +78,9 @@ async def not_found_html(request):
 
 async def get_favicon(request):
   raise web.HTTPFound(request.app['config']['connection.statichost'] + '/favicons/favicon.ico')
+
+async def get_robots(request):
+  raise web.HTTPFound(request.app['config']['connection.statichost'] + '/robots.txt')
+
+async def get_sitemap(request):
+  raise web.HTTPFound(request.app['config']['connection.statichost'] + '/sitemap.xml')
