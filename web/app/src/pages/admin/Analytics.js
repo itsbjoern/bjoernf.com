@@ -1,5 +1,5 @@
 import React, { useEffect, useState } from 'react'
-import { FormControlLabel, Switch } from '@mui/material'
+import { FormControlLabel, FormControl, Switch, Select, MenuItem, InputLabel } from '@mui/material'
 
 import { getViews } from 'app/api/admin'
 import { withRequest } from 'app/providers/RequestProvider'
@@ -12,13 +12,14 @@ import Funnel from './Charts/Funnel'
 const Analytics = ({ sendRequest }) => {
   const [fetchedViews, setFetchedViews] = useState([])
   const [views, setViews] = useState()
+  const [span, setSpan] = useState(14)
   const [includeAdmin, setIncludeAdmin] = useState(false)
 
   useEffect(() => {
-    sendRequest(getViews()).success((data) => {
+    sendRequest(getViews(span)).success((data) => {
       setFetchedViews(data.views)
     })
-  }, [])
+  }, [span])
 
   useEffect(() => {
     setViews(fetchedViews.filter((v) => (includeAdmin || !v.isAdmin) && !v.isProbablyBot && v.jsEnabled))
@@ -30,7 +31,7 @@ const Analytics = ({ sendRequest }) => {
 
   return (
     <Column style={{ marginTop: 50 }} gap={50}>
-      <Row>
+      <Row justify="between">
         <FormControlLabel
           control={
             <Switch
@@ -40,6 +41,23 @@ const Analytics = ({ sendRequest }) => {
           }
           label="Include admin views"
         />
+        <FormControl variant="filled">
+          <InputLabel id="select-time-span-label">
+            Time span
+          </InputLabel>
+          <Select
+            labelId="select-time-span-label"
+            value={span}
+            onChange={(event) => {
+              setSpan(event.target.value);
+            }}
+          >
+            <MenuItem value={7}>1 week</MenuItem>
+            <MenuItem value={14}>2 weeks</MenuItem>
+            <MenuItem value={30}>1 month</MenuItem>
+            <MenuItem value={365}>1 year</MenuItem>
+          </Select>
+        </FormControl>
       </Row>
       <Row>
         <ViewCount views={views} />
