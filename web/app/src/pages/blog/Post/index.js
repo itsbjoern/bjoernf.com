@@ -268,7 +268,7 @@ const Post = ({
     >
       <Column>
         <Row gap={20}>
-          <Column flexed>
+          <Column flexed style={{ maxWidth: '100%' }}>
             {token && editing ? (
               <PostEditor post={post} updatePost={updatePost} />
             ) : (
