@@ -70,7 +70,7 @@ const Projects = () => {
         <Row gap={30}>
           <ProjectBlock>
             <H4>This website</H4>
-            <Ref text="On GitHub" href="https://github.com/BFriedrichs/blog" />
+            <Ref text="On GitHub" href="https://github.com/BFriedrichs/bjornf.dev" />
             <span>
               A custom built website using React + aiohttp. Includes server side
               rendering, a ProseMirror powered WYSIWYG editor and built-to-fit
