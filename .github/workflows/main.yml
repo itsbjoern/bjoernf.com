@@ -200,20 +200,15 @@ jobs:
               mongo:
                 volumes:
                   - /home/${{ secrets.SSH_USERNAME }}/bjornf.dev/mongo-data:/data/db
-              web:
-                environment:
-                  REACT_APP_API_URL: https://api.${{ secrets.HOSTNAME }}
               render-server:
                 environment:
-                  VIRTUAL_HOST: node.${{ secrets.HOSTNAME }}
-                  LETSENCRYPT_HOST: node.${{ secrets.HOSTNAME }}
-                  REACT_APP_API_URL: https://api.${{ secrets.HOSTNAME }}
-                  PUBLIC_URL: https://${{ secrets.HOSTNAME }}
+                  VIRTUAL_HOST: node.bjornf.dev
+                  LETSENCRYPT_HOST: node.bjornf.dev
               api:
                 environment:
-                  VIRTUAL_HOST: api.${{ secrets.HOSTNAME }}
-                  LETSENCRYPT_HOST: api.${{ secrets.HOSTNAME }}
-                  API_CONNECTION_WEBHOST: https://${{ secrets.HOSTNAME }}
+                  VIRTUAL_HOST: api.bjornf.dev
+                  LETSENCRYPT_HOST: api.bjornf.dev
+                  API_CONNECTION_WEBHOST: https://bjornf.dev
                   API_JWT_SECRET: ${{ secrets.JWT_SECRET }}
                   API_MONGO_USER_PASSWORD: ${{ secrets.MONGO_USER_PASSWORD }}
                   API_AWS_ACCESSKEY: ${{ secrets.AWS_ACCESS_KEY }}
