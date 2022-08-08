@@ -46,6 +46,7 @@ jobs:
         run: yarn build
 
       - name: Move builds
+        if: steps.changes.outputs.web == 'true' || steps.cache-build.outputs.cache-hit != 'true'
         run: |
           rm -rf dist
           mv web/dist dist
