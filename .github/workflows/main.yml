@@ -15,7 +15,7 @@ jobs:
         id: web-hash
         with:
           path: |
-            web
+            web/**
 
       - name: Cache web build
         id: cache-build
