@@ -14,7 +14,7 @@ jobs:
       - name: Set web hash
         id: web-hash
         run: |
-          echo '::set-output name=hash::${{ hashFiles('web/**') }}'
+          echo '::set-output name=hash::${{ hashFiles('web/**/*.*') }}'
 
       - name: Cache web build
         id: cache-build
