@@ -21,7 +21,7 @@ jobs:
         uses: actions/cache@v3
         with:
           path: web/dist
-          key: ${{ runner.os }}-webbuild-${{ steps.web-hash.outputs.hash }}
+          key: hashbuild-${{ steps.web-hash.outputs.hash }}
 
       - uses: actions/setup-node@v3
         if: steps.cache-build.outputs.cache-hit != 'true'
@@ -55,7 +55,7 @@ jobs:
         uses: actions/cache@v3
         with:
           path: web/dist
-          key: ${{ runner.os }}-webbuild-${{ needs.build-web.steps.web-hash.outputs.hash }}
+          key: hashbuild-${{ needs.build-web.steps.web-hash.outputs.hash }}
 
       - name: Copy web build
         if: ${{ matrix.name }} == 'render-server'
@@ -111,7 +111,7 @@ jobs:
         uses: actions/cache@v3
         with:
           path: web/dist
-          key: ${{ runner.os }}-webbuild-${{ needs.build-web.steps.web-hash.outputs.hash }}
+          key: hashbuild-${{ needs.build-web.steps.web-hash.outputs.hash }}
 
       - name: Configure AWS credentials
         uses: aws-actions/configure-aws-credentials@v1
