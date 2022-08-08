@@ -100,36 +100,6 @@ jobs:
           name: ${{ matrix.name }}-image
           path: images/bjornf-${{ matrix.name }}.tar
 
-  s3-upload:
-    needs: build-web
-    runs-on: ubuntu-latest
-    steps:
-      - uses: actions/checkout@v2
-
-      - name: Cache web build
-        id: cache-build
-        uses: actions/cache@v3
-        with:
-          path: web/dist
-          key: hashbuild-${{ needs.build-web.steps.web-hash.outputs.hash }}
-
-      - name: Configure AWS credentials
-        uses: aws-actions/configure-aws-credentials@v1
-        with:
-          aws-access-key-id: ${{ secrets.AWS_ACCESS_KEY }}
-          aws-secret-access-key: ${{ secrets.AWS_SECRET_KEY }}
-          aws-region: eu-west-2
-
-      - name: Upload static files to AWS
-        run: |
-          aws s3 sync --delete web/dist/browser s3://bjornf.dev-public/public/static
-
-      - name: Invalidate cache from CF
-        run: |
-          aws cloudfront create-invalidation \
-            --distribution-id E16OOQSQGDXBD \
-            --paths "/*" "/static/*" "/rss" "/rss*"
-
   restart-server:
     needs: build-images
     runs-on: ubuntu-latest
@@ -209,10 +179,39 @@ jobs:
             sudo docker-compose -f docker-compose.yml -f docker/prod-config.yml -f release.yml up -d
             sudo docker system prune -f
 
+  s3-upload:
+    needs: restart-server
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v2
+
+      - name: Cache web build
+        id: cache-build
+        uses: actions/cache@v3
+        with:
+          path: web/dist
+          key: hashbuild-${{ needs.build-web.steps.web-hash.outputs.hash }}
+
+      - name: Configure AWS credentials
+        uses: aws-actions/configure-aws-credentials@v1
+        with:
+          aws-access-key-id: ${{ secrets.AWS_ACCESS_KEY }}
+          aws-secret-access-key: ${{ secrets.AWS_SECRET_KEY }}
+          aws-region: eu-west-2
+
+      - name: Upload static files to AWS
+        run: |
+          aws s3 sync --delete web/dist/browser s3://bjornf.dev-public/public/static
+
+      - name: Invalidate cache from CF
+        run: |
+          aws cloudfront create-invalidation \
+            --distribution-id E16OOQSQGDXBD \
+            --paths "/*" "/static/*" "/rss" "/rss*"
+
   cleanup:
     needs:
       - restart-server
-      - s3-upload
     runs-on: ubuntu-latest
     if: always()
     steps:
