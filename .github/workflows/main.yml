@@ -129,7 +129,7 @@ jobs:
         run: |
           aws cloudfront create-invalidation \
             --distribution-id E16OOQSQGDXBD \
-            --paths "/*" "/static*" "/rss*"
+            --paths "/*" "/static/*" "/rss" "/rss*"
 
   restart-server:
     needs: build-images
