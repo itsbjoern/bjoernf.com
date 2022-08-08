@@ -9,11 +9,6 @@ jwt:
 
 paths:
   root: .
-  public: dist/public
-  images: dist/images
-  uploads: dist/uploads
-  static: dist/static
-  cache: dist/node_cache
 
 mongo:
   host: 127.0.0.1

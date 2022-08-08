@@ -1,1 +1,1 @@
-from blogapi.api.admin import analytics, blog, index
+from blogapi.api.admin import blog, index

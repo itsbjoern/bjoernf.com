@@ -3,7 +3,7 @@ import os
 from aiohttp import web, ClientSession
 import urllib.parse
 
-from blogapi.api import hydrations, analytics
+from blogapi.api import hydrations
 
 tag_template = '<link rel="alternate" type="application/rss+xml" title="Björn Friedrichs\' Blog{}" href="/rss{}.xml" />'
 
@@ -48,9 +48,7 @@ async def handler(request):
     extra_meta += '\n' + tag_template.format(f' | {tag.capitalize()}', f'/{tag.lower()}')
   index.hydrate('meta', extra_meta)
 
-
-  journey = analytics.create_journey(request)
-  index.hydrate('viewid', str(journey['viewId']))
+  # index.hydrate('viewid', str(journey['viewId']))
 
   if not is_dev:
     with open(cache_url, 'w+') as fh:

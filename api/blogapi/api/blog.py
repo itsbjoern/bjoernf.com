@@ -1,6 +1,4 @@
-import time
 from aiohttp import web
-import aiohttp
 import bson
 import pymongo
 from pymongo.collation import Collation

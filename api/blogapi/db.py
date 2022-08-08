@@ -3,6 +3,7 @@ from pymongo.collation import Collation
 
 from blogapi.utils import auth
 
+
 def ensure_index(db):
   db.posts.create_index(name='index1',
                         keys=[
@@ -17,8 +18,6 @@ def ensure_index(db):
                         ],
                         default_language='english',
                         collation=Collation(locale='en', strength=2))
-  db.analytics.create_index(name='views', keys=[('viewId', pymongo.DESCENDING)])
-  db.analytics.create_index(name='views2', keys=[('viewId', pymongo.DESCENDING), ('jsEnabled', pymongo.DESCENDING)])
 
 
 async def mongo_ctx(app):
