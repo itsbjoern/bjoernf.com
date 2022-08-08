@@ -14,6 +14,7 @@ const FullButton = ({ to, ...props }) => (
 )
 
 const StyledNav = styled(BottomNavigation)`
+  z-index: 100;
   &&& {
     @media only screen and (max-width: 425px) {
       ${({ mobile }) => (!mobile ? 'display: none;' : '')}
