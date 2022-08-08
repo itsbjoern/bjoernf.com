@@ -13,14 +13,7 @@ services:
     depends_on:
       - mongo
     environment:
-
       API_CONNECTION_PORT: '8080'
-      API_MONGO_HOST: mongo
-    networks:
-      - default
-  mongo:
-    image: mongo
-    restart: unless-stopped
     networks:
       - default
 

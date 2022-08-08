@@ -197,19 +197,10 @@ jobs:
             cd ~/bjornf.dev
             cat >release.yml <<EOL
             services:
-              mongo:
-                volumes:
-                  - /home/${{ secrets.SSH_USERNAME }}/bjornf.dev/mongo-data:/data/db
-              render-server:
-                environment:
-                  VIRTUAL_HOST: node.bjornf.dev
-                  LETSENCRYPT_HOST: node.bjornf.dev
               api:
                 environment:
-                  VIRTUAL_HOST: api.bjornf.dev
-                  LETSENCRYPT_HOST: api.bjornf.dev
-                  API_CONNECTION_WEBHOST: https://bjornf.dev
                   API_JWT_SECRET: ${{ secrets.JWT_SECRET }}
+                  API_MONGO_URL: ${{ secrets.MONGO_URL }}
                   API_MONGO_USER_PASSWORD: ${{ secrets.MONGO_USER_PASSWORD }}
                   API_AWS_ACCESSKEY: ${{ secrets.AWS_ACCESS_KEY }}
                   API_AWS_SECRETKEY: ${{ secrets.AWS_SECRET_KEY }}

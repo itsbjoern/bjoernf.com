@@ -21,7 +21,7 @@ def ensure_index(db):
 
 
 async def mongo_ctx(app):
-  client = pymongo.MongoClient(host=app['config']['mongo.host'], port=app['config']['mongo.port'])
+  client = pymongo.MongoClient(app['config']['mongo.url'])
   db = client[app['config']['mongo.db']]
   ensure_index(db)
   app['db'] = db
