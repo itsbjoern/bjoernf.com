@@ -11,11 +11,10 @@ jobs:
     steps:
       - uses: actions/checkout@v2
 
-      - uses: theowenyoung/folder-hash@v2.0.1
+      - name: Set web hash
         id: web-hash
-        with:
-          path: |
-            web/**
+        run: |
+          echo '::set-output name=hash::${{ hashFiles('web/**') }}'
 
       - name: Cache web build
         id: cache-build
