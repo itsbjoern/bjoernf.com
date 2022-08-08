@@ -3,6 +3,7 @@
   font-style: normal;
   font-weight: normal;
   src: url('fonts/comfortaa/Regular.ttf') format('truetype');
+  font-display: swap;
 }
 
 @font-face {
@@ -10,6 +11,7 @@
   font-style: normal;
   font-weight: normal;
   src: url('fonts/raleway/Raleway-VariableFont_wght.ttf') format('truetype');
+  font-display: swap;
 }
 
 * {
