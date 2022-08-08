@@ -201,6 +201,9 @@ jobs:
               mongo:
                 volumes:
                   - /home/${{ secrets.SSH_USERNAME }}/bjornf.dev/mongo-data:/data/db
+              web:
+                environment:
+                  REACT_APP_API_URL: https://api.${{ secrets.HOSTNAME }}
               render-server:
                 environment:
                   VIRTUAL_HOST: node.${{ secrets.HOSTNAME }}

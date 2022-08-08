@@ -1,7 +1,6 @@
 import React, { useEffect } from 'react'
 import { withRouter } from 'react-router-dom'
 
-import { heartbeat } from 'app/api/analytics'
 import { withRequest } from 'app/providers/RequestProvider'
 
 import { isSSR } from 'app/util'
