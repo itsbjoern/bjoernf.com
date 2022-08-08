@@ -1,5 +1,0 @@
-{
-  "scripts": {
-    "start": "adev runserver server --port 8004"
-  }
-}

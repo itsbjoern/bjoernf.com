@@ -1,7 +1,7 @@
 import pymongo
 from pymongo.collation import Collation
 
-from blogapi import util
+from blogapi.utils import auth
 
 def ensure_index(db):
   db.posts.create_index(name='index1',
@@ -30,7 +30,7 @@ async def mongo_ctx(app):
   if not db.users.find_one():
     db.users.insert_one({
       'username': app['config']['mongo.user.username'],
-      'password': util.generate_password_hash(app['config']['mongo.user.password'])
+      'password': auth.generate_password_hash(app['config']['mongo.user.password'])
     })
 
   yield

@@ -1,7 +1,6 @@
 import pathlib
 import os
 import yaml
-import functools
 
 
 BASE_DIR = pathlib.Path(__file__).parent

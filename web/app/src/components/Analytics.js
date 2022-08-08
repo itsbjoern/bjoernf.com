@@ -15,8 +15,8 @@ const getTimezone = () => {
 }
 
 const getOS = () => {
-  const userAgent = window.navigator.userAgent
-  const platform = window.navigator.platform
+  const userAgent = global.window?.navigator?.userAgent
+  const platform = global.window?.navigator?.platform
   const macosPlatforms = ['Macintosh', 'MacIntel', 'MacPPC', 'Mac68K', 'darwin']
   const windowsPlatforms = ['Win32', 'Win64', 'Windows', 'WinCE']
   const iosPlatforms = ['iPhone', 'iPad', 'iPod']
@@ -36,7 +36,7 @@ const getOS = () => {
 }
 
 const getSources = () => {
-  const searchParams = new URLSearchParams(window.location.search)
+  const searchParams = new URLSearchParams(global.window?.location?.search)
 
   return Array.from(searchParams.entries())
     .filter(([key, _]) => key.startsWith('utm_'))
@@ -48,11 +48,11 @@ const getSources = () => {
 
 const getScreen = () => {
   return {
-    width: screen.width,
-    height: screen.height,
+    width: global.screen?.width,
+    height: global.screen?.height,
     orientation:
-      screen.orientation?.type?.split('-')[0] ||
-      window.innerWidth > window.innerHeight
+      global.screen?.orientation?.type?.split('-')[0] ||
+      global.window?.innerWidth > global.window?.innerHeight
         ? 'landscape'
         : 'portrait',
   }
@@ -87,7 +87,7 @@ const getBrowser = () => {
 
 const buildAnalytics = ({ change }) => {
   const datetime = new Date().toISOString()
-  const referrer = window.document.referrer || null
+  const referrer = global.window?.document?.referrer
   const timezone = getTimezone()
   const path = change.pathname
   const userAgent = navigator.userAgent
@@ -121,13 +121,13 @@ const Analytics = ({ history, location, children, sendRequest }) => {
       if (prevLocation === change.pathname) {
         return
       }
-      const analytics = buildAnalytics({ change })
-      const requestData = heartbeat(analytics)
-      requestData.headers = {
-        'pageview-id': window.viewId,
-      }
+      // const analytics = buildAnalytics({ change })
+      // const requestData = heartbeat(analytics)
+      // requestData.headers = {
+      //   'pageview-id': global.window.viewId,
+      // }
 
-      sendRequest(requestData).success(() => {})
+      // sendRequest(requestData).success(() => {})
       prevLocation = change.pathname
     }
     listener(location)

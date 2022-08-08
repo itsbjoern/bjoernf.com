@@ -1,2 +1,5 @@
-prod.yml
 dist/
+web/.parcel-cache
+
+docker/secret.yml
+node_modules/

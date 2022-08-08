@@ -30,7 +30,9 @@ const PostEditor = ({ post, updatePost, sendRequest }) => {
     title = '',
     tags = [],
     html = '',
-  } = { ...post.published, ...post.draft }
+  } = { ...(post.published || {}), ...(post.draft || {}) }
+  const [initialHtml] = useState(html)
+
   const uploadHandler = useCallback(
     (file) =>
       sendRequest(upload(post._id, file)).success(({ src, fileName }) => {
@@ -114,7 +116,11 @@ const PostEditor = ({ post, updatePost, sendRequest }) => {
           ),
         }}
       />
-      <RichText content={html} onChange={updatePost} upload={uploadHandler} />
+      <RichText
+        content={initialHtml}
+        onChange={updatePost}
+        upload={uploadHandler}
+      />
     </Column>
   )
 }

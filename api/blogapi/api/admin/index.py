@@ -1,6 +1,7 @@
 from aiohttp import web
 import bson
 from blogapi import util
+from blogapi.utils import auth
 
 
 async def login_handler(request):
@@ -20,24 +21,24 @@ async def login_handler(request):
   if not user:
     raise web.HTTPBadRequest(reason="User not found")
 
-  is_valid = util.check_password_hash(user['password'], password)
+  is_valid = auth.check_password_hash(user['password'], password)
   if not is_valid:
     raise web.HTTPBadRequest(reason="Incorrect login credentials")
 
-  auth = request.use('auth')
-  token = auth.create_user_token(user)
+  app_auth = request.use('auth')
+  token = app_auth.create_user_token(user)
   db.users.update_one({'_id': user['_id']}, {'$set': {'token': token}})
 
   return util.json_response({'user': user, 'token': token})
 
 
-@util.auth
+@auth.require
 async def change_password(request):
   db = request.use('db')
 
   data = await request.json()
   user = request.get('user')
-  hashed = util.generate_password_hash(data['password'])
+  hashed = auth.generate_password_hash(data['password'])
 
   db.users.update_one({'_id': bson.ObjectId(user['_id'])}, {'$set': {'password': hashed}})
 

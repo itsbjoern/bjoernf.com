@@ -36,8 +36,7 @@ async def auth_middleware(app, handler):
 
 
 def setup_middlewares(app):
-  local = 'http://' + socket.gethostbyname(socket.gethostname()) + ':3000'
-  origins = [local, app['config']['connection.webhost']]
+  origins = [app['config']['connection.webhost']]
   app.middlewares.extend([
     cors_middleware(
       origins=origins,

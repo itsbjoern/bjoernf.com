@@ -77,7 +77,8 @@ async def not_found_html(request):
 
 
 async def get_favicon(request):
-  raise web.HTTPFound(request.app['config']['connection.statichost'] + '/favicons/favicon.ico')
+  url = request.app['aws'].get_s3_file_url('favicon.ico', folder='/static/favicons')
+  raise web.HTTPFound(url)
 
 async def get_robots(request):
   raise web.HTTPFound(request.app['config']['connection.statichost'] + '/robots.txt')

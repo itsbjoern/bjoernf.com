@@ -1,41 +1,32 @@
 {
-  "overrides": [
-    {
-      "files": [ "app/**/*.js" ]
-    }
-  ],
   "env": {
-      "browser": true,
-      "es2021": true
+    "browser": true,
+    "node": true,
+    "es2021": true
   },
   "settings": {
-      "react": {
-          "version": "detect"
-      }
+    "react": {
+      "version": "detect"
+    }
+  },
+  "parserOptions": {
+    "sourceType": "module"
   },
   "extends": [
       "plugin:react/recommended",
-      "eslint-config-prettier"
+      "prettier"
   ],
-  "parserOptions": {
-      "parser": "babel-eslint",
-      "ecmaFeatures": {
-          "jsx": true
-      },
-      "ecmaVersion": 12,
-      "sourceType": "module"
-  },
   "plugins": [
       "react",
-      "eslint-plugin-prettier"
+      "prettier"
   ],
   "globals": {
     "global": true,
     "process": true,
-    "require": true,
+    "require": true
   },
   "rules": {
-    "prettier/prettier": "warn",
+    "prettier/prettier": ["error", { "singleQuote": true }],
     "react/no-unescaped-entities": 0,
     "react/prop-types": 0,
     "no-unused-vars": ["warn", {

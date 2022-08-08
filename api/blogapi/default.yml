@@ -2,8 +2,7 @@
 connection:
   host: 127.0.0.1
   port: 8080
-  webhost: http://127.0.0.1:3000
-  imagehost: http://127.0.0.1:8000
+  webhost: http://localhost:9009
 
 jwt:
   secret: secret
@@ -24,9 +23,5 @@ mongo:
   user:
     username: admin
     password: password
-
-node:
-  address: 127.0.0.1
-  port: 9009
 
 dev: True

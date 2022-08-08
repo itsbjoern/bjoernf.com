@@ -1,8 +1,9 @@
+from blogapi.utils import auth
 from blogapi import util
 import datetime
 
 
-@util.auth
+@auth.require
 def get_analytics(request):
   days = int(request.query.get('days', 14))
   db = request.use('db')

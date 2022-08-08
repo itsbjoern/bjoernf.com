@@ -7,9 +7,8 @@ import {
   IconButton,
   CircularProgress,
   Button,
-  Box,
   Popover,
-  Input
+  Input,
 } from '@mui/material'
 import { Search, Clear, RssFeed, ContentCopy } from '@mui/icons-material'
 
@@ -19,6 +18,7 @@ import { useSSR } from 'app/providers/SSRProvider'
 import { getPosts } from 'app/api/blog'
 import { withRequest } from 'app/providers/RequestProvider'
 import { withNotification } from 'app/providers/NotificationProvider'
+import { apiUrl } from 'app/api'
 
 import { Row, Column } from 'app/components/Flex'
 import { H2 } from 'app/components/Text'
@@ -42,20 +42,19 @@ const makeQuery = (page, search) => {
   )
 }
 
-const Blog = ({ history, location, sendRequest, createNotification, staticContext }) => {
+const Blog = ({ history, location, sendRequest, createNotification }) => {
   const query = new URLSearchParams(location.search)
   const currentPage = parseInt(query.get('page')) || 1
   const currentSearch = query.get('search') || ''
   const [isLoading, setIsLoading] = useState(false)
   const [anchorEl, setAnchorEl] = useState(null)
   const rssRef = useRef()
-  const url = staticContext?.absUrl || global.window.location.origin
 
   const [data] = useSSR(
     () => sendRequest(getPosts({ page: currentPage, search: currentSearch })),
     {
       deps: [currentPage, currentSearch],
-      init: {posts: new Array(5).fill({_id: '?'}), numPages: 1},
+      init: { posts: new Array(5).fill({ _id: '?' }), numPages: 1 },
       delay: 200,
       chainFirst: () => setIsLoading(true),
       chainFailure: (err) =>
@@ -80,13 +79,18 @@ const Blog = ({ history, location, sendRequest, createNotification, staticContex
         <Row align="center" gap={10}>
           <H2>Recent posts</H2>
           <Row>
-            <Button size="small" variant="text" startIcon={<RssFeed fontSize="7px" />} onClick={(e) => {
-              if (anchorEl) {
-                setAnchorEl(null)
-              } else {
-                setAnchorEl(e.currentTarget)
-              }
-            }}>
+            <Button
+              size="small"
+              variant="text"
+              startIcon={<RssFeed fontSize="7px" />}
+              onClick={(e) => {
+                if (anchorEl) {
+                  setAnchorEl(null)
+                } else {
+                  setAnchorEl(e.currentTarget)
+                }
+              }}
+            >
               Feed
             </Button>
             <Popover
@@ -99,15 +103,23 @@ const Blog = ({ history, location, sendRequest, createNotification, staticContex
               }}
             >
               <Row style={{ padding: 10 }} gap={10}>
-                <Input value={url + '/rss'} disableUnderline inputRef={rssRef} onClick={(e) => e.target.select()}/>
-                <IconButton size="small" onClick={async () => {
-                  try {
-                    await navigator.clipboard.writeText(url + '/rss');
-                    createNotification('Copied to clipboard');
-                  } catch (err) {
-                    createNotification('Copy to clipboard failed', 'error');
-                  }
-                }}>
+                <Input
+                  value={apiUrl + '/rss'}
+                  disableUnderline
+                  inputRef={rssRef}
+                  onClick={(e) => e.target.select()}
+                />
+                <IconButton
+                  size="small"
+                  onClick={async () => {
+                    try {
+                      await navigator.clipboard.writeText(url + '/rss')
+                      createNotification('Copied to clipboard')
+                    } catch (err) {
+                      createNotification('Copy to clipboard failed', 'error')
+                    }
+                  }}
+                >
                   <ContentCopy />
                 </IconButton>
               </Row>

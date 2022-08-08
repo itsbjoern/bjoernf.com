@@ -6,9 +6,10 @@ import re
 import pymongo
 
 from blogapi import util
+from blogapi.utils import auth, image
 
 
-@util.auth
+@auth.require
 async def create_post(request):
   db = request.use('db')
 
@@ -18,7 +19,7 @@ async def create_post(request):
   return util.json_response({'post': {'_id': op.inserted_id, **insert}})
 
 
-@util.auth
+@auth.require
 async def get_drafts(request):
   db = request.use('db')
   query = {'draft': {'$exists': 1}}
@@ -31,7 +32,7 @@ async def get_drafts(request):
   return util.json_response({'posts': posts, 'numPages': num_pages, 'page': current_page})
 
 
-@util.auth
+@auth.require
 async def update_post(request):
   data = await request.json()
   allowed_keys = ['title', 'tags', 'text', 'html']
@@ -56,7 +57,7 @@ async def update_post(request):
   return util.json_response({'post': post})
 
 
-@util.auth
+@auth.require
 async def delete_draft(request):
   post_id = request.match_info.get('id', None)
   if not post_id:
@@ -70,7 +71,7 @@ async def delete_draft(request):
   return util.json_response({'post': post})
 
 
-@util.auth
+@auth.require
 async def publish(request):
   post_id = request.match_info.get('id', None)
   if not post_id:
@@ -116,7 +117,7 @@ async def publish(request):
   return util.json_response({'post': post})
 
 
-@util.auth
+@auth.require
 async def unpublish(request):
   post_id = request.match_info.get('id', None)
   if not post_id:
@@ -142,7 +143,7 @@ async def unpublish(request):
   return util.json_response({'post': post})
 
 
-@util.auth
+@auth.require
 async def delete_post(request):
   post_id = request.match_info.get('id', None)
   if not post_id:
@@ -160,7 +161,7 @@ async def delete_post(request):
   return util.json_response({'post': post})
 
 
-@util.auth
+@auth.require
 async def upload(request):
   post_id = request.match_info.get('id', None)
   if not post_id:
@@ -179,22 +180,23 @@ async def upload(request):
   ext = field.filename.split('.')[-1]
   file_name = f'{str(bson.ObjectId())}.{ext}'
 
-  upload_path = request.app['config']['paths.uploads'] / post_id
-  os.makedirs(upload_path, exist_ok=True)
-
-  save_path = os.path.join(upload_path, file_name)
+  upload_data = bytearray()
   size = 0
-  with open(save_path, 'wb') as f:
-    while True:
-      chunk = await field.read_chunk()
-      if not chunk:
-          break
-      size += len(chunk)
-      f.write(chunk)
+  while True:
+    chunk = await field.read_chunk()
+    if not chunk:
+      break
+    size += len(chunk)
+    upload_data.extend(chunk)
 
-  upload_src = request.app['config']['connection.imagehost'] + f'/uploads/{post_id}/{file_name}'
+  adjusted = image.compress_image(upload_data)
+  file_url = request.app['aws'].s3_upload_file(file_name, adjusted, path='uploads')
+
+  if not file_url:
+    return web.HTTPBadRequest(reason="Upload failed")
+
   return util.json_response({
-    'src': upload_src,
+    'src': file_url,
+    'fileName': file_name,
     'fileSize': size,
-    'fileName': file_name
   })

@@ -1,4 +1,4 @@
-import React, { useState, useEffect } from 'react'
+import React, { useState } from 'react'
 import {
   BoldExtension,
   UnderlineExtension,
@@ -15,7 +15,7 @@ import {
 } from 'remirror/extensions'
 // import { FileExtension } from '@remirror/extension-file'
 
-import { VideoExtension } from './extensions/video'
+// import { VideoExtension } from './extensions/video'
 import { ImageExtension } from './extensions/fixed-image'
 import FloatingLinkToolbar from './FloatingLinkToolbar'
 
@@ -83,8 +83,6 @@ const hooks = [
 ]
 
 const Editor = ({ content, onChange, upload, editable = true }) => {
-  const [didRender, setDidRender] = useState(false)
-  const [internalContent, setInternalContent] = useState(content)
   const [extensions] = useState(() => [
     new BoldExtension(),
     new UnderlineExtension(),
@@ -97,10 +95,10 @@ const Editor = ({ content, onChange, upload, editable = true }) => {
       uploadHandler: createUploadHandler(upload),
       enableResizing: true,
     }),
-    new VideoExtension({ uploadHandler: createUploadHandler(upload) }),
+    // new VideoExtension({ uploadHandler: createUploadHandler(upload) }),
     // new FileExtension({ uploadFileHandler: createFileUploadHandler(upload) }),
     new HeadingExtension(),
-    new LinkExtension({ autoLink: true }),
+    new LinkExtension({ autoLink: false }),
     new CodeBlockExtension(),
     new CodeExtension(),
     new NodeFormattingExtension(),
@@ -111,15 +109,7 @@ const Editor = ({ content, onChange, upload, editable = true }) => {
     content,
     stringHandler: 'html',
   })
-  const { manager, state, setState, getContext } = remirror
-
-  useEffect(() => {
-    if (didRender && internalContent !== content) {
-      const context = getContext()
-      context.setContent(content)
-    }
-  }, [content])
-
+  const { manager, state, setState } = remirror
   return (
     <ThemeProvider>
       <Remirror
@@ -132,16 +122,12 @@ const Editor = ({ content, onChange, upload, editable = true }) => {
           const { state, tr } = parameter
           setState(state)
 
-          if (parameter.firstRender && !didRender) {
-            setDidRender(true)
-          }
-
           if (parameter.internalUpdate) return
           if (!tr?.steps?.length) return
           if (!editable) return
 
           const html = parameter.helpers.getHTML()
-          setInternalContent(html)
+
           onChange &&
             onChange({
               html,

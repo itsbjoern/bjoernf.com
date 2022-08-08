@@ -2,7 +2,7 @@ import React from 'react'
 
 import { ListItem, ListItemButton, Skeleton } from '@mui/material'
 import { PendingActions } from '@mui/icons-material'
-import moment from 'moment'
+import format from 'date-fns/format'
 import styled from '@emotion/styled'
 
 import { morphMixin } from 'app/theme'
@@ -100,7 +100,9 @@ const PostItem = ({ post }) => {
           <ShadowButton>
             <Row justify="start" flexed gap={10} grow={10} mobileWrapping>
               <Column gap={10}>
-                <Title><Skeleton animation="wave" height={30} width={120} /></Title>
+                <Title>
+                  <Skeleton animation="wave" height={30} width={120} />
+                </Title>
                 <Skeleton animation="wave" height={10} width={240} />
                 <Skeleton animation="wave" height={10} width={220} />
               </Column>
@@ -110,7 +112,6 @@ const PostItem = ({ post }) => {
       </Column>
     )
   }
-
 
   const { draft, published, createdAt } = post
   const { title, tags } = draft ?? published
@@ -123,7 +124,7 @@ const PostItem = ({ post }) => {
           <Row gap={10}>
             <Row>
               <span style={{ fontSize: '0.9rem' }}>
-                {moment(createdAt * 1000).format('MMMM Do, YYYY')}
+                {format(createdAt * 1000, 'MMMM do, yyyy')}
               </span>
             </Row>
           </Row>

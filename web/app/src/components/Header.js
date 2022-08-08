@@ -11,7 +11,7 @@ import {
   AdminPanelSettings,
 } from '@mui/icons-material'
 
-import { imageUrl } from 'app/util'
+import { getPublicFileUrl } from 'app/util'
 import { withRequest } from 'app/providers/RequestProvider'
 import { Row, Column } from 'app/components/Flex'
 import { H2 } from 'app/components/Text'
@@ -33,7 +33,7 @@ const Header = ({ history, token, setToken }) => {
         <Row align="center">
           <Avatar
             sx={{ width: 70, height: 70 }}
-            src={`${imageUrl}/images/me.png?max_size=500`}
+            src={getPublicFileUrl('me.png', 'images')}
           />
           <Column justify="evenly" style={{ marginLeft: 10 }}>
             <H2>Björn Friedrichs</H2>

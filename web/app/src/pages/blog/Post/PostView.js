@@ -1,5 +1,5 @@
 import React, { useState } from 'react'
-import moment from 'moment'
+import format from 'date-fns/format'
 
 import { EmailIcon, LinkedinIcon, TwitterIcon, WhatsappIcon } from 'react-share'
 import { IconButton } from '@mui/material'
@@ -23,9 +23,9 @@ const ShareIcon = ({ href, size, Icon }) => (
 
 const PostView = ({ postData, createdAt, hideShare, staticContext }) => {
   const { title, html, tags } = postData
-  const [url] = useState(staticContext?.absUrl || global.window.location.href)
+  const [url] = useState(staticContext?.absUrl || global.window?.location?.href)
   const [userAgent] = useState(
-    staticContext?.userAgent || global.navigator.userAgent
+    staticContext?.userAgent || global.navigator?.userAgent || ''
   )
 
   const iconSize = 45
@@ -70,9 +70,7 @@ const PostView = ({ postData, createdAt, hideShare, staticContext }) => {
               ? tags.map((t) => <Tag size="small" key={t} name={t} />)
               : null}
           </Row>
-          <div>
-            Published {moment(createdAt * 1000).format('MMMM Do, YYYY')}
-          </div>
+          <div>Published {format(createdAt * 1000, 'MMMM do, yyyy')}</div>
         </Row>
         <H2>{title}</H2>
         <StyledEditor>

@@ -8,13 +8,14 @@ from blogapi.middlewares import setup_middlewares
 from blogapi.routes import setup_routes
 from blogapi.paths import setup_paths
 from blogapi.settings import get_config
-from blogapi import util
+from blogapi.utils import auth, aws
 
 
 async def init_app(argv):
   app = web.Application()
   app['config'] = get_config()
-  app['auth'] = util.Auth(app['config']['jwt.secret'])
+  app['auth'] = auth.Auth(app['config']['jwt.secret'])
+  app['aws'] = aws.AWS(app['config']['aws.accesskey'], app['config']['aws.secretkey'])
 
   setup_paths(app)
   app.cleanup_ctx.append(mongo_ctx)
