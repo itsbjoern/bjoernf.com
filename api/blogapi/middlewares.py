@@ -40,8 +40,7 @@ def setup_middlewares(app):
   app.middlewares.extend([
     cors_middleware(
       origins=origins,
-      allow_headers=[*DEFAULT_ALLOW_HEADERS, "pageview-id"],
-      expose_headers=['pageview-id']
+      allow_headers=DEFAULT_ALLOW_HEADERS,
     ),
     error_middleware,
     easy_access_middleware,

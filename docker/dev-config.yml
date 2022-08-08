@@ -15,6 +15,10 @@ services:
   render-server:
     command: yarn node watch.js
     build: ./render-server
+    depends_on:
+      - api
+    links:
+      - api
     environment:
       NODE_ENV: development
       REACT_APP_API_URL: http://api:8000
@@ -27,6 +31,10 @@ services:
   api:
     build: ./api
     command: adev runserver blogapi
+    depends_on:
+      - mongo
+    links:
+      - mongo
     expose:
       - 8000
     ports:
@@ -35,8 +43,8 @@ services:
       - ./api/blogapi:/api/blogapi
     environment:
       API_CONNECTION_HOST: 0.0.0.0
-      API_CONNECTION_PORT: '8080'
-      API_MONGO_HOST: mongo:27017
+      API_CONNECTION_PORT: '8000'
+      API_MONGO_URL: mongodb://mongo:27017
   mongo:
     image: mongo
     restart: unless-stopped
@@ -46,5 +54,4 @@ services:
 
 networks:
   default:
-    name: app-network
     driver: bridge

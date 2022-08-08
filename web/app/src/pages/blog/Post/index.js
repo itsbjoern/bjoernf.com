@@ -181,7 +181,7 @@ const Post = ({
 
   const draftEqualsLive =
     !post.draft ||
-    (post.draft?.text === post.published?.text &&
+    (post.draft?.html === post.published?.html &&
       post.draft?.title === post.draft?.title &&
       post.draft?.tags?.length === post.published?.tags?.length)
 

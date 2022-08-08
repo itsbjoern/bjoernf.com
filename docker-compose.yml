@@ -7,11 +7,6 @@ services:
 
   api:
     restart: unless-stopped
-    links:
-      - mongo
-      - render-server
-    depends_on:
-      - mongo
     environment:
       API_CONNECTION_PORT: '8080'
     networks:
