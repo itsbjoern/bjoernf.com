@@ -61,27 +61,34 @@ const RouterLayer = isSSR ? SSRSupport : BrowserRouter;
 
 const HistoryLayer = withRouter(({ children, history, location }) => {
   useEffect(() => {
+    let ackee = null;
     let siteReferrer = document.referrer;
-    if (location.search) {
-      const params = new URLSearchParams(location.search);
-      const shareSource = params.get('utm_share');
-      if (shareSource) {
-        siteReferrer = shareSource;
+    if (isSSR) {
+      if (location.search) {
+        const params = new URLSearchParams(location.search);
+        const shareSource = params.get('utm_share');
+        if (shareSource) {
+          siteReferrer = shareSource;
+        }
       }
-    }
 
-    const ackee = ackeeTracker.create('https://dashboard.bjornf.dev', {
-      detailed: true,
-      ignoreLocalhost: true,
-    });
-    ackee.record('2a5590d3-ef8c-45ab-9b29-7f14459e092f', {
-      siteReferrer,
-    });
-
-    const unsub = history.listen((location) => {
+      ackee = ackeeTracker.create('https://dashboard.bjornf.dev', {
+        detailed: true,
+        ignoreLocalhost: true,
+      });
       ackee.record('2a5590d3-ef8c-45ab-9b29-7f14459e092f', {
+        siteLocation: window.location.href,
         siteReferrer,
       });
+    }
+
+    const unsub = history.listen((location) => {
+      if (!isSSR) {
+        ackee.record('2a5590d3-ef8c-45ab-9b29-7f14459e092f', {
+          siteLocation: window.location.href,
+          siteReferrer,
+        });
+      }
 
       const path = location.pathname;
       let title = '';
