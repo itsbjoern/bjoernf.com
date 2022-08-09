@@ -176,6 +176,11 @@ jobs:
                   API_MONGO_USER_PASSWORD: ${{ secrets.MONGO_USER_PASSWORD }}
                   API_AWS_ACCESSKEY: ${{ secrets.AWS_ACCESS_KEY }}
                   API_AWS_SECRETKEY: ${{ secrets.AWS_SECRET_KEY }}
+              analytics:
+                environment:
+                  ACKEE_MONGODB: ${{ secrets.MONGO_URL }}
+                  ACKEE_USERNAME: ${{ secrets.ACKEE_USER }}
+                  ACKEE_PASSWORD: ${{ secrets.ACKEE_PASSWORD }}
             EOL
 
             sudo docker-compose -f docker-compose.yml -f docker/prod-config.yml -f release.yml up -d

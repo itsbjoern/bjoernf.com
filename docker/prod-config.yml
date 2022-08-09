@@ -12,6 +12,7 @@ services:
       LETSENCRYPT_HOST: node.bjornf.dev
     networks:
       - nginx-proxy
+
   api:
     image: bjornf-api
     expose:
@@ -26,9 +27,20 @@ services:
       API_DEV: "false"
     networks:
       - nginx-proxy
-  mongo:
-    image: mongo
+
+  analytics:
+    image: electerious/ackee
     restart: unless-stopped
+    expose:
+      - 80
+    environment:
+      VIRTUAL_HOST: analytics.bjornf.dev
+      LETSENCRYPT_HOST: analytics.bjornf.dev
+      VIRTUAL_PORT: 80
+      ACKEE_PORT: 80
+      ACKEE_ALLOW_ORIGIN: https://bjornf.dev
+    networks:
+      - nginx-proxy
 
 networks:
   nginx-proxy:
