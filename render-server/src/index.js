@@ -3,7 +3,8 @@ console.log('Starting server...');
 const http = require('http');
 const express = require('express');
 const bodyParser = require('body-parser');
-const nodeFetch = require('node-fetch');
+// Import for ES-Module necessary
+const nodeFetch = import('node-fetch');
 
 const { isDevelopment, getArguments } = require('./util');
 const { renderHandler } = require('./handler/render');

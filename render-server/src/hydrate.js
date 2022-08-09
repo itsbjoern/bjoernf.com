@@ -39,8 +39,8 @@ const hydrateIndex = (rawIndex, request, renderedApp, resolvedData) => {
     description: 'Personal website and blog by Björn Friedrichs',
     img: staticMetaImg,
   };
-  const postData = resolvedData.post;
-  if (postData.published) {
+  const postData = resolvedData?.post;
+  if (postData?.published) {
     metaData.title = postData.published.title;
     metaData.description =
       postData.published.text.split(' ').slice(0, 20).join(' ') + ' ...';
