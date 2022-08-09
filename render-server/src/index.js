@@ -1,44 +1,46 @@
-console.log('Starting server...')
+console.log('Starting server...');
 
-const { isDevelopment, getArguments } = require('./util')
-const http = require('http')
-const express = require('express')
-const bodyParser = require('body-parser')
-const nodeFetch = import('node-fetch')
+const http = require('http');
+const express = require('express');
+const bodyParser = require('body-parser');
+const nodeFetch = require('node-fetch');
+
+const { isDevelopment, getArguments } = require('./util');
+const { renderHandler } = require('./handler/render');
+const { staticHandler } = require('./handler/static');
 
 if (!global.fetch) {
-  global.fetch = nodeFetch.default
-  global.Headers = nodeFetch.Headers
+  global.fetch = nodeFetch.default;
+  global.Headers = nodeFetch.Headers;
 }
 
-const { renderHandler } = require('./handler/render')
-const { staticHandler } = require('./handler/static')
-
-const args = getArguments()
-const ADDRESS = args.address
-const PORT = args.port
+const args = getArguments();
+const ADDRESS = args.address;
+const PORT = args.port;
 
 const createApp = () => {
-  const app = express()
+  const app = express();
 
-  app.use(bodyParser.json())
+  app.use(bodyParser.json());
 
   app.get('/*', async function (req, res) {
     if (
       isDevelopment &&
       (req.path.indexOf('static/') !== -1 || req.path.endsWith('.js.map'))
     ) {
-      return await staticHandler(req, res)
+      return await staticHandler(req, res);
     }
-    res.set('Content-Type', 'text/html')
-    return await renderHandler(req, res)
-  })
+    res.set('Content-Type', 'text/html');
+    return await renderHandler(req, res);
+  });
 
-  return app
-}
+  return app;
+};
 
-const app = createApp()
-let server = http.Server(app)
+const app = createApp();
+let server = http.Server(app);
 server.listen(PORT, ADDRESS, function () {
-  console.log('React render server listening at http://' + ADDRESS + ':' + PORT)
-})
+  console.log(
+    'React render server listening at http://' + ADDRESS + ':' + PORT
+  );
+});

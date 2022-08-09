@@ -1,26 +1,26 @@
-import React, { forwardRef, useContext, useState, useCallback } from 'react'
-import { Snackbar, Alert } from '@mui/material'
+import React, { forwardRef, useContext, useState, useCallback } from 'react';
+import { Snackbar, Alert } from '@mui/material';
 
-export const NotificationContext = React.createContext(null)
+export const NotificationContext = React.createContext(null);
 
 const NotificationProvider = ({ children }) => {
-  const [notifications, setNotifications] = useState([])
+  const [notifications, setNotifications] = useState([]);
   const createNotification = useCallback(
     (message, severity, timeout = 5000) => {
-      setNotifications([{ message, severity, timeout }, ...notifications])
+      setNotifications([{ message, severity, timeout }, ...notifications]);
     },
     [notifications]
-  )
+  );
 
-  const displayedNotification = notifications[notifications.length - 1]
+  const displayedNotification = notifications[notifications.length - 1];
 
   return (
     <NotificationContext.Provider value={{ createNotification, notifications }}>
       <Snackbar
         open={!!displayedNotification}
         onClose={() => {
-          notifications.splice(0, 1)
-          setNotifications([...notifications])
+          notifications.splice(0, 1);
+          setNotifications([...notifications]);
         }}
         autoHideDuration={displayedNotification?.timeout}
         anchorOrigin={{ vertical: 'top', horizontal: 'right' }}
@@ -33,18 +33,18 @@ const NotificationProvider = ({ children }) => {
       </Snackbar>
       {children}
     </NotificationContext.Provider>
-  )
-}
+  );
+};
 
 export const withNotification = (cls) => {
   const Wrapper = forwardRef((props, ref) => {
-    const context = useContext(NotificationContext)
+    const context = useContext(NotificationContext);
 
-    return cls({ ...props, ...context, ref })
-  })
-  Wrapper.displayName = cls.displayName
+    return cls({ ...props, ...context, ref });
+  });
+  Wrapper.displayName = cls.displayName;
 
-  return Wrapper
-}
+  return Wrapper;
+};
 
-export default NotificationProvider
+export default NotificationProvider;

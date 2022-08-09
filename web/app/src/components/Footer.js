@@ -1,18 +1,17 @@
-import React from 'react'
+import React from 'react';
+import { withRouter } from 'react-router-dom';
+import styled from '@emotion/styled';
 
-import { withRouter } from 'react-router-dom'
-import styled from '@emotion/styled'
-
-import { morphMixin } from 'app/theme'
-import { Row, Column } from 'app/components/Flex'
-import Ref from 'app/components/Ref'
+import { morphMixin } from 'app/theme';
+import { Row, Column } from 'app/components/Flex';
+import Ref from 'app/components/Ref';
 
 const BG = styled(Column)`
   background-color: ${({ theme }) => theme.palette.background.paper};
   padding: 30px;
   ${morphMixin()}
   border-radius: 10px 10px 0 0;
-`
+`;
 
 const Footer = () => {
   return (
@@ -22,7 +21,7 @@ const Footer = () => {
         <Ref text={'privacy & more'} href="/about" />
       </Row>
     </BG>
-  )
-}
+  );
+};
 
-export default withRouter(Footer)
+export default withRouter(Footer);

@@ -1,4 +1,4 @@
-import React, { useEffect, useState, useRef } from 'react'
+import React, { useEffect, useState, useRef } from 'react';
 import {
   List,
   Pagination,
@@ -9,29 +9,27 @@ import {
   Button,
   Popover,
   Input,
-} from '@mui/material'
-import { Search, Clear, RssFeed, ContentCopy } from '@mui/icons-material'
+} from '@mui/material';
+import { Search, Clear, RssFeed, ContentCopy } from '@mui/icons-material';
+import { withRouter } from 'react-router-dom';
 
-import { withRouter } from 'react-router-dom'
-
-import { useSSR } from 'app/providers/SSRProvider'
-import { getPosts } from 'app/api/blog'
-import { withRequest } from 'app/providers/RequestProvider'
-import { withNotification } from 'app/providers/NotificationProvider'
-import { apiUrl } from 'app/api'
-
-import { Row, Column } from 'app/components/Flex'
-import { H2 } from 'app/components/Text'
-import PostItem from 'app/components/PostItem'
-import UnstyledLink from 'app/components/UnstyledLink'
+import { useSSR } from 'app/providers/SSRProvider';
+import { getPosts } from 'app/api/blog';
+import { withRequest } from 'app/providers/RequestProvider';
+import { withNotification } from 'app/providers/NotificationProvider';
+import { apiUrl } from 'app/api';
+import { Row, Column } from 'app/components/Flex';
+import { H2 } from 'app/components/Text';
+import PostItem from 'app/components/PostItem';
+import UnstyledLink from 'app/components/UnstyledLink';
 
 const makeQuery = (page, search) => {
-  const params = {}
+  const params = {};
   if (page) {
-    params.page = page
+    params.page = page;
   }
   if (search) {
-    params.search = search
+    params.search = search;
   }
 
   return (
@@ -39,16 +37,16 @@ const makeQuery = (page, search) => {
     Object.entries(params)
       .map(([key, val]) => `${key}=${val}`)
       .join('&')
-  )
-}
+  );
+};
 
 const Blog = ({ history, location, sendRequest, createNotification }) => {
-  const query = new URLSearchParams(location.search)
-  const currentPage = parseInt(query.get('page')) || 1
-  const currentSearch = query.get('search') || ''
-  const [isLoading, setIsLoading] = useState(false)
-  const [anchorEl, setAnchorEl] = useState(null)
-  const rssRef = useRef()
+  const query = new URLSearchParams(location.search);
+  const currentPage = parseInt(query.get('page')) || 1;
+  const currentSearch = query.get('search') || '';
+  const [isLoading, setIsLoading] = useState(false);
+  const [anchorEl, setAnchorEl] = useState(null);
+  const rssRef = useRef();
 
   const [data] = useSSR(
     () => sendRequest(getPosts({ page: currentPage, search: currentSearch })),
@@ -61,17 +59,17 @@ const Blog = ({ history, location, sendRequest, createNotification }) => {
         createNotification(`Fetch failed: ${err.message}`, 'error'),
       chainFinally: () => setIsLoading(false),
     }
-  )
+  );
 
   useEffect(() => {
     if (anchorEl) {
       setTimeout(() => {
-        rssRef?.current.select()
-      }, 50)
+        rssRef?.current.select();
+      }, 50);
     }
-  }, [anchorEl, rssRef])
+  }, [anchorEl, rssRef]);
 
-  const { posts = [], numPages } = data
+  const { posts = [], numPages } = data;
 
   return (
     <Column>
@@ -85,9 +83,9 @@ const Blog = ({ history, location, sendRequest, createNotification }) => {
               startIcon={<RssFeed fontSize="7px" />}
               onClick={(e) => {
                 if (anchorEl) {
-                  setAnchorEl(null)
+                  setAnchorEl(null);
                 } else {
-                  setAnchorEl(e.currentTarget)
+                  setAnchorEl(e.currentTarget);
                 }
               }}
             >
@@ -113,10 +111,10 @@ const Blog = ({ history, location, sendRequest, createNotification }) => {
                   size="small"
                   onClick={async () => {
                     try {
-                      await navigator.clipboard.writeText(url + '/rss')
-                      createNotification('Copied to clipboard')
+                      await navigator.clipboard.writeText(apiUrl + '/rss');
+                      createNotification('Copied to clipboard');
                     } catch (err) {
-                      createNotification('Copy to clipboard failed', 'error')
+                      createNotification('Copy to clipboard failed', 'error');
                     }
                   }}
                 >
@@ -178,7 +176,7 @@ const Blog = ({ history, location, sendRequest, createNotification }) => {
         color="primary"
       />
     </Column>
-  )
-}
+  );
+};
 
-export default withRouter(withRequest(withNotification(Blog)))
+export default withRouter(withRequest(withNotification(Blog)));

@@ -1,5 +1,4 @@
-import React, { useState } from 'react'
-
+import React, { useState } from 'react';
 import {
   Divider,
   Accordion,
@@ -11,22 +10,22 @@ import {
   TableHead,
   TableRow,
   TableContainer,
-} from '@mui/material'
-import { ExpandMore } from '@mui/icons-material'
+} from '@mui/material';
+import { ExpandMore } from '@mui/icons-material';
 
-import { Column } from 'app/components/Flex'
-import { H4 } from 'app/components/Text'
-import Ref from 'app/components/Ref'
+import { Column } from 'app/components/Flex';
+import { H4 } from 'app/components/Text';
+import Ref from 'app/components/Ref';
 
-import collectionData from './collectionData'
+import collectionData from './collectionData';
 
 const About = () => {
-  const [isExpanded, setExpanded] = useState(true)
+  const [isExpanded, setExpanded] = useState(true);
 
   return (
     <Column gap={30}>
       <span>
-        <H4>How it's made</H4>
+        <H4>How it&apos;s made</H4>
       </span>
       <span>
         This website is built using React and delivered using{' '}
@@ -72,7 +71,7 @@ const About = () => {
           aria-controls="panel1a-content"
           id="panel1a-header"
           onClick={() => {
-            setExpanded(!isExpanded)
+            setExpanded(!isExpanded);
           }}
         >
           Check the data I collect
@@ -106,7 +105,7 @@ const About = () => {
         </AccordionDetails>
       </Accordion>
     </Column>
-  )
-}
+  );
+};
 
-export default About
+export default About;

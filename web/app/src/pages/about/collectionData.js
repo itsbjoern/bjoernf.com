@@ -53,4 +53,4 @@ export default [
       'URL query parameters with a prefix that I can manually add to shared links to see how my links are shared.',
     example: 'share=whatsapp',
   },
-]
+];

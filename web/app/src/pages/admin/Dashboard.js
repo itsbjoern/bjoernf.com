@@ -1,19 +1,17 @@
-import React, { useState } from 'react'
+import React, { useState } from 'react';
+import { TextField, Button, InputAdornment, IconButton } from '@mui/material';
+import { Visibility, VisibilityOff } from '@mui/icons-material';
 
-import { TextField, Button, InputAdornment, IconButton } from '@mui/material'
-import { Visibility, VisibilityOff } from '@mui/icons-material'
-
-import { H2 } from 'app/components/Text'
-import { Column } from 'app/components/Flex'
-import { withRequest } from 'app/providers/RequestProvider'
-import { withNotification } from 'app/providers/NotificationProvider'
-
-import { changePassword } from 'app/api/admin'
+import { H2 } from 'app/components/Text';
+import { Column } from 'app/components/Flex';
+import { withRequest } from 'app/providers/RequestProvider';
+import { withNotification } from 'app/providers/NotificationProvider';
+import { changePassword } from 'app/api/admin';
 
 const Dashboard = ({ sendRequest, createNotification }) => {
-  const [pass1, setPass1] = useState('')
-  const [pass2, setPass2] = useState('')
-  const [isVisible, setIsVisible] = useState(false)
+  const [pass1, setPass1] = useState('');
+  const [pass2, setPass2] = useState('');
+  const [isVisible, setIsVisible] = useState(false);
 
   return (
     <Column flexed>
@@ -47,20 +45,20 @@ const Dashboard = ({ sendRequest, createNotification }) => {
           onClick={() => {
             sendRequest(changePassword(pass1))
               .success(() => {
-                createNotification('Successfully updated password')
-                setPass1('')
-                setPass2('')
+                createNotification('Successfully updated password');
+                setPass1('');
+                setPass2('');
               })
               .failure(() => {
-                createNotification('There was an issue', 'error')
-              })
+                createNotification('There was an issue', 'error');
+              });
           }}
         >
           Confirm change
         </Button>
       </Column>
     </Column>
-  )
-}
+  );
+};
 
-export default withRequest(withNotification(Dashboard))
+export default withRequest(withNotification(Dashboard));

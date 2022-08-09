@@ -4,74 +4,75 @@ import React, {
   useContext,
   useRef,
   useCallback,
-} from 'react'
-import { isSSR } from 'app/util'
+} from 'react';
 
-export let SSRContext = null
-let toResolve = null
-let resolvedData = null
+import { isSSR } from 'app/util';
+
+export let SSRContext = null;
+let toResolve = null;
+let resolvedData = null;
 
 export const createSSRContext = () => {
-  SSRContext = React.createContext(null)
-  toResolve = {}
-  resolvedData = {}
+  SSRContext = React.createContext(null);
+  toResolve = {};
+  resolvedData = {};
 
   const resolveData = () => {
-    const isDone = Object.keys(toResolve).map(() => false)
+    const isDone = Object.keys(toResolve).map(() => false);
 
     return new Promise((resolve) => {
       if (isDone.length === 0) {
-        resolve(resolvedData)
+        resolve(resolvedData);
       }
       Object.entries(toResolve).forEach(([name, request], i) => {
         request
           .success((data) => {
-            resolvedData[name] = data
+            resolvedData[name] = data;
           })
           .failure((e) => {
-            console.log(e)
+            console.log(e);
           })
           .finally(() => {
-            isDone[i] = true
+            isDone[i] = true;
             if (isDone.every((e) => e)) {
-              resolve(resolvedData)
+              resolve(resolvedData);
             }
-          })
-      })
-    })
-  }
+          });
+      });
+    });
+  };
 
-  return { resolveData }
-}
-createSSRContext()
+  return { resolveData };
+};
+createSSRContext();
 
 const SSRProvider = ({ children }) => {
   if (!SSRContext) {
-    new Error('Call "createSSRContext" before render')
+    new Error('Call "createSSRContext" before render');
   }
 
   const addResolve = (id, req) => {
-    toResolve[id] = req
-  }
-  const getResolvedData = (id) => resolvedData[id]
+    toResolve[id] = req;
+  };
+  const getResolvedData = (id) => resolvedData[id];
 
   return (
     <SSRContext.Provider value={{ addResolve, getResolvedData }}>
       {children}
     </SSRContext.Provider>
-  )
-}
+  );
+};
 
 // eslint-disable-next-line no-unused-vars
-const ssrDidChain = {}
+const ssrDidChain = {};
 const makePseudoId = (options) =>
-  btoa(encodeURIComponent(JSON.stringify(options).replace(' ', '')))
-const windowData = () => (global.window && global.window.__RESOLVED_DATA) || {}
+  btoa(encodeURIComponent(JSON.stringify(options).replace(' ', '')));
+const windowData = () => (global.window && global.window.__RESOLVED_DATA) || {};
 
 export const useSSR = (request, options) => {
-  const timeout = useRef()
+  const timeout = useRef();
 
-  const { getResolvedData, addResolve } = isSSR ? useContext(SSRContext) : {}
+  const { getResolvedData, addResolve } = isSSR ? useContext(SSRContext) : {};
   const {
     init = null,
     deps = [],
@@ -80,52 +81,53 @@ export const useSSR = (request, options) => {
     chainSuccess = (data) => data,
     chainFailure,
     chainFinally,
-  } = options
+    dataId = null,
+  } = options;
 
-  const pseudoId = `data-${makePseudoId(options)}`
-  let initData = init
-  if (pseudoId in windowData()) {
-    initData = chainSuccess(windowData()[pseudoId])
+  const fixedId = dataId ?? `data-${makePseudoId(options)}`;
+  let initData = init;
+  if (fixedId in windowData()) {
+    initData = chainSuccess(windowData()[fixedId]);
   }
 
-  const [data, setData] = useState(initData)
+  const [data, setData] = useState(initData);
   const runFetch = useCallback(() => {
-    chainFirst && chainFirst()
+    chainFirst && chainFirst();
     request()
       .success((data) => setData(chainSuccess(data)))
       .failure(chainFailure)
-      .finally(chainFinally)
-  }, deps)
+      .finally(chainFinally);
+  }, deps);
 
   useEffect(() => {
     if (delay) {
       if (timeout.current) {
-        clearTimeout(timeout.current)
+        clearTimeout(timeout.current);
       }
       timeout.current = setTimeout(() => {
-        runFetch()
-        timeout.current = null
-      }, delay)
+        runFetch();
+        timeout.current = null;
+      }, delay);
     } else {
-      runFetch()
+      runFetch();
     }
-  }, [runFetch, delay])
+  }, [runFetch, delay]);
 
   // The SSR component return instantly, register requests with a counter for the current page and return
   if (isSSR) {
-    const resolvedData = getResolvedData(pseudoId)
+    const resolvedData = getResolvedData(fixedId);
     if (resolvedData) {
-      if (!ssrDidChain[pseudoId]) {
-        ssrDidChain[pseudoId] = true
-        chainFinally && chainFinally()
+      if (!ssrDidChain[fixedId]) {
+        ssrDidChain[fixedId] = true;
+        chainFinally && chainFinally();
       }
-      return [chainSuccess(resolvedData), setData]
+      return [chainSuccess(resolvedData), setData];
     }
 
-    addResolve(pseudoId, request())
+    addResolve(fixedId, request());
   }
 
-  return [data, setData]
-}
+  return [data, setData];
+};
 
-export default SSRProvider
+export default SSRProvider;

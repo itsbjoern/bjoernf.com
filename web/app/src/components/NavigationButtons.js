@@ -1,17 +1,16 @@
-import React from 'react'
+import React from 'react';
+import { withRouter } from 'react-router-dom';
+import styled from '@emotion/styled';
+import { BottomNavigation, BottomNavigationAction } from '@mui/material';
+import { Home, Receipt, AccountTree } from '@mui/icons-material';
 
-import { withRouter } from 'react-router-dom'
-import styled from '@emotion/styled'
-
-import { BottomNavigation, BottomNavigationAction } from '@mui/material'
-import { Home, Receipt, AccountTree } from '@mui/icons-material'
-import UnstyledLink from 'app/components/UnstyledLink'
+import UnstyledLink from 'app/components/UnstyledLink';
 
 const FullButton = ({ to, ...props }) => (
   <UnstyledLink style={{ minWidth: 85, flex: 1 }} to={to}>
     <BottomNavigationAction {...props} />
   </UnstyledLink>
-)
+);
 
 const StyledNav = styled(BottomNavigation)`
   z-index: 100;
@@ -28,12 +27,12 @@ const StyledNav = styled(BottomNavigation)`
       ${({ mobile }) => (mobile ? 'display: none;' : '')}
     }
   }
-`
+`;
 
-const paths = ['/', '/blog', '/projects']
+const paths = ['/', '/blog', '/projects'];
 const NavigationButtons = ({ location, mobile }) => {
-  const split = location.pathname.split('/')
-  const menuIndex = split.length === 1 ? 0 : paths.indexOf('/' + split[1])
+  const split = location.pathname.split('/');
+  const menuIndex = split.length === 1 ? 0 : paths.indexOf('/' + split[1]);
 
   return (
     <StyledNav showLabels value={menuIndex} mobile={mobile ? 'true' : null}>
@@ -41,7 +40,7 @@ const NavigationButtons = ({ location, mobile }) => {
       <FullButton label="Blog" icon={<Receipt />} to={paths[1]} />
       <FullButton label="Projects" icon={<AccountTree />} to={paths[2]} />
     </StyledNav>
-  )
-}
+  );
+};
 
-export default withRouter(NavigationButtons)
+export default withRouter(NavigationButtons);

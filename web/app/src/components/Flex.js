@@ -1,4 +1,4 @@
-import styled from '@emotion/styled'
+import styled from '@emotion/styled';
 
 const translate = {
   start: 'flex-start',
@@ -9,7 +9,7 @@ const translate = {
   between: 'space-between',
   around: 'space-around',
   evenly: 'space-evenly',
-}
+};
 
 export const Flex = styled.div`
   display: flex;
@@ -28,12 +28,12 @@ export const Flex = styled.div`
     ${({ mobileDirection }) =>
       mobileDirection ? `flex-direction: ${mobileDirection};` : ''}
   }
-`
+`;
 
 export const Row = styled(Flex)`
   flex-direction: row;
-`
+`;
 
 export const Column = styled(Flex)`
   flex-direction: column;
-`
+`;

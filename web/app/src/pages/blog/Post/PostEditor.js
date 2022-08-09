@@ -1,45 +1,43 @@
-import React, { useState, useEffect, useCallback } from 'react'
-
+import React, { useState, useEffect, useCallback } from 'react';
 import {
   IconButton,
   TextField,
   Autocomplete,
   InputAdornment,
-} from '@mui/material'
-import { Subtitles, Loyalty, ControlPoint } from '@mui/icons-material'
+} from '@mui/material';
+import { Subtitles, Loyalty, ControlPoint } from '@mui/icons-material';
 
-import { withRequest } from 'app/providers/RequestProvider'
-import { getTags } from 'app/api/blog'
-import { upload } from 'app/api/admin'
-
-import { Row, Column } from 'app/components/Flex'
-import RichText from 'app/components/RichText'
-import Tag from 'app/components/Tag'
+import { withRequest } from 'app/providers/RequestProvider';
+import { getTags } from 'app/api/blog';
+import { upload } from 'app/api/admin';
+import { Row, Column } from 'app/components/Flex';
+import RichText from 'app/components/RichText';
+import Tag from 'app/components/Tag';
 
 const PostEditor = ({ post, updatePost, sendRequest }) => {
-  const [newTag, setNewTag] = useState('')
-  const [availableTags, setAvailableTags] = useState([])
+  const [newTag, setNewTag] = useState('');
+  const [availableTags, setAvailableTags] = useState([]);
 
   useEffect(() => {
     sendRequest(getTags()).success(({ tags }) => {
-      setAvailableTags(tags ?? [])
-    })
-  }, [])
+      setAvailableTags(tags ?? []);
+    });
+  }, []);
 
   const {
     title = '',
     tags = [],
     html = '',
-  } = { ...(post.published || {}), ...(post.draft || {}) }
-  const [initialHtml] = useState(html)
+  } = { ...(post.published || {}), ...(post.draft || {}) };
+  const [initialHtml] = useState(html);
 
   const uploadHandler = useCallback(
     (file) =>
       sendRequest(upload(post._id, file)).success(({ src, fileName }) => {
-        return Promise.resolve({ src, fileName })
+        return Promise.resolve({ src, fileName });
       }),
     [post._id]
-  )
+  );
 
   return (
     <Column gap={30}>
@@ -59,11 +57,11 @@ const PostEditor = ({ post, updatePost, sendRequest }) => {
               label="Add Tag"
               onKeyDown={(e) => {
                 if (newTag === '' || tags?.includes(newTag)) {
-                  return
+                  return;
                 }
                 if (e.key === 'Enter') {
-                  updatePost({ tags: [...(tags || []), newTag] })
-                  setNewTag('')
+                  updatePost({ tags: [...(tags || []), newTag] });
+                  setNewTag('');
                 }
               }}
               InputProps={{
@@ -82,8 +80,8 @@ const PostEditor = ({ post, updatePost, sendRequest }) => {
           size="small"
           disabled={newTag === '' || tags?.includes(newTag)}
           onClick={() => {
-            updatePost({ tags: [...(tags || []), newTag] })
-            setNewTag('')
+            updatePost({ tags: [...(tags || []), newTag] });
+            setNewTag('');
           }}
         >
           <ControlPoint />
@@ -95,12 +93,12 @@ const PostEditor = ({ post, updatePost, sendRequest }) => {
                 key={t}
                 name={t}
                 onDelete={() => {
-                  tags.splice(i, 1)
-                  const newTags = [...tags]
-                  updatePost({ tags: newTags })
+                  tags.splice(i, 1);
+                  const newTags = [...tags];
+                  updatePost({ tags: newTags });
                 }}
               />
-            )
+            );
           })}
         </Row>
       </Row>
@@ -122,7 +120,7 @@ const PostEditor = ({ post, updatePost, sendRequest }) => {
         upload={uploadHandler}
       />
     </Column>
-  )
-}
+  );
+};
 
-export default withRequest(PostEditor)
+export default withRequest(PostEditor);

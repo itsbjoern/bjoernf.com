@@ -1,16 +1,16 @@
 // eslint-disable-next-line no-undef
-export const isDev = process.env.NODE_ENV === 'development'
+export const isDev = process.env.NODE_ENV === 'development';
 
 // eslint-disable-next-line no-undef
-export const isSSR = typeof window === 'undefined'
+export const isSSR = typeof window === 'undefined';
 
 export const getFileUrl = (fileName, path = null) =>
   `https://s3.eu-west-2.amazonaws.com/bjornf.dev-public/${
     path ? path + '/' : ''
-  }${fileName}`
+  }${fileName}`;
 
 export const getPublicFileUrl = (fileName, path = '') =>
-  getFileUrl(fileName, `public/${path}`)
+  getFileUrl(fileName, `public/${path}`);
 
 export const getUploadFileUrl = (fileName, path = '') =>
-  getFileUrl(fileName, `uploads/${path}`)
+  getFileUrl(fileName, `uploads/${path}`);

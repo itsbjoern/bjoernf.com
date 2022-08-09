@@ -1,21 +1,22 @@
-import React from 'react'
+import React from 'react';
+import { Divider, List } from '@mui/material';
 
-import { Divider, List } from '@mui/material'
-
-import { useSSR } from 'app/providers/SSRProvider'
-import { withRequest } from 'app/providers/RequestProvider'
-import { getPosts } from 'app/api/blog'
-
-import { Column } from 'app/components/Flex'
-import { H2, H4 } from 'app/components/Text'
-import Ref from 'app/components/Ref'
-import PostItem from 'app/components/PostItem'
+import { useSSR } from 'app/providers/SSRProvider';
+import { withRequest } from 'app/providers/RequestProvider';
+import { getPosts } from 'app/api/blog';
+import { Column } from 'app/components/Flex';
+import { H2, H4 } from 'app/components/Text';
+import Ref from 'app/components/Ref';
+import PostItem from 'app/components/PostItem';
 
 const Home = ({ sendRequest }) => {
-  const [posts] = useSSR(() => sendRequest(getPosts({ page: 1, limit: 2, search: '' })), {
-    init: new Array(2).fill({_id: '?'}),
-    chainSuccess: (data) => data.posts,
-  })
+  const [posts] = useSSR(
+    () => sendRequest(getPosts({ page: 1, limit: 2, search: '' })),
+    {
+      init: new Array(2).fill({ _id: '?' }),
+      chainSuccess: (data) => data.posts,
+    }
+  );
 
   return (
     <Column gap={30}>
@@ -36,7 +37,7 @@ const Home = ({ sendRequest }) => {
         I have always enjoyed learning (and educating others) with all the weird
         little kinks and intricacies programming throws at you all the time.
         Maybe I can shed some light on these weirdnesses or maybe you are just
-        here to have a snoop around, don't let me stop you.
+        here to have a snoop around, don&apos;t let me stop you.
       </span>
       <span>
         <Divider />
@@ -45,7 +46,7 @@ const Home = ({ sendRequest }) => {
         <H4>Brief background</H4>
       </span>
       <span>
-        I'm a software engineer, orginally from Germany and now living and
+        I&apos;m a software engineer, orginally from Germany and now living and
         working in the UK. As of right now I am employed at
         <Ref text="Simply Do Ideas" href="https://simplydo.co.uk" />.
       </span>
@@ -70,7 +71,7 @@ const Home = ({ sendRequest }) => {
         </Column>
       </span>
     </Column>
-  )
-}
+  );
+};
 
-export default withRequest(Home)
+export default withRequest(Home);

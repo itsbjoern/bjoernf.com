@@ -1,9 +1,8 @@
-import React from 'react'
-
-import { Link as RouterLink, withRouter } from 'react-router-dom'
-import { Link } from '@mui/material'
-import { withTheme } from '@mui/styles'
-import { TransitEnterexit } from '@mui/icons-material'
+import React from 'react';
+import { Link as RouterLink, withRouter } from 'react-router-dom';
+import { Link } from '@mui/material';
+import { withTheme } from '@mui/styles';
+import { TransitEnterexit } from '@mui/icons-material';
 
 const LinkRender = withTheme(({ theme, external, href, ...props }) =>
   external ? (
@@ -15,10 +14,10 @@ const LinkRender = withTheme(({ theme, external, href, ...props }) =>
       {...props}
     />
   )
-)
+);
 
 const Ref = ({ text, href }) => {
-  const isExternal = href.slice(0, 1) !== '/'
+  const isExternal = href.slice(0, 1) !== '/';
   return (
     <React.Fragment>
       {' '}
@@ -36,7 +35,7 @@ const Ref = ({ text, href }) => {
         ) : null}
       </LinkRender>
     </React.Fragment>
-  )
-}
+  );
+};
 
-export default withRouter(Ref)
+export default withRouter(Ref);

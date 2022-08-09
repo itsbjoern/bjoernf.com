@@ -1,30 +1,29 @@
-import React from 'react'
-
-import { withRouter } from 'react-router-dom'
-import styled from '@emotion/styled'
-import { Avatar, Divider, Chip } from '@mui/material'
+import React from 'react';
+import { withRouter } from 'react-router-dom';
+import styled from '@emotion/styled';
+import { Avatar, Divider, Chip } from '@mui/material';
 import {
   ArrowCircleUp,
   LinkedIn,
   GitHub,
   Logout,
   AdminPanelSettings,
-} from '@mui/icons-material'
+} from '@mui/icons-material';
 
-import { getPublicFileUrl } from 'app/util'
-import { withRequest } from 'app/providers/RequestProvider'
-import { Row, Column } from 'app/components/Flex'
-import { H2 } from 'app/components/Text'
+import { getPublicFileUrl } from 'app/util';
+import { withRequest } from 'app/providers/RequestProvider';
+import { Row, Column } from 'app/components/Flex';
+import { H2 } from 'app/components/Text';
+import { morphMixin } from 'app/theme';
 
-import NavigationButtons from './NavigationButtons'
-import { morphMixin } from 'app/theme'
+import NavigationButtons from './NavigationButtons';
 
 const BG = styled(Column)`
   background-color: ${({ theme }) => theme.palette.background.paper};
   padding: 15px;
   ${morphMixin()}
   border-radius: 0 0 10px 10px;
-`
+`;
 
 const Header = ({ history, token, setToken }) => {
   return (
@@ -39,7 +38,7 @@ const Header = ({ history, token, setToken }) => {
             <H2>Björn Friedrichs</H2>
             <Row gap={5}>
               <ArrowCircleUp sx={{ fontSize: '1.2em' }} />
-              <span>That's me</span>
+              <span>That&apos;s me</span>
             </Row>
           </Column>
         </Row>
@@ -90,7 +89,7 @@ const Header = ({ history, token, setToken }) => {
         </Row>
       </Row>
     </BG>
-  )
-}
+  );
+};
 
-export default withRouter(withRequest(Header))
+export default withRouter(withRequest(Header));

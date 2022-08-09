@@ -1,43 +1,40 @@
-import React, { useEffect, useState } from 'react'
+import React, { useEffect, useState } from 'react';
 import {
   BrowserRouter,
   StaticRouter,
   Switch,
   Route,
   withRouter,
-} from 'react-router-dom'
-
+} from 'react-router-dom';
 import {
   Container,
   ThemeProvider,
   Typography,
   createTheme,
-} from '@mui/material'
-import styled from '@emotion/styled'
+} from '@mui/material';
+import styled from '@emotion/styled';
 
-import themeTemplate from 'app/theme'
-import { isSSR } from 'app/util'
-import { Column } from 'app/components/Flex'
-import Analytics from 'app/components/Analytics'
-
-import NotificationProvider from 'app/providers/NotificationProvider'
-import RequestProvider from 'app/providers/RequestProvider'
-import Header from 'app/components/Header'
-import Footer from 'app/components/Footer'
-import Home from 'app/pages/home/Home'
-import Blog from 'app/pages/blog/Blog'
-import Projects from 'app/pages/projects/Projects'
-import Post from 'app/pages/blog/Post'
-import Admin from 'app/pages/admin/Admin'
-import About from 'app/pages/about/About'
-
-import NavigationButtons from 'app/components/NavigationButtons'
+import themeTemplate from 'app/theme';
+import { isSSR } from 'app/util';
+import { Column } from 'app/components/Flex';
+import Analytics from 'app/components/Analytics';
+import NotificationProvider from 'app/providers/NotificationProvider';
+import RequestProvider from 'app/providers/RequestProvider';
+import Header from 'app/components/Header';
+import Footer from 'app/components/Footer';
+import Home from 'app/pages/home/Home';
+import Blog from 'app/pages/blog/Blog';
+import Projects from 'app/pages/projects/Projects';
+import Post from 'app/pages/blog/Post';
+import Admin from 'app/pages/admin/Admin';
+import About from 'app/pages/about/About';
+import NavigationButtons from 'app/components/NavigationButtons';
 
 const AppStyle = styled.div`
   display: flex;
   flex: 1;
   background-color: ${({ theme }) => theme.palette.background.default};
-`
+`;
 
 const AdaptiveContainer = styled(Container)`
   && {
@@ -50,40 +47,40 @@ const AdaptiveContainer = styled(Container)`
       padding-right: 0;
     }
   }
-`
+`;
 
 const SSRSupport = ({ ssr, children }) => {
   return (
     <StaticRouter location={ssr.url} context={ssr}>
       {children}
     </StaticRouter>
-  )
-}
+  );
+};
 
-const RouterLayer = isSSR ? SSRSupport : BrowserRouter
+const RouterLayer = isSSR ? SSRSupport : BrowserRouter;
 
 const HistoryLayer = withRouter(({ children, history }) => {
   useEffect(() => {
     const unsub = history.listen((location) => {
-      const path = location.pathname
-      let title = ''
+      const path = location.pathname;
+      let title = '';
       if (path === '/') {
-        title = 'Home'
+        title = 'Home';
       } else {
-        const firstItem = path.split('/')[1]
-        title = firstItem.charAt(0).toUpperCase() + firstItem.slice(1)
+        const firstItem = path.split('/')[1];
+        title = firstItem.charAt(0).toUpperCase() + firstItem.slice(1);
       }
 
-      document.title = `${title} - Björn Friedrichs`
-    })
-    return unsub
-  }, [])
+      document.title = `${title} - Björn Friedrichs`;
+    });
+    return unsub;
+  }, []);
 
-  return children
-})
+  return children;
+});
 
 const App = (props) => {
-  const [theme] = useState(() => createTheme(themeTemplate))
+  const [theme] = useState(() => createTheme(themeTemplate));
 
   return (
     <ThemeProvider theme={theme}>
@@ -140,7 +137,7 @@ const App = (props) => {
         </NotificationProvider>
       </AppStyle>
     </ThemeProvider>
-  )
-}
+  );
+};
 
-export default App
+export default App;

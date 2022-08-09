@@ -1,18 +1,17 @@
-import React from 'react'
+import React from 'react';
+import { Divider } from '@mui/material';
+import styled from '@emotion/styled';
 
-import { Divider } from '@mui/material'
-import styled from '@emotion/styled'
-
-import { morphMixin } from 'app//theme'
-import { Column, Row } from 'app/components/Flex'
-import { H2, H4 } from 'app/components/Text'
-import Ref from 'app/components/Ref'
+import { morphMixin } from 'app//theme';
+import { Column, Row } from 'app/components/Flex';
+import { H2, H4 } from 'app/components/Text';
+import Ref from 'app/components/Ref';
 
 const ProjectBlock = styled(Column)`
   flex: 1;
   padding: 15px;
   ${morphMixin()}
-`
+`;
 
 const Projects = () => {
   return (
@@ -70,7 +69,10 @@ const Projects = () => {
         <Row gap={30}>
           <ProjectBlock>
             <H4>This website</H4>
-            <Ref text="On GitHub" href="https://github.com/BFriedrichs/bjornf.dev" />
+            <Ref
+              text="On GitHub"
+              href="https://github.com/BFriedrichs/bjornf.dev"
+            />
             <span>
               A custom built website using React + aiohttp. Includes server side
               rendering, a ProseMirror powered WYSIWYG editor and built-to-fit
@@ -104,7 +106,7 @@ const Projects = () => {
         </Row>
       </Column>
     </Column>
-  )
-}
+  );
+};
 
-export default Projects
+export default Projects;

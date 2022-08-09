@@ -4,8 +4,8 @@ import React, {
   useLayoutEffect,
   useMemo,
   useState,
-} from 'react'
-import { createMarkPositioner, LinkExtension } from 'remirror/extensions'
+} from 'react';
+import { createMarkPositioner, LinkExtension } from 'remirror/extensions';
 import {
   ComponentItem,
   FloatingToolbar,
@@ -16,86 +16,86 @@ import {
   useCurrentSelection,
   useExtension,
   useUpdateReason,
-} from '@remirror/react'
+} from '@remirror/react';
 
 function useLinkShortcut() {
-  const [linkShortcut, setLinkShortcut] = useState()
-  const [isEditing, setIsEditing] = useState(false)
+  const [linkShortcut, setLinkShortcut] = useState();
+  const [isEditing, setIsEditing] = useState(false);
 
   useExtension(
     LinkExtension,
     ({ addHandler }) =>
       addHandler('onShortcut', (props) => {
         if (!isEditing) {
-          setIsEditing(true)
+          setIsEditing(true);
         }
 
-        return setLinkShortcut(props)
+        return setLinkShortcut(props);
       }),
     [isEditing]
-  )
+  );
 
-  return { linkShortcut, isEditing, setIsEditing }
+  return { linkShortcut, isEditing, setIsEditing };
 }
 
 function useFloatingLinkState() {
-  const chain = useChainedCommands()
-  const { isEditing, linkShortcut, setIsEditing } = useLinkShortcut()
-  const { to, empty } = useCurrentSelection()
+  const chain = useChainedCommands();
+  const { isEditing, linkShortcut, setIsEditing } = useLinkShortcut();
+  const { to, empty } = useCurrentSelection();
 
-  const url = useAttrs().link()?.href ?? ''
-  const [href, setHref] = useState(url)
+  const url = useAttrs().link()?.href ?? '';
+  const [href, setHref] = useState(url);
 
   // A positioner which only shows for links.
   const linkPositioner = useMemo(
     () => createMarkPositioner({ type: 'link' }),
     []
-  )
+  );
 
   const onRemove = useCallback(() => {
-    return chain.removeLink().focus().run()
-  }, [chain])
+    return chain.removeLink().focus().run();
+  }, [chain]);
 
-  const updateReason = useUpdateReason()
+  const updateReason = useUpdateReason();
 
   useLayoutEffect(() => {
     if (!isEditing) {
-      return
+      return;
     }
 
     if (updateReason.doc || updateReason.selection) {
-      setIsEditing(false)
+      setIsEditing(false);
     }
-  }, [isEditing, setIsEditing, updateReason.doc, updateReason.selection])
+  }, [isEditing, setIsEditing, updateReason.doc, updateReason.selection]);
 
   useEffect(() => {
-    setHref(url)
-  }, [url])
+    setHref(url);
+  }, [url]);
 
   const submitHref = useCallback(() => {
-    setIsEditing(false)
-    const range = linkShortcut ?? undefined
+    setIsEditing(false);
+    const range = linkShortcut ?? undefined;
 
     if (href === '') {
-      chain.removeLink()
+      chain.removeLink();
     } else {
-      chain.updateLink({ href, auto: false }, range)
+      chain.updateLink({ href, auto: false }, range);
     }
 
-    chain.focus(range?.to ?? to).run()
-  }, [setIsEditing, linkShortcut, chain, href, to])
+    chain.focus(range?.to ?? to).run();
+  }, [setIsEditing, linkShortcut, chain, href, to]);
 
   const cancelHref = useCallback(() => {
-    setIsEditing(false)
-  }, [setIsEditing])
+    setIsEditing(false);
+  }, [setIsEditing]);
 
   const clickEdit = useCallback(() => {
     if (empty) {
-      chain.selectLink()
+      chain.selectLink();
     }
 
-    setIsEditing(true)
-  }, [chain, empty, setIsEditing])
+    setIsEditing(true);
+  }, [chain, empty, setIsEditing]);
 
   return useMemo(
     () => ({
@@ -119,7 +119,7 @@ function useFloatingLinkState() {
       submitHref,
       cancelHref,
     ]
-  )
+  );
 }
 
 const FloatingLinkToolbar = () => {
@@ -132,10 +132,10 @@ const FloatingLinkToolbar = () => {
     href,
     setHref,
     cancelHref,
-  } = useFloatingLinkState()
-  const active = useActive()
-  const activeLink = active.link()
-  const { empty } = useCurrentSelection()
+  } = useFloatingLinkState();
+  const active = useActive();
+  const activeLink = active.link();
+  const { empty } = useCurrentSelection();
   const linkEditItems = useMemo(
     () => [
       {
@@ -164,9 +164,9 @@ const FloatingLinkToolbar = () => {
       },
     ],
     [clickEdit, onRemove, activeLink]
-  )
+  );
 
-  const items = useMemo(() => linkEditItems, [linkEditItems])
+  const items = useMemo(() => linkEditItems, [linkEditItems]);
 
   return (
     <>
@@ -196,20 +196,20 @@ const FloatingLinkToolbar = () => {
           onChange={(event) => setHref(event.target.value)}
           value={href}
           onKeyPress={(event) => {
-            const { code } = event
+            const { code } = event;
 
             if (code === 'Enter') {
-              submitHref()
+              submitHref();
             }
 
             if (code === 'Escape') {
-              cancelHref()
+              cancelHref();
             }
           }}
         />
       </FloatingWrapper>
     </>
-  )
-}
+  );
+};
 
-export default FloatingLinkToolbar
+export default FloatingLinkToolbar;

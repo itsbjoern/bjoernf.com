@@ -1,9 +1,8 @@
-import React, { useEffect } from 'react'
-import { withRouter } from 'react-router-dom'
+import React, { useEffect } from 'react';
+import { withRouter } from 'react-router-dom';
 
-import { withRequest } from 'app/providers/RequestProvider'
-
-import { isSSR } from 'app/util'
+import { withRequest } from 'app/providers/RequestProvider';
+import { isSSR } from 'app/util';
 
 // const getTimezone = () => {
 //   try {
@@ -112,13 +111,13 @@ import { isSSR } from 'app/util'
 const Analytics = ({ history, location, children }) => {
   useEffect(() => {
     if (isSSR) {
-      return
+      return;
     }
 
-    let prevLocation = null
+    let prevLocation = null;
     const listener = (change) => {
       if (prevLocation === change.pathname) {
-        return
+        return;
       }
       // const analytics = buildAnalytics({ change })
       // const requestData = heartbeat(analytics)
@@ -127,14 +126,14 @@ const Analytics = ({ history, location, children }) => {
       // }
 
       // sendRequest(requestData).success(() => {})
-      prevLocation = change.pathname
-    }
-    listener(location)
-    const unsub = history.listen(listener)
+      prevLocation = change.pathname;
+    };
+    listener(location);
+    const unsub = history.listen(listener);
 
-    return unsub
-  }, [])
-  return <React.Fragment>{children}</React.Fragment>
-}
+    return unsub;
+  }, []);
+  return <React.Fragment>{children}</React.Fragment>;
+};
 
-export default withRouter(withRequest(Analytics))
+export default withRouter(withRequest(Analytics));

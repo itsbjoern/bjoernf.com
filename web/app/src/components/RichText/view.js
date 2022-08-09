@@ -1,8 +1,6 @@
-import React, { useState } from 'react'
-
-import { useRemirrorContext } from '@remirror/react'
-
-import styled from '@emotion/styled'
+import React, { useState } from 'react';
+import { useRemirrorContext } from '@remirror/react';
+import styled from '@emotion/styled';
 
 export const StyledEditor = styled.div`
   .remirror-editor {
@@ -109,12 +107,12 @@ export const StyledEditor = styled.div`
       max-width: 100%;
     }
   }
-`
+`;
 
 const View = () => {
-  const { getRootProps } = useRemirrorContext()
-  const [rootProps] = useState(() => getRootProps())
-  return <StyledEditor {...rootProps} />
-}
+  const { getRootProps } = useRemirrorContext();
+  const [rootProps] = useState(() => getRootProps());
+  return <StyledEditor {...rootProps} />;
+};
 
-export default View
+export default View;

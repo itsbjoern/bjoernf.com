@@ -1,19 +1,18 @@
-import React from 'react'
+import React from 'react';
+import { ListItem, ListItemButton, Skeleton } from '@mui/material';
+import { PendingActions } from '@mui/icons-material';
+import format from 'date-fns/format';
+import styled from '@emotion/styled';
 
-import { ListItem, ListItemButton, Skeleton } from '@mui/material'
-import { PendingActions } from '@mui/icons-material'
-import format from 'date-fns/format'
-import styled from '@emotion/styled'
-
-import { morphMixin } from 'app/theme'
-import { Row, Column } from 'app/components/Flex'
-import { H4 } from 'app/components/Text'
-import Tag from 'app/components/Tag'
-import UnstyledLink from 'app/components/UnstyledLink'
+import { morphMixin } from 'app/theme';
+import { Row, Column } from 'app/components/Flex';
+import { H4 } from 'app/components/Text';
+import Tag from 'app/components/Tag';
+import UnstyledLink from 'app/components/UnstyledLink';
 
 const Title = styled(H4)`
   color: ${({ theme }) => theme.palette.primary.main};
-`
+`;
 
 const ShadowButton = styled(ListItemButton)`
   &&& {
@@ -29,7 +28,7 @@ const ShadowButton = styled(ListItemButton)`
       background-color: ${({ theme }) => theme.palette.secondary.main};
     }
   }
-`
+`;
 
 const Outer = styled(Row)`
   z-index: 5;
@@ -40,7 +39,7 @@ const Outer = styled(Row)`
     width: 100%;
     align-self: center;
   }
-`
+`;
 
 const Inner = styled(Row)`
   z-index: 5;
@@ -50,7 +49,7 @@ const Inner = styled(Row)`
     padding: 0;
     width: 100%;
   }
-`
+`;
 
 const PaperClip = styled(Row)`
   background-color: ${({ theme }) => theme.palette.background.paper};
@@ -65,7 +64,7 @@ const PaperClip = styled(Row)`
     flex: 1;
     box-shadow: none;
   }
-`
+`;
 
 const Control = styled(Row)`
   @media only screen and (max-width: 425px) {
@@ -73,7 +72,7 @@ const Control = styled(Row)`
     padding-bottom: 8px;
     margin-top: 20px;
   }
-`
+`;
 
 const ClipOn = ({ children }) => (
   <Outer>
@@ -81,10 +80,10 @@ const ClipOn = ({ children }) => (
       <PaperClip>{children}</PaperClip>
     </Inner>
   </Outer>
-)
+);
 
 const PostItem = ({ post }) => {
-  const isSkeleton = post._id === '?'
+  const isSkeleton = post._id === '?';
   if (isSkeleton) {
     return (
       <Column>
@@ -110,12 +109,12 @@ const PostItem = ({ post }) => {
           </ShadowButton>
         </ListItem>
       </Column>
-    )
+    );
   }
 
-  const { draft, published, createdAt } = post
-  const { title, tags } = draft ?? published
-  const summary = draft ? draft.text?.slice(0, 100) : published.summary
+  const { draft, published, createdAt } = post;
+  const { title, tags } = draft ?? published;
+  const summary = draft ? draft.text?.slice(0, 100) : published.summary;
 
   return (
     <Column>
@@ -158,7 +157,7 @@ const PostItem = ({ post }) => {
         </ListItem>
       </UnstyledLink>
     </Column>
-  )
-}
+  );
+};
 
-export default PostItem
+export default PostItem;

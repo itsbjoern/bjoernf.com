@@ -1,30 +1,27 @@
-import React, { useRef, useEffect, useCallback, useState } from 'react'
+import React, { useRef, useEffect, useCallback, useState } from 'react';
+import { withRouter } from 'react-router-dom';
+import { Alert, Button, FormControlLabel, Switch } from '@mui/material';
+import { Delete } from '@mui/icons-material';
 
-import { withRouter } from 'react-router-dom'
-import { getPost } from 'app/api/blog'
+import { getPost } from 'app/api/blog';
 import {
   updatePost as updatePostAPI,
   publishPost as publishPostAPI,
   unpublishPost as unpublishPostAPI,
   deletePost as deletePostAPI,
   deleteDraft as deleteDraftAPI,
-} from 'app/api/admin'
+} from 'app/api/admin';
+import { useSSR } from 'app/providers/SSRProvider';
+import { isSSR } from 'app/util';
+import { withRequest } from 'app/providers/RequestProvider';
+import { withNotification } from 'app/providers/NotificationProvider';
+import NotFound from 'app/pages/404';
+import { Row, Column } from 'app/components/Flex';
+import FloatAside from 'app/components/FloatAside';
+import { useDialog } from 'app/components/Dialog';
 
-import { Alert, Button, FormControlLabel, Switch } from '@mui/material'
-import { Delete } from '@mui/icons-material'
-
-import { useSSR } from 'app/providers/SSRProvider'
-import { isSSR } from 'app/util'
-import { withRequest } from 'app/providers/RequestProvider'
-import { withNotification } from 'app/providers/NotificationProvider'
-import NotFound from 'app/pages/404'
-
-import { Row, Column } from 'app/components/Flex'
-import FloatAside from 'app/components/FloatAside'
-import { useDialog } from 'app/components/Dialog'
-
-import PostEditor from './PostEditor'
-import PostView from './PostView'
+import PostEditor from './PostEditor';
+import PostView from './PostView';
 
 const filterEmpty = (dict) =>
   !dict
@@ -32,9 +29,9 @@ const filterEmpty = (dict) =>
     : Object.entries(dict)
         .filter(([_, v]) => !!v)
         .reduce((p, [k, v]) => {
-          p[k] = v
-          return p
-        }, {})
+          p[k] = v;
+          return p;
+        }, {});
 
 const Post = ({
   match,
@@ -44,146 +41,152 @@ const Post = ({
   sendRequest,
   token,
 }) => {
-  const postId = match.params.id
-  const [loading, setLoading] = useState(false)
-  const [isComparing, setIsComparing] = useState(false)
-  const editing = location.pathname.endsWith('/edit') && !!token
-  const updateTimeout = useRef()
-  const queuedUpdate = useRef()
+  const postId = match.params.id;
+  const [loading, setLoading] = useState(false);
+  const [isComparing, setIsComparing] = useState(false);
+  const editing = location.pathname.endsWith('/edit') && !!token;
+  const updateTimeout = useRef();
+  const queuedUpdate = useRef();
 
   const [post, setPost] = useSSR(() => sendRequest(getPost(postId)), {
     chainSuccess: (data) => {
       if (!isSSR) {
-        const title = (data.post.published ?? data.post.draft).title
-        document.title = `${title} - Björn Friedrichs`
+        const title = (data.post.published ?? data.post.draft).title;
+        document.title = `${title} - Björn Friedrichs`;
       }
-      return data.post
+      return data.post;
     },
     chainFinally: () => setLoading(false),
-  })
+    dataId: 'post',
+  });
   const update = post?.draft;
 
-  const updatePost = useCallback((update) => {
-    setPost((prevPost) => ({
-      ...prevPost,
-      draft: {
-        ...filterEmpty(prevPost.published),
-        ...filterEmpty(prevPost.draft),
-        ...update,
-      },
-    }))
-  }, [postId])
+  const updatePost = useCallback(
+    (update) => {
+      setPost((prevPost) => ({
+        ...prevPost,
+        draft: {
+          ...filterEmpty(prevPost.published),
+          ...filterEmpty(prevPost.draft),
+          ...update,
+        },
+      }));
+    },
+    [postId]
+  );
 
   useEffect(() => {
     if (!update) {
-      return
+      return;
     }
 
     if (updateTimeout.current) {
-      clearTimeout(updateTimeout.current)
-      updateTimeout.current = null
+      clearTimeout(updateTimeout.current);
+      updateTimeout.current = null;
     }
 
     const { title, tags, html, text } = update;
     queuedUpdate.current = (then) => {
-      sendRequest(updatePostAPI(postId, { title, tags, html, text })).success(({ post: _ }) => {
-        createNotification('Post saved', 'success', 1000)
-        if (then) {
-          then()
+      sendRequest(updatePostAPI(postId, { title, tags, html, text })).success(
+        ({ post: _ }) => {
+          createNotification('Post saved', 'success', 1000);
+          if (then) {
+            then();
+          }
         }
-      })
-    }
+      );
+    };
 
     updateTimeout.current = setTimeout(() => {
-     if (queuedUpdate.current) {
-      queuedUpdate.current()
-     }
-    }, 700)
-  }, [update])
+      if (queuedUpdate.current) {
+        queuedUpdate.current();
+      }
+    }, 700);
+  }, [update]);
 
   const publishPost = useCallback(() => {
     const doPublish = () => {
       sendRequest(publishPostAPI(postId))
-      .success(({ post: updatedPost }) => {
-        setPost(updatedPost)
-        history.push('#')
-        createNotification('Post published', 'success')
-      })
-      .failure(() => {
-        createNotification('Publish failed', 'error')
-      })
-    }
+        .success(({ post: updatedPost }) => {
+          setPost(updatedPost);
+          history.push('#');
+          createNotification('Post published', 'success');
+        })
+        .failure(() => {
+          createNotification('Publish failed', 'error');
+        });
+    };
 
     if (queuedUpdate.current) {
-      queuedUpdate.current(doPublish)
+      queuedUpdate.current(doPublish);
     } else {
-      doPublish()
+      doPublish();
     }
-  }, [postId])
+  }, [postId]);
 
   const unpublishPost = useCallback(() => {
     sendRequest(unpublishPostAPI(postId))
       .success(({ post: updatedPost }) => {
-        setPost(updatedPost)
-        createNotification('Post published', 'success')
+        setPost(updatedPost);
+        createNotification('Post published', 'success');
       })
       .failure(() => {
-        createNotification('Publish failed', 'error')
-      })
-  }, [postId])
+        createNotification('Publish failed', 'error');
+      });
+  }, [postId]);
 
   const deletePost = useCallback(() => {
     sendRequest(deletePostAPI(postId))
       .success(() => {
-        createNotification('Post deleted', 'success')
-        history.push('/admin#tab-1')
+        createNotification('Post deleted', 'success');
+        history.push('/admin#tab-1');
       })
       .failure((e) => {
-        createNotification(e.message, 'error')
-      })
-  }, [postId])
+        createNotification(e.message, 'error');
+      });
+  }, [postId]);
 
   const deleteDraft = useCallback(() => {
     sendRequest(deleteDraftAPI(postId))
       .success(({ post }) => {
-        createNotification('Draft deleted', 'success')
-        setPost(post)
+        createNotification('Draft deleted', 'success');
+        setPost(post);
       })
       .failure((e) => {
-        createNotification(e.message, 'error')
-      })
-  }, [postId])
+        createNotification(e.message, 'error');
+      });
+  }, [postId]);
 
   const [PublishDialog, openPublishDialog] = useDialog(
     'Are you sure you want to publish this post? This will make it available to the public.',
     publishPost
-  )
+  );
   const [UnPublishDialog, openUnPublishDialog] = useDialog(
     'Are you sure you want to unpublish this post? Readers will be unable to access it.',
     unpublishPost
-  )
+  );
   const [DeleteDialog, openDeleteDialog] = useDialog(
     'Are you sure you want to delete this post? This will remove it permanently.',
     deletePost
-  )
+  );
   const [DeleteDraftDialog, openDeleteDraftDialog] = useDialog(
     'Are you sure you want to delete the draft for this post? This will remove it permanently.',
     deleteDraft
-  )
+  );
 
   if (loading) {
-    return null
+    return null;
   }
 
   if (!loading && !post) {
-    return <NotFound />
+    return <NotFound />;
   }
 
   const draftEqualsLive =
     !post.draft ||
     (post.draft?.html === post.published?.html &&
       post.draft?.title === post.draft?.title &&
-      post.draft?.tags?.length === post.published?.tags?.length)
+      post.draft?.tags?.length === post.published?.tags?.length);
 
   return (
     <FloatAside
@@ -207,7 +210,7 @@ const Post = ({
                     onChange={() => {
                       history.push(
                         `/blog/${post._id}/` + (!editing ? 'edit' : '')
-                      )
+                      );
                     }}
                   />
                 }
@@ -221,7 +224,7 @@ const Post = ({
                     disabled={!post.draft || !post.published}
                     checked={isComparing}
                     onChange={() => {
-                      setIsComparing(!isComparing)
+                      setIsComparing(!isComparing);
                     }}
                   />
                 }
@@ -295,7 +298,7 @@ const Post = ({
         </Row>
       </Column>
     </FloatAside>
-  )
-}
+  );
+};
 
-export default withRouter(withRequest(withNotification(Post)))
+export default withRouter(withRequest(withNotification(Post)));

@@ -1,7 +1,6 @@
-import React from 'react'
-
-import { useActive, useChainedCommands, useCommands } from '@remirror/react'
-import { Button, ButtonGroup } from '@mui/material'
+import React from 'react';
+import { useActive, useChainedCommands, useCommands } from '@remirror/react';
+import { Button, ButtonGroup } from '@mui/material';
 import {
   FormatBold,
   FormatItalic,
@@ -15,10 +14,10 @@ import {
   AlignHorizontalCenter,
   AlignHorizontalLeft,
   AlignHorizontalRight,
-} from '@mui/icons-material'
+} from '@mui/icons-material';
+import styled from '@emotion/styled';
 
-import styled from '@emotion/styled'
-import { Row } from 'app/components/Flex'
+import { Row } from 'app/components/Flex';
 
 const MenuButton = styled(Button)`
   width: 45px;
@@ -26,11 +25,11 @@ const MenuButton = styled(Button)`
   > svg {
     height: 20px;
   }
-`
+`;
 
 const ToggleButton = ({ type, command, param, icon, variant: _, ...props }) => {
-  const { [type]: active } = useActive()
-  const { [command]: chain } = useChainedCommands()
+  const { [type]: active } = useActive();
+  const { [command]: chain } = useChainedCommands();
 
   return (
     <MenuButton
@@ -40,17 +39,17 @@ const ToggleButton = ({ type, command, param, icon, variant: _, ...props }) => {
     >
       {icon}
     </MenuButton>
-  )
-}
+  );
+};
 
 const Menu = () => {
-  const { undo, redo } = useCommands()
+  const { undo, redo } = useCommands();
 
   return (
     <Row
       onMouseDown={(e) => {
-        e.preventDefault()
-        e.stopPropagation()
+        e.preventDefault();
+        e.stopPropagation();
       }}
       justify="center"
       style={{
@@ -153,7 +152,7 @@ const Menu = () => {
         </ButtonGroup>
       </Row>
     </Row>
-  )
-}
+  );
+};
 
-export default Menu
+export default Menu;

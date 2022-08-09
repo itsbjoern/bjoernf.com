@@ -1,17 +1,20 @@
-import React, { useState } from 'react'
-import format from 'date-fns/format'
+import React, { useState } from 'react';
+import format from 'date-fns/format';
+import {
+  EmailIcon,
+  LinkedinIcon,
+  TwitterIcon,
+  WhatsappIcon,
+} from 'react-share';
+import { IconButton } from '@mui/material';
+import { withRouter } from 'react-router-dom';
 
-import { EmailIcon, LinkedinIcon, TwitterIcon, WhatsappIcon } from 'react-share'
-import { IconButton } from '@mui/material'
-import { withRouter } from 'react-router-dom'
-
-import { emailLink, linkedinLink, whatsappLink, twitterLink } from 'app/share'
-
-import { Column, Row } from 'app/components/Flex'
-import { H2 } from 'app/components/Text'
-import { StyledEditor } from 'app/components/RichText/view'
-import Tag from 'app/components/Tag'
-import FloatAside from 'app/components/FloatAside'
+import { emailLink, linkedinLink, whatsappLink, twitterLink } from 'app/share';
+import { Column, Row } from 'app/components/Flex';
+import { H2 } from 'app/components/Text';
+import { StyledEditor } from 'app/components/RichText/view';
+import Tag from 'app/components/Tag';
+import FloatAside from 'app/components/FloatAside';
 
 const ShareIcon = ({ href, size, Icon }) => (
   <a href={href} target="_blank" rel="noreferrer">
@@ -19,18 +22,20 @@ const ShareIcon = ({ href, size, Icon }) => (
       <Icon style={{ height: size - 16, width: size - 16 }} round />
     </IconButton>
   </a>
-)
+);
 
 const PostView = ({ postData, createdAt, hideShare, staticContext }) => {
-  const { title, html, tags } = postData
-  const [url] = useState(staticContext?.absUrl || global.window?.location?.href)
+  const { title, html, tags } = postData;
+  const [url] = useState(
+    staticContext?.absUrl || global.window?.location?.href
+  );
   const [userAgent] = useState(
     staticContext?.userAgent || global.navigator?.userAgent || ''
-  )
+  );
 
-  const iconSize = 45
+  const iconSize = 45;
 
-  const isMobile = /(android|iphone|ipad|mobile)/i.test(userAgent)
+  const isMobile = /(android|iphone|ipad|mobile)/i.test(userAgent);
 
   return (
     <FloatAside
@@ -81,7 +86,7 @@ const PostView = ({ postData, createdAt, hideShare, staticContext }) => {
         </StyledEditor>
       </Column>
     </FloatAside>
-  )
-}
+  );
+};
 
-export default withRouter(PostView)
+export default withRouter(PostView);

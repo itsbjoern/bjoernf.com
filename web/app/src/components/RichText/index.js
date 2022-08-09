@@ -1,4 +1,4 @@
-import React, { useState } from 'react'
+import React, { useState } from 'react';
 import {
   BoldExtension,
   UnderlineExtension,
@@ -12,43 +12,41 @@ import {
   NodeFormattingExtension,
   CodeExtension,
   CodeBlockExtension,
-} from 'remirror/extensions'
-// import { FileExtension } from '@remirror/extension-file'
-
-// import { VideoExtension } from './extensions/video'
-import { ImageExtension } from './extensions/fixed-image'
-import FloatingLinkToolbar from './FloatingLinkToolbar'
-
+} from 'remirror/extensions';
 import {
   Remirror,
   useRemirror,
   ThemeProvider,
   useKeymap,
-} from '@remirror/react'
+} from '@remirror/react';
+import { getTextSelection } from '@remirror/core';
+import { findNodeAtSelection } from '@remirror/core-utils';
 
-import { getTextSelection } from '@remirror/core'
-import { findNodeAtSelection } from '@remirror/core-utils'
+// import { FileExtension } from '@remirror/extension-file'
+// import { VideoExtension } from './extensions/video'
 
-import { Column } from 'app/components/Flex'
+import { Column } from 'app/components/Flex';
 
-import EditorView from './view'
-import EditorMenu from './menu'
+import FloatingLinkToolbar from './FloatingLinkToolbar';
+import { ImageExtension } from './extensions/fixed-image';
+import EditorView from './view';
+import EditorMenu from './menu';
 
 const createUploadHandler = (upload) => (uploads) => {
-  let completed = 0
+  let completed = 0;
   const futureUploads = uploads.map(
     ({ file, progress }) =>
       () =>
         new Promise((resolve) => {
           return upload(file, progress).success((result) => {
-            completed += 1
-            progress(completed / uploads.length)
-            resolve(result)
-          })
+            completed += 1;
+            progress(completed / uploads.length);
+            resolve(result);
+          });
         })
-  )
-  return futureUploads
-}
+  );
+  return futureUploads;
+};
 
 // const createFileUploadHandler = (upload) => {
 //   let f
@@ -67,20 +65,23 @@ const createUploadHandler = (upload) => (uploads) => {
 const hooks = [
   () => {
     const onTab = (props) => {
-      const { tr, dispatch, state } = props
-      const selection = state.selection
-      const node = findNodeAtSelection(selection)
+      const { tr, dispatch, state } = props;
+      const selection = state.selection;
+      const node = findNodeAtSelection(selection);
       if (node && node.node.type.name === 'codeBlock') {
-        const { from, to } = getTextSelection(selection ?? tr.selection, tr.doc)
+        const { from, to } = getTextSelection(
+          selection ?? tr.selection,
+          tr.doc
+        );
 
-        dispatch(tr.insertText('  ', from, to))
-        return true
+        dispatch(tr.insertText('  ', from, to));
+        return true;
       }
-      return false
-    }
-    useKeymap('Tab', onTab)
+      return false;
+    };
+    useKeymap('Tab', onTab);
   },
-]
+];
 
 const Editor = ({ content, onChange, upload, editable = true }) => {
   const [extensions] = useState(() => [
@@ -102,14 +103,14 @@ const Editor = ({ content, onChange, upload, editable = true }) => {
     new CodeBlockExtension(),
     new CodeExtension(),
     new NodeFormattingExtension(),
-  ])
+  ]);
 
   const remirror = useRemirror({
     extensions,
     content,
     stringHandler: 'html',
-  })
-  const { manager, state, setState } = remirror
+  });
+  const { manager, state, setState } = remirror;
   return (
     <ThemeProvider>
       <Remirror
@@ -119,20 +120,20 @@ const Editor = ({ content, onChange, upload, editable = true }) => {
         initialContent={state}
         placeholder="Start your post..."
         onChange={(parameter) => {
-          const { state, tr } = parameter
-          setState(state)
+          const { state, tr } = parameter;
+          setState(state);
 
-          if (parameter.internalUpdate) return
-          if (!tr?.steps?.length) return
-          if (!editable) return
+          if (parameter.internalUpdate) return;
+          if (!tr?.steps?.length) return;
+          if (!editable) return;
 
-          const html = parameter.helpers.getHTML()
+          const html = parameter.helpers.getHTML();
 
           onChange &&
             onChange({
               html,
               text: parameter.helpers.getText(),
-            })
+            });
         }}
       >
         <Column gap={20}>
@@ -142,7 +143,7 @@ const Editor = ({ content, onChange, upload, editable = true }) => {
         </Column>
       </Remirror>
     </ThemeProvider>
-  )
-}
+  );
+};
 
-export default React.memo(Editor)
+export default React.memo(Editor);

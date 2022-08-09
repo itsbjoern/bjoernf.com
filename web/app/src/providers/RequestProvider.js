@@ -4,73 +4,73 @@ import React, {
   useCallback,
   useContext,
   forwardRef,
-} from 'react'
+} from 'react';
 
-import { request } from 'app/api'
-import { isSSR } from 'app/util'
+import { request } from 'app/api';
+import { isSSR } from 'app/util';
 
-export const RequestContext = React.createContext(null)
+export const RequestContext = React.createContext(null);
 
 const UserProvider = ({ children }) => {
-  const [token, _setToken] = useState('')
+  const [token, _setToken] = useState('');
   useEffect(() => {
-    setToken(localStorage.getItem('authToken'))
-  })
+    setToken(localStorage.getItem('authToken'));
+  });
 
   const setToken = (newToken) => {
     if (!isSSR) {
       if (newToken) {
-        localStorage.setItem('authToken', newToken)
+        localStorage.setItem('authToken', newToken);
       } else {
-        localStorage.removeItem('authToken')
+        localStorage.removeItem('authToken');
       }
     }
 
-    _setToken(newToken)
-  }
+    _setToken(newToken);
+  };
 
   const sendRequest = useCallback(
     ({ headers, ...payload }, options) => {
-      const rewrittenHeaders = headers || {}
+      const rewrittenHeaders = headers || {};
       const currentToken =
         token ||
-        (global.localStorage && global.localStorage.getItem('authToken'))
+        (global.localStorage && global.localStorage.getItem('authToken'));
       if (!!currentToken) {
-        rewrittenHeaders['Authorization'] = `Bearer ${currentToken}`
+        rewrittenHeaders['Authorization'] = `Bearer ${currentToken}`;
       }
       if (isSSR) {
-        rewrittenHeaders['user-agent'] = 'Node;https://bjornf.dev'
+        rewrittenHeaders['user-agent'] = 'Node;https://bjornf.dev';
       }
       return request(
         { ...payload, headers: rewrittenHeaders },
         options
       ).failure((e) => {
         if (e.status == 401) {
-          setToken(null)
+          setToken(null);
         }
-        return { error: e }
-      })
+        return { error: e };
+      });
     },
     [token]
-  )
+  );
 
   return (
     <RequestContext.Provider value={{ sendRequest, token, setToken }}>
       {children}
     </RequestContext.Provider>
-  )
-}
+  );
+};
 
 export const withRequest = (cls) => {
-  cls = cls.render || cls
+  const clsRenderer = cls.render || cls;
   const Wrapper = forwardRef((props, ref) => {
-    const context = useContext(RequestContext)
+    const context = useContext(RequestContext);
 
-    return cls({ ...props, ...context, ref })
-  })
-  Wrapper.displayName = cls.displayName
+    return clsRenderer({ ...props, ...context, ref });
+  });
+  Wrapper.displayName = clsRenderer.displayName;
 
-  return Wrapper
-}
+  return Wrapper;
+};
 
-export default UserProvider
+export default UserProvider;

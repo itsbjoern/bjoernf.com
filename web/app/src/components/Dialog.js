@@ -1,10 +1,10 @@
-import React, { useState, useCallback } from 'react'
-import Button from '@mui/material/Button'
-import MUIDialog from '@mui/material/Dialog'
-import DialogActions from '@mui/material/DialogActions'
-import DialogContent from '@mui/material/DialogContent'
-import DialogContentText from '@mui/material/DialogContentText'
-import DialogTitle from '@mui/material/DialogTitle'
+import React, { useState, useCallback } from 'react';
+import Button from '@mui/material/Button';
+import MUIDialog from '@mui/material/Dialog';
+import DialogActions from '@mui/material/DialogActions';
+import DialogContent from '@mui/material/DialogContent';
+import DialogContentText from '@mui/material/DialogContentText';
+import DialogTitle from '@mui/material/DialogTitle';
 
 const Dialog = ({ onConfirm, onClose, content, open }) => {
   return (
@@ -27,16 +27,16 @@ const Dialog = ({ onConfirm, onClose, content, open }) => {
         </Button>
       </DialogActions>
     </MUIDialog>
-  )
-}
+  );
+};
 
 export const useDialog = (content, onConfirm) => {
-  const [open, setOpen] = useState(false)
+  const [open, setOpen] = useState(false);
 
   const wrappedConfirm = useCallback(() => {
-    onConfirm && onConfirm()
-    setOpen(false)
-  }, [onConfirm])
+    onConfirm && onConfirm();
+    setOpen(false);
+  }, [onConfirm]);
 
   const Component = () => (
     <Dialog
@@ -45,9 +45,9 @@ export const useDialog = (content, onConfirm) => {
       onClose={() => setOpen(false)}
       open={open}
     />
-  )
+  );
 
-  return [Component, () => setOpen(true)]
-}
+  return [Component, () => setOpen(true)];
+};
 
-export default Dialog
+export default Dialog;

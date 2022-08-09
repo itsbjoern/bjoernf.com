@@ -1,7 +1,7 @@
 /*
   https://coolors.co/9e829c-381d2a-ff570a-eef1f3-3f403f
 */
-import styled from '@emotion/styled'
+import styled from '@emotion/styled';
 
 export default {
   typography: {
@@ -26,15 +26,15 @@ export default {
       secondary: '#9E829C',
     },
   },
-}
+};
 
 export const morphMixin = (size = 5) => `
   border-radius: 10px;
   box-shadow: ${size}px ${size}px ${size * 2}px #e3e3e3,
   -${size}px -${size}px ${size * 2}px #ffffff;
-`
+`;
 
 export const Morph = styled.div`
   padding: 10px;
   ${morphMixin}
-`
+`;

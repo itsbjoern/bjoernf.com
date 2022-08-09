@@ -1,17 +1,17 @@
-import React, { useState, useEffect } from 'react'
+import React, { useState, useEffect } from 'react';
+import { withRouter } from 'react-router-dom';
+import { Button, Tabs, Tab, List } from '@mui/material';
+import { AddCircle } from '@mui/icons-material';
 
-import { withRouter } from 'react-router-dom'
-import { Button, Tabs, Tab, List } from '@mui/material'
-import { AddCircle } from '@mui/icons-material'
-import { getDrafts, createPost } from 'app/api/admin'
+import { getDrafts, createPost } from 'app/api/admin';
+import { withRequest } from 'app/providers/RequestProvider';
+import { Row, Column } from 'app/components/Flex';
+import PostItem from 'app/components/PostItem';
+import FloatAside from 'app/components/FloatAside';
 
-import { withRequest } from 'app/providers/RequestProvider'
-import { Row, Column } from 'app/components/Flex'
-import PostItem from 'app/components/PostItem'
-import FloatAside from 'app/components/FloatAside'
-import Dashboard from './Dashboard'
-import Login from './Login'
-import Analytics from './Analytics'
+import Dashboard from './Dashboard';
+import Login from './Login';
+import Analytics from './Analytics';
 
 const LinkedTab = withRouter(({ label, index, history, ...props }) => (
   <Tab
@@ -23,7 +23,7 @@ const LinkedTab = withRouter(({ label, index, history, ...props }) => (
       'aria-selected': props['aria-selected'],
     }}
   />
-))
+));
 
 const Panel = ({ children, value, index }) => {
   return (
@@ -35,26 +35,26 @@ const Panel = ({ children, value, index }) => {
     >
       {value === index ? children : null}
     </div>
-  )
-}
+  );
+};
 
 const Admin = ({ location, history, token, sendRequest }) => {
-  const [draftPosts, setDraftPosts] = useState([])
+  const [draftPosts, setDraftPosts] = useState([]);
 
-  const hashSplit = location.hash?.split('-')
+  const hashSplit = location.hash?.split('-');
   const currentTab =
-    hashSplit && hashSplit.length > 1 ? parseInt(hashSplit[1]) : 0
+    hashSplit && hashSplit.length > 1 ? parseInt(hashSplit[1]) : 0;
 
   useEffect(() => {
     if (token) {
       sendRequest(getDrafts()).success(({ posts }) => {
-        setDraftPosts(posts)
-      })
+        setDraftPosts(posts);
+      });
     }
-  }, [token])
+  }, [token]);
 
   if (!token) {
-    return <Login />
+    return <Login />;
   }
 
   return (
@@ -83,8 +83,8 @@ const Admin = ({ location, history, token, sendRequest }) => {
                   variant="contained"
                   onClick={() => {
                     sendRequest(createPost()).success(({ post }) => {
-                      history.push(`/blog/${post._id}/edit`)
-                    })
+                      history.push(`/blog/${post._id}/edit`);
+                    });
                   }}
                 >
                   New post
@@ -104,7 +104,7 @@ const Admin = ({ location, history, token, sendRequest }) => {
         <Analytics />
       </Panel>
     </Column>
-  )
-}
+  );
+};
 
-export default withRouter(withRequest(Admin))
+export default withRouter(withRequest(Admin));

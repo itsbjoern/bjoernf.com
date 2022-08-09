@@ -1,6 +1,5 @@
-import React from 'react'
-
-import styled from '@emotion/styled'
+import React from 'react';
+import styled from '@emotion/styled';
 
 const Sticky = styled.div`
   ${(props) => `
@@ -28,13 +27,13 @@ const Sticky = styled.div`
       }
     }
   `}
-`
+`;
 
 const Wrapper = styled.div`
   display: flex;
   height: auto;
   flex-direction: column;
-`
+`;
 
 const FloatAside = ({
   children,
@@ -51,7 +50,7 @@ const FloatAside = ({
       </Sticky>
       {children}
     </Wrapper>
-  )
-}
+  );
+};
 
-export default FloatAside
+export default FloatAside;

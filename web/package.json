@@ -18,11 +18,6 @@
     "@remirror/react": "^1.0.43",
     "@swc/helpers": "^0.4.3",
     "date-fns": "^2.29.1",
-    "eslint": "^7.32.0",
-    "eslint-config-react-app": "^6.0.0",
-    "eslint-plugin-import": "^2.22.1",
-    "eslint-plugin-jsx-a11y": "^6.3.1",
-    "eslint-plugin-react": "^7.21.5",
     "prompts": "2.4.0",
     "react": "^17.0.2",
     "react-app-polyfill": "^2.0.0",
@@ -71,12 +66,17 @@
   "devDependencies": {
     "@parcel/reporter-bundle-analyzer": "^2.7.0",
     "buffer": "^6.0.3",
+    "eslint": "^8.21.0",
     "eslint-config-prettier": "^8.3.0",
+    "eslint-config-react-app": "^7.0.1",
+    "eslint-import-resolver-alias": "^1.1.2",
+    "eslint-plugin-import": "^2.26.0",
     "eslint-plugin-prettier": "^4.2.1",
+    "eslint-plugin-react": "^7.30.1",
     "parcel": "^2.7.0",
+    "parcel-resolver-shim": "link:./parcel-resolver-shim",
     "prettier": "^2.4.1",
-    "process": "^0.11.10",
-    "parcel-resolver-shim": "link:./parcel-resolver-shim"
+    "process": "^0.11.10"
   },
   "alias": {
     "app": "./app/src",

@@ -1,23 +1,22 @@
-import { ImageExtension as BrokenImageExtension } from 'remirror/extensions'
-
-import { isElementDomNode, omitExtraAttributes } from '@remirror/core'
+import { ImageExtension as BrokenImageExtension } from 'remirror/extensions';
+import { isElementDomNode, omitExtraAttributes } from '@remirror/core';
 
 /**
  * Get the width and the height of the image.
  */
 function getDimensions(element) {
-  let { width, height } = element.style
-  width = element.getAttribute('width') ?? width ?? ''
-  height = element.getAttribute('height') ?? height ?? ''
+  let { width, height } = element.style;
+  width = element.getAttribute('width') ?? width ?? '';
+  height = element.getAttribute('height') ?? height ?? '';
 
-  return { width, height }
+  return { width, height };
 }
 
 /**
  * Retrieve attributes from the dom for the image extension.
  */
 function getImageAttributes({ element, parse }) {
-  const { width, height } = getDimensions(element)
+  const { width, height } = getDimensions(element);
 
   return {
     ...parse(element),
@@ -27,7 +26,7 @@ function getImageAttributes({ element, parse }) {
     title: element.getAttribute('title') ?? '',
     width: Number.parseInt(width || '0', 10) || null,
     fileName: element.getAttribute('data-file-name') ?? null,
-  }
+  };
 }
 
 export class ImageExtension extends BrokenImageExtension {
@@ -61,9 +60,9 @@ export class ImageExtension extends BrokenImageExtension {
         ...(override.parseDOM ?? []),
       ],
       toDOM: (node) => {
-        const attrs = omitExtraAttributes(node.attrs, extra)
-        return ['img', { ...extra.dom(node), ...attrs }]
+        const attrs = omitExtraAttributes(node.attrs, extra);
+        return ['img', { ...extra.dom(node), ...attrs }];
       },
-    }
+    };
   }
 }

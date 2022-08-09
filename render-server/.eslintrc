@@ -1,23 +1,14 @@
 {
   "env": {
-    "browser": true,
     "node": true,
     "es2021": true
   },
-  "parserOptions": {
-    "sourceType": "module",
-    "ecmaFeatures": {
-      "jsx": true
-    }
-  },
   "extends": [
-      "plugin:react/recommended",
       "plugin:import/errors",
       "plugin:import/warnings",
       "prettier"
     ],
   "plugins": [
-      "react",
       "prettier"
   ],
   "globals": {
@@ -35,17 +26,10 @@
         "singleQuote": true
       }
     ],
-    "react/jsx-props-no-spreading": "off",
-    "react/react-in-jsx-scope": "off",
-    "react/require-default-props": "off",
     "import/extensions": ["error", "never"],
     "no-param-reassign": ["error", { "props": false }],
-    "react/prop-types": 0,
     "no-undef": ["error"],
     "no-underscore-dangle": "off",
-    "react/function-component-definition": ["error", {
-      "namedComponents": "arrow-function"
-    }],
     "import/order": ["error", {
       "groups": [["builtin", "external"], ["type"], ["internal"], ["index", "sibling"]],
       "newlines-between": "always",
@@ -65,9 +49,6 @@
     }]
   },
   "settings": {
-    "react": {
-      "version": "detect"
-    },
     "import/resolver": {
       "alias": {
         "map": [

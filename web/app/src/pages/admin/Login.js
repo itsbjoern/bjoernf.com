@@ -1,26 +1,25 @@
-import React, { useState, useCallback } from 'react'
+import React, { useState, useCallback } from 'react';
+import { TextField, Button, InputAdornment } from '@mui/material';
+import { AccountCircle, VpnKey } from '@mui/icons-material';
 
-import { TextField, Button, InputAdornment } from '@mui/material'
-import { AccountCircle, VpnKey } from '@mui/icons-material'
-
-import { Flex, Column } from 'app/components/Flex'
-import { withRequest } from 'app/providers/RequestProvider'
-import { withNotification } from 'app/providers/NotificationProvider'
-import { login } from 'app/api/admin'
+import { Flex, Column } from 'app/components/Flex';
+import { withRequest } from 'app/providers/RequestProvider';
+import { withNotification } from 'app/providers/NotificationProvider';
+import { login } from 'app/api/admin';
 
 const Login = ({ sendRequest, setToken, createNotification }) => {
-  const [username, setUsername] = useState('')
-  const [password, setPassword] = useState('')
+  const [username, setUsername] = useState('');
+  const [password, setPassword] = useState('');
 
   const tryLogin = useCallback(() => {
     sendRequest(login(username, password))
       .success((response) => {
-        setToken(response.token)
+        setToken(response.token);
       })
       .failure((err) =>
         createNotification(`Login failed: ${err.message}`, 'error')
-      )
-  }, [username, password, sendRequest])
+      );
+  }, [username, password, sendRequest]);
 
   return (
     <Flex justify="center">
@@ -57,7 +56,7 @@ const Login = ({ sendRequest, setToken, createNotification }) => {
         </Button>
       </Column>
     </Flex>
-  )
-}
+  );
+};
 
-export default withRequest(withNotification(Login))
+export default withRequest(withNotification(Login));
