@@ -1,27 +1,11 @@
-import React, { useState } from 'react';
-import {
-  Divider,
-  Accordion,
-  AccordionSummary,
-  AccordionDetails,
-  Table,
-  TableBody,
-  TableCell,
-  TableHead,
-  TableRow,
-  TableContainer,
-} from '@mui/material';
-import { ExpandMore } from '@mui/icons-material';
+import React from 'react';
+import { Divider } from '@mui/material';
 
 import { Column } from 'app/components/Flex';
 import { H4 } from 'app/components/Text';
 import Ref from 'app/components/Ref';
 
-import collectionData from './collectionData';
-
 const About = () => {
-  const [isExpanded, setExpanded] = useState(true);
-
   return (
     <Column gap={30}>
       <span>
@@ -54,56 +38,27 @@ const About = () => {
         <H4>Privacy / Tracking</H4>
       </span>
       <span>
-        I use self-built analytics that do not interface with any third party. A
-        custom header tracks the same session of clicks through the website, a
-        website refresh or new tab resets this. The information I collect is
-        mostly basic and just for personal housekeeping.
-      </span>
-      <span>
-        At no point do I collect or save any data that can be traced to an
-        individual (including IP addresses or geo location data) or maintain
-        information of an individual across multiple sessions or websites (no
-        setting of cookies or application storage).
-      </span>
-      <Accordion expanded={isExpanded}>
-        <AccordionSummary
-          expandIcon={<ExpandMore />}
-          aria-controls="panel1a-content"
-          id="panel1a-header"
-          onClick={() => {
-            setExpanded(!isExpanded);
-          }}
+        To get information about the behavior of my visitors, I use{' '}
+        <a
+          href="https://ackee.electerious.com"
+          target="_blank"
+          rel="noopener noreferrer"
         >
-          Check the data I collect
-        </AccordionSummary>
-        <AccordionDetails>
-          <TableContainer>
-            <Table aria-label="simple table">
-              <TableHead>
-                <TableRow>
-                  <TableCell>Name</TableCell>
-                  <TableCell align="right">Description</TableCell>
-                  <TableCell align="right">Example</TableCell>
-                </TableRow>
-              </TableHead>
-              <TableBody>
-                {collectionData.map((row) => (
-                  <TableRow
-                    key={row.name}
-                    sx={{ '&:last-child td, &:last-child th': { border: 0 } }}
-                  >
-                    <TableCell component="th" scope="row">
-                      {row.name}
-                    </TableCell>
-                    <TableCell align="right">{row.description}</TableCell>
-                    <TableCell align="right">{row.example}</TableCell>
-                  </TableRow>
-                ))}
-              </TableBody>
-            </Table>
-          </TableContainer>
-        </AccordionDetails>
-      </Accordion>
+          Ackee
+        </a>
+        . This analytics software gives me insight about my visitors only in
+        general, but not about individuals per se, as it does not track visitors
+        and does not store any personal identifiable information.{' '}
+        <a
+          href="https://docs.ackee.electerious.com/#/docs/Anonymization"
+          target="_blank"
+          rel="noopener noreferrer"
+        >
+          Go to their documentation
+        </a>{' '}
+        to find out what Ackee collects. Please note that I do collect the
+        detailed information as outlined on their page.
+      </span>
     </Column>
   );
 };

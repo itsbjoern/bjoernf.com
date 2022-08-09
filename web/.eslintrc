@@ -42,6 +42,7 @@
     "no-param-reassign": ["error", { "props": false }],
     "react/prop-types": 0,
     "no-undef": ["error"],
+    "no-unused-vars": ["error"],
     "no-underscore-dangle": "off",
     "react/function-component-definition": ["error", {
       "namedComponents": "arrow-function"

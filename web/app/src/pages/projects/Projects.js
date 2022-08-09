@@ -75,8 +75,7 @@ const Projects = () => {
             />
             <span>
               A custom built website using React + aiohttp. Includes server side
-              rendering, a ProseMirror powered WYSIWYG editor and built-to-fit
-              simple <Ref text="analytics" href="/about" />.
+              rendering and a a ProseMirror powered WYSIWYG editor.
             </span>
           </ProjectBlock>
           <ProjectBlock>
