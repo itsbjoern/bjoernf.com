@@ -8,6 +8,8 @@ on:
 jobs:
   build-web:
     runs-on: ubuntu-latest
+    outputs:
+      hash: ${{ steps.web-hash.outputs.hash }}
     steps:
       - uses: actions/checkout@v2
 
@@ -55,7 +57,7 @@ jobs:
         uses: actions/cache@v3
         with:
           path: web/dist
-          key: hashbuild-${{ needs.build-web.steps.web-hash.outputs.hash }}
+          key: hashbuild-${{ needs.build-web.outputs.hash }}
 
       - name: Copy web build
         if: ${{ matrix.name }} == 'render-server'
@@ -180,7 +182,9 @@ jobs:
             sudo docker system prune -f
 
   s3-upload:
-    needs: restart-server
+    needs:
+      - restart-server
+      - build-web
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v2
@@ -190,7 +194,7 @@ jobs:
         uses: actions/cache@v3
         with:
           path: web/dist
-          key: hashbuild-${{ needs.build-web.steps.web-hash.outputs.hash }}
+          key: hashbuild-${{ needs.build-web.outputs.hash }}
 
       - name: Configure AWS credentials
         uses: aws-actions/configure-aws-credentials@v1
