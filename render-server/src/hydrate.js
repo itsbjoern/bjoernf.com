@@ -12,6 +12,10 @@ const metaTemplate = ({ url, title, description, img }) => `
 <meta prefix="og: http://ogp.me/ns#" name="og:image" content="${img}">
 <meta prefix="og: http://ogp.me/ns#" name="og:url" content="${url}">
 <meta prefix="og: http://ogp.me/ns#" name="og:site_name" content="${title}">
+
+<link rel="alternate" type="application/rss+xml" title="Björn Friedrichs\' Blog" href="/rss.xml" />
+<link rel="alternate" type="application/rss+xml" title="Björn Friedrichs\' Blog | Development" href="/rss/development.xml" />
+<link rel="alternate" type="application/rss+xml" title="Björn Friedrichs\' Blog | Life" href="/rss/life.xml" />
 `;
 
 const staticMetaImg =
@@ -32,7 +36,7 @@ const hydrateIndex = (rawIndex, request, renderedApp, resolvedData) => {
     `<script type="text/javascript" id="ssr-scripts">${scriptInjection}</script>`
   );
 
-  const pathName = request.path === '/' ? 'Home' : request.split('/')[1];
+  const pathName = request.path === '/' ? 'Home' : request.path.split('/')[1];
   const metaData = {
     url: 'https://bjornf.dev/' + request.path,
     title: 'Björn Friedrichs',
@@ -46,7 +50,7 @@ const hydrateIndex = (rawIndex, request, renderedApp, resolvedData) => {
       postData.published.text.split(' ').slice(0, 20).join(' ') + ' ...';
   }
 
-  index = index.replace('<meta id="tags"></meta>', metaTemplate(metaData));
+  index = index.replace('<meta id="tags">', metaTemplate(metaData));
 
   index = index.replace('<title></title>', `<title>${metaData.title}</title>`);
 
