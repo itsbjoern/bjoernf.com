@@ -42,20 +42,3 @@ let server = http.Server(app)
 server.listen(PORT, ADDRESS, function () {
   console.log('React render server listening at http://' + ADDRESS + ':' + PORT)
 })
-
-// if (process.env.NODE_ENV === 'development') {
-//   const watch = spawn('node', ['watcher.js'])
-
-//   const restart = () => {
-//     server.close(() => {
-//       server = http.Server(app)
-//       startListen(server)
-//     })
-//   }
-
-//   watch.stdout.on('data', restart)
-
-//   // watch.stderr.on('data', restart)
-
-//   watch.on('close', () => server.close())
-// }
