@@ -2,10 +2,6 @@ from .api import index, blog, rss, admin
 
 
 def setup_routes(app):
-  app.router.add_get('/favicon.ico', index.get_favicon)
-  app.router.add_get('/robots.txt', index.get_robots)
-  app.router.add_get('/sitemap.xml', index.get_sitemap)
-
   app.router.add_get('/blog/posts', blog.get_all_posts_handler)
   app.router.add_get('/blog/posts/{id}', blog.get_post_handler)
   app.router.add_get('/blog/tags', blog.get_tags)
