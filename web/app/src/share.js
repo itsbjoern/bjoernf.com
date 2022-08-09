@@ -15,7 +15,7 @@ const template = ({ title, url, tags, type }) => {
   return `You should read this${add}:
 ${title}
 
-${url}?utm_share=${type}`;
+${url}?source=${type}`;
 };
 
 const objectToGetParams = (object) => {
@@ -34,7 +34,7 @@ export const linkedinLink = (input) => {
   return (
     'https://linkedin.com/shareArticle' +
     objectToGetParams({
-      url: input.url + '?utm_share=linkedin',
+      url: input.url + '?source=linkedin',
       mini: 'true',
       title: input.title,
       summary: templated,
@@ -66,7 +66,7 @@ export const twitterLink = (input) => {
   return (
     'https://twitter.com/share' +
     objectToGetParams({
-      url: input.url + '?utm_share=twitter',
+      url: input.url + '?source=twitter',
       text: input.title,
       hashtags: input.tags?.length > 0 ? input.tags.join(',') : undefined,
       related: undefined,
