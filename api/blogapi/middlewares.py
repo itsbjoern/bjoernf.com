@@ -23,6 +23,7 @@ async def error_middleware(_app: web.Application, handler):
 async def auth_middleware(app: web.Application, handler):
     async def mid(request: Request):
         auth_header = request.headers.get('Authorization', None)
+        setattr(request, 'user', None)
         if auth_header:
             database = cast(BlogApplication, app).database
             user: User = cast(User, database.users.find_one({'token': auth_header[7:]}))

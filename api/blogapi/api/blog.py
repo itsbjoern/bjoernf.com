@@ -19,7 +19,7 @@ async def get_all_posts_handler(request: BlogRequest, return_all=False):
     query = {'published': {'$exists': True}}
 
     projection = public_projection
-    if request.get('user'):
+    if request.user:
         projection = None
 
     page = int(request.query.get('page', 1))
@@ -69,7 +69,7 @@ async def get_post_handler(request: BlogRequest):
     query = {'_id': bson.ObjectId(post_id), 'published': {'$exists': True}}
     projection = public_projection
 
-    if request.get('user'):
+    if request.user:
         del query['published']
         projection = None
 

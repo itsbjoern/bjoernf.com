@@ -25,7 +25,7 @@ def check_password_hash(encoded: str, password: str) -> bool:
 
 def require(func):
     def route(request):
-        if not request.get('user'):
+        if not request.user:
             raise web.HTTPForbidden(reason="No access")
         return func(request)
     return route
