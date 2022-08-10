@@ -2,11 +2,19 @@ version: "3.9"
 services:
   web:
     build: ./web
-    command: yarn run start
+    command: yarn parcel serve --target default
     expose:
       - 1234
     ports:
       - 1234:1234
+    environment:
+      REACT_APP_API_URL: http://localhost:8000
+    volumes:
+      - ./web/dist/:/web/dist
+      - ./web/app:/web/app
+  web-watch-node:
+    build: ./web
+    command: yarn parcel watch --target node
     environment:
       REACT_APP_API_URL: http://localhost:8000
     volumes:
