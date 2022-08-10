@@ -3,7 +3,7 @@ Handler that generates an rss feed on demand
 """
 import re
 from email import utils
-import xml.etree.cElementTree as ET # pylint: disable=deprecated-module
+import xml.etree.ElementTree as ET # pylint: disable=deprecated-module
 from aiohttp import web
 
 from blogapi.api import blog
@@ -15,8 +15,7 @@ def _serialize_xml(write, elem, *args, **kwargs):
         write(f'<{elem.tag}{elem.text}]]>{elem.tail or ""}')
         return
     return original_serialize_xml(write, elem, *args, **kwargs)
-ET._serialize_xml = _serialize_xml # pylint: disable=protected-access
-# ET._serialize['xml'] = ET._serialize_xml
+ET._serialize_xml = ET._serialize['xml'] = _serialize_xml # pylint: disable=protected-access
 
 
 def valid_xml_char_ordinal(text):
