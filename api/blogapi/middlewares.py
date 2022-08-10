@@ -7,7 +7,7 @@ from aiohttp_middlewares import cors_middleware
 from aiohttp_middlewares.cors import DEFAULT_ALLOW_HEADERS
 
 
-async def error_middleware(app, handler):
+async def error_middleware(_app, handler):
     async def mid(request):
         try:
             return await handler(request)
@@ -16,14 +16,14 @@ async def error_middleware(app, handler):
     return mid
 
 
-async def easy_access_middleware(app, handler):
+async def easy_access_middleware(_app, handler):
     async def mid(request):
         setattr(request, 'use', lambda x: request.app[x])
         return await handler(request)
     return mid
 
 
-async def auth_middleware(app, handler):
+async def auth_middleware(_app, handler):
     async def mid(request):
         auth_header = request.headers.get('Authorization', None)
         if auth_header:

@@ -76,6 +76,14 @@ async def delete_draft(request):
 
 @auth.require
 async def publish(request):
+    """Publishes a post by merging the draft into the current published object
+
+    Args:
+        request (werkzeug.Request): The request object
+
+    Returns:
+       web.Response: Updated post data
+    """
     post_id = request.match_info.get('id', None)
     if not post_id:
         return web.HTTPBadRequest(reason="No post id")
@@ -115,6 +123,9 @@ async def publish(request):
 
     db.posts.update_one({'_id': bson.ObjectId(post_id)},
                         {'$unset': {'draft': True}, '$set': {'published': version}})
+
+    aws = request.use('aws')
+    aws.cloudfront_create_invalidation()
 
     post = db.posts.find_one({'_id': bson.ObjectId(post_id)})
     return utils.json_response({'post': post})
