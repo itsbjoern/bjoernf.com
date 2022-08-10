@@ -1,42 +1,44 @@
 """
 Handler for post publishing and updating
 """
+from typing import cast
 import re
 import datetime
 import bson
 import pymongo
-from aiohttp import web
+from aiohttp import web, BodyPartReader
 
 from blogapi import utils
 from blogapi.utils import auth, image
+from blogapi.application import BlogRequest
 
 
 @auth.require
-async def create_post(request):
-    db = request.use('db')
+async def create_post(request: BlogRequest):
+    database = request.app.database
 
     insert = {'createdAt': datetime.datetime.utcnow(), 'draft': {}}
-    result = db.posts.insert_one(insert)
+    result = database.posts.insert_one(insert)
 
     return utils.json_response({'post': {'_id': result.inserted_id, **insert}})
 
 
 @auth.require
-async def get_drafts(request):
-    db = request.use('db')
+async def get_drafts(request: BlogRequest):
+    database = request.app.database
     query = {'draft': {'$exists': 1}}
 
     page = int(request.query.get('page', 1))
     limit = int(request.query.get('limit', 10))
     posts, num_pages, current_page = utils.paginate(
-        db.posts, query, page=page, limit=limit)
+        database.posts, query, page=page, limit=limit)
     posts = posts.sort('createdAt', pymongo.DESCENDING)
 
     return utils.json_response({'posts': posts, 'numPages': num_pages, 'page': current_page})
 
 
 @auth.require
-async def update_post(request):
+async def update_post(request: BlogRequest):
     data = await request.json()
     allowed_keys = ['title', 'tags', 'text', 'html']
     for key in data.keys():
@@ -47,35 +49,35 @@ async def update_post(request):
     if not post_id:
         return web.HTTPBadRequest(reason="No post id")
 
-    db = request.use('db')
+    database = request.app.database
     the_update = {'updatedAt': datetime.datetime.utcnow(),
                   **{f'draft.{key}': val for key, val in data.items()}}
 
-    op = db.posts.update_one({'_id': bson.ObjectId(post_id)},
+    result = database.posts.update_one({'_id': bson.ObjectId(post_id)},
                              {'$set': the_update})
-    if op.matched_count == 0:
+    if result.matched_count == 0:
         return web.HTTPNotFound(reason="Post does not exist")
 
-    post = db.posts.find_one({'_id': bson.ObjectId(post_id)})
+    post = database.posts.find_one({'_id': bson.ObjectId(post_id)})
     return utils.json_response({'post': post})
 
 
 @auth.require
-async def delete_draft(request):
+async def delete_draft(request: BlogRequest):
     post_id = request.match_info.get('id', None)
     if not post_id:
         return web.HTTPBadRequest(reason="No post id")
 
-    db = request.use('db')
-    db.posts.update_one({'_id': bson.ObjectId(post_id)},
+    database = request.app.database
+    database.posts.update_one({'_id': bson.ObjectId(post_id)},
                         {'$unset': {'draft': 1}})
-    post = db.posts.find_one({'_id': bson.ObjectId(post_id)})
+    post = database.posts.find_one({'_id': bson.ObjectId(post_id)})
 
     return utils.json_response({'post': post})
 
 
 @auth.require
-async def publish(request):
+async def publish(request: BlogRequest):
     """Publishes a post by merging the draft into the current published object
 
     Args:
@@ -88,8 +90,8 @@ async def publish(request):
     if not post_id:
         return web.HTTPBadRequest(reason="No post id")
 
-    db = request.use('db')
-    post = db.posts.find_one({'_id': bson.ObjectId(post_id)})
+    database = request.app.database
+    post = database.posts.find_one({'_id': bson.ObjectId(post_id)})
     if not post:
         return web.HTTPNotFound(reason="Post does not exist")
 
@@ -100,7 +102,7 @@ async def publish(request):
 
     title = draft.get('title') or published.get('title')
     html = draft.get('html') or published.get('html')
-    text = draft.get('text') or published.get('text')
+    text = draft.get('text') or published.get('text') or ''
     published_date = published.get('publishedAt', datetime.datetime.utcnow())
 
     if not title or not html:
@@ -121,24 +123,24 @@ async def publish(request):
         'version': published.get('version', 0) + 1
     }
 
-    db.posts.update_one({'_id': bson.ObjectId(post_id)},
+    database.posts.update_one({'_id': bson.ObjectId(post_id)},
                         {'$unset': {'draft': True}, '$set': {'published': version}})
 
-    aws = request.use('aws')
+    aws = request.app.aws
     aws.cloudfront_create_invalidation()
 
-    post = db.posts.find_one({'_id': bson.ObjectId(post_id)})
+    post = database.posts.find_one({'_id': bson.ObjectId(post_id)})
     return utils.json_response({'post': post})
 
 
 @auth.require
-async def unpublish(request):
+async def unpublish(request: BlogRequest):
     post_id = request.match_info.get('id', None)
     if not post_id:
         return web.HTTPBadRequest(reason="No post id")
 
-    db = request.use('db')
-    post = db.posts.find_one({'_id': bson.ObjectId(post_id)})
+    database = request.app.database
+    post = database.posts.find_one({'_id': bson.ObjectId(post_id)})
     if not post:
         return web.HTTPNotFound(reason="Post does not exist")
 
@@ -150,45 +152,48 @@ async def unpublish(request):
         update = [{'$set': {'draft': '$published'}}, {'$unset': 'published'}]
     else:
         update = {'$unset': {'published': 1}}
-    db.posts.update_one({'_id': bson.ObjectId(post_id)},
+    database.posts.update_one({'_id': bson.ObjectId(post_id)},
                         update)
 
-    post = db.posts.find_one(bson.ObjectId(post_id))
+    post = database.posts.find_one(bson.ObjectId(post_id))
     return utils.json_response({'post': post})
 
 
 @auth.require
-async def delete_post(request):
+async def delete_post(request: BlogRequest):
     post_id = request.match_info.get('id', None)
     if not post_id:
         return web.HTTPBadRequest(reason="No post id")
 
-    db = request.use('db')
-    post = db.posts.find_one({'_id': bson.ObjectId(post_id)})
+    database = request.app.database
+    post = database.posts.find_one({'_id': bson.ObjectId(post_id)})
     if not post:
         return web.HTTPNotFound(reason="Post does not exist")
 
     if post.get('published') is not None:
         return web.HTTPBadRequest(reason="Cannot delete published posts")
 
-    db.posts.delete_one({'_id': bson.ObjectId(post_id)})
+    database.posts.delete_one({'_id': bson.ObjectId(post_id)})
     return utils.json_response({'post': post})
 
 
 @auth.require
-async def upload(request):
+async def upload(request: BlogRequest):
     post_id = request.match_info.get('id', None)
     if not post_id:
         return web.HTTPBadRequest(reason="No post id")
 
-    db = request.use('db')
-    post = db.posts.find_one({'_id': bson.ObjectId(post_id)})
+    database = request.app.database
+    post = database.posts.find_one({'_id': bson.ObjectId(post_id)})
     if not post:
         return web.HTTPNotFound(reason="Post does not exist")
 
     reader = await request.multipart()
-    field = await reader.next()
-    if field.name != 'data':
+    field = cast(BodyPartReader, await reader.next())
+
+    if field is None:
+        return web.HTTPBadRequest(reason="Bad request")
+    if field.name != 'data' or field.filename is None:
         return web.HTTPBadRequest(reason="Bad request")
 
     ext = field.filename.split('.')[-1]
@@ -204,7 +209,7 @@ async def upload(request):
         upload_data.extend(chunk)
 
     adjusted = image.compress_image(upload_data)
-    file_url = request.app['aws'].s3_upload_file(
+    file_url = request.app.aws.s3_upload_file(
         file_name, adjusted, path='uploads')
 
     if not file_url:

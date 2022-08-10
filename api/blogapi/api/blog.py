@@ -8,13 +8,14 @@ import pymongo
 from pymongo.collation import Collation
 
 from blogapi import utils
+from blogapi.application import BlogRequest
 
 
 public_projection = {'published': 1, 'createdAt': 1}
 
 
-async def get_all_posts_handler(request, return_all=False):
-    db = request.use('db')
+async def get_all_posts_handler(request: BlogRequest, return_all=False):
+    database = request.app.database
     query = {'published': {'$exists': True}}
 
     projection = public_projection
@@ -43,7 +44,7 @@ async def get_all_posts_handler(request, return_all=False):
         }
 
     limit = int(request.query.get('limit', 10))
-    paginated = utils.paginate(db.posts,
+    paginated = utils.paginate(database.posts,
                               query,
                               page=page,
                               limit=limit,
@@ -51,7 +52,7 @@ async def get_all_posts_handler(request, return_all=False):
 
     posts, num_pages, current_page = paginated
     if return_all:
-        posts = db.posts.find(query, projection).collation(
+        posts = database.posts.find(query, projection).collation(
             Collation(locale='en', strength=2))
 
     posts = posts.sort('createdAt', pymongo.DESCENDING)
@@ -59,12 +60,12 @@ async def get_all_posts_handler(request, return_all=False):
     return utils.json_response({'posts': list(posts), 'numPages': num_pages, 'page': current_page})
 
 
-async def get_post_handler(request):
+async def get_post_handler(request: BlogRequest):
     post_id = request.match_info.get('id', None)
     if not post_id:
         return web.HTTPBadRequest(reason="No post id")
 
-    db = request.use('db')
+    database = request.app.database
     query = {'_id': bson.ObjectId(post_id), 'published': {'$exists': True}}
     projection = public_projection
 
@@ -72,16 +73,16 @@ async def get_post_handler(request):
         del query['published']
         projection = None
 
-    post = db.posts.find_one(query, projection)
+    post = database.posts.find_one(query, projection)
     if not post:
         return web.HTTPNotFound(reason="Post does not exist")
 
     return utils.json_response({'post': post})
 
 
-async def get_tags(request):
-    db = request.use('db')
+async def get_tags(request: BlogRequest):
+    database = request.app.database
 
-    tags = db.posts.distinct('published.tags')
+    tags = database.posts.distinct('published.tags')
 
     return utils.json_response({'tags': tags})

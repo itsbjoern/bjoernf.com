@@ -1,6 +1,7 @@
 """
 Utility to support AWS related functionality
 """
+from typing import Literal, Union, Optional
 import mimetypes
 import os
 import io
@@ -9,23 +10,23 @@ from botocore.exceptions import ClientError
 
 
 class AWS():
-    def __init__(self, access_key, secret_key):
-        self.bucket = 'bjornf.dev-public'
-        self.region = 'eu-west-2'
+    def __init__(self, access_key: str, secret_key: str):
+        self.bucket: str = 'bjornf.dev-public'
+        self.region: str = 'eu-west-2'
 
-        self.cf_distribution = 'E16OOQSQGDXBD'
+        self.cf_distribution: str = 'E16OOQSQGDXBD'
 
-        self.access_key = access_key
-        self.secret_key = secret_key
+        self.access_key: str = access_key
+        self.secret_key: str = secret_key
 
-    def get_client(self, client_type):
+    def get_client(self, client_type: Union[Literal['s3'], Literal['cloudfront']]):
         return boto3.client(client_type,
                             aws_access_key_id=self.access_key,
                             aws_secret_access_key=self.secret_key)
 
     def cloudfront_create_invalidation(self):
         client = self.get_client('cloudfront')
-        client.create_invalidation(
+        client.create_invalidation( # type: ignore
             DistributionId=self.cf_distribution,
             InvalidationBatch={
                 'Paths': {
@@ -41,20 +42,10 @@ class AWS():
             }
         )
 
-    def s3_get_file_url(self, file_name, path=None):
+    def s3_get_file_url(self, file_name: str, path: Optional[str]=None) -> str:
         return f"https://s3.{self.region}.amazonaws.com/{self.bucket}/{path + '/' if path else ''}{file_name}"
 
-    def s3_upload_file(self, file_name, byte_data, path=None):
-        """Upload a file to an S3 bucket
-
-        Args:
-            file_name: File to upload
-            byte_data: bytearray of the data to upload
-            folder_path: folder to upload to
-        Returns:
-            Optional(str): The uploaded file
-        """
-
+    def s3_upload_file(self, file_name: str, byte_data: bytes, path: Optional[str]=None) -> Optional[str]:
         file_path = file_name
         if path:
             file_path = os.path.join(path, file_name)

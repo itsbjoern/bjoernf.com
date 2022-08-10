@@ -2,21 +2,18 @@
 Main application entry point
 """
 import logging
+from typing import cast
 from aiohttp import web
 
 from blogapi.db import mongo_ctx
 from blogapi.middlewares import setup_middlewares
 from blogapi.routes import setup_routes
 from blogapi.settings import get_config
-from blogapi.utils import auth, aws
+from blogapi.application import BlogApplication
 
 
-async def init_app():
-    app = web.Application()
-    app['config'] = get_config()
-    app['auth'] = auth.Auth(app['config']['jwt.secret'])
-    app['aws'] = aws.AWS(app['config']['aws.accesskey'],
-                         app['config']['aws.secretkey'])
+async def init_app() -> BlogApplication:
+    app: BlogApplication = BlogApplication()
 
     app.cleanup_ctx.append(mongo_ctx)
     setup_routes(app)
@@ -25,7 +22,7 @@ async def init_app():
     return app
 
 
-async def get_app():
+async def get_app() -> BlogApplication:
     app = await init_app()
     return app
 
@@ -35,8 +32,8 @@ def main():
     app = init_app()
     config = get_config()
     web.run_app(app,
-                host=config['connection.host'],
-                port=config['connection.port'])
+                host=cast(str, config['connection.host']),
+                port=cast(int, config['connection.port']))
 
 
 if __name__ == '__main__':

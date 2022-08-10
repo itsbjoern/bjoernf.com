@@ -1,6 +1,7 @@
 """
 Load configuration
 """
+from typing import Union, Dict
 import pathlib
 import os
 import yaml
@@ -28,7 +29,7 @@ def update_with_env(config):
 
 
 class Config(dict):
-    def __getitem__(self, key):
+    def __getitem__(self, key: str) -> Union[str, int, Dict[str, Union[str, int]]]:
         if key in self:
             return super().__getitem__(key)
         if '.' in key:
@@ -42,12 +43,12 @@ class Config(dict):
         raise KeyError()
 
 
-def get_config():
+def get_config() -> Config:
     config = {}
     config_file = BASE_DIR / 'default.yml'
     if os.path.exists(config_file):
         with open(config_file, 'r', encoding='utf-8') as fh:
-            config = yaml.load(fh)
+            config = yaml.safe_load(fh)
     update_with_env(config)
 
     return Config(config)

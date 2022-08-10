@@ -1,10 +1,13 @@
+# type: ignore
+# Ignore types to allow blog specific request
 """
 Routing configuration
 """
-from .api import blog, rss, admin
+from blogapi.application import BlogApplication
+from blogapi.api import blog, rss, admin
 
 
-def setup_routes(app):
+def setup_routes(app: BlogApplication):
     app.router.add_get('/blog/posts', blog.get_all_posts_handler)
     app.router.add_get('/blog/posts/{id}', blog.get_post_handler)
     app.router.add_get('/blog/tags', blog.get_tags)

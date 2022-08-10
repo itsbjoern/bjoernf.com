@@ -1,14 +1,18 @@
 """
 Aiohttp middleware configuration for CORS, auth etc
 """
+from typing import cast
 from aiohttp import web
+from aiohttp.web_request import Request
 from aiohttp.web_exceptions import HTTPException
-from aiohttp_middlewares import cors_middleware
-from aiohttp_middlewares.cors import DEFAULT_ALLOW_HEADERS
+from aiohttp_middlewares.cors import cors_middleware, DEFAULT_ALLOW_HEADERS
+
+from blogapi.application import BlogApplication
+from blogapi.models import User
 
 
-async def error_middleware(_app, handler):
-    async def mid(request):
+async def error_middleware(_app: web.Application, handler):
+    async def mid(request: Request):
         try:
             return await handler(request)
         except HTTPException as exception:
@@ -16,35 +20,27 @@ async def error_middleware(_app, handler):
     return mid
 
 
-async def easy_access_middleware(_app, handler):
-    async def mid(request):
-        setattr(request, 'use', lambda x: request.app[x])
-        return await handler(request)
-    return mid
-
-
-async def auth_middleware(_app, handler):
-    async def mid(request):
+async def auth_middleware(app: web.Application, handler):
+    async def mid(request: Request):
         auth_header = request.headers.get('Authorization', None)
         if auth_header:
-            db = request.use('db')
-            user = db.users.find_one({'token': auth_header[7:]})
+            database = cast(BlogApplication, app).database
+            user: User = cast(User, database.users.find_one({'token': auth_header[7:]}))
             if user:
-                request['user'] = user
+                setattr(request, 'user', user)
             else:
                 raise web.HTTPUnauthorized()
         return await handler(request)
     return mid
 
 
-def setup_middlewares(app):
-    origins = [app['config']['connection.webhost']]
+def setup_middlewares(app: BlogApplication):
+    origins = [cast(str, app.config['connection.webhost'])]
     app.middlewares.extend([
         cors_middleware(
             origins=origins,
             allow_headers=DEFAULT_ALLOW_HEADERS,
         ),
         error_middleware,
-        easy_access_middleware,
         auth_middleware,
     ])

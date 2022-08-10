@@ -6,22 +6,22 @@ import datetime
 import math
 import bson
 from aiohttp import web
-import pymongo
+from pymongo.cursor import Cursor
 
 
 class ObjEnconder(json.JSONEncoder):
-    def default(self, obj):
-        if isinstance(obj, bson.ObjectId):
-            return str(obj)
-        elif isinstance(obj, pymongo.cursor.Cursor):
-            return list(obj)
-        elif isinstance(obj, datetime.datetime):
-            return obj.timestamp()
+    def default(self, o):
+        if isinstance(o, bson.ObjectId):
+            return str(o)
+        elif isinstance(o, Cursor):
+            return list(o)
+        elif isinstance(o, datetime.datetime):
+            return o.timestamp()
 
-        return json.JSONEncoder.default(self, obj)
+        return json.JSONEncoder.default(self, o)
 
 
-def dumps(data):
+def dumps(data: dict) -> str:
     return json.dumps(data, cls=ObjEnconder)
 
 

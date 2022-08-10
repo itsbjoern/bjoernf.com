@@ -9,13 +9,13 @@ from aiohttp import web
 from blogapi.api import blog
 
 # We swizzle the serialize function to fix an issue with CDATA encoding
-original_serialize_xml = ET._serialize_xml  # pylint: disable=protected-access
+original_serialize_xml = ET._serialize_xml  # type: ignore # pylint: disable=protected-access
 def _serialize_xml(write, elem, *args, **kwargs):
     if elem.tag == '![CDATA[':
         write(f'<{elem.tag}{elem.text}]]>{elem.tail or ""}')
         return
     return original_serialize_xml(write, elem, *args, **kwargs)
-ET._serialize_xml = ET._serialize['xml'] = _serialize_xml # pylint: disable=protected-access
+ET._serialize_xml = ET._serialize['xml'] = _serialize_xml # type: ignore # pylint: disable=protected-access
 
 
 def valid_xml_char_ordinal(text):
@@ -45,7 +45,7 @@ async def create_feed(request):
     post_response = await blog.get_all_posts_handler(request, return_all=True)
     posts = post_response.json['posts']
 
-    config = request.app['config']
+    config = request.app.config
     url = config['connection.webhost']
 
     root = ET.Element("rss", {
