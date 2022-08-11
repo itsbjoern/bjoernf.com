@@ -2,7 +2,7 @@ import React from 'react';
 import { useHistory } from 'react-router-dom';
 import styled from '@emotion/styled';
 import { Avatar, Divider, Chip } from '@mui/material';
-import ArrowCircleUp from '@mui/icons-material/ArrowCircleUp';
+import ArrowUpward from '@mui/icons-material/ArrowUpward';
 import LinkedIn from '@mui/icons-material/LinkedIn';
 import GitHub from '@mui/icons-material/GitHub';
 import Logout from '@mui/icons-material/Logout';
@@ -38,7 +38,7 @@ const Header = () => {
           <Column justify="evenly" style={{ marginLeft: 10 }}>
             <H2>Björn Friedrichs</H2>
             <Row gap={5}>
-              <ArrowCircleUp sx={{ fontSize: '1.2em' }} />
+              <ArrowUpward sx={{ fontSize: '1.2em' }} />
               <span>That&apos;s me</span>
             </Row>
           </Column>
