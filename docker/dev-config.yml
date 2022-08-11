@@ -2,48 +2,21 @@ version: "3.9"
 services:
   web:
     build: ./web
-    command: yarn parcel serve --target default
+    command: yarn parcel serve --target default --dist-dir dist/browser/ --port 9009 --hmr-port 9010 --public-url /static --cache-dir .docker-parcel-cache
     expose:
-      - 1234
-    ports:
-      - 1234:1234
-    environment:
-      REACT_APP_API_URL: http://localhost:8000
-    volumes:
-      - ./web/dist/:/web/dist
-      - ./web/app:/web/app
-  web-watch-node:
-    build: ./web
-    command: yarn parcel watch --target node
-    environment:
-      REACT_APP_API_URL: http://localhost:8000
-    volumes:
-      - ./web/dist/:/web/dist
-      - ./web/app:/web/app
-  render-server:
-    command: yarn node watch.js
-    build: ./render-server
-    depends_on:
-      - api
-    links:
-      - api
-    environment:
-      NODE_ENV: development
-      REACT_APP_API_URL: http://api:8000
-    expose:
+      - 9010
       - 9009
     ports:
+      - 9010:9010
       - 9009:9009
+    environment:
+      REACT_APP_API_URL: http://localhost:8000
     volumes:
-      - ./render-server:/render-server
-      - ./web/dist/:/render-server/dist
+      - ./web:/web
+      - /web/node_modules
   api:
     build: ./api
     command: adev runserver blogapi
-    depends_on:
-      - mongo
-    links:
-      - mongo
     expose:
       - 8000
     ports:
@@ -53,12 +26,7 @@ services:
     environment:
       API_CONNECTION_HOST: 0.0.0.0
       API_CONNECTION_PORT: '8000'
-      API_MONGO_URL: mongodb://mongo:27017
-  mongo:
-    image: mongo
-    restart: unless-stopped
-    networks:
-      - default
+      API_MONGO_URL: mongodb://host.docker.internal:27017
 
 
 networks:

@@ -12,7 +12,8 @@ services:
       LETSENCRYPT_HOST: node.bjornf.dev
     networks:
       - nginx-proxy
-
+      - default
+    restart: unless-stopped
   api:
     image: bjornf-api
     expose:

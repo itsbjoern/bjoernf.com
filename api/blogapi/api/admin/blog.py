@@ -11,6 +11,7 @@ from aiohttp import web, BodyPartReader
 from blogapi import utils
 from blogapi.utils import auth, image
 from blogapi.application import BlogRequest
+from blogapi.models import PostContent
 
 
 @auth.require
@@ -40,7 +41,7 @@ async def get_drafts(request: BlogRequest):
 @auth.require
 async def update_post(request: BlogRequest):
     data = await request.json()
-    allowed_keys = ['title', 'tags', 'text', 'html']
+    allowed_keys = ['title', 'tags', 'text', 'html', 'image']
     for key in data.keys():
         if key not in allowed_keys:
             raise web.HTTPBadRequest(reason=f'{key} is not allowed')
@@ -100,18 +101,24 @@ async def publish(request: BlogRequest):
     if draft is None:
         return web.HTTPBadRequest(reason="No staged changes found")
 
-    title = draft.get('title') or published.get('title')
-    html = draft.get('html') or published.get('html')
-    text = draft.get('text') or published.get('text') or ''
+    merged: PostContent = {
+        **published,
+        **draft,
+    }  # type: ignore
+
+    title = merged.get('title')
+    html = merged.get('html')
     published_date = published.get('publishedAt', datetime.datetime.utcnow())
 
     if not title or not html:
         return web.HTTPBadRequest(reason="Title and text are required")
 
     remove_multi = re.compile(r"\s+")
+    text = merged.get('text') or published.get('text') or ''
     summary = '.'.join(text.split('.')[:3]) + '.'
     summary = remove_multi.sub(" ", summary).strip()
-    tags = draft.get('tags') or published.get('tags', [])
+    tags = merged.get('tags', [])
+    post_image = merged.get('image')
 
     version = {
         'title': title,
@@ -119,6 +126,7 @@ async def publish(request: BlogRequest):
         'summary': summary,
         'html': html,
         'tags': tags,
+        'image': post_image,
         'publishedAt': published_date,
         'version': published.get('version', 0) + 1
     }

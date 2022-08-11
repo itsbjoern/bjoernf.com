@@ -27,6 +27,7 @@ const filterEmpty = (dict) =>
   !dict
     ? {}
     : Object.entries(dict)
+        // eslint-disable-next-line no-unused-vars
         .filter(([_, v]) => !!v)
         .reduce((p, [k, v]) => {
           p[k] = v;
@@ -85,16 +86,16 @@ const Post = ({
       updateTimeout.current = null;
     }
 
-    const { title, tags, html, text } = update;
+    const { title, tags, html, text, image } = update;
     queuedUpdate.current = (then) => {
-      sendRequest(updatePostAPI(postId, { title, tags, html, text })).success(
-        ({ post: _ }) => {
-          createNotification('Post saved', 'success', 1000);
-          if (then) {
-            then();
-          }
+      sendRequest(
+        updatePostAPI(postId, { title, tags, html, text, image })
+      ).success(() => {
+        createNotification('Post saved', 'success', 1000);
+        if (then) {
+          then();
         }
-      );
+      });
     };
 
     updateTimeout.current = setTimeout(() => {

@@ -41,79 +41,84 @@ const PostEditor = ({ post, updatePost, sendRequest }) => {
 
   return (
     <Column gap={30}>
-      <Row gap={15} align="center" wrapping>
-        <Autocomplete
-          style={{ flex: 1 }}
-          size="small"
-          freeSolo={true}
-          value={newTag}
-          options={availableTags || []}
-          disablePortal={true}
-          onChange={(event, name) => setNewTag(name)}
-          renderInput={({ InputProps, ...rest }) => (
-            <TextField
+      <Row gap={15}>
+        <div style={{ width: 150, height: 150, background: 'green' }}></div>
+        <Column gap={30}>
+          <Row gap={15} align="center" wrapping>
+            <Autocomplete
+              style={{ flex: 1 }}
               size="small"
-              onChange={(event) => setNewTag(event.target.value)}
-              label="Add Tag"
-              onKeyDown={(e) => {
-                if (newTag === '' || tags?.includes(newTag)) {
-                  return;
-                }
-                if (e.key === 'Enter') {
-                  updatePost({ tags: [...(tags || []), newTag] });
-                  setNewTag('');
-                }
-              }}
-              InputProps={{
-                ...InputProps,
-                startAdornment: (
-                  <InputAdornment position="start">
-                    <Loyalty />
-                  </InputAdornment>
-                ),
-              }}
-              {...rest}
+              freeSolo={true}
+              value={newTag}
+              options={availableTags || []}
+              disablePortal={true}
+              onChange={(event, name) => setNewTag(name)}
+              renderInput={({ InputProps, ...rest }) => (
+                <TextField
+                  size="small"
+                  onChange={(event) => setNewTag(event.target.value)}
+                  label="Add Tag"
+                  onKeyDown={(e) => {
+                    if (newTag === '' || tags?.includes(newTag)) {
+                      return;
+                    }
+                    if (e.key === 'Enter') {
+                      updatePost({ tags: [...(tags || []), newTag] });
+                      setNewTag('');
+                    }
+                  }}
+                  InputProps={{
+                    ...InputProps,
+                    startAdornment: (
+                      <InputAdornment position="start">
+                        <Loyalty />
+                      </InputAdornment>
+                    ),
+                  }}
+                  {...rest}
+                />
+              )}
             />
-          )}
-        />
-        <IconButton
-          size="small"
-          disabled={newTag === '' || tags?.includes(newTag)}
-          onClick={() => {
-            updatePost({ tags: [...(tags || []), newTag] });
-            setNewTag('');
-          }}
-        >
-          <ControlPoint />
-        </IconButton>
-        <Row gap={5} flexed wrapping>
-          {tags?.map((t, i) => {
-            return (
-              <Tag
-                key={t}
-                name={t}
-                onDelete={() => {
-                  tags.splice(i, 1);
-                  const newTags = [...tags];
-                  updatePost({ tags: newTags });
-                }}
-              />
-            );
-          })}
-        </Row>
+            <IconButton
+              size="small"
+              disabled={newTag === '' || tags?.includes(newTag)}
+              onClick={() => {
+                updatePost({ tags: [...(tags || []), newTag] });
+                setNewTag('');
+              }}
+            >
+              <ControlPoint />
+            </IconButton>
+            <Row gap={5} flexed wrapping>
+              {tags?.map((t, i) => {
+                return (
+                  <Tag
+                    key={t}
+                    name={t}
+                    onDelete={() => {
+                      tags.splice(i, 1);
+                      const newTags = [...tags];
+                      updatePost({ tags: newTags });
+                    }}
+                  />
+                );
+              })}
+            </Row>
+          </Row>
+          <TextField
+            value={title}
+            onChange={(event) => updatePost({ title: event.target.value })}
+            label="Title"
+            InputProps={{
+              startAdornment: (
+                <InputAdornment position="start">
+                  <Subtitles />
+                </InputAdornment>
+              ),
+            }}
+          />
+        </Column>
       </Row>
-      <TextField
-        value={title}
-        onChange={(event) => updatePost({ title: event.target.value })}
-        label="Title"
-        InputProps={{
-          startAdornment: (
-            <InputAdornment position="start">
-              <Subtitles />
-            </InputAdornment>
-          ),
-        }}
-      />
       <RichText
         content={initialHtml}
         onChange={updatePost}

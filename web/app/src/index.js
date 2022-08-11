@@ -6,6 +6,10 @@ import './remirror.css';
 import AppServer from './AppServer';
 import reportWebVitals from './reportWebVitals';
 
+if (module.hot) {
+  module.hot.accept();
+}
+
 ReactDOM.hydrate(
   <React.StrictMode>
     <AppServer />

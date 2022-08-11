@@ -16,6 +16,7 @@ class PostContent(TypedDict):
     version: NotRequired[int]
     title: NotRequired[str]
     html: NotRequired[str]
+    image: NotRequired[str]
     text: NotRequired[str]
     summary: NotRequired[str]
     tags: NotRequired[List[str]]
