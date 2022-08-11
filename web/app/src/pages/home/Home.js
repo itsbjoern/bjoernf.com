@@ -2,14 +2,15 @@ import React from 'react';
 import { Divider, List } from '@mui/material';
 
 import { useSSR } from 'app/providers/SSRProvider';
-import { withRequest } from 'app/providers/RequestProvider';
+import { useRequest } from 'app/providers/RequestProvider';
 import { getPosts } from 'app/api/blog';
 import { Column } from 'app/components/Flex';
 import { H2, H4 } from 'app/components/Text';
 import Ref from 'app/components/Ref';
 import PostItem from 'app/components/PostItem';
 
-const Home = ({ sendRequest }) => {
+const Home = () => {
+  const { sendRequest } = useRequest();
   const [posts] = useSSR(
     () => sendRequest(getPosts({ page: 1, limit: 2, search: '' })),
     {
@@ -74,4 +75,4 @@ const Home = ({ sendRequest }) => {
   );
 };
 
-export default withRequest(Home);
+export default Home;

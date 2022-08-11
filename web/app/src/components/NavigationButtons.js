@@ -1,5 +1,5 @@
 import React from 'react';
-import { withRouter } from 'react-router-dom';
+import { useLocation } from 'react-router-dom';
 import styled from '@emotion/styled';
 import { BottomNavigation, BottomNavigationAction } from '@mui/material';
 import Home from '@mui/icons-material/Home';
@@ -32,7 +32,8 @@ const StyledNav = styled(BottomNavigation)`
 `;
 
 const paths = ['/', '/blog', '/projects'];
-const NavigationButtons = ({ location, mobile }) => {
+const NavigationButtons = ({ mobile }) => {
+  const location = useLocation();
   const split = location.pathname.split('/');
   const menuIndex = split.length === 1 ? 0 : paths.indexOf('/' + split[1]);
 
@@ -45,4 +46,4 @@ const NavigationButtons = ({ location, mobile }) => {
   );
 };
 
-export default withRouter(NavigationButtons);
+export default NavigationButtons;

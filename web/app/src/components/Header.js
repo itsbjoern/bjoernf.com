@@ -1,5 +1,5 @@
 import React from 'react';
-import { withRouter } from 'react-router-dom';
+import { useHistory } from 'react-router-dom';
 import styled from '@emotion/styled';
 import { Avatar, Divider, Chip } from '@mui/material';
 import ArrowCircleUp from '@mui/icons-material/ArrowCircleUp';
@@ -9,7 +9,7 @@ import Logout from '@mui/icons-material/Logout';
 import AdminPanelSettings from '@mui/icons-material/AdminPanelSettings';
 
 import { getPublicFileUrl } from 'app/util';
-import { withRequest } from 'app/providers/RequestProvider';
+import { useRequest } from 'app/providers/RequestProvider';
 import { Row, Column } from 'app/components/Flex';
 import { H2 } from 'app/components/Text';
 import { morphMixin } from 'app/theme';
@@ -23,7 +23,10 @@ const BG = styled(Column)`
   border-radius: 0 0 10px 10px;
 `;
 
-const Header = ({ history, token, setToken }) => {
+const Header = () => {
+  const history = useHistory();
+  const { token, setToken } = useRequest();
+
   return (
     <BG gap={15}>
       <Row justify="between" align="center">
@@ -90,4 +93,4 @@ const Header = ({ history, token, setToken }) => {
   );
 };
 
-export default withRouter(withRequest(Header));
+export default Header;

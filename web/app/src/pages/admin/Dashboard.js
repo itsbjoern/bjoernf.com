@@ -5,11 +5,13 @@ import VisibilityOff from '@mui/icons-material/VisibilityOff';
 
 import { H2 } from 'app/components/Text';
 import { Column } from 'app/components/Flex';
-import { withRequest } from 'app/providers/RequestProvider';
-import { withNotification } from 'app/providers/NotificationProvider';
+import { useRequest } from 'app/providers/RequestProvider';
+import { useNotification } from 'app/providers/NotificationProvider';
 import { changePassword } from 'app/api/admin';
 
-const Dashboard = ({ sendRequest, createNotification }) => {
+const Dashboard = () => {
+  const { sendRequest } = useRequest();
+  const { createNotification } = useNotification();
   const [pass1, setPass1] = useState('');
   const [pass2, setPass2] = useState('');
   const [isVisible, setIsVisible] = useState(false);
@@ -73,4 +75,4 @@ const Dashboard = ({ sendRequest, createNotification }) => {
   );
 };
 
-export default withRequest(withNotification(Dashboard));
+export default Dashboard;

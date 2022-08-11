@@ -1,5 +1,5 @@
 import React from 'react';
-import { Link as RouterLink, withRouter } from 'react-router-dom';
+import { Link as RouterLink } from 'react-router-dom';
 import { Link } from '@mui/material';
 import { withTheme } from '@mui/styles';
 import TransitEnterexit from '@mui/icons-material/TransitEnterexit';
@@ -38,4 +38,4 @@ const Ref = ({ text, href }) => {
   );
 };
 
-export default withRouter(Ref);
+export default Ref;

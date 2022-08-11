@@ -9,7 +9,7 @@ import Subtitles from '@mui/icons-material/Subtitles';
 import Loyalty from '@mui/icons-material/Loyalty';
 import ControlPoint from '@mui/icons-material/ControlPoint';
 
-import { withRequest } from 'app/providers/RequestProvider';
+import { useRequest } from 'app/providers/RequestProvider';
 import { getTags } from 'app/api/blog';
 import { upload } from 'app/api/admin';
 import { Row, Column } from 'app/components/Flex';
@@ -17,7 +17,8 @@ import RichText from 'app/components/RichText';
 import Tag from 'app/components/Tag';
 import PostImage from 'app/components/PostImage';
 
-const PostEditor = ({ post, updatePost, sendRequest }) => {
+const PostEditor = ({ post, updatePost }) => {
+  const { sendRequest } = useRequest();
   const [newTag, setNewTag] = useState('');
   const [availableTags, setAvailableTags] = useState([]);
 
@@ -143,4 +144,4 @@ const PostEditor = ({ post, updatePost, sendRequest }) => {
   );
 };
 
-export default withRequest(PostEditor);
+export default PostEditor;

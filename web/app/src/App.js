@@ -4,7 +4,7 @@ import {
   StaticRouter,
   Switch,
   Route,
-  withRouter,
+  useHistory,
 } from 'react-router-dom';
 import {
   Container,
@@ -59,7 +59,9 @@ const SSRSupport = ({ ssr, children }) => {
 
 const RouterLayer = isSSR ? SSRSupport : BrowserRouter;
 
-const HistoryLayer = withRouter(({ children, history }) => {
+const HistoryLayer = ({ children }) => {
+  const history = useHistory();
+
   useEffect(() => {
     let ackee = null;
     if (!isSSR) {
@@ -90,7 +92,7 @@ const HistoryLayer = withRouter(({ children, history }) => {
   }, []);
 
   return children;
-});
+};
 
 const App = (props) => {
   const [theme] = useState(() => createTheme(themeTemplate));

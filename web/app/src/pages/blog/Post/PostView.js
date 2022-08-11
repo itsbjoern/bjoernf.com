@@ -7,6 +7,7 @@ import {
   WhatsappIcon,
 } from 'react-share';
 import { IconButton } from '@mui/material';
+// need withRouter for staticContexts
 import { withRouter } from 'react-router-dom';
 
 import { emailLink, linkedinLink, whatsappLink, twitterLink } from 'app/share';

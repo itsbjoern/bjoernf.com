@@ -14,12 +14,12 @@ import Search from '@mui/icons-material/Search';
 import Clear from '@mui/icons-material/Clear';
 import RssFeed from '@mui/icons-material/RssFeed';
 import ContentCopy from '@mui/icons-material/ContentCopy';
-import { withRouter } from 'react-router-dom';
+import { useLocation, useHistory } from 'react-router-dom';
 
 import { useSSR } from 'app/providers/SSRProvider';
 import { getPosts } from 'app/api/blog';
-import { withRequest } from 'app/providers/RequestProvider';
-import { withNotification } from 'app/providers/NotificationProvider';
+import { useRequest } from 'app/providers/RequestProvider';
+import { useNotification } from 'app/providers/NotificationProvider';
 import { apiUrl } from 'app/api';
 import { Row, Column } from 'app/components/Flex';
 import { H2 } from 'app/components/Text';
@@ -43,7 +43,12 @@ const makeQuery = (page, search) => {
   );
 };
 
-const Blog = ({ history, location, sendRequest, createNotification }) => {
+const Blog = () => {
+  const history = useHistory();
+  const location = useLocation();
+  const { sendRequest } = useRequest();
+  const { createNotification } = useNotification();
+
   const query = new URLSearchParams(location.search);
   const currentPage = parseInt(query.get('page')) || 1;
   const currentSearch = query.get('search') || '';
@@ -63,6 +68,7 @@ const Blog = ({ history, location, sendRequest, createNotification }) => {
       chainFinally: () => setIsLoading(false),
     }
   );
+  console.log(data);
 
   useEffect(() => {
     if (anchorEl) {
@@ -182,4 +188,4 @@ const Blog = ({ history, location, sendRequest, createNotification }) => {
   );
 };
 
-export default withRouter(withRequest(withNotification(Blog)));
+export default Blog;

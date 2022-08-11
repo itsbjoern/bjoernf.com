@@ -73,4 +73,9 @@ export const withRequest = (cls) => {
   return Wrapper;
 };
 
+export const useRequest = () => {
+  const context = useContext(RequestContext);
+  return context;
+};
+
 export default UserProvider;

@@ -1,5 +1,5 @@
 import React, { useRef, useEffect, useCallback, useState } from 'react';
-import { withRouter } from 'react-router-dom';
+import { useLocation, useHistory, useRouteMatch } from 'react-router-dom';
 import { Alert, Button, FormControlLabel, Switch } from '@mui/material';
 import Delete from '@mui/icons-material/Delete';
 
@@ -13,8 +13,8 @@ import {
 } from 'app/api/admin';
 import { useSSR } from 'app/providers/SSRProvider';
 import { isSSR } from 'app/util';
-import { withRequest } from 'app/providers/RequestProvider';
-import { withNotification } from 'app/providers/NotificationProvider';
+import { useRequest } from 'app/providers/RequestProvider';
+import { useNotification } from 'app/providers/NotificationProvider';
 import NotFound from 'app/pages/404';
 import { Row, Column } from 'app/components/Flex';
 import FloatAside from 'app/components/FloatAside';
@@ -34,14 +34,13 @@ const filterEmpty = (dict) =>
           return p;
         }, {});
 
-const Post = ({
-  match,
-  location,
-  createNotification,
-  history,
-  sendRequest,
-  token,
-}) => {
+const Post = () => {
+  const location = useLocation();
+  const history = useHistory();
+  const match = useRouteMatch();
+  const { token, sendRequest } = useRequest();
+  const { createNotification } = useNotification();
+
   const postId = match.params.id;
   const [loading, setLoading] = useState(false);
   const [isComparing, setIsComparing] = useState(false);
@@ -302,4 +301,4 @@ const Post = ({
   );
 };
 
-export default withRouter(withRequest(withNotification(Post)));
+export default Post;

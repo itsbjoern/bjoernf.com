@@ -4,11 +4,13 @@ import AccountCircle from '@mui/icons-material/AccountCircle';
 import VpnKey from '@mui/icons-material/VpnKey';
 
 import { Flex, Column } from 'app/components/Flex';
-import { withRequest } from 'app/providers/RequestProvider';
-import { withNotification } from 'app/providers/NotificationProvider';
+import { useRequest } from 'app/providers/RequestProvider';
+import { useNotification } from 'app/providers/NotificationProvider';
 import { login } from 'app/api/admin';
 
-const Login = ({ sendRequest, setToken, createNotification }) => {
+const Login = () => {
+  const { sendRequest, setToken } = useRequest();
+  const { createNotification } = useNotification();
   const [username, setUsername] = useState('');
   const [password, setPassword] = useState('');
 
@@ -60,4 +62,4 @@ const Login = ({ sendRequest, setToken, createNotification }) => {
   );
 };
 
-export default withRequest(withNotification(Login));
+export default Login;
