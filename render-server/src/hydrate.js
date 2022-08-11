@@ -48,6 +48,7 @@ const hydrateIndex = (rawIndex, request, renderedApp, resolvedData) => {
     metaData.title = postData.published.title;
     metaData.description =
       postData.published.text.split(' ').slice(0, 20).join(' ') + ' ...';
+    metaData.img = postData.published?.image ?? staticMetaImg;
   }
 
   index = index.replace('<meta id="tags">', metaTemplate(metaData));
