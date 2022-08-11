@@ -22,7 +22,7 @@ services:
     ports:
       - 8000:8000
     volumes:
-      - ./api/blogapi:/api/blogapi
+      - ./api:/api
     environment:
       API_CONNECTION_HOST: 0.0.0.0
       API_CONNECTION_PORT: '8000'

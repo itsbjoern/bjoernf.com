@@ -15,6 +15,7 @@ import { H2 } from 'app/components/Text';
 import { StyledEditor } from 'app/components/RichText/view';
 import Tag from 'app/components/Tag';
 import FloatAside from 'app/components/FloatAside';
+import PostImage from 'app/components/PostImage';
 
 const ShareIcon = ({ href, size, Icon }) => (
   <a href={href} target="_blank" rel="noreferrer">
@@ -25,7 +26,7 @@ const ShareIcon = ({ href, size, Icon }) => (
 );
 
 const PostView = ({ postData, createdAt, hideShare, staticContext }) => {
-  const { title, html, tags } = postData;
+  const { title, html, tags, image } = postData;
   const [url] = useState(
     staticContext?.absUrl || global.window?.location?.href
   );
@@ -69,15 +70,20 @@ const PostView = ({ postData, createdAt, hideShare, staticContext }) => {
       left={false}
     >
       <Column gap={20}>
-        <Row justify="between" wrapping gap={10}>
-          <Row gap={10}>
-            {tags
-              ? tags.map((t) => <Tag size="small" key={t} name={t} />)
-              : null}
-          </Row>
-          <div>Published {format(createdAt * 1000, 'MMMM do, yyyy')}</div>
+        <Row gap={20} align="center">
+          {image ? <PostImage src={image} /> : null}
+          <Column gap={20} justify="center">
+            <Row justify="between" wrapping gap={10}>
+              <Row gap={10}>
+                {tags
+                  ? tags.map((t) => <Tag size="small" key={t} name={t} />)
+                  : null}
+              </Row>
+              <div>Published {format(createdAt * 1000, 'MMMM do, yyyy')}</div>
+            </Row>
+            <H2>{title}</H2>
+          </Column>
         </Row>
-        <H2>{title}</H2>
         <StyledEditor>
           <div
             className="remirror-editor"

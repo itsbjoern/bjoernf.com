@@ -52,11 +52,11 @@ export const StyledEditor = styled.div`
       padding: 10px;
       border-radius: 5px;
       background-color: #fff;
-      border: 0.5px solid rgba(0, 0, 0, 0.2);
+      border: 1px solid rgba(0, 0, 0, 0.2);
       caret-color: ${({ theme }) => theme.palette.primary.main};
 
       &:hover {
-        border: 1px solid ${({ theme }) => theme.palette.primary.main};
+        border: 1px solid #3f403f;
       }
       &:focus {
         padding: 9px;

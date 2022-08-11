@@ -1,0 +1,19 @@
+{
+  "folders": [
+    {
+      "path": "web"
+    },
+    {
+      "path": "api"
+    },
+    {
+      "path": "render-server"
+    },
+    {
+      "path": "."
+    }
+  ],
+  "settings": {
+    "autoDocstring.docstringFormat": "google"
+  }
+}

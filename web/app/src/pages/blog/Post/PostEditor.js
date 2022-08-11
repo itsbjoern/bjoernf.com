@@ -13,6 +13,7 @@ import { upload } from 'app/api/admin';
 import { Row, Column } from 'app/components/Flex';
 import RichText from 'app/components/RichText';
 import Tag from 'app/components/Tag';
+import PostImage from 'app/components/PostImage';
 
 const PostEditor = ({ post, updatePost, sendRequest }) => {
   const [newTag, setNewTag] = useState('');
@@ -28,6 +29,7 @@ const PostEditor = ({ post, updatePost, sendRequest }) => {
     title = '',
     tags = [],
     html = '',
+    image = '',
   } = { ...(post.published || {}), ...(post.draft || {}) };
   const [initialHtml] = useState(html);
 
@@ -41,9 +43,20 @@ const PostEditor = ({ post, updatePost, sendRequest }) => {
 
   return (
     <Column gap={30}>
-      <Row gap={15}>
-        <div style={{ width: 150, height: 150, background: 'green' }}></div>
-        <Column gap={30}>
+      <Row gap={15} align="center">
+        <PostImage
+          src={image}
+          onImageChosen={(file) =>
+            uploadHandler(file).then(({ src }) => {
+              updatePost({ image: src });
+            })
+          }
+          onImageCleared={() => {
+            updatePost({ image: null });
+          }}
+          editable
+        />
+        <Column flexed gap={30}>
           <Row gap={15} align="center" wrapping>
             <Autocomplete
               style={{ flex: 1 }}

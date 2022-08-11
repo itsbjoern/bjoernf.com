@@ -47,4 +47,9 @@ export const withNotification = (cls) => {
   return Wrapper;
 };
 
+export const useNotification = () => {
+  const context = useContext(NotificationContext);
+  return context;
+};
+
 export default NotificationProvider;
