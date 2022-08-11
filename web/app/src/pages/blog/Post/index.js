@@ -1,7 +1,7 @@
 import React, { useRef, useEffect, useCallback, useState } from 'react';
 import { withRouter } from 'react-router-dom';
 import { Alert, Button, FormControlLabel, Switch } from '@mui/material';
-import { Delete } from '@mui/icons-material';
+import Delete from '@mui/icons-material/Delete';
 
 import { getPost } from 'app/api/blog';
 import {

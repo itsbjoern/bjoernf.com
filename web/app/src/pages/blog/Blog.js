@@ -10,7 +10,10 @@ import {
   Popover,
   Input,
 } from '@mui/material';
-import { Search, Clear, RssFeed, ContentCopy } from '@mui/icons-material';
+import Search from '@mui/icons-material/Search';
+import Clear from '@mui/icons-material/Clear';
+import RssFeed from '@mui/icons-material/RssFeed';
+import ContentCopy from '@mui/icons-material/ContentCopy';
 import { withRouter } from 'react-router-dom';
 
 import { useSSR } from 'app/providers/SSRProvider';

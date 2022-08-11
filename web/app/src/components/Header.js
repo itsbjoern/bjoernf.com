@@ -2,13 +2,11 @@ import React from 'react';
 import { withRouter } from 'react-router-dom';
 import styled from '@emotion/styled';
 import { Avatar, Divider, Chip } from '@mui/material';
-import {
-  ArrowCircleUp,
-  LinkedIn,
-  GitHub,
-  Logout,
-  AdminPanelSettings,
-} from '@mui/icons-material';
+import ArrowCircleUp from '@mui/icons-material/ArrowCircleUp';
+import LinkedIn from '@mui/icons-material/LinkedIn';
+import GitHub from '@mui/icons-material/GitHub';
+import Logout from '@mui/icons-material/Logout';
+import AdminPanelSettings from '@mui/icons-material/AdminPanelSettings';
 
 import { getPublicFileUrl } from 'app/util';
 import { withRequest } from 'app/providers/RequestProvider';

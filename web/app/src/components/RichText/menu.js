@@ -1,20 +1,18 @@
 import React from 'react';
 import { useActive, useChainedCommands, useCommands } from '@remirror/react';
 import { Button, ButtonGroup } from '@mui/material';
-import {
-  FormatBold,
-  FormatItalic,
-  FormatStrikethrough,
-  FormatUnderlined,
-  Redo,
-  Undo,
-  FormatListBulleted,
-  FormatListNumbered,
-  FormatSize,
-  AlignHorizontalCenter,
-  AlignHorizontalLeft,
-  AlignHorizontalRight,
-} from '@mui/icons-material';
+import FormatBold from '@mui/icons-material/FormatBold';
+import FormatItalic from '@mui/icons-material/FormatItalic';
+import FormatStrikethrough from '@mui/icons-material/FormatStrikethrough';
+import FormatUnderlined from '@mui/icons-material/FormatUnderlined';
+import Redo from '@mui/icons-material/Redo';
+import Undo from '@mui/icons-material/Undo';
+import FormatListBulleted from '@mui/icons-material/FormatListBulleted';
+import FormatListNumbered from '@mui/icons-material/FormatListNumbered';
+import FormatSize from '@mui/icons-material/FormatSize';
+import AlignHorizontalCenter from '@mui/icons-material/AlignHorizontalCenter';
+import AlignHorizontalLeft from '@mui/icons-material/AlignHorizontalLeft';
+import AlignHorizontalRight from '@mui/icons-material/AlignHorizontalRight';
 import styled from '@emotion/styled';
 
 import { Row } from 'app/components/Flex';

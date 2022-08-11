@@ -1,6 +1,6 @@
 import React from 'react';
 import { ListItem, ListItemButton, Skeleton } from '@mui/material';
-import { PendingActions } from '@mui/icons-material';
+import PendingActions from '@mui/icons-material/PendingActions';
 import format from 'date-fns/format';
 import styled from '@emotion/styled';
 

@@ -5,7 +5,9 @@ import {
   Autocomplete,
   InputAdornment,
 } from '@mui/material';
-import { Subtitles, Loyalty, ControlPoint } from '@mui/icons-material';
+import Subtitles from '@mui/icons-material/Subtitles';
+import Loyalty from '@mui/icons-material/Loyalty';
+import ControlPoint from '@mui/icons-material/ControlPoint';
 
 import { withRequest } from 'app/providers/RequestProvider';
 import { getTags } from 'app/api/blog';

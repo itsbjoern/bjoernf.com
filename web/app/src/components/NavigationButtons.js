@@ -2,7 +2,9 @@ import React from 'react';
 import { withRouter } from 'react-router-dom';
 import styled from '@emotion/styled';
 import { BottomNavigation, BottomNavigationAction } from '@mui/material';
-import { Home, Receipt, AccountTree } from '@mui/icons-material';
+import Home from '@mui/icons-material/Home';
+import Receipt from '@mui/icons-material/Receipt';
+import AccountTree from '@mui/icons-material/AccountTree';
 
 import UnstyledLink from 'app/components/UnstyledLink';
 
