@@ -1,12 +1,11 @@
 # Blog
 
-## nginx proxy + acme encrypt
-```
-  sudo docker-compose -f proxy.yml up
-```
+Repository for my personal website and blog at [bjornf.dev](https://bjornf.dev).
 
-## Blog
+# The deployment
+![Infrastructure](./docs/infrastructure.png)
 
-```
-  sudo docker-compose rm -f; sudo docker volume prune -f; sudo docker-compose -f docker-compose.yml -f prod.yml up -d --build
-```
+The repository consists of 3 main projects:
+* api
+* web
+* render-server
