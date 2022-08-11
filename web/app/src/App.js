@@ -15,6 +15,7 @@ import {
 import styled from '@emotion/styled';
 import * as ackeeTracker from 'ackee-tracker';
 
+import NotFound from 'app/pages/404';
 import themeTemplate from 'app/theme';
 import { isSSR } from 'app/util';
 import { Column } from 'app/components/Flex';
@@ -136,6 +137,9 @@ const App = (props) => {
                           </Route>
                           <Route exact path="/about">
                             <About />
+                          </Route>
+                          <Route>
+                            <NotFound />
                           </Route>
                         </Switch>
                       </Column>
