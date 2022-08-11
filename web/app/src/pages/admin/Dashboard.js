@@ -17,6 +17,17 @@ const Dashboard = ({ sendRequest, createNotification }) => {
   return (
     <Column flexed>
       <Column style={{ width: 400, marginTop: 30 }} gap={20}>
+        <H2>Analytics</H2>
+        <Button
+          variant="contained"
+          onClick={() => {
+            window.open('https://dashboard.bjornf.dev', '_blank');
+          }}
+        >
+          Visit
+        </Button>
+      </Column>
+      <Column style={{ width: 400, marginTop: 30 }} gap={20}>
         <H2>Update password</H2>
         <TextField
           value={pass1}

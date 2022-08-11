@@ -25,6 +25,7 @@ const MenuButton = styled(Button)`
   }
 `;
 
+// eslint-disable-next-line no-unused-vars
 const ToggleButton = ({ type, command, param, icon, variant: _, ...props }) => {
   const { [type]: active } = useActive();
   const { [command]: chain } = useChainedCommands();

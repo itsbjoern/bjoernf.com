@@ -11,7 +11,6 @@ import FloatAside from 'app/components/FloatAside';
 
 import Dashboard from './Dashboard';
 import Login from './Login';
-import Analytics from './Analytics';
 
 const LinkedTab = withRouter(({ label, index, history, ...props }) => (
   <Tab
@@ -67,7 +66,7 @@ const Admin = ({ location, history, token, sendRequest }) => {
         >
           <LinkedTab label="Dashboard" index={0} />
           <LinkedTab label="Drafts" index={1} />
-          <LinkedTab label="Analytics" index={2} />
+          <LinkedTab label="Analytics" />
         </Tabs>
       </Row>
       <Panel value={currentTab} index={0}>
@@ -99,9 +98,6 @@ const Admin = ({ location, history, token, sendRequest }) => {
             ))}
           </List>
         </FloatAside>
-      </Panel>
-      <Panel value={currentTab} index={2}>
-        <Analytics />
       </Panel>
     </Column>
   );
