@@ -126,18 +126,6 @@ jobs:
       - name: Adding Known Hosts
         run: ssh-keyscan -H ${{ secrets.SSH_HOST }} >> ~/.ssh/known_hosts
 
-      - name: Take down server
-        uses: appleboy/ssh-action@master
-        with:
-          host: ${{ secrets.SSH_HOST }}
-          username: ${{ secrets.SSH_USERNAME }}
-          key: ${{ secrets.SSH_KEY }}
-          script: |
-            mkdir -p ~/bjornf.dev
-            cd ~/bjornf.dev
-            sudo docker-compose down || true
-            sudo docker-compose rm -f || true
-
       - name: Copy files
         run: |
           rsync ./docker/prod-config.yml ${{ secrets.SSH_USERNAME }}@${{ secrets.SSH_HOST }}:/home/${{ secrets.SSH_USERNAME }}/bjornf.dev/docker/prod-config.yml
@@ -183,7 +171,8 @@ jobs:
                   ACKEE_PASSWORD: ${{ secrets.ACKEE_PASSWORD }}
             EOL
 
-            sudo docker-compose -f docker-compose.yml -f docker/prod-config.yml -f release.yml up -d
+            sudo docker-compose -f docker-compose.yml -f docker/prod-config.yml -f release.yml down
+            sudo docker-compose -f docker-compose.yml -f docker/prod-config.yml -f release.yml up -V -d
             sudo docker system prune -f
 
   s3-upload:
