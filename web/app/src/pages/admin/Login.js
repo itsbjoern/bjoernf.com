@@ -1,7 +1,6 @@
 import React, { useState, useCallback } from 'react';
 import { TextField, Button, InputAdornment } from '@mui/material';
-import AccountCircle from '@mui/icons-material/AccountCircle';
-import VpnKey from '@mui/icons-material/VpnKey';
+import { AccountCircle, VpnKey } from '@mui/icons-material';
 
 import { Flex, Column } from 'app/components/Flex';
 import { useRequest } from 'app/providers/RequestProvider';

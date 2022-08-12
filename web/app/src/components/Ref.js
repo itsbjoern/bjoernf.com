@@ -2,7 +2,7 @@ import React from 'react';
 import { Link as RouterLink } from 'react-router-dom';
 import { Link } from '@mui/material';
 import { withTheme } from '@mui/styles';
-import TransitEnterexit from '@mui/icons-material/TransitEnterexit';
+import { TransitEnterexit } from '@mui/icons-material';
 
 const LinkRender = withTheme(({ theme, external, href, ...props }) =>
   external ? (

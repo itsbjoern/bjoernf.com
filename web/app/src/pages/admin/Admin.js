@@ -1,7 +1,7 @@
 import React, { useState, useEffect } from 'react';
 import { useLocation, useHistory } from 'react-router-dom';
 import { Button, Tabs, Tab, List } from '@mui/material';
-import AddCircle from '@mui/icons-material/AddCircle';
+import { AddCircle } from '@mui/icons-material';
 
 import { getDrafts, createPost } from 'app/api/admin';
 import { useRequest } from 'app/providers/RequestProvider';

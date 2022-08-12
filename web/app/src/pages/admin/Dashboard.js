@@ -1,7 +1,6 @@
 import React, { useState } from 'react';
 import { TextField, Button, InputAdornment, IconButton } from '@mui/material';
-import Visibility from '@mui/icons-material/Visibility';
-import VisibilityOff from '@mui/icons-material/VisibilityOff';
+import { Visibility, VisibilityOff } from '@mui/icons-material';
 
 import { H2 } from 'app/components/Text';
 import { Column } from 'app/components/Flex';

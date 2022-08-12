@@ -2,11 +2,13 @@ import React from 'react';
 import { useHistory } from 'react-router-dom';
 import styled from '@emotion/styled';
 import { Avatar, Divider, Chip } from '@mui/material';
-import ArrowUpward from '@mui/icons-material/ArrowUpward';
-import LinkedIn from '@mui/icons-material/LinkedIn';
-import GitHub from '@mui/icons-material/GitHub';
-import Logout from '@mui/icons-material/Logout';
-import AdminPanelSettings from '@mui/icons-material/AdminPanelSettings';
+import {
+  ArrowCircleUp,
+  LinkedIn,
+  GitHub,
+  Logout,
+  AdminPanelSettings,
+} from '@mui/icons-material';
 
 import { getPublicFileUrl } from 'app/util';
 import { useRequest } from 'app/providers/RequestProvider';
@@ -38,7 +40,7 @@ const Header = () => {
           <Column justify="evenly" style={{ marginLeft: 10 }}>
             <H2>Björn Friedrichs</H2>
             <Row gap={5}>
-              <ArrowUpward sx={{ fontSize: '1.2em' }} />
+              <ArrowCircleUp sx={{ fontSize: '1.2em' }} />
               <span>That&apos;s me</span>
             </Row>
           </Column>
