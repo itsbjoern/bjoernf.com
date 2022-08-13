@@ -149,13 +149,7 @@ const PostItem = ({ post }) => {
       <UnstyledLink delay={300} to={`/blog/${post._id}`}>
         <ListItem sx={{ padding: `0 0 10px 0` }}>
           <ShadowButton>
-            <Row
-              justify="start"
-              flexed
-              gap={10}
-              grow={10}
-              mobileWrapping
-            >
+            <Row justify="start" flexed gap={10} grow={10} mobileWrapping>
               {!published ? <PendingActionsIcon /> : null}
               {image ? <PostImage src={image} size={100} /> : null}
               <Column gap={10}>
