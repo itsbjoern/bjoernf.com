@@ -47,6 +47,13 @@ const PostImageContainer = styled.div`
     height: ${size}px;
   `}
 
+  @media only screen and (max-width: 425px) {
+    min-width: 75px;
+    width: 75px;
+    min-height: 75px;
+    height: 75px;
+  }
+
   ${({ editable, imgSrc }) =>
     editable &&
     `
@@ -98,6 +105,7 @@ const PostImage = ({
   onImageChosen,
   onImageCleared,
   size = 150,
+  hideOnMobile,
 }) => {
   const [isUploading, setIsUploading] = useState(false);
   const { createNotification } = useNotification();
@@ -130,6 +138,7 @@ const PostImage = ({
         imgSrc={src}
         editable={!isUploading && editable}
         isUploading={isUploading}
+        hideOnMobile={hideOnMobile}
         onClick={() => {
           if (!editable) return;
           if (!uploadRef.current) return;

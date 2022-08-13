@@ -46,7 +46,7 @@ const PostView = ({ postData, createdAt, hideShare, staticContext }) => {
       width={iconSize}
       gap={30}
       menu={
-        <Column gap={0} mobileDirection="row">
+        <Column gap={0} flip="mobile">
           <ShareIcon
             size={iconSize}
             Icon={EmailIcon}
@@ -72,7 +72,7 @@ const PostView = ({ postData, createdAt, hideShare, staticContext }) => {
       left={false}
     >
       <Column gap={20}>
-        <Row gap={20} align="center">
+        <Row gap={20} align="center" mobileReverse>
           {image ? <PostImage src={image} /> : null}
           <Column gap={20} justify="center">
             <Row justify="between" wrapping gap={10}>

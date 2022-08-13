@@ -1,5 +1,7 @@
 import styled from '@emotion/styled';
 
+import { mobileMixin, mobileMixins } from 'app/theme';
+
 const translate = {
   start: 'flex-start',
   end: 'flex-end',
@@ -13,6 +15,8 @@ const translate = {
 
 export const Flex = styled.div`
   display: flex;
+  ${mobileMixin('display', 'hide', 'none')};
+
   align-items: ${({ align }) => translate[align || 'normal']};
   justify-content: ${({ justify }) => translate[justify || 'normal']};
   ${({ flexed }) => (flexed ? `flex: 1;` : '')}
@@ -21,19 +25,20 @@ export const Flex = styled.div`
   ${({ shrink }) => (shrink ? `flex-shrink: ${shrink};` : '')}
   ${({ alignSelf }) => (alignSelf ? `align-self: ${alignSelf};` : '')}
   ${({ gap }) => (gap ? `gap: ${gap || 0}px;` : '')}
-
-  @media only screen and (max-width: 425px) {
-    ${({ mobileWrapping }) => (mobileWrapping ? 'flex-wrap: wrap;' : '')}
-    ${({ hideMobile }) => (hideMobile ? 'display: none;' : '')}
-    ${({ mobileDirection }) =>
-      mobileDirection ? `flex-direction: ${mobileDirection};` : ''}
-  }
 `;
 
 export const Row = styled(Flex)`
   flex-direction: row;
+  ${mobileMixins([
+    ['flex-direction', 'flip', 'column'],
+    ['flex-direction', 'reverse', 'row-reverse'],
+  ])};
 `;
 
 export const Column = styled(Flex)`
   flex-direction: column;
+  ${mobileMixins([
+    ['flex-direction', 'flip', 'row'],
+    ['flex-direction', 'reverse', 'column-reverse'],
+  ])};
 `;

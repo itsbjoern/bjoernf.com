@@ -38,3 +38,18 @@ export const Morph = styled.div`
   padding: 10px;
   ${morphMixin}
 `;
+
+export const mobileMixins = (mixins) => (props) =>
+  `${mixins
+    .filter((mixin) => props[mixin[1]] && props[mixin[1]] !== 'mobile')
+    .map((mixin) => `${mixin[0]}: ${mixin[2]};`)
+    .join('\n')}
+  @media only screen and (max-width: 425px) {
+    ${mixins
+      .filter((mixin) => props[mixin[1]] && props[mixin[1]] === 'mobile')
+      .map((mixin) => `${mixin[0]}: ${mixin[2]};`)
+      .join('\n')}
+  }`;
+
+export const mobileMixin = (attr, prop, mobileValue) =>
+  mobileMixins([[attr, prop, mobileValue]]);

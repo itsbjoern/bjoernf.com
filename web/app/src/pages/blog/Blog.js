@@ -133,7 +133,7 @@ const Blog = () => {
           </Row>
         </Row>
         {isLoading ? <CircularProgress size={35} /> : null}
-        <Row justify="end" hideMobile>
+        <Row justify="end" hide="mobile">
           <TextField
             size="small"
             value={currentSearch}

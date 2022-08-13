@@ -4,7 +4,7 @@ import PendingActionsIcon from '@mui/icons-material/PendingActions';
 import format from 'date-fns/format';
 import styled from '@emotion/styled';
 
-import { morphMixin } from 'app/theme';
+import { morphMixin, mobileMixin } from 'app/theme';
 import { Row, Column } from 'app/components/Flex';
 import { H4 } from 'app/components/Text';
 import Tag from 'app/components/Tag';
@@ -21,6 +21,10 @@ const ShadowButton = styled(ListItemButton)`
     padding-left: 10px;
     padding-top: 10px;
     padding-right: 10%;
+
+    @media only screen and (max-width: 425px) {
+      padding-right: 10px;
+    }
 
     min-height: 77px;
     background-color: ${({ theme }) => theme.palette.background.paper};
@@ -64,9 +68,10 @@ const PaperClip = styled(Row)`
   gap: 15px;
 
   @media only screen and (max-width: 425px) {
-    padding: 5px 0;
+    padding: 5px 0 0 5px;
     flex: 1;
     box-shadow: none;
+    align-items: center;
   }
 `;
 
@@ -75,6 +80,13 @@ const Control = styled(Row)`
     flex-direction: column-reverse;
     padding-bottom: 8px;
     margin-top: 20px;
+  }
+`;
+
+const Summary = styled.span`
+  font-size: 0.9rem;
+  @media only screen and (max-width: 425px) {
+    min-width: calc(100% + 75px);
   }
 `;
 
@@ -101,7 +113,7 @@ const PostItem = ({ post }) => {
         </Control>
         <ListItem sx={{ padding: `0 0 10px 0` }}>
           <ShadowButton>
-            <Row justify="start" flexed gap={10} grow={10} mobileWrapping>
+            <Row justify="start" flexed gap={10} grow={10}>
               <Column gap={10}>
                 <Title>
                   <Skeleton animation="wave" height={30} width={120} />
@@ -149,13 +161,12 @@ const PostItem = ({ post }) => {
       <UnstyledLink delay={300} to={`/blog/${post._id}`}>
         <ListItem sx={{ padding: `0 0 10px 0` }}>
           <ShadowButton>
-            <Row justify="start" flexed gap={10} grow={10} mobileWrapping>
+            <Row gap={10} reverse="mobile">
               {!published ? <PendingActionsIcon /> : null}
-              {image ? <PostImage src={image} size={100} /> : null}
-              <Column gap={10}>
+              {image ? <PostImage size={100} src={image} /> : null}
+              <Column>
                 <Title>{title || 'No title'}</Title>
-
-                <span style={{ fontSize: '0.9em' }}>{summary}</span>
+                <Summary>{summary}</Summary>
               </Column>
             </Row>
           </ShadowButton>
