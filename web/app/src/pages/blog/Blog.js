@@ -68,7 +68,6 @@ const Blog = () => {
       chainFinally: () => setIsLoading(false),
     }
   );
-  console.log(data);
 
   useEffect(() => {
     if (anchorEl) {
