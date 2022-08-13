@@ -30,10 +30,7 @@ const ClearButton = styled.div`
 const PostImageContainer = styled.div`
   position: relative;
   display: flex;
-  min-width: 150px;
-  width: 150px;
-  min-height: 150px;
-  height: 150px;
+
   border-width: 1px;
   border-style: solid;
   border-color: rgba(0, 0, 0, 0.23);
@@ -42,6 +39,13 @@ const PostImageContainer = styled.div`
 
   align-items: center;
   justify-content: center;
+
+  ${({ size }) => `
+    min-width: ${size}px;
+    width: ${size}px;
+    min-height: ${size}px;
+    height: ${size}px;
+  `}
 
   ${({ editable, imgSrc }) =>
     editable &&
@@ -88,7 +92,13 @@ const PostImageContainer = styled.div`
   }
 `;
 
-const PostImage = ({ src, editable, onImageChosen, onImageCleared }) => {
+const PostImage = ({
+  src,
+  editable,
+  onImageChosen,
+  onImageCleared,
+  size = 150,
+}) => {
   const [isUploading, setIsUploading] = useState(false);
   const { createNotification } = useNotification();
 
@@ -116,6 +126,7 @@ const PostImage = ({ src, editable, onImageChosen, onImageCleared }) => {
     <>
       <ClearDialog />
       <PostImageContainer
+        size={size}
         imgSrc={src}
         editable={!isUploading && editable}
         isUploading={isUploading}

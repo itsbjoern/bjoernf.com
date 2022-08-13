@@ -9,6 +9,7 @@ import { Row, Column } from 'app/components/Flex';
 import { H4 } from 'app/components/Text';
 import Tag from 'app/components/Tag';
 import UnstyledLink from 'app/components/UnstyledLink';
+import PostImage from 'app/components/PostImage';
 
 const Title = styled(H4)`
   color: ${({ theme }) => theme.palette.primary.main};
@@ -17,7 +18,10 @@ const Title = styled(H4)`
 const ShadowButton = styled(ListItemButton)`
   &&& {
     padding-bottom: 10px;
+    padding-left: 10px;
+    padding-top: 10px;
     padding-right: 10%;
+
     min-height: 77px;
     background-color: ${({ theme }) => theme.palette.background.paper};
     position: relative;
@@ -113,7 +117,7 @@ const PostItem = ({ post }) => {
   }
 
   const { draft, published, createdAt } = post;
-  const { title, tags } = draft ?? published;
+  const { title, tags, image } = draft ?? published;
   const summary = draft ? draft.text?.slice(0, 100) : published.summary;
 
   return (
@@ -145,8 +149,15 @@ const PostItem = ({ post }) => {
       <UnstyledLink delay={300} to={`/blog/${post._id}`}>
         <ListItem sx={{ padding: `0 0 10px 0` }}>
           <ShadowButton>
-            <Row justify="start" flexed gap={10} grow={10} mobileWrapping>
-              {draft ? <PendingActionsIcon /> : null}
+            <Row
+              justify="start"
+              flexed
+              gap={10}
+              grow={10}
+              mobileWrapping
+            >
+              {!published ? <PendingActionsIcon /> : null}
+              {image ? <PostImage src={image} size={100} /> : null}
               <Column gap={10}>
                 <Title>{title || 'No title'}</Title>
 
