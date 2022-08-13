@@ -30,6 +30,7 @@ export const StyledEditor = styled.div`
     }
 
     pre {
+      margin: 8px 0;
       tab-size: 2;
       padding: 10px 15px;
       display: block;
