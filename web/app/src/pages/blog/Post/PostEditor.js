@@ -5,7 +5,9 @@ import {
   Autocomplete,
   InputAdornment,
 } from '@mui/material';
-import { Subtitles, Loyalty, ControlPoint } from '@mui/icons-material';
+import SubtitlesIcon from '@mui/icons-material/Subtitles';
+import LoyaltyIcon from '@mui/icons-material/Loyalty';
+import ControlPointIcon from '@mui/icons-material/ControlPoint';
 
 import { useRequest } from 'app/providers/RequestProvider';
 import { getTags } from 'app/api/blog';
@@ -85,7 +87,7 @@ const PostEditor = ({ post, updatePost }) => {
                     ...InputProps,
                     startAdornment: (
                       <InputAdornment position="start">
-                        <Loyalty />
+                        <LoyaltyIcon />
                       </InputAdornment>
                     ),
                   }}
@@ -101,7 +103,7 @@ const PostEditor = ({ post, updatePost }) => {
                 setNewTag('');
               }}
             >
-              <ControlPoint />
+              <ControlPointIcon />
             </IconButton>
             <Row gap={5} flexed wrapping>
               {tags?.map((t, i) => {
@@ -126,7 +128,7 @@ const PostEditor = ({ post, updatePost }) => {
             InputProps={{
               startAdornment: (
                 <InputAdornment position="start">
-                  <Subtitles />
+                  <SubtitlesIcon />
                 </InputAdornment>
               ),
             }}

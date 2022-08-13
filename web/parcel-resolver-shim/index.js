@@ -1,5 +1,5 @@
-const { Resolver } = require('@parcel/plugin')
-const path = require('path')
+const { Resolver } = require('@parcel/plugin');
+const path = require('path');
 
 module.exports = new Resolver({
   async resolve({ specifier }) {
@@ -9,11 +9,24 @@ module.exports = new Resolver({
     ) {
       return {
         filePath: path.join(__dirname, 'shim', 'mention-extension.js'),
-      }
+      };
+    }
+    if (specifier === './utils/createSvgIcon') {
+      return {
+        filePath: path.join(
+          __dirname,
+          '..',
+          'node_modules',
+          '@mui',
+          'material',
+          'utils',
+          'createSvgIcon.js'
+        ),
+      };
     }
 
     // Let the next resolver in the pipeline handle
     // this dependency.
-    return null
+    return null;
   },
-})
+});

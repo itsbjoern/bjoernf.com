@@ -2,7 +2,7 @@ import React from 'react';
 import { Link as RouterLink } from 'react-router-dom';
 import { Link } from '@mui/material';
 import { withTheme } from '@mui/styles';
-import { TransitEnterexit } from '@mui/icons-material';
+import TransitEnterexitIcon from '@mui/icons-material/TransitEnterexit';
 
 const LinkRender = withTheme(({ theme, external, href, ...props }) =>
   external ? (
@@ -24,7 +24,7 @@ const Ref = ({ text, href }) => {
       <LinkRender external={isExternal} href={href}>
         {text || href}
         {isExternal ? (
-          <TransitEnterexit
+          <TransitEnterexitIcon
             color="primary"
             sx={{
               marginLeft: 0,

@@ -1,20 +1,18 @@
 import React from 'react';
 import { useActive, useChainedCommands, useCommands } from '@remirror/react';
 import { Button, ButtonGroup } from '@mui/material';
-import {
-  FormatBold,
-  FormatItalic,
-  FormatStrikethrough,
-  FormatUnderlined,
-  Redo,
-  Undo,
-  FormatListBulleted,
-  FormatListNumbered,
-  FormatSize,
-  AlignHorizontalCenter,
-  AlignHorizontalLeft,
-  AlignHorizontalRight,
-} from '@mui/icons-material';
+import FormatBoldIcon from '@mui/icons-material/FormatBold';
+import FormatItalicIcon from '@mui/icons-material/FormatItalic';
+import StrikethroughSIcon from '@mui/icons-material/StrikethroughS';
+import FormatUnderlinedIcon from '@mui/icons-material/FormatUnderlined';
+import RedoIcon from '@mui/icons-material/Redo';
+import UndoIcon from '@mui/icons-material/Undo';
+import FormatListBulletedIcon from '@mui/icons-material/FormatListBulleted';
+import FormatListNumberedIcon from '@mui/icons-material/FormatListNumbered';
+import FormatSizeIcon from '@mui/icons-material/FormatSize';
+import FormatAlignLeftIcon from '@mui/icons-material/FormatAlignLeft';
+import FormatAlignRightIcon from '@mui/icons-material/FormatAlignRight';
+import FormatAlignCenterIcon from '@mui/icons-material/FormatAlignCenter';
 import styled from '@emotion/styled';
 
 import { Row } from 'app/components/Flex';
@@ -71,32 +69,32 @@ const Menu = () => {
       >
         <ButtonGroup variant="outlined">
           <MenuButton onClick={() => undo()}>
-            <Undo />
+            <UndoIcon />
           </MenuButton>
           <MenuButton onClick={() => redo()}>
-            <Redo />
+            <RedoIcon />
           </MenuButton>
         </ButtonGroup>
         <ButtonGroup variant="outlined">
           <ToggleButton
             type="bold"
             command="toggleBold"
-            icon={<FormatBold />}
+            icon={<FormatBoldIcon />}
           />
           <ToggleButton
             type="italic"
             command="toggleItalic"
-            icon={<FormatItalic />}
+            icon={<FormatItalicIcon />}
           />
           <ToggleButton
             type="underline"
             command="toggleUnderline"
-            icon={<FormatUnderlined />}
+            icon={<FormatUnderlinedIcon />}
           />
           <ToggleButton
             type="strike"
             command="toggleStrike"
-            icon={<FormatStrikethrough />}
+            icon={<StrikethroughSIcon />}
           />
         </ButtonGroup>
         <ButtonGroup variant="outlined">
@@ -104,31 +102,31 @@ const Menu = () => {
             type="heading"
             command="toggleHeading"
             param={{ level: 1 }}
-            icon={<FormatSize sx={{ fontSize: 20 }} />}
+            icon={<FormatSizeIcon sx={{ fontSize: 20 }} />}
           />
           <ToggleButton
             type="heading"
             command="toggleHeading"
             param={{ level: 2 }}
-            icon={<FormatSize sx={{ fontSize: 16 }} />}
+            icon={<FormatSizeIcon sx={{ fontSize: 16 }} />}
           />
           <ToggleButton
             type="heading"
             command="toggleHeading"
             param={{ level: 3 }}
-            icon={<FormatSize sx={{ fontSize: 12 }} />}
+            icon={<FormatSizeIcon sx={{ fontSize: 12 }} />}
           />
         </ButtonGroup>
         <ButtonGroup variant="outlined">
           <ToggleButton
             type="bulletList"
             command="toggleBulletList"
-            icon={<FormatListBulleted />}
+            icon={<FormatListBulletedIcon />}
           />
           <ToggleButton
             type="orderedList"
             command="toggleOrderedList"
-            icon={<FormatListNumbered />}
+            icon={<FormatListNumberedIcon />}
           />
         </ButtonGroup>
         <ButtonGroup variant="outlined">
@@ -136,19 +134,19 @@ const Menu = () => {
             type="nodeFormatting"
             command="setTextAlignment"
             param="left"
-            icon={<AlignHorizontalLeft />}
+            icon={<FormatAlignLeftIcon />}
           />
           <ToggleButton
             type="nodeFormatting"
             command="setTextAlignment"
             param="center"
-            icon={<AlignHorizontalCenter />}
+            icon={<FormatAlignCenterIcon />}
           />
           <ToggleButton
             type="nodeFormatting"
             command="setTextAlignment"
             param="right"
-            icon={<AlignHorizontalRight />}
+            icon={<FormatAlignRightIcon />}
           />
         </ButtonGroup>
       </Row>

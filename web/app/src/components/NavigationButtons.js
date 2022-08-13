@@ -2,7 +2,9 @@ import React from 'react';
 import { useLocation } from 'react-router-dom';
 import styled from '@emotion/styled';
 import { BottomNavigation, BottomNavigationAction } from '@mui/material';
-import { Home, Receipt, AccountTree } from '@mui/icons-material';
+import HomeIcon from '@mui/icons-material/Home';
+import ReceiptIcon from '@mui/icons-material/Receipt';
+import AccountTreeIcon from '@mui/icons-material/AccountTree';
 
 import UnstyledLink from 'app/components/UnstyledLink';
 
@@ -37,9 +39,9 @@ const NavigationButtons = ({ mobile }) => {
 
   return (
     <StyledNav showLabels value={menuIndex} mobile={mobile ? 'true' : null}>
-      <FullButton label="Home" icon={<Home />} to={paths[0]} />
-      <FullButton label="Blog" icon={<Receipt />} to={paths[1]} />
-      <FullButton label="Projects" icon={<AccountTree />} to={paths[2]} />
+      <FullButton label="Home" icon={<HomeIcon />} to={paths[0]} />
+      <FullButton label="Blog" icon={<ReceiptIcon />} to={paths[1]} />
+      <FullButton label="Projects" icon={<AccountTreeIcon />} to={paths[2]} />
     </StyledNav>
   );
 };

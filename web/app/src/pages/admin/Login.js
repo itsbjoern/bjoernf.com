@@ -1,6 +1,7 @@
 import React, { useState, useCallback } from 'react';
 import { TextField, Button, InputAdornment } from '@mui/material';
-import { AccountCircle, VpnKey } from '@mui/icons-material';
+import AccountCircleIcon from '@mui/icons-material/AccountCircle';
+import VpnKeyIcon from '@mui/icons-material/VpnKey';
 
 import { Flex, Column } from 'app/components/Flex';
 import { useRequest } from 'app/providers/RequestProvider';
@@ -34,7 +35,7 @@ const Login = () => {
           InputProps={{
             startAdornment: (
               <InputAdornment position="start">
-                <AccountCircle />
+                <AccountCircleIcon />
               </InputAdornment>
             ),
           }}
@@ -48,7 +49,7 @@ const Login = () => {
           InputProps={{
             startAdornment: (
               <InputAdornment position="start">
-                <VpnKey />
+                <VpnKeyIcon />
               </InputAdornment>
             ),
           }}

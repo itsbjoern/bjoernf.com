@@ -1,6 +1,6 @@
 import React from 'react';
 import { ListItem, ListItemButton, Skeleton } from '@mui/material';
-import { PendingActions } from '@mui/icons-material';
+import PendingActionsIcon from '@mui/icons-material/PendingActions';
 import format from 'date-fns/format';
 import styled from '@emotion/styled';
 
@@ -146,7 +146,7 @@ const PostItem = ({ post }) => {
         <ListItem sx={{ padding: `0 0 10px 0` }}>
           <ShadowButton>
             <Row justify="start" flexed gap={10} grow={10} mobileWrapping>
-              {draft ? <PendingActions /> : null}
+              {draft ? <PendingActionsIcon /> : null}
               <Column gap={10}>
                 <Title>{title || 'No title'}</Title>
 

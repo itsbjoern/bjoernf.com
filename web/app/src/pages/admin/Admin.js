@@ -1,7 +1,7 @@
 import React, { useState, useEffect } from 'react';
 import { useLocation, useHistory } from 'react-router-dom';
 import { Button, Tabs, Tab, List } from '@mui/material';
-import { AddCircle } from '@mui/icons-material';
+import AddCircleIcon from '@mui/icons-material/AddCircle';
 
 import { getDrafts, createPost } from 'app/api/admin';
 import { useRequest } from 'app/providers/RequestProvider';
@@ -84,7 +84,7 @@ const Admin = () => {
             token ? (
               <Column>
                 <Button
-                  startIcon={<AddCircle />}
+                  startIcon={<AddCircleIcon />}
                   variant="contained"
                   onClick={() => {
                     sendRequest(createPost()).success(({ post }) => {

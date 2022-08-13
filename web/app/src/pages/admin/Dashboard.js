@@ -1,6 +1,7 @@
 import React, { useState } from 'react';
 import { TextField, Button, InputAdornment, IconButton } from '@mui/material';
-import { Visibility, VisibilityOff } from '@mui/icons-material';
+import VisibilityIcon from '@mui/icons-material/Visibility';
+import VisibilityOffIcon from '@mui/icons-material/VisibilityOff';
 
 import { H2 } from 'app/components/Text';
 import { Column } from 'app/components/Flex';
@@ -39,7 +40,7 @@ const Dashboard = () => {
             endAdornment: (
               <InputAdornment position="end">
                 <IconButton onClick={() => setIsVisible((v) => !v)}>
-                  {isVisible ? <VisibilityOff /> : <Visibility />}
+                  {isVisible ? <VisibilityOffIcon /> : <VisibilityIcon />}
                 </IconButton>
               </InputAdornment>
             ),

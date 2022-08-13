@@ -11,7 +11,10 @@ import {
   Input,
 } from '@mui/material';
 import { useLocation, useHistory } from 'react-router-dom';
-import { Search, Clear, RssFeed, ContentCopy } from '@mui/icons-material';
+import SearchIcon from '@mui/icons-material/Search';
+import ClearIcon from '@mui/icons-material/Clear';
+import RssFeedIcon from '@mui/icons-material/RssFeed';
+import ContentCopyIcon from '@mui/icons-material/ContentCopy';
 
 import { useSSR } from 'app/providers/SSRProvider';
 import { getPosts } from 'app/api/blog';
@@ -86,7 +89,7 @@ const Blog = () => {
             <Button
               size="small"
               variant="text"
-              startIcon={<RssFeed fontSize="7px" />}
+              startIcon={<RssFeedIcon fontSize="7px" />}
               onClick={(e) => {
                 if (anchorEl) {
                   setAnchorEl(null);
@@ -124,7 +127,7 @@ const Blog = () => {
                     }
                   }}
                 >
-                  <ContentCopy />
+                  <ContentCopyIcon />
                 </IconButton>
               </Row>
             </Popover>
@@ -148,7 +151,7 @@ const Blog = () => {
             InputProps={{
               startAdornment: (
                 <InputAdornment position="start">
-                  <Search />
+                  <SearchIcon />
                 </InputAdornment>
               ),
               endAdornment: (
@@ -158,7 +161,7 @@ const Blog = () => {
                     style={currentSearch ? {} : { visibility: 'hidden' }}
                   >
                     <IconButton edge="end" size="small">
-                      <Clear />
+                      <ClearIcon />
                     </IconButton>
                   </UnstyledLink>
                 </InputAdornment>

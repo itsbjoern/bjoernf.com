@@ -4,10 +4,11 @@
   "private": true,
   "homepage": "/public",
   "dependencies": {
+    "@babel/runtime": "^7.18.9",
     "@emotion/react": "^11.10.0",
     "@emotion/styled": "^11.10.0",
-    "@mui/icons-material": "^5.0.0",
-    "@mui/material": "^5.0.0",
+    "@mui/icons-material": "^5.8.4",
+    "@mui/material": "^5.10.0",
     "@mui/styles": "^5.0.0",
     "@remirror/pm": "^1.0.22",
     "@remirror/react": "^1.0.43",

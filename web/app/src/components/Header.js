@@ -2,13 +2,11 @@ import React from 'react';
 import { useHistory } from 'react-router-dom';
 import styled from '@emotion/styled';
 import { Avatar, Divider, Chip } from '@mui/material';
-import {
-  ArrowCircleUp,
-  LinkedIn,
-  GitHub,
-  Logout,
-  AdminPanelSettings,
-} from '@mui/icons-material';
+import LogoutIcon from '@mui/icons-material/Logout';
+import GitHubIcon from '@mui/icons-material/GitHub';
+import LinkedInIcon from '@mui/icons-material/LinkedIn';
+import AdminPanelSettingsIcon from '@mui/icons-material/AdminPanelSettings';
+import ArrowCircleUpIcon from '@mui/icons-material/ArrowCircleUp';
 
 import { getPublicFileUrl } from 'app/util';
 import { useRequest } from 'app/providers/RequestProvider';
@@ -40,7 +38,7 @@ const Header = () => {
           <Column justify="evenly" style={{ marginLeft: 10 }}>
             <H2>Björn Friedrichs</H2>
             <Row gap={5}>
-              <ArrowCircleUp sx={{ fontSize: '1.2em' }} />
+              <ArrowCircleUpIcon sx={{ fontSize: '1.2em' }} />
               <span>That&apos;s me</span>
             </Row>
           </Column>
@@ -54,14 +52,14 @@ const Header = () => {
           {token ? (
             <Row gap={10}>
               <Chip
-                icon={<AdminPanelSettings fontSize="small" />}
+                icon={<AdminPanelSettingsIcon fontSize="small" />}
                 label="Admin"
                 clickable
                 variant="outlined"
                 onClick={() => history.push('/admin')}
               />
               <Chip
-                icon={<Logout fontSize="small" />}
+                icon={<LogoutIcon fontSize="small" />}
                 label="Sign out"
                 clickable
                 variant="outlined"
@@ -73,7 +71,7 @@ const Header = () => {
         <Row justify="end" gap={15}>
           <Chip
             component="a"
-            icon={<GitHub />}
+            icon={<GitHubIcon />}
             href="https://github.com/BFriedrichs"
             label="BFriedrichs"
             variant="outlined"
@@ -82,7 +80,7 @@ const Header = () => {
           />
           <Chip
             component="a"
-            icon={<LinkedIn />}
+            icon={<LinkedInIcon />}
             href="https://linkedin.com/in/bjoern-friedrichs"
             label="bjoern-friedrichs"
             variant="outlined"
