@@ -4,7 +4,7 @@ import PendingActionsIcon from '@mui/icons-material/PendingActions';
 import format from 'date-fns/format';
 import styled from '@emotion/styled';
 
-import { morphMixin, mobileMixin } from 'app/theme';
+import { morphMixin } from 'app/theme';
 import { Row, Column } from 'app/components/Flex';
 import { H4 } from 'app/components/Text';
 import Tag from 'app/components/Tag';
