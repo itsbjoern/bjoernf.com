@@ -62,7 +62,7 @@ export const whatsappLink = (input, mobile) => {
 };
 
 export const twitterLink = (input) => {
-  const _body = template({ type: 'twitter', ...input });
+  // const _body = template({ type: 'twitter', ...input });
   return (
     'https://twitter.com/share' +
     objectToGetParams({

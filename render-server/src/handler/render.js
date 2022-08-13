@@ -34,7 +34,10 @@ const renderHandler = async (req, res) => {
     const { resolveData } = createSSRContext();
 
     const RenderComponent = React.createElement(AppServerElement, {
-      ssr: { url: req.path },
+      ssr: {
+        url: req.path,
+        host: process.env.API_CONNECTION_WEBHOST,
+      },
     });
 
     const _prepRun = ReactDOMServer.renderToString(RenderComponent);

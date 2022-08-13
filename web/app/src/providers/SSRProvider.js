@@ -26,10 +26,10 @@ export const createSSRContext = () => {
       }
       Object.entries(toResolve).forEach(([name, request], i) => {
         request
-          .success((data) => {
+          .then((data) => {
             resolvedData[name] = data;
           })
-          .failure((e) => {
+          .catch((e) => {
             console.log(e);
           })
           .finally(() => {
@@ -86,11 +86,15 @@ export const useSSR = (request, options) => {
 
   const fixedId = dataId ?? `data-${makePseudoId(options)}`;
   let initData = init;
+  let hasSSRData = false;
   if (fixedId in windowData()) {
-    initData = chainSuccess(windowData()[fixedId]);
+    initData = windowData()[fixedId];
+    hasSSRData = true;
   }
 
   const [data, setData] = useState(initData);
+  const fetchNeeded = useRef(!hasSSRData);
+
   const runFetch = useCallback(() => {
     chainFirst && chainFirst();
     request()
@@ -100,6 +104,10 @@ export const useSSR = (request, options) => {
   }, deps);
 
   useEffect(() => {
+    if (!fetchNeeded.current) {
+      fetchNeeded.current = true;
+      return;
+    }
     if (delay) {
       if (timeout.current) {
         clearTimeout(timeout.current);
@@ -121,10 +129,13 @@ export const useSSR = (request, options) => {
         ssrDidChain[fixedId] = true;
         chainFinally && chainFinally();
       }
-      return [chainSuccess(resolvedData), setData];
+      return [resolvedData, setData];
     }
 
-    addResolve(fixedId, request());
+    const ssrPrepRequest = request()
+      .success((data) => chainSuccess(data))
+      .failure((e) => e);
+    addResolve(fixedId, ssrPrepRequest);
   }
 
   return [data, setData];

@@ -25,6 +25,7 @@ services:
     environment:
       NODE_ENV: development
       REACT_APP_API_URL: http://api:8000
+      API_CONNECTION_WEBHOST: http://localhost:9009
     expose:
       - 9009
     ports:

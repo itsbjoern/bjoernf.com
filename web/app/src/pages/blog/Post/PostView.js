@@ -28,8 +28,9 @@ const ShareIcon = ({ href, size, Icon }) => (
 
 const PostView = ({ postData, createdAt, hideShare, staticContext }) => {
   const { title, html, tags, image } = postData;
+  const { host, url: path } = staticContext ?? {};
   const [url] = useState(
-    staticContext?.absUrl || global.window?.location?.href
+    staticContext ? host + path : global.window?.location?.href
   );
   const [userAgent] = useState(
     staticContext?.userAgent || global.navigator?.userAgent || ''
