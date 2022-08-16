@@ -12,6 +12,7 @@ import UnstyledLink from 'app/components/UnstyledLink';
 import PostImage from 'app/components/PostImage';
 
 const Title = styled(H4)`
+  line-height: 1.6rem;
   color: ${({ theme }) => theme.palette.primary.main};
 `;
 
@@ -85,6 +86,12 @@ const Control = styled(Row)`
 
 const Summary = styled.span`
   font-size: 0.9rem;
+
+  -webkit-line-clamp: 3;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  -webkit-box-orient: vertical;
+  display: -webkit-box;
 `;
 
 const ClipOn = ({ children }) => (

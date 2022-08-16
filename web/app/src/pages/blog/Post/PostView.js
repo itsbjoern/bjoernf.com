@@ -83,7 +83,7 @@ const PostView = ({ postData, createdAt, hideShare, staticContext }) => {
               </Row>
               <div>Published {format(createdAt * 1000, 'MMMM do, yyyy')}</div>
             </Row>
-            <H2>{title}</H2>
+            <H2 mobileSize="1.2rem">{title}</H2>
           </Column>
         </Row>
         <StyledEditor>
