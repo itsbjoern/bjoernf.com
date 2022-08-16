@@ -85,9 +85,6 @@ const Control = styled(Row)`
 
 const Summary = styled.span`
   font-size: 0.9rem;
-  @media only screen and (max-width: 425px) {
-    min-width: calc(100% + 75px);
-  }
 `;
 
 const ClipOn = ({ children }) => (
@@ -161,10 +158,10 @@ const PostItem = ({ post }) => {
       <UnstyledLink delay={300} to={`/blog/${post._id}`}>
         <ListItem sx={{ padding: `0 0 10px 0` }}>
           <ShadowButton>
-            <Row gap={10} reverse="mobile">
+            <Row gap={10}>
               {!published ? <PendingActionsIcon /> : null}
               {image ? <PostImage size={100} src={image} /> : null}
-              <Column>
+              <Column wrapping="mobile">
                 <Title>{title || 'No title'}</Title>
                 <Summary>{summary}</Summary>
               </Column>

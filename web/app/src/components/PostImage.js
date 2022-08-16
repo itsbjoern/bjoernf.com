@@ -47,13 +47,6 @@ const PostImageContainer = styled.div`
     height: ${size}px;
   `}
 
-  @media only screen and (max-width: 425px) {
-    min-width: 75px;
-    width: 75px;
-    min-height: 75px;
-    height: 75px;
-  }
-
   ${({ editable, imgSrc }) =>
     editable &&
     `

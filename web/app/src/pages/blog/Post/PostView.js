@@ -72,7 +72,7 @@ const PostView = ({ postData, createdAt, hideShare, staticContext }) => {
       left={false}
     >
       <Column gap={20}>
-        <Row gap={20} align="center" mobileReverse>
+        <Row gap={20} align="center" flip="mobile">
           {image ? <PostImage src={image} /> : null}
           <Column gap={20} justify="center">
             <Row justify="between" wrapping gap={10}>

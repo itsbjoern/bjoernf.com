@@ -16,11 +16,11 @@ const translate = {
 export const Flex = styled.div`
   display: flex;
   ${mobileMixin('display', 'hide', 'none')};
+  ${mobileMixin('flex-wrap', 'wrapping', 'wrap')};
 
   align-items: ${({ align }) => translate[align || 'normal']};
   justify-content: ${({ justify }) => translate[justify || 'normal']};
   ${({ flexed }) => (flexed ? `flex: 1;` : '')}
-  ${({ wrapping }) => (wrapping ? `flex-wrap: wrap;` : '')}
   ${({ grow }) => (grow ? `flex-grow: ${grow};` : '')}
   ${({ shrink }) => (shrink ? `flex-shrink: ${shrink};` : '')}
   ${({ alignSelf }) => (alignSelf ? `align-self: ${alignSelf};` : '')}
