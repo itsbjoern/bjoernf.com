@@ -55,7 +55,7 @@ const RouterLayer = isSSR ? SSRSupport : BrowserRouter;
 const HistoryLayer = ({ children }) => {
   const location = useLocation();
   const [ackee] = useState(
-    ackeeTracker.create('https://dashboard.bjornf.dev', {
+    isSSR ? null : ackeeTracker.create('https://dashboard.bjornf.dev', {
       ignoreLocalhost: true,
       detailed: true,
     })

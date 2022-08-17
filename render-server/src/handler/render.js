@@ -1,7 +1,7 @@
 const path = require('path');
 const fs = require('fs');
-const React = require('react');
-const ReactDOMServer = require('react-dom/server');
+const render = require('preact-render-to-string');
+const { h } = require('preact');
 
 const { isDevelopment } = require('../util');
 const { hydrateIndex } = require('../hydrate');
@@ -33,16 +33,16 @@ const renderHandler = async (req, res) => {
   try {
     const { resolveData } = createSSRContext();
 
-    const RenderComponent = React.createElement(AppServerElement, {
+    const RenderComponent = h(AppServerElement, {
       ssr: {
         url: req.path,
         host: process.env.API_CONNECTION_WEBHOST,
       },
     });
 
-    const _prepRun = ReactDOMServer.renderToString(RenderComponent);
+    const _prepRun = render(RenderComponent);
     const resolvedData = await resolveData();
-    const renderedApp = ReactDOMServer.renderToString(RenderComponent);
+    const renderedApp = render(RenderComponent);
 
     res.send(
       Buffer.from(hydrateIndex(indexFile, req, renderedApp, resolvedData))
