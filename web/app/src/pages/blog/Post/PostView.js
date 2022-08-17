@@ -1,5 +1,4 @@
 import React, { useState } from 'react';
-import format from 'date-fns/format';
 import {
   EmailIcon,
   LinkedinIcon,
@@ -7,16 +6,16 @@ import {
   WhatsappIcon,
 } from 'react-share';
 import { IconButton } from '@mui/material';
-// need withRouter for staticContexts
-import { withRouter } from 'react-router-dom';
 
+import { useSSRProps } from 'app/providers/SSRProvider';
 import { emailLink, linkedinLink, whatsappLink, twitterLink } from 'app/share';
 import { Column, Row } from 'app/components/Flex';
 import { H2 } from 'app/components/Text';
-import { StyledEditor } from 'app/components/RichText/view';
+import StyledEditor from 'app/components/RichText/StyledEditor';
 import Tag from 'app/components/Tag';
 import FloatAside from 'app/components/FloatAside';
 import PostImage from 'app/components/PostImage';
+import { formatDate } from 'app/util';
 
 const ShareIcon = ({ href, size, Icon }) => (
   <a href={href} target="_blank" rel="noreferrer">
@@ -26,15 +25,11 @@ const ShareIcon = ({ href, size, Icon }) => (
   </a>
 );
 
-const PostView = ({ postData, createdAt, hideShare, staticContext }) => {
+const PostView = ({ postData, createdAt, hideShare }) => {
   const { title, html, tags, image } = postData;
-  const { host, url: path } = staticContext ?? {};
-  const [url] = useState(
-    staticContext ? host + path : global.window?.location?.href
-  );
-  const [userAgent] = useState(
-    staticContext?.userAgent || global.navigator?.userAgent || ''
-  );
+  const ssrProps = useSSRProps();
+  const [url] = useState(ssrProps ? ssrProps.host + ssrProps.path : global.window?.location?.href);
+  const [userAgent] = useState(global?.navigator?.userAgent || '');
 
   const iconSize = 45;
 
@@ -81,7 +76,7 @@ const PostView = ({ postData, createdAt, hideShare, staticContext }) => {
                   ? tags.map((t) => <Tag size="small" key={t} name={t} />)
                   : null}
               </Row>
-              <div>Published {format(createdAt * 1000, 'MMMM do, yyyy')}</div>
+              <div>Published {formatDate(createdAt)}</div>
             </Row>
             <H2 mobileSize="1.2rem">{title}</H2>
           </Column>
@@ -97,4 +92,4 @@ const PostView = ({ postData, createdAt, hideShare, staticContext }) => {
   );
 };
 
-export default withRouter(PostView);
+export default PostView;

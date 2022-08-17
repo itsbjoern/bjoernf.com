@@ -1,5 +1,5 @@
 import React from 'react';
-import { useHistory } from 'react-router-dom';
+import { useNavigate } from 'react-router-dom';
 import styled from '@emotion/styled';
 import { Avatar, Divider, Chip } from '@mui/material';
 import LogoutIcon from '@mui/icons-material/Logout';
@@ -24,7 +24,7 @@ const BG = styled(Column)`
 `;
 
 const Header = () => {
-  const history = useHistory();
+  const navigate = useNavigate();
   const { token, setToken } = useRequest();
 
   return (
@@ -56,7 +56,7 @@ const Header = () => {
                 label="Admin"
                 clickable
                 variant="outlined"
-                onClick={() => history.push('/admin')}
+                onClick={() => navigate('/admin')}
               />
               <Chip
                 icon={<LogoutIcon fontSize="small" />}

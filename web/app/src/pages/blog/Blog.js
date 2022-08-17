@@ -10,7 +10,7 @@ import {
   Popover,
   Input,
 } from '@mui/material';
-import { useLocation, useHistory } from 'react-router-dom';
+import { useLocation, useNavigate } from 'react-router-dom';
 import SearchIcon from '@mui/icons-material/Search';
 import ClearIcon from '@mui/icons-material/Clear';
 import RssFeedIcon from '@mui/icons-material/RssFeed';
@@ -44,7 +44,7 @@ const makeQuery = (page, search) => {
 };
 
 const Blog = () => {
-  const history = useHistory();
+  const navigate = useNavigate();
   const location = useLocation();
   const { sendRequest } = useRequest();
   const { createNotification } = useNotification();
@@ -138,7 +138,7 @@ const Blog = () => {
             size="small"
             value={currentSearch}
             onChange={(event) =>
-              history.push(makeQuery(currentPage, event.target.value))
+              navigate(makeQuery(currentPage, event.target.value))
             }
             label="Search"
             placeholder="Title, tag or content"

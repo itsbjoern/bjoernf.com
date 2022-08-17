@@ -7,7 +7,7 @@ import './index.css';
 
 const AppServer = (props) => {
   return (
-    <SSRProvider>
+    <SSRProvider ssrProps={props.ssr}>
       <App {...props} />
     </SSRProvider>
   );

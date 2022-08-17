@@ -1,5 +1,5 @@
 import React, { useState, useEffect } from 'react';
-import { useLocation, useHistory } from 'react-router-dom';
+import { useLocation, useNavigate } from 'react-router-dom';
 import { Button, Tabs, Tab, List } from '@mui/material';
 import AddCircleIcon from '@mui/icons-material/AddCircle';
 
@@ -13,11 +13,11 @@ import Dashboard from './Dashboard';
 import Login from './Login';
 
 const LinkedTab = ({ label, index, ...props }) => {
-  const history = useHistory();
+  const navigate = useNavigate();
   return (
     <Tab
       label={label}
-      onClick={() => history.push(`#tab-${index}`)}
+      onClick={() => navigate(`#tab-${index}`)}
       id={`simple-tab-${index}`}
       {...{
         'aria-controls': `simple-tabpanel-${index}`,
@@ -42,7 +42,7 @@ const Panel = ({ children, value, index }) => {
 
 const Admin = () => {
   const location = useLocation();
-  const history = useHistory();
+  const navigate = useNavigate();
   const { token, sendRequest } = useRequest();
   const [draftPosts, setDraftPosts] = useState([]);
 
@@ -67,7 +67,7 @@ const Admin = () => {
       <Row>
         <Tabs
           value={currentTab}
-          onChange={(evt, newTab) => history.push(`#tab-${newTab}`)}
+          onChange={(evt, newTab) => navigate(`#tab-${newTab}`)}
           aria-label="basic tabs"
         >
           <LinkedTab label="Dashboard" index={0} />
@@ -88,7 +88,7 @@ const Admin = () => {
                   variant="contained"
                   onClick={() => {
                     sendRequest(createPost()).success(({ post }) => {
-                      history.push(`/blog/${post._id}/edit`);
+                      navigate(`/blog/${post._id}/edit`);
                     });
                   }}
                 >

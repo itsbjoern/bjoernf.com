@@ -1,11 +1,6 @@
-import React, { useEffect, useState } from 'react';
-import {
-  BrowserRouter,
-  StaticRouter,
-  Switch,
-  Route,
-  useHistory,
-} from 'react-router-dom';
+import React, { useEffect, useState, Suspense } from 'react';
+import { BrowserRouter, Routes, Route, useLocation } from 'react-router-dom';
+import { StaticRouter } from 'react-router-dom/server';
 import {
   Container,
   ThemeProvider,
@@ -27,9 +22,10 @@ import Home from 'app/pages/home/Home';
 import Blog from 'app/pages/blog/Blog';
 import Projects from 'app/pages/projects/Projects';
 import Post from 'app/pages/blog/Post';
-import Admin from 'app/pages/admin/Admin';
 import About from 'app/pages/about/About';
 import NavigationButtons from 'app/components/NavigationButtons';
+
+const Admin = React.lazy(() => import('app/pages/admin/Admin'));
 
 const AppStyle = styled.div`
   display: flex;
@@ -51,46 +47,36 @@ const AdaptiveContainer = styled(Container)`
 `;
 
 const SSRSupport = ({ ssr, children }) => {
-  return (
-    <StaticRouter location={ssr.url} context={ssr}>
-      {children}
-    </StaticRouter>
-  );
+  return <StaticRouter location={ssr.url}>{children}</StaticRouter>;
 };
 
 const RouterLayer = isSSR ? SSRSupport : BrowserRouter;
 
 const HistoryLayer = ({ children }) => {
-  const history = useHistory();
+  const location = useLocation();
+  const [ackee] = useState(
+    ackeeTracker.create('https://dashboard.bjornf.dev', {
+      ignoreLocalhost: true,
+      detailed: true,
+    })
+  );
 
   useEffect(() => {
-    let ackee = null;
     if (!isSSR) {
-      ackee = ackeeTracker.create('https://dashboard.bjornf.dev', {
-        ignoreLocalhost: true,
-        detailed: true,
-      });
       ackee.record('2a5590d3-ef8c-45ab-9b29-7f14459e092f');
     }
 
-    const unsub = history.listen((location) => {
-      if (ackee) {
-        ackee.record('2a5590d3-ef8c-45ab-9b29-7f14459e092f');
-      }
+    const path = location.pathname;
+    let title = '';
+    if (path === '/') {
+      title = 'Home';
+    } else {
+      const firstItem = path.split('/')[1];
+      title = firstItem.charAt(0).toUpperCase() + firstItem.slice(1);
+    }
 
-      const path = location.pathname;
-      let title = '';
-      if (path === '/') {
-        title = 'Home';
-      } else {
-        const firstItem = path.split('/')[1];
-        title = firstItem.charAt(0).toUpperCase() + firstItem.slice(1);
-      }
-
-      document.title = `${title} - Björn Friedrichs`;
-    });
-    return unsub;
-  }, []);
+    document.title = `${title} - Björn Friedrichs`;
+  }, [location]);
 
   return children;
 };
@@ -119,29 +105,22 @@ const App = (props) => {
                         }}
                         flexed
                       >
-                        <Switch>
-                          <Route exact path="/">
-                            <Home />
-                          </Route>
-                          <Route exact path="/blog">
-                            <Blog />
-                          </Route>
-                          <Route path="/blog/:id">
-                            <Post />
-                          </Route>
-                          <Route exact path="/projects">
-                            <Projects />
-                          </Route>
-                          <Route exact path="/admin">
-                            <Admin />
-                          </Route>
-                          <Route exact path="/about">
-                            <About />
-                          </Route>
-                          <Route>
-                            <NotFound />
-                          </Route>
-                        </Switch>
+                        <Routes>
+                          <Route path="/" element={<Home />} />
+                          <Route path="/blog" element={<Blog />} />
+                          <Route path="/blog/:id" element={<Post />} />
+                          <Route path="/projects" element={<Projects />} />
+                          <Route
+                            path="/admin"
+                            element={
+                              <Suspense fallback={<div>Loading...</div>}>
+                                <Admin />
+                              </Suspense>
+                            }
+                          />
+                          <Route path="/about" element={<About />} />
+                          <Route path="*" element={<NotFound />} />
+                        </Routes>
                       </Column>
                       <Footer />
                       <NavigationButtons mobile />

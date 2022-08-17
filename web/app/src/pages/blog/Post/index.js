@@ -1,5 +1,11 @@
-import React, { useRef, useEffect, useCallback, useState } from 'react';
-import { useLocation, useHistory, useRouteMatch } from 'react-router-dom';
+import React, {
+  useRef,
+  useEffect,
+  useCallback,
+  useState,
+  Suspense,
+} from 'react';
+import { useLocation, useNavigate, useParams } from 'react-router-dom';
 import { Alert, Button, FormControlLabel, Switch } from '@mui/material';
 import DeleteIcon from '@mui/icons-material/Delete';
 
@@ -20,7 +26,8 @@ import { Row, Column } from 'app/components/Flex';
 import FloatAside from 'app/components/FloatAside';
 import { useDialog } from 'app/components/Dialog';
 
-import PostEditor from './PostEditor';
+const PostEditor = React.lazy(() => import('./PostEditor'));
+
 import PostView from './PostView';
 
 const filterEmpty = (dict) =>
@@ -36,12 +43,12 @@ const filterEmpty = (dict) =>
 
 const Post = () => {
   const location = useLocation();
-  const history = useHistory();
-  const match = useRouteMatch();
+  const navigate = useNavigate();
+  const params = useParams();
   const { token, sendRequest } = useRequest();
   const { createNotification } = useNotification();
 
-  const postId = match.params.id;
+  const postId = params.id;
   const [loading, setLoading] = useState(false);
   const [isComparing, setIsComparing] = useState(false);
   const editing = location.pathname.endsWith('/edit') && !!token;
@@ -109,7 +116,7 @@ const Post = () => {
       sendRequest(publishPostAPI(postId))
         .success(({ post: updatedPost }) => {
           setPost(updatedPost);
-          history.push('#');
+          navigate('#');
           createNotification('Post published', 'success');
         })
         .failure(() => {
@@ -139,7 +146,7 @@ const Post = () => {
     sendRequest(deletePostAPI(postId))
       .success(() => {
         createNotification('Post deleted', 'success');
-        history.push('/admin#tab-1');
+        navigate('/admin#tab-1');
       })
       .failure((e) => {
         createNotification(e.message, 'error');
@@ -208,9 +215,7 @@ const Post = () => {
                   <Switch
                     checked={editing}
                     onChange={() => {
-                      history.push(
-                        `/blog/${post._id}/` + (!editing ? 'edit' : '')
-                      );
+                      navigate(`/blog/${post._id}/` + (!editing ? 'edit' : ''));
                     }}
                   />
                 }
@@ -273,7 +278,9 @@ const Post = () => {
         <Row gap={20}>
           <Column flexed style={{ maxWidth: '100%' }}>
             {token && editing ? (
-              <PostEditor post={post} updatePost={updatePost} />
+              <Suspense fallback={<div>Loading...</div>}>
+                <PostEditor post={post} updatePost={updatePost} />
+              </Suspense>
             ) : (
               <PostView
                 postData={

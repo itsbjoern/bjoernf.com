@@ -46,7 +46,8 @@ export const createSSRContext = () => {
 };
 createSSRContext();
 
-const SSRProvider = ({ children }) => {
+const SSRProvider = ({ children, ssrProps }) => {
+  const [props] = useState(ssrProps);
   if (!SSRContext) {
     new Error('Call "createSSRContext" before render');
   }
@@ -57,7 +58,7 @@ const SSRProvider = ({ children }) => {
   const getResolvedData = (id) => resolvedData[id];
 
   return (
-    <SSRContext.Provider value={{ addResolve, getResolvedData }}>
+    <SSRContext.Provider value={{ addResolve, getResolvedData, props }}>
       {children}
     </SSRContext.Provider>
   );
@@ -68,6 +69,14 @@ const ssrDidChain = {};
 const makePseudoId = (options) =>
   btoa(encodeURIComponent(JSON.stringify(options).replace(' ', '')));
 const windowData = () => (global.window && global.window.__RESOLVED_DATA) || {};
+
+export const useSSRProps = () => {
+  const context = useContext(SSRContext);
+  if (context === null) {
+    return null;
+  }
+  return context.props;
+};
 
 export const useSSR = (request, options) => {
   const timeout = useRef();

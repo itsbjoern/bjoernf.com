@@ -1,7 +1,6 @@
 import React from 'react';
 import { ListItem, ListItemButton, Skeleton } from '@mui/material';
 import PendingActionsIcon from '@mui/icons-material/PendingActions';
-import format from 'date-fns/format';
 import styled from '@emotion/styled';
 
 import { morphMixin } from 'app/theme';
@@ -10,6 +9,7 @@ import { H4 } from 'app/components/Text';
 import Tag from 'app/components/Tag';
 import UnstyledLink from 'app/components/UnstyledLink';
 import PostImage from 'app/components/PostImage';
+import { formatDate } from 'app/util';
 
 const Title = styled(H4)`
   line-height: 1.6rem;
@@ -143,7 +143,7 @@ const PostItem = ({ post }) => {
           <Row gap={10}>
             <Row>
               <span style={{ fontSize: '0.9rem' }}>
-                {format(createdAt * 1000, 'MMMM do, yyyy')}
+                {formatDate(createdAt)}
               </span>
             </Row>
           </Row>
