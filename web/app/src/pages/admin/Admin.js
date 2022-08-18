@@ -1,44 +1,18 @@
+import AddCircleIcon from '@mui/icons-material/AddCircle';
 import React, { useState, useEffect } from 'react';
 import { useLocation, useNavigate } from 'react-router-dom';
-import { Button, Tabs, Tab, List } from '@mui/material';
-import AddCircleIcon from '@mui/icons-material/AddCircle';
 
 import { getDrafts, createPost } from 'app/api/admin';
 import { useRequest } from 'app/providers/RequestProvider';
+
 import { Row, Column } from 'app/components/Flex';
-import PostItem from 'app/components/PostItem';
 import FloatAside from 'app/components/FloatAside';
+import PostItem from 'app/components/PostItem';
+import Button from 'app/components/ui/Button';
+import { List } from 'app/components/ui/List';
 
 import Dashboard from './Dashboard';
 import Login from './Login';
-
-const LinkedTab = ({ label, index, ...props }) => {
-  const navigate = useNavigate();
-  return (
-    <Tab
-      label={label}
-      onClick={() => navigate(`#tab-${index}`)}
-      id={`simple-tab-${index}`}
-      {...{
-        'aria-controls': `simple-tabpanel-${index}`,
-        'aria-selected': props['aria-selected'],
-      }}
-    />
-  );
-};
-
-const Panel = ({ children, value, index }) => {
-  return (
-    <div
-      role="tabpanel"
-      hidden={value !== index}
-      id={`simple-tabpanel-${index}`}
-      aria-labelledby={`simple-tab-${index}`}
-    >
-      {value === index ? children : null}
-    </div>
-  );
-};
 
 const Admin = () => {
   const location = useLocation();
@@ -65,20 +39,25 @@ const Admin = () => {
   return (
     <Column>
       <Row>
-        <Tabs
-          value={currentTab}
-          onChange={(evt, newTab) => navigate(`#tab-${newTab}`)}
-          aria-label="basic tabs"
+        <Button
+          variant={currentTab === 0 ? 'contained' : 'text'}
+          onClick={() => {
+            navigate('#tab-0');
+          }}
         >
-          <LinkedTab label="Dashboard" index={0} />
-          <LinkedTab label="Drafts" index={1} />
-          <LinkedTab label="Analytics" />
-        </Tabs>
+          Dashboard
+        </Button>
+        <Button
+          variant={currentTab === 1 ? 'contained' : 'text'}
+          onClick={() => {
+            navigate('#tab-1');
+          }}
+        >
+          Drafts
+        </Button>
       </Row>
-      <Panel value={currentTab} index={0}>
-        <Dashboard />
-      </Panel>
-      <Panel value={currentTab} index={1}>
+      {currentTab === 0 ? <Dashboard /> : null}
+      {currentTab === 1 ? (
         <FloatAside
           menu={
             token ? (
@@ -104,7 +83,7 @@ const Admin = () => {
             ))}
           </List>
         </FloatAside>
-      </Panel>
+      ) : null}
     </Column>
   );
 };

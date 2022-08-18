@@ -5,17 +5,18 @@ import {
   TwitterIcon,
   WhatsappIcon,
 } from 'react-share';
-import { IconButton } from '@mui/material';
 
 import { useSSRProps } from 'app/providers/SSRProvider';
 import { emailLink, linkedinLink, whatsappLink, twitterLink } from 'app/share';
+import { formatDate } from 'app/util';
+
 import { Column, Row } from 'app/components/Flex';
-import { H2 } from 'app/components/Text';
-import StyledEditor from 'app/components/RichText/StyledEditor';
-import Tag from 'app/components/Tag';
 import FloatAside from 'app/components/FloatAside';
 import PostImage from 'app/components/PostImage';
-import { formatDate } from 'app/util';
+import StyledEditor from 'app/components/RichText/StyledEditor';
+import Tag from 'app/components/Tag';
+import { H2 } from 'app/components/Text';
+import { IconButton } from 'app/components/ui/Button';
 
 const ShareIcon = ({ href, size, Icon }) => (
   <a href={href} target="_blank" rel="noreferrer">
@@ -28,7 +29,9 @@ const ShareIcon = ({ href, size, Icon }) => (
 const PostView = ({ postData, createdAt, hideShare }) => {
   const { title, html, tags, image } = postData;
   const ssrProps = useSSRProps();
-  const [url] = useState(ssrProps ? ssrProps.host + ssrProps.path : global.window?.location?.href);
+  const [url] = useState(
+    ssrProps ? ssrProps.host + ssrProps.path : global.window?.location?.href
+  );
   const [userAgent] = useState(global?.navigator?.userAgent || '');
 
   const iconSize = 45;

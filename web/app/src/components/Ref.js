@@ -1,20 +1,32 @@
-import React from 'react';
-import { Link as RouterLink } from 'react-router-dom';
-import { Link } from '@mui/material';
-import { withTheme } from '@mui/styles';
 import TransitEnterexitIcon from '@mui/icons-material/TransitEnterexit';
+import React from 'react';
+import { Link } from 'react-router-dom';
+import styled from 'styled-components';
 
-const LinkRender = withTheme(({ theme, external, href, ...props }) =>
+const RouterLink = styled(Link)`
+  color: ${({ theme }) => theme.palette.primary.main};
+  text-decoration-color: rgba(255, 87, 10, 0.4);
+
+  &:hover {
+    text-decoration-color: rgba(255, 87, 10, 1);
+  }
+`;
+
+const ExternalLink = styled.a`
+  color: ${({ theme }) => theme.palette.primary.main};
+  text-decoration-color: rgba(255, 87, 10, 0.4);
+
+  &:hover {
+    text-decoration-color: rgba(255, 87, 10, 1);
+  }
+`;
+
+const LinkRender = ({ external, href, ...props }) =>
   external ? (
-    <Link color="primary" href={href} target="_blank" {...props} />
+    <ExternalLink href={href} target="_blank" {...props} />
   ) : (
-    <RouterLink
-      style={{ color: theme.palette.primary.main }}
-      to={href}
-      {...props}
-    />
-  )
-);
+    <RouterLink to={href} {...props} />
+  );
 
 const Ref = ({ text, href }) => {
   const isExternal = href.slice(0, 1) !== '/';
@@ -26,7 +38,7 @@ const Ref = ({ text, href }) => {
         {isExternal ? (
           <TransitEnterexitIcon
             color="primary"
-            sx={{
+            style={{
               marginLeft: 0,
               fontSize: '1rem',
               transform: 'rotate(180deg)',

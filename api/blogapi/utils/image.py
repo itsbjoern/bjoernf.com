@@ -2,21 +2,15 @@
 Utilities to support image related modification tasks
 """
 import io
-from typing import TypedDict, Union, Literal, Optional, Tuple
-from typing_extensions import NotRequired
+from typing import Optional, Tuple
 from aiohttp import web
 from PIL import Image
-
+from blogapi.models import Options
 
 formats = {
     'png': 'PNG',
     'jpg': 'JPEG'
 }
-
-class Options(TypedDict):
-    ext: NotRequired[Union[Literal['png'], Literal['jpg']]]
-    max_size: NotRequired[int]
-    quality: NotRequired[int]
 
 
 def compress_image(image_bytes: bytearray, options: Optional[Options]=None) -> bytes:
@@ -24,7 +18,7 @@ def compress_image(image_bytes: bytearray, options: Optional[Options]=None) -> b
         options = Options()
     pil_image = Image.open(io.BytesIO(image_bytes))
     ext = options.get('ext', 'jpg')
-    max_size = options.get('max_size', 1200)
+    max_size = options.get('max_size', 800)
     quality = options.get('quality', 95)
 
     aspect_ratio = max_size / max(*pil_image.size, max_size)

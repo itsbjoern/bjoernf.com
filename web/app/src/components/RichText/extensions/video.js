@@ -20,10 +20,10 @@ import {
   ProsemirrorAttributes,
   ProsemirrorNode,
 } from '@remirror/core';
+import { ResizableImageView } from '@remirror/extension-image';
 import { PasteRule } from '@remirror/pm/paste-rules';
 import { insertPoint } from '@remirror/pm/transform';
 import { ExtensionImageTheme } from '@remirror/theme';
-import { ResizableImageView } from '@remirror/extension-image';
 
 export class VideoExtension extends NodeExtension {
   constructor(options) {

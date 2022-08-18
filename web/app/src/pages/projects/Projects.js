@@ -1,11 +1,12 @@
 import React from 'react';
-import { Divider } from '@mui/material';
-import styled from '@emotion/styled';
+import styled from 'styled-components';
 
 import { morphMixin } from 'app//theme';
+
 import { Column, Row } from 'app/components/Flex';
-import { H2, H4 } from 'app/components/Text';
 import Ref from 'app/components/Ref';
+import { H2, H4 } from 'app/components/Text';
+import Divider from 'app/components/ui/Divider';
 
 const ProjectBlock = styled(Column)`
   flex: 1;

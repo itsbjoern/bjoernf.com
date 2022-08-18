@@ -1,13 +1,15 @@
 import React from 'react';
-import { Divider, List } from '@mui/material';
 
-import { useSSR } from 'app/providers/SSRProvider';
-import { useRequest } from 'app/providers/RequestProvider';
 import { getPosts } from 'app/api/blog';
+import { useRequest } from 'app/providers/RequestProvider';
+import { useSSR } from 'app/providers/SSRProvider';
+
 import { Column } from 'app/components/Flex';
-import { H2, H4 } from 'app/components/Text';
-import Ref from 'app/components/Ref';
 import PostItem from 'app/components/PostItem';
+import Ref from 'app/components/Ref';
+import { H2, H4 } from 'app/components/Text';
+import Divider from 'app/components/ui/Divider';
+import { List } from 'app/components/ui/List';
 
 const Home = () => {
   const { sendRequest } = useRequest();

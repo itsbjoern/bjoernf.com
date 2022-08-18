@@ -1,5 +1,5 @@
-import React, { useState } from 'react';
 import { useRemirrorContext } from '@remirror/react';
+import React, { useState } from 'react';
 
 import StyledEditor from './StyledEditor';
 

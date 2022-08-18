@@ -36,11 +36,15 @@ export const deleteDraft = (postId) => {
   return deleteCall(`/admin/blog/posts/${postId}/draft`);
 };
 
-export const upload = (postId, file) => {
+export const upload = (postId, file, options = {}) => {
   const formData = new FormData();
   formData.append('data', file);
+  const params = new URLSearchParams(options);
 
-  return postRaw(`/admin/blog/posts/${postId}/upload`, formData);
+  return postRaw(
+    `/admin/blog/posts/${postId}/upload?${params.toString()}`,
+    formData
+  );
 };
 
 export const getViews = (days = 14) => {

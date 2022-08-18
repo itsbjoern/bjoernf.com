@@ -1,21 +1,18 @@
-import React, { useState, useEffect, useCallback } from 'react';
-import {
-  IconButton,
-  TextField,
-  Autocomplete,
-  InputAdornment,
-} from '@mui/material';
-import SubtitlesIcon from '@mui/icons-material/Subtitles';
-import LoyaltyIcon from '@mui/icons-material/Loyalty';
 import ControlPointIcon from '@mui/icons-material/ControlPoint';
+import LoyaltyIcon from '@mui/icons-material/Loyalty';
+import SubtitlesIcon from '@mui/icons-material/Subtitles';
+import React, { useState, useEffect, useCallback } from 'react';
 
-import { useRequest } from 'app/providers/RequestProvider';
-import { getTags } from 'app/api/blog';
 import { upload } from 'app/api/admin';
+import { getTags } from 'app/api/blog';
+import { useRequest } from 'app/providers/RequestProvider';
+
 import { Row, Column } from 'app/components/Flex';
+import PostImage from 'app/components/PostImage';
 import RichText from 'app/components/RichText';
 import Tag from 'app/components/Tag';
-import PostImage from 'app/components/PostImage';
+import { IconButton } from 'app/components/ui/Button';
+import TextField, { Autocomplete } from 'app/components/ui/TextField';
 
 const PostEditor = ({ post, updatePost }) => {
   const { sendRequest } = useRequest();
@@ -37,10 +34,12 @@ const PostEditor = ({ post, updatePost }) => {
   const [initialHtml] = useState(html);
 
   const uploadHandler = useCallback(
-    (file) =>
-      sendRequest(upload(post._id, file)).success(({ src, fileName }) => {
-        return Promise.resolve({ src, fileName });
-      }),
+    (file, options) =>
+      sendRequest(upload(post._id, file, options)).success(
+        ({ src, fileName }) => {
+          return Promise.resolve({ src, fileName });
+        }
+      ),
     [post._id]
   );
 
@@ -49,8 +48,8 @@ const PostEditor = ({ post, updatePost }) => {
       <Row gap={15} align="center">
         <PostImage
           src={image}
-          onImageChosen={(file) =>
-            uploadHandler(file).then(({ src }) => {
+          onImageChosen={(file, options) =>
+            uploadHandler(file, options).then(({ src }) => {
               updatePost({ image: src });
             })
           }
@@ -62,38 +61,20 @@ const PostEditor = ({ post, updatePost }) => {
         <Column flexed gap={30}>
           <Row gap={15} align="center" wrapping>
             <Autocomplete
-              style={{ flex: 1 }}
-              size="small"
-              freeSolo={true}
               value={newTag}
               options={availableTags || []}
-              disablePortal={true}
-              onChange={(event, name) => setNewTag(name)}
-              renderInput={({ InputProps, ...rest }) => (
-                <TextField
-                  size="small"
-                  onChange={(event) => setNewTag(event.target.value)}
-                  label="Add Tag"
-                  onKeyDown={(e) => {
-                    if (newTag === '' || tags?.includes(newTag)) {
-                      return;
-                    }
-                    if (e.key === 'Enter') {
-                      updatePost({ tags: [...(tags || []), newTag] });
-                      setNewTag('');
-                    }
-                  }}
-                  InputProps={{
-                    ...InputProps,
-                    startAdornment: (
-                      <InputAdornment position="start">
-                        <LoyaltyIcon />
-                      </InputAdornment>
-                    ),
-                  }}
-                  {...rest}
-                />
-              )}
+              onChange={(event) => setNewTag(event.target.value)}
+              label="Add Tag"
+              onKeyDown={(e) => {
+                if (newTag === '' || tags?.includes(newTag)) {
+                  return;
+                }
+                if (e.key === 'Enter') {
+                  updatePost({ tags: [...(tags || []), newTag] });
+                  setNewTag('');
+                }
+              }}
+              icon={<LoyaltyIcon />}
             />
             <IconButton
               size="small"
@@ -125,13 +106,7 @@ const PostEditor = ({ post, updatePost }) => {
             value={title}
             onChange={(event) => updatePost({ title: event.target.value })}
             label="Title"
-            InputProps={{
-              startAdornment: (
-                <InputAdornment position="start">
-                  <SubtitlesIcon />
-                </InputAdornment>
-              ),
-            }}
+            icon={<SubtitlesIcon />}
           />
         </Column>
       </Row>

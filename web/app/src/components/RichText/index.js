@@ -1,3 +1,11 @@
+import { getTextSelection } from '@remirror/core';
+import { findNodeAtSelection } from '@remirror/core-utils';
+import {
+  Remirror,
+  useRemirror,
+  ThemeProvider,
+  useKeymap,
+} from '@remirror/react';
 import React, { useState } from 'react';
 import {
   BoldExtension,
@@ -13,24 +21,16 @@ import {
   CodeExtension,
   CodeBlockExtension,
 } from 'remirror/extensions';
-import {
-  Remirror,
-  useRemirror,
-  ThemeProvider,
-  useKeymap,
-} from '@remirror/react';
-import { getTextSelection } from '@remirror/core';
-import { findNodeAtSelection } from '@remirror/core-utils';
 
 // import { FileExtension } from '@remirror/extension-file'
 // import { VideoExtension } from './extensions/video'
 
 import { Column } from 'app/components/Flex';
 
-import FloatingLinkToolbar from './FloatingLinkToolbar';
 import { ImageExtension } from './extensions/fixed-image';
-import EditorView from './view';
+import FloatingLinkToolbar from './FloatingLinkToolbar';
 import EditorMenu from './menu';
+import EditorView from './view';
 
 const createUploadHandler = (upload) => (uploads) => {
   let completed = 0;

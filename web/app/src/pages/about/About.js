@@ -1,9 +1,9 @@
 import React from 'react';
-import { Divider } from '@mui/material';
 
 import { Column } from 'app/components/Flex';
-import { H4 } from 'app/components/Text';
 import Ref from 'app/components/Ref';
+import { H4 } from 'app/components/Text';
+import Divider from 'app/components/ui/Divider';
 
 const About = () => {
   return (
@@ -39,23 +39,14 @@ const About = () => {
       </span>
       <span>
         To get information about the behavior of my visitors, I use{' '}
-        <a
-          href="https://ackee.electerious.com"
-          target="_blank"
-          rel="noopener noreferrer"
-        >
-          Ackee
-        </a>
-        . This analytics software gives me insight about my visitors only in
-        general, but not about individuals per se, as it does not track visitors
-        and does not store any personal identifiable information.{' '}
-        <a
+        <Ref text="Ackee" href="https://ackee.electerious.com" />. This
+        analytics software gives me insight about my visitors only in general,
+        but not about individuals per se, as it does not track visitors and does
+        not store any personal identifiable information.{' '}
+        <Ref
+          text="Go to their documentation"
           href="https://docs.ackee.electerious.com/#/docs/Anonymization"
-          target="_blank"
-          rel="noopener noreferrer"
-        >
-          Go to their documentation
-        </a>{' '}
+        />
         to find out what Ackee collects. Please note that I do collect the
         detailed information as outlined on their page.
       </span>

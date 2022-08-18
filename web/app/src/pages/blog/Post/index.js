@@ -1,3 +1,4 @@
+import DeleteIcon from '@mui/icons-material/Delete';
 import React, {
   useRef,
   useEffect,
@@ -6,10 +7,8 @@ import React, {
   Suspense,
 } from 'react';
 import { useLocation, useNavigate, useParams } from 'react-router-dom';
-import { Alert, Button, FormControlLabel, Switch } from '@mui/material';
-import DeleteIcon from '@mui/icons-material/Delete';
+import { toast } from 'react-toast';
 
-import { getPost } from 'app/api/blog';
 import {
   updatePost as updatePostAPI,
   publishPost as publishPostAPI,
@@ -17,14 +16,18 @@ import {
   deletePost as deletePostAPI,
   deleteDraft as deleteDraftAPI,
 } from 'app/api/admin';
+import { getPost } from 'app/api/blog';
+import NotFound from 'app/pages/404';
+import { useRequest } from 'app/providers/RequestProvider';
 import { useSSR } from 'app/providers/SSRProvider';
 import { isSSR } from 'app/util';
-import { useRequest } from 'app/providers/RequestProvider';
-import { useNotification } from 'app/providers/NotificationProvider';
-import NotFound from 'app/pages/404';
+
 import { Row, Column } from 'app/components/Flex';
 import FloatAside from 'app/components/FloatAside';
-import { useDialog } from 'app/components/Dialog';
+import Alert from 'app/components/ui/Alert';
+import Button from 'app/components/ui/Button';
+import { useDialog } from 'app/components/ui/Dialog';
+import Switch from 'app/components/ui/Switch';
 
 const PostEditor = React.lazy(() => import('./PostEditor'));
 
@@ -46,7 +49,6 @@ const Post = () => {
   const navigate = useNavigate();
   const params = useParams();
   const { token, sendRequest } = useRequest();
-  const { createNotification } = useNotification();
 
   const postId = params.id;
   const [loading, setLoading] = useState(false);
@@ -97,7 +99,7 @@ const Post = () => {
       sendRequest(
         updatePostAPI(postId, { title, tags, html, text, image })
       ).success(() => {
-        createNotification('Post saved', 'success', 1000);
+        toast.success('Post saved');
         if (then) {
           then();
         }
@@ -117,10 +119,10 @@ const Post = () => {
         .success(({ post: updatedPost }) => {
           setPost(updatedPost);
           navigate('#');
-          createNotification('Post published', 'success');
+          toast.success('Post published');
         })
         .failure(() => {
-          createNotification('Publish failed', 'error');
+          toast.error('Publish failed');
         });
     };
 
@@ -135,32 +137,32 @@ const Post = () => {
     sendRequest(unpublishPostAPI(postId))
       .success(({ post: updatedPost }) => {
         setPost(updatedPost);
-        createNotification('Post published', 'success');
+        toast.success('Post published');
       })
       .failure(() => {
-        createNotification('Publish failed', 'error');
+        toast.error('Publish failed');
       });
   }, [postId]);
 
   const deletePost = useCallback(() => {
     sendRequest(deletePostAPI(postId))
       .success(() => {
-        createNotification('Post deleted', 'success');
+        toast.success('Post deleted');
         navigate('/admin#tab-1');
       })
       .failure((e) => {
-        createNotification(e.message, 'error');
+        toast.error(e.message);
       });
   }, [postId]);
 
   const deleteDraft = useCallback(() => {
     sendRequest(deleteDraftAPI(postId))
       .success(({ post }) => {
-        createNotification('Draft deleted', 'success');
+        toast.success('Draft deleted');
         setPost(post);
       })
       .failure((e) => {
-        createNotification(e.message, 'error');
+        toast.error(e.message);
       });
   }, [postId]);
 
@@ -210,29 +212,21 @@ const Post = () => {
               {post.published && post.draft ? ' (Changes)' : ''}
             </Alert>
             <Row justify="center">
-              <FormControlLabel
-                control={
-                  <Switch
-                    checked={editing}
-                    onChange={() => {
-                      navigate(`/blog/${post._id}/` + (!editing ? 'edit' : ''));
-                    }}
-                  />
-                }
+              <Switch
+                checked={editing}
+                onChange={() => {
+                  navigate(`/blog/${post._id}/` + (!editing ? 'edit' : ''));
+                }}
                 label="Edit Mode"
               />
             </Row>
             <Row justify="center">
-              <FormControlLabel
-                control={
-                  <Switch
-                    disabled={!post.draft || !post.published}
-                    checked={isComparing}
-                    onChange={() => {
-                      setIsComparing(!isComparing);
-                    }}
-                  />
-                }
+              <Switch
+                disabled={!post.draft || !post.published}
+                checked={isComparing}
+                onChange={() => {
+                  setIsComparing(!isComparing);
+                }}
                 label="Compare"
               />
             </Row>

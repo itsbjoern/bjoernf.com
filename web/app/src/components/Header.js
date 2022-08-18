@@ -1,18 +1,20 @@
-import React from 'react';
-import { useNavigate } from 'react-router-dom';
-import styled from '@emotion/styled';
-import { Avatar, Divider, Chip } from '@mui/material';
-import LogoutIcon from '@mui/icons-material/Logout';
-import GitHubIcon from '@mui/icons-material/GitHub';
-import LinkedInIcon from '@mui/icons-material/LinkedIn';
 import AdminPanelSettingsIcon from '@mui/icons-material/AdminPanelSettings';
 import ArrowCircleUpIcon from '@mui/icons-material/ArrowCircleUp';
+import GitHubIcon from '@mui/icons-material/GitHub';
+import LinkedInIcon from '@mui/icons-material/LinkedIn';
+import LogoutIcon from '@mui/icons-material/Logout';
+import React from 'react';
+import { useNavigate } from 'react-router-dom';
+import styled from 'styled-components';
 
-import { getPublicFileUrl } from 'app/util';
 import { useRequest } from 'app/providers/RequestProvider';
+import { morphMixin } from 'app/theme';
+import { getPublicFileUrl } from 'app/util';
+
 import { Row, Column } from 'app/components/Flex';
 import { H2 } from 'app/components/Text';
-import { morphMixin } from 'app/theme';
+import Chip from 'app/components/ui/Chip';
+import Divider from 'app/components/ui/Divider';
 
 import NavigationButtons from './NavigationButtons';
 
@@ -23,6 +25,13 @@ const BG = styled(Column)`
   border-radius: 0 0 10px 10px;
 `;
 
+const Avatar = styled.img`
+  width: 70px;
+  height: 70px;
+  border-radius: 35px;
+  object-fit: cover;
+`;
+
 const Header = () => {
   const navigate = useNavigate();
   const { token, setToken } = useRequest();
@@ -31,10 +40,7 @@ const Header = () => {
     <BG gap={15}>
       <Row justify="between" align="center">
         <Row align="center">
-          <Avatar
-            sx={{ width: 70, height: 70 }}
-            src={getPublicFileUrl('me.png', 'images')}
-          />
+          <Avatar src={getPublicFileUrl('me.png', 'images')} />
           <Column justify="evenly" style={{ marginLeft: 10 }}>
             <H2>Björn Friedrichs</H2>
             <Row gap={5}>
@@ -54,14 +60,12 @@ const Header = () => {
               <Chip
                 icon={<AdminPanelSettingsIcon fontSize="small" />}
                 label="Admin"
-                clickable
                 variant="outlined"
                 onClick={() => navigate('/admin')}
               />
               <Chip
                 icon={<LogoutIcon fontSize="small" />}
                 label="Sign out"
-                clickable
                 variant="outlined"
                 onClick={() => setToken(null)}
               />
@@ -71,20 +75,20 @@ const Header = () => {
         <Row justify="end" gap={15}>
           <Chip
             component="a"
+            clickable
             icon={<GitHubIcon />}
             href="https://github.com/BFriedrichs"
             label="BFriedrichs"
             variant="outlined"
-            clickable
             target="_blank"
           />
           <Chip
             component="a"
+            clickable
             icon={<LinkedInIcon />}
             href="https://linkedin.com/in/bjoern-friedrichs"
             label="bjoern-friedrichs"
             variant="outlined"
-            clickable
             target="_blank"
           />
         </Row>

@@ -11,19 +11,11 @@ module.exports = new Resolver({
         filePath: path.join(__dirname, 'shim', 'mention-extension.js'),
       };
     }
-    if (specifier === './utils/createSvgIcon') {
-      return {
-        filePath: path.join(
-          __dirname,
-          '..',
-          'node_modules',
-          '@mui',
-          'material',
-          'utils',
-          'createSvgIcon.js'
-        ),
-      };
-    }
+    // if (specifier === './utils/createSvgIcon') {
+    //   return {
+    //     filePath: path.join(__dirname, 'shim', 'createSvgIcon.js'),
+    //   };
+    // }
 
     // Let the next resolver in the pipeline handle
     // this dependency.

@@ -1,24 +1,25 @@
-import React from 'react';
-import { useActive, useChainedCommands, useCommands } from '@remirror/react';
-import { Button, ButtonGroup } from '@mui/material';
+import FormatAlignCenterIcon from '@mui/icons-material/FormatAlignCenter';
+import FormatAlignLeftIcon from '@mui/icons-material/FormatAlignLeft';
+import FormatAlignRightIcon from '@mui/icons-material/FormatAlignRight';
 import FormatBoldIcon from '@mui/icons-material/FormatBold';
 import FormatItalicIcon from '@mui/icons-material/FormatItalic';
-import StrikethroughSIcon from '@mui/icons-material/StrikethroughS';
-import FormatUnderlinedIcon from '@mui/icons-material/FormatUnderlined';
-import RedoIcon from '@mui/icons-material/Redo';
-import UndoIcon from '@mui/icons-material/Undo';
 import FormatListBulletedIcon from '@mui/icons-material/FormatListBulleted';
 import FormatListNumberedIcon from '@mui/icons-material/FormatListNumbered';
 import FormatSizeIcon from '@mui/icons-material/FormatSize';
-import FormatAlignLeftIcon from '@mui/icons-material/FormatAlignLeft';
-import FormatAlignRightIcon from '@mui/icons-material/FormatAlignRight';
-import FormatAlignCenterIcon from '@mui/icons-material/FormatAlignCenter';
-import styled from '@emotion/styled';
+import FormatUnderlinedIcon from '@mui/icons-material/FormatUnderlined';
+import RedoIcon from '@mui/icons-material/Redo';
+import StrikethroughSIcon from '@mui/icons-material/StrikethroughS';
+import UndoIcon from '@mui/icons-material/Undo';
+import { useActive, useChainedCommands, useCommands } from '@remirror/react';
+import React from 'react';
+import styled from 'styled-components';
 
 import { Row } from 'app/components/Flex';
+import Button, { ButtonGroup } from 'app/components/ui/Button';
 
 const MenuButton = styled(Button)`
   width: 45px;
+  min-width: 45px;
 
   > svg {
     height: 20px;

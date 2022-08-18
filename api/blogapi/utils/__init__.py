@@ -37,7 +37,7 @@ def json_response(data, **kwargs):
     return JsonResponse(data, **kwargs)
 
 
-def paginate(coll, query, projection=None, page=1, limit=10, items_per_page=10):
+def paginate(coll, query, projection=None, page=1, limit=10, items_per_page=5):
     cursor = None
     num_pages = 1
     current_page = 1

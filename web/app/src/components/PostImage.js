@@ -1,11 +1,12 @@
-import React, { useState, useCallback, useRef } from 'react';
-import { CircularProgress, IconButton } from '@mui/material';
-import UploadIcon from '@mui/icons-material/Upload';
 import Clear from '@mui/icons-material/Clear';
-import styled from '@emotion/styled';
+import UploadIcon from '@mui/icons-material/Upload';
+import React, { useState, useCallback, useRef } from 'react';
+import { toast } from 'react-toast';
+import styled from 'styled-components';
 
-import { useNotification } from 'app/providers/NotificationProvider';
-import { useDialog } from 'app/components/Dialog';
+import { IconButton } from 'app/components/ui/Button';
+import CircularProgress from 'app/components/ui/CircularProgress';
+import { useDialog } from 'app/components/ui/Dialog';
 
 const ClearButton = styled.div`
   position: absolute;
@@ -62,13 +63,13 @@ const PostImageContainer = styled.div`
         color: #3f403f;
       }
 
-      &&> .MuiSvgIcon-root {
+      &&> .upload-icon {
         display: block;
         z-index: 2;
       }
     }
 
-    &> .MuiSvgIcon-root {
+    &> .upload-icon {
       display: ${imgSrc ? 'none' : 'block'};
     }
   `}
@@ -79,17 +80,17 @@ const PostImageContainer = styled.div`
     object-fit: cover;
   }
 
-  > .MuiSvgIcon-root {
+  > svg {
     position: absolute;
     font-size: 50px;
     color: rgba(0, 0, 0, 0.54);
     display: none;
   }
+`;
 
-  > .MuiCircularProgress-root {
-    position: absolute;
-    color: rgba(0, 0, 0, 0.54);
-  }
+const Progress = styled(CircularProgress)`
+  position: absolute;
+  color: rgba(0, 0, 0, 0.54);
 `;
 
 const PostImage = ({
@@ -101,7 +102,6 @@ const PostImage = ({
   hideOnMobile,
 }) => {
   const [isUploading, setIsUploading] = useState(false);
-  const { createNotification } = useNotification();
 
   const [ClearDialog, openClearDialog] = useDialog(
     'Are you sure you want to clear this image?',
@@ -116,7 +116,7 @@ const PostImage = ({
   const onFileChosen = useCallback(
     (file) => {
       setIsUploading(true);
-      onImageChosen(file).then(() => {
+      onImageChosen(file, { max_size: 200, quality: 80 }).then(() => {
         setIsUploading(false);
       });
     },
@@ -138,17 +138,24 @@ const PostImage = ({
 
           uploadRef.current.click();
         }}
+        onDragOver={(ev) => {
+          ev.preventDefault();
+        }}
         onDrop={(event) => {
+          event.preventDefault();
           if (!editable) return;
-          if (event.datatTransfer?.items?.length !== 1) {
-            createNotification('A single file is required.');
+          if (event.dataTransfer?.items?.length !== 1) {
+            toast.error('A single file is required.');
+            return;
           }
           if (event.dataTransfer.items[0].kind !== 'file') {
-            createNotification('File required.');
+            toast.error('File required.');
+            return;
           }
           const file = event.dataTransfer.items[0].getAsFile();
           if (!file.type.startsWith('image/')) {
-            createNotification('Image file required.');
+            toast.error('Image file required.');
+            return;
           }
 
           onFileChosen(file);
@@ -164,14 +171,14 @@ const PostImage = ({
               onChange={(event) => {
                 const files = event.target.files;
                 if (files.length !== 1) {
-                  createNotification('Image file required.');
+                  toast.error('Image file required.');
                 }
                 const file = files[0];
                 onFileChosen(file);
                 event.currentTarget.value = '';
               }}
             />
-            <UploadIcon />
+            <UploadIcon className="upload-icon" />
             {src ? (
               <ClearButton
                 onClick={(e) => {
@@ -188,7 +195,7 @@ const PostImage = ({
           </>
         ) : null}
         {src ? <img src={src} /> : null}
-        {isUploading ? <CircularProgress size={50} /> : null}
+        {isUploading ? <Progress size={50} /> : null}
       </PostImageContainer>
     </>
   );

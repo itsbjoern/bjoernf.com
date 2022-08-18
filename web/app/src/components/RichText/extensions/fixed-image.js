@@ -1,5 +1,5 @@
-import { ImageExtension as BrokenImageExtension } from 'remirror/extensions';
 import { isElementDomNode, omitExtraAttributes } from '@remirror/core';
+import { ImageExtension as BrokenImageExtension } from 'remirror/extensions';
 
 /**
  * Get the width and the height of the image.

@@ -2,6 +2,11 @@ from datetime import datetime
 from typing import List, TypedDict
 from typing_extensions import NotRequired
 
+class Options(TypedDict):
+    ext: NotRequired[str]
+    max_size: NotRequired[int]
+    quality: NotRequired[int]
+
 
 class Model(TypedDict):
     _id: str

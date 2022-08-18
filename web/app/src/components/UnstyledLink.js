@@ -1,6 +1,6 @@
 import React, { useRef } from 'react';
 import { Link } from 'react-router-dom';
-import styled from '@emotion/styled';
+import styled from 'styled-components';
 
 const UnstyledLink = styled(Link)`
   &&& {
@@ -8,6 +8,7 @@ const UnstyledLink = styled(Link)`
     align-items: center;
     text-decoration: none;
     color: initial;
+    -webkit-tap-highlight-color: rgba(0, 0, 0, 0);
   }
 `;
 

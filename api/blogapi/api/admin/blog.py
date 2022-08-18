@@ -11,7 +11,7 @@ from aiohttp import web, BodyPartReader
 from blogapi import utils
 from blogapi.utils import auth, image
 from blogapi.application import BlogRequest
-from blogapi.models import PostContent
+from blogapi.models import PostContent, Options
 
 
 @auth.require
@@ -216,7 +216,15 @@ async def upload(request: BlogRequest):
         size += len(chunk)
         upload_data.extend(chunk)
 
-    adjusted = image.compress_image(upload_data)
+    ext = request.query.get('ext') or 'jpg'
+    max_size = request.query.get('max_size') or 800
+    quality = request.query.get('quality') or 95
+
+    adjusted = image.compress_image(upload_data, options=Options(
+        ext=ext,
+        max_size=int(max_size),
+        quality=int(quality)
+    ))
     file_url = request.app.aws.s3_upload_file(
         file_name, adjusted, path='uploads')
 

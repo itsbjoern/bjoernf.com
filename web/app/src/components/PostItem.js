@@ -1,42 +1,45 @@
-import React from 'react';
-import { ListItem, ListItemButton, Skeleton } from '@mui/material';
 import PendingActionsIcon from '@mui/icons-material/PendingActions';
-import styled from '@emotion/styled';
+import React from 'react';
+import styled from 'styled-components';
 
+import Ripples from 'app/lib/Ripples';
 import { morphMixin } from 'app/theme';
-import { Row, Column } from 'app/components/Flex';
-import { H4 } from 'app/components/Text';
-import Tag from 'app/components/Tag';
-import UnstyledLink from 'app/components/UnstyledLink';
-import PostImage from 'app/components/PostImage';
 import { formatDate } from 'app/util';
+
+import { Row, Column } from 'app/components/Flex';
+import PostImage from 'app/components/PostImage';
+import Tag from 'app/components/Tag';
+import { H4 } from 'app/components/Text';
+import { ListItem } from 'app/components/ui/List';
+import Skeleton from 'app/components/ui/Skeleton';
+import UnstyledLink from 'app/components/UnstyledLink';
 
 const Title = styled(H4)`
   line-height: 1.6rem;
   color: ${({ theme }) => theme.palette.primary.main};
 `;
 
-const ShadowButton = styled(ListItemButton)`
-  &&& {
-    padding-bottom: 10px;
-    padding-left: 10px;
-    padding-top: 10px;
-    padding-right: 10%;
+const ShadowButton = styled.div`
+  display: flex;
+  flex: 1;
+  overflow: hidden;
 
-    @media only screen and (max-width: 425px) {
-      padding-right: 10px;
-    }
-
-    min-height: 77px;
-    background-color: ${({ theme }) => theme.palette.background.paper};
-    position: relative;
-
-    ${morphMixin()}
-
-    .MuiTouchRipple-root > span > span {
-      background-color: ${({ theme }) => theme.palette.secondary.main};
-    }
+  @media only screen and (max-width: 425px) {
+    padding-right: 10px;
   }
+
+  min-height: 77px;
+  background-color: ${({ theme }) => theme.palette.background.paper};
+  position: relative;
+
+  ${morphMixin()}
+`;
+
+const PadRow = styled(Row)`
+  padding-bottom: 10px;
+  padding-left: 10px;
+  padding-top: 10px;
+  padding-right: 10%;
 `;
 
 const Outer = styled(Row)`
@@ -115,17 +118,19 @@ const PostItem = ({ post }) => {
             </Row>
           </ClipOn>
         </Control>
-        <ListItem sx={{ padding: `0 0 10px 0` }}>
+        <ListItem>
           <ShadowButton>
-            <Row justify="start" flexed gap={10} grow={10}>
-              <Column gap={10}>
-                <Title>
-                  <Skeleton animation="wave" height={30} width={120} />
-                </Title>
-                <Skeleton animation="wave" height={10} width={240} />
-                <Skeleton animation="wave" height={10} width={220} />
-              </Column>
-            </Row>
+            <Ripples flex>
+              <PadRow justify="start" flexed gap={10} grow={10}>
+                <Column gap={10}>
+                  <Title>
+                    <Skeleton animation="wave" height={30} width={120} />
+                  </Title>
+                  <Skeleton animation="wave" height={10} width={240} />
+                  <Skeleton animation="wave" height={10} width={220} />
+                </Column>
+              </PadRow>
+            </Ripples>
           </ShadowButton>
         </ListItem>
       </Column>
@@ -137,7 +142,7 @@ const PostItem = ({ post }) => {
   const summary = draft ? draft.text?.slice(0, 100) : published.summary;
 
   return (
-    <Column>
+    <Column style={{ marginBottom: 10 }}>
       <Control justify="start">
         <ClipOn>
           <Row gap={10}>
@@ -163,16 +168,18 @@ const PostItem = ({ post }) => {
         </ClipOn>
       </Control>
       <UnstyledLink delay={300} to={`/blog/${post._id}`}>
-        <ListItem sx={{ padding: `0 0 10px 0` }}>
+        <ListItem>
           <ShadowButton>
-            <Row gap={10}>
-              {!published ? <PendingActionsIcon /> : null}
-              {image ? <PostImage size={100} src={image} /> : null}
-              <Column wrapping="mobile">
-                <Title>{title || 'No title'}</Title>
-                <Summary>{summary}</Summary>
-              </Column>
-            </Row>
+            <Ripples flex>
+              <PadRow gap={10}>
+                {!published ? <PendingActionsIcon /> : null}
+                {image ? <PostImage size={100} src={image} /> : null}
+                <Column wrapping="mobile">
+                  <Title>{title || 'No title'}</Title>
+                  <Summary>{summary}</Summary>
+                </Column>
+              </PadRow>
+            </Ripples>
           </ShadowButton>
         </ListItem>
       </UnstyledLink>

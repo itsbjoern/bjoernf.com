@@ -1,17 +1,18 @@
-import React, { useState } from 'react';
-import { TextField, Button, InputAdornment, IconButton } from '@mui/material';
 import VisibilityIcon from '@mui/icons-material/Visibility';
 import VisibilityOffIcon from '@mui/icons-material/VisibilityOff';
+import React, { useState } from 'react';
+import { toast } from 'react-toast';
 
-import { H2 } from 'app/components/Text';
-import { Column } from 'app/components/Flex';
-import { useRequest } from 'app/providers/RequestProvider';
-import { useNotification } from 'app/providers/NotificationProvider';
 import { changePassword } from 'app/api/admin';
+import { useRequest } from 'app/providers/RequestProvider';
+
+import { Column } from 'app/components/Flex';
+import { H2 } from 'app/components/Text';
+import Button, { IconButton } from 'app/components/ui/Button';
+import TextField from 'app/components/ui/TextField';
 
 const Dashboard = () => {
   const { sendRequest } = useRequest();
-  const { createNotification } = useNotification();
   const [pass1, setPass1] = useState('');
   const [pass2, setPass2] = useState('');
   const [isVisible, setIsVisible] = useState(false);
@@ -36,15 +37,11 @@ const Dashboard = () => {
           type={isVisible ? 'text' : 'password'}
           label="Enter password"
           onChange={(e) => setPass1(e.target.value)}
-          InputProps={{
-            endAdornment: (
-              <InputAdornment position="end">
-                <IconButton onClick={() => setIsVisible((v) => !v)}>
-                  {isVisible ? <VisibilityOffIcon /> : <VisibilityIcon />}
-                </IconButton>
-              </InputAdornment>
-            ),
-          }}
+          icon={
+            <IconButton onClick={() => setIsVisible((v) => !v)}>
+              {isVisible ? <VisibilityOffIcon /> : <VisibilityIcon />}
+            </IconButton>
+          }
         />
         <TextField
           error={pass2 !== '' && pass1 !== pass2}
@@ -59,12 +56,12 @@ const Dashboard = () => {
           onClick={() => {
             sendRequest(changePassword(pass1))
               .success(() => {
-                createNotification('Successfully updated password');
+                toast.success('Successfully updated password');
                 setPass1('');
                 setPass2('');
               })
               .failure(() => {
-                createNotification('There was an issue', 'error');
+                toast.errro('There was an issue');
               });
           }}
         >

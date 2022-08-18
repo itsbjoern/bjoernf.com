@@ -4,11 +4,7 @@
   "private": true,
   "homepage": "/public",
   "dependencies": {
-    "@emotion/react": "^11.10.0",
-    "@emotion/styled": "^11.10.0",
     "@mui/icons-material": "^5.8.4",
-    "@mui/material": "^5.10.0",
-    "@mui/styles": "^5.0.0",
     "@remirror/pm": "^1.0.22",
     "@remirror/react": "^1.0.43",
     "ackee-tracker": "^5.1.0",
@@ -17,7 +13,9 @@
     "preact": "^10.10.3",
     "react-router-dom": "^6.3.0",
     "react-share": "^4.4.0",
-    "remirror": "^1.0.89"
+    "react-toast": "^1.0.3",
+    "remirror": "^1.0.89",
+    "styled-components": "^5.3.5"
   },
   "scripts": {
     "start": "parcel watch",
@@ -73,7 +71,8 @@
     "react": "preact/compat",
     "react-dom": "preact/compat",
     "react/jsx-runtime": "preact/jsx-runtime",
-    "react/jsx-dev-runtime": "preact/compat/jsx-dev-runtime"
+    "react/jsx-dev-runtime": "preact/compat/jsx-dev-runtime",
+    "@mui/material/utils": "./app/src/alias"
   },
   "resolutions": {
     "prosemirror-model": "1.16.1"

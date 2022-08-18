@@ -1,11 +1,3 @@
-import React, {
-  useCallback,
-  useEffect,
-  useLayoutEffect,
-  useMemo,
-  useState,
-} from 'react';
-import { createMarkPositioner, LinkExtension } from 'remirror/extensions';
 import {
   ComponentItem,
   FloatingToolbar,
@@ -17,6 +9,14 @@ import {
   useExtension,
   useUpdateReason,
 } from '@remirror/react';
+import React, {
+  useCallback,
+  useEffect,
+  useLayoutEffect,
+  useMemo,
+  useState,
+} from 'react';
+import { createMarkPositioner, LinkExtension } from 'remirror/extensions';
 
 function useLinkShortcut() {
   const [linkShortcut, setLinkShortcut] = useState();

@@ -1,7 +1,8 @@
 import React from 'react';
-import styled from '@emotion/styled';
+import styled from 'styled-components';
 
 import { morphMixin } from 'app/theme';
+
 import { Row, Column } from 'app/components/Flex';
 import Ref from 'app/components/Ref';
 

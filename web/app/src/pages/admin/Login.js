@@ -1,16 +1,17 @@
-import React, { useState, useCallback } from 'react';
-import { TextField, Button, InputAdornment } from '@mui/material';
 import AccountCircleIcon from '@mui/icons-material/AccountCircle';
 import VpnKeyIcon from '@mui/icons-material/VpnKey';
+import React, { useState, useCallback } from 'react';
+import { toast } from 'react-toast';
 
-import { Flex, Column } from 'app/components/Flex';
-import { useRequest } from 'app/providers/RequestProvider';
-import { useNotification } from 'app/providers/NotificationProvider';
 import { login } from 'app/api/admin';
+import { useRequest } from 'app/providers/RequestProvider';
+
+import { Flex, Row, Column } from 'app/components/Flex';
+import Button from 'app/components/ui/Button';
+import TextField from 'app/components/ui/TextField';
 
 const Login = () => {
   const { sendRequest, setToken } = useRequest();
-  const { createNotification } = useNotification();
   const [username, setUsername] = useState('');
   const [password, setPassword] = useState('');
 
@@ -19,9 +20,7 @@ const Login = () => {
       .success((response) => {
         setToken(response.token);
       })
-      .failure((err) =>
-        createNotification(`Login failed: ${err.message}`, 'error')
-      );
+      .failure((err) => toast.error(`Login failed: ${err.message}`));
   }, [username, password, sendRequest]);
 
   return (
@@ -32,13 +31,7 @@ const Login = () => {
           onChange={(event) => setUsername(event.target.value)}
           label="Username"
           onKeyDown={(evt) => (evt.key === 'Enter' ? tryLogin() : null)}
-          InputProps={{
-            startAdornment: (
-              <InputAdornment position="start">
-                <AccountCircleIcon />
-              </InputAdornment>
-            ),
-          }}
+          icon={<AccountCircleIcon />}
         />
         <TextField
           value={password}
@@ -46,17 +39,13 @@ const Login = () => {
           label="Password"
           type="password"
           onKeyDown={(evt) => (evt.key === 'Enter' ? tryLogin() : null)}
-          InputProps={{
-            startAdornment: (
-              <InputAdornment position="start">
-                <VpnKeyIcon />
-              </InputAdornment>
-            ),
-          }}
+          icon={<VpnKeyIcon />}
         />
-        <Button variant="outlined" onClick={tryLogin}>
-          Login
-        </Button>
+        <Row justify="end">
+          <Button variant="outlined" onClick={tryLogin}>
+            Login
+          </Button>
+        </Row>
       </Column>
     </Flex>
   );
