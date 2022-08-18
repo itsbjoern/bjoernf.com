@@ -47,7 +47,7 @@ const renderHandler = async (req, res) => {
     const renderedApp = render(sheet.collectStyles(RenderComponent));
     const styleTags = sheet.getStyleTags();
     sheet.seal();
-    console.log('here', styleTags);
+
     res.send(
       Buffer.from(
         hydrateIndex(indexFile, req, renderedApp, resolvedData, styleTags)
