@@ -61,10 +61,7 @@ const Blog = () => {
     <Column>
       <Row justify="between">
         <Row align="center" gap={10}>
-          <Row gap={10} align="center">
-            {isLoading ? <CircularProgress size={35} /> : null}
-            <H2>Recent posts</H2>
-          </Row>
+          <H2>Recent posts</H2>
           <Row align="center">
             <Button
               size="small"
@@ -98,6 +95,7 @@ const Blog = () => {
               </Row>
             ) : null}
           </Row>
+          {isLoading ? <CircularProgress size={35} /> : null}
         </Row>
         <Row justify="end" hide="mobile">
           <TextField
