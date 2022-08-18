@@ -23,17 +23,30 @@ const Projects = () => {
       <span>
         <H4>Research</H4>
       </span>
-      <Column>
-        <Ref
-          text="Discovering Types of Smartphone Usage Sessions from User-App Interactions"
-          href="https://ieeexplore.ieee.org/abstract/document/9431034"
-        />
-        In this paper, we examine how embedding physical user-app activity
-        (e.g., taps and scrolls) can provide a rich basis for summarising device
-        usage. Using a large dataset of 82,758,449 interaction events from 86
-        users over an 8-week period we combine feature embedding and
-        unsupervised learning to extract prominent interactions within clusters
-        of smartphone usage sessions.
+      <Column gap={20}>
+        <Column>
+          <Ref
+            text="Discovering Types of Smartphone Usage Sessions from User-App Interactions"
+            href="https://ieeexplore.ieee.org/abstract/document/9431034"
+          />
+          In this paper, we examine how embedding physical user-app activity
+          (e.g., taps and scrolls) can provide a rich basis for summarising
+          device usage. Using a large dataset of 82,758,449 interaction events
+          from 86 users over an 8-week period we combine feature embedding and
+          unsupervised learning to extract prominent interactions within
+          clusters of smartphone usage sessions.
+        </Column>
+        <Column>
+          <Ref
+            text="Utilising the co-occurrence of user interface interactions as a risk indicator for smartphone addiction"
+            href="https://doi.org/10.1016/j.pmcj.2022.101677"
+          />
+          The study highlights a novel methodology to transform and analyse
+          large amounts of interaction events to infer a user&apos;s level of
+          smartphone addiction. This is a step forward from using commonly used
+          metrics such as pure screen on time which can misrepresent the
+          cognitive complexities and dependencies of human behaviour.
+        </Column>
       </Column>
       <span>
         <Divider />
