@@ -72,18 +72,18 @@ const HistoryLayer = ({ children }) => {
   useEffect(() => {
     if (!isSSR) {
       ackee.record('2a5590d3-ef8c-45ab-9b29-7f14459e092f');
-    }
 
-    const path = location.pathname;
-    let title = '';
-    if (path === '/') {
-      title = 'Home';
-    } else {
-      const firstItem = path.split('/')[1];
-      title = firstItem.charAt(0).toUpperCase() + firstItem.slice(1);
-    }
+      const path = location.pathname;
+      let title = '';
+      if (path === '/') {
+        title = 'Home';
+      } else {
+        const firstItem = path.split('/')[1];
+        title = firstItem.charAt(0).toUpperCase() + firstItem.slice(1);
+      }
 
-    document.title = `${title} - Björn Friedrichs`;
+      document.title = `${title} - Björn Friedrichs`;
+    }
   }, [location]);
 
   return children;

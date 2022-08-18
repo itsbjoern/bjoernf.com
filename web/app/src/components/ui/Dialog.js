@@ -2,6 +2,8 @@ import React, { useState, useCallback } from 'react';
 import { createPortal } from 'react-dom';
 import styled from 'styled-components';
 
+import { isSSR } from 'app/util';
+
 import Button from 'app/components/ui/Button';
 
 const DialogBackground = styled.div`
@@ -67,6 +69,10 @@ const DialogActions = styled.div`
 `;
 
 const Dialog = ({ open, onConfirm, onClose, content }) => {
+  if (isSSR) {
+    return null;
+  }
+
   let dialogContainer = document.getElementById('dialogs');
   if (!dialogContainer) {
     dialogContainer = document.createElement('div');
