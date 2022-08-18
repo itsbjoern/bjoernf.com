@@ -45,7 +45,7 @@ const Ripples = ({
       const left = pageX - (rect.left + window.scrollX);
       const top = pageY - (rect.top + window.scrollY);
       const size = Math.max(rect.width, rect.height);
-      console.log(left, top, size);
+
       setRippleStyle((state) => {
         timer.current = setTimeout(() => {
           setRippleStyle((state) => ({
