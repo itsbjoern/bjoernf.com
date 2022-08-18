@@ -1,4 +1,4 @@
-import { useState, useId } from 'react';
+import { useState } from 'react';
 import styled from 'styled-components';
 
 const Wrapper = styled.div`
@@ -169,6 +169,8 @@ const TextField = ({
   onChange,
   onKeyDown,
   list,
+  inputStyle,
+  disabled,
 }) => {
   const [focused, setFocused] = useState(false);
   const hasContent = !!value;
@@ -189,11 +191,13 @@ const TextField = ({
         hasAdornement={!!icon}
       >
         <input
+          disabled={disabled}
           list={list}
           type={type}
           value={value}
           onChange={onChange}
           onKeyDown={onKeyDown}
+          style={inputStyle}
         />
         {icon ? <InputAdornment>{icon}</InputAdornment> : null}
         <Fieldset focused={focused} hasContent={hasContent} label={label} />
@@ -205,7 +209,7 @@ const TextField = ({
 export default TextField;
 
 const Autocomplete = ({ options, ...rest }) => {
-  const id = useId();
+  const id = JSON.stringify(options);
   return (
     <div style={{ display: 'flex' }}>
       <TextField list={`datalist-${id}`} {...rest} />

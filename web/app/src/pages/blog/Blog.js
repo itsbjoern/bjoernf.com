@@ -62,7 +62,7 @@ const Blog = () => {
       <Row justify="between">
         <Row align="center" gap={10}>
           <H2>Recent posts</H2>
-          <Row align="center">
+          <Row align="center" gap={10}>
             <Button
               size="small"
               variant="text"
@@ -74,8 +74,10 @@ const Blog = () => {
               Feed
             </Button>
             {showsRss ? (
-              <Row align="center" style={{ padding: 10 }} gap={10}>
+              <Row align="center" gap={10}>
                 <TextField
+                  disabled
+                  inputStyle={{ padding: 5 }}
                   value={apiUrl + '/rss'}
                   onClick={(e) => e.target.select()}
                 />
