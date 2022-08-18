@@ -44,7 +44,7 @@ const PostView = ({ postData, createdAt, hideShare }) => {
       width={iconSize}
       gap={30}
       menu={
-        <Column gap={0} flip="mobile">
+        <Column gap={0} flip="mobile" justify="center">
           <ShareIcon
             size={iconSize}
             Icon={EmailIcon}

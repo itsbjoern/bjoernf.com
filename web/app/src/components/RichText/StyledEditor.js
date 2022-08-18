@@ -84,6 +84,7 @@ const StyledEditor = styled.div`
 
     img {
       max-width: 100%;
+      object-fit: contain;
     }
     p em {
       letter-spacing: 1.2px;

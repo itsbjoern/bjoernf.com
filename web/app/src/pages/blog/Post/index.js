@@ -8,6 +8,7 @@ import React, {
 } from 'react';
 import { useLocation, useNavigate, useParams } from 'react-router-dom';
 import { toast } from 'react-toast';
+import styled from 'styled-components';
 
 import {
   updatePost as updatePostAPI,
@@ -43,6 +44,12 @@ const filterEmpty = (dict) =>
           p[k] = v;
           return p;
         }, {});
+
+const ContentColumn = styled(Column)`
+  @media only screen and (max-width: 425px) {
+    margin-top: -45px;
+  }
+`;
 
 const Post = () => {
   const location = useLocation();
@@ -268,7 +275,7 @@ const Post = () => {
         ) : null
       }
     >
-      <Column>
+      <ContentColumn>
         <Row gap={20}>
           <Column flexed style={{ maxWidth: '100%' }}>
             {token && editing ? (
@@ -297,7 +304,7 @@ const Post = () => {
             </Column>
           ) : null}
         </Row>
-      </Column>
+      </ContentColumn>
     </FloatAside>
   );
 };

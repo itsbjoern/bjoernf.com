@@ -5,7 +5,7 @@ const Sticky = styled.div`
   ${(props) => `
     ${props.hideMenu ? 'display: none;' : ''}
     @media only screen and (max-width: 425px) {
-      margin-bottom: 20px;
+      margin-bottom: 10px;
     }
 
     @media only screen and (min-width: 426px) {

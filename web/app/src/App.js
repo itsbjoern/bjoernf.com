@@ -89,6 +89,11 @@ const HistoryLayer = ({ children }) => {
   return children;
 };
 
+const ContentColumn = styled(Column)`
+  padding: 45px 5px;
+  max-width: 100vw;
+`;
+
 const App = (props) => {
   return (
     <ThemeProvider theme={theme}>
@@ -100,16 +105,7 @@ const App = (props) => {
                 <AdaptiveContainer maxWidth="md">
                   <Column flexed>
                     <Header />
-                    <Column
-                      style={{
-                        paddingTop: 45,
-                        paddingBottom: 45,
-                        paddingLeft: 5,
-                        paddingRight: 5,
-                        maxWidth: '100vw',
-                      }}
-                      flexed
-                    >
+                    <ContentColumn flexed>
                       <Routes>
                         <Route path="/" element={<Home />} />
                         <Route path="/blog" element={<Blog />} />
@@ -127,7 +123,7 @@ const App = (props) => {
                         <Route path="/about" element={<About />} />
                         <Route path="*" element={<NotFound />} />
                       </Routes>
-                    </Column>
+                    </ContentColumn>
                     <Footer />
                     <NavigationButtons mobile />
                   </Column>
