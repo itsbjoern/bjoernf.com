@@ -216,15 +216,19 @@ async def upload(request: BlogRequest):
         size += len(chunk)
         upload_data.extend(chunk)
 
-    ext = request.query.get('ext') or 'jpg'
-    max_size = request.query.get('max_size') or 800
-    quality = request.query.get('quality') or 95
+    ext = request.query.get('ext')
+    max_size = request.query.get('max_size')
+    quality = request.query.get('quality')
 
-    adjusted = image.compress_image(upload_data, options=Options(
-        ext=ext,
-        max_size=int(max_size),
-        quality=int(quality)
-    ))
+    options = Options()
+    if ext:
+        options['ext'] = ext
+    if max_size:
+        options['max_size'] = int(max_size)
+    if quality:
+        options['quality'] = int(quality)
+
+    adjusted = image.compress_image(upload_data, options=options)
     file_url = request.app.aws.s3_upload_file(
         file_name, adjusted, path='uploads')
 

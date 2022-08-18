@@ -102,7 +102,6 @@ const PostImage = ({
   hideOnMobile,
 }) => {
   const [isUploading, setIsUploading] = useState(false);
-
   const [ClearDialog, openClearDialog] = useDialog(
     'Are you sure you want to clear this image?',
     onImageCleared
@@ -116,7 +115,7 @@ const PostImage = ({
   const onFileChosen = useCallback(
     (file) => {
       setIsUploading(true);
-      onImageChosen(file, { max_size: 200, quality: 80 }).then(() => {
+      onImageChosen(file, { max_size: 300, quality: 80 }).then(() => {
         setIsUploading(false);
       });
     },
