@@ -2,6 +2,7 @@ const path = require('path');
 const fs = require('fs');
 const render = require('preact-render-to-string');
 const { h } = require('preact');
+const { ServerStyleSheet } = require('styled-components');
 
 const { isDevelopment } = require('../util');
 const { hydrateIndex } = require('../hydrate');
@@ -40,12 +41,17 @@ const renderHandler = async (req, res) => {
       },
     });
 
+    const sheet = new ServerStyleSheet();
     const _prepRun = render(RenderComponent);
     const resolvedData = await resolveData();
-    const renderedApp = render(RenderComponent);
-
+    const renderedApp = render(sheet.collectStyles(RenderComponent));
+    const styleTags = sheet.getStyleTags();
+    sheet.seal();
+    console.log('here', styleTags);
     res.send(
-      Buffer.from(hydrateIndex(indexFile, req, renderedApp, resolvedData))
+      Buffer.from(
+        hydrateIndex(indexFile, req, renderedApp, resolvedData, styleTags)
+      )
     );
   } catch (e) {
     console.log(e);

@@ -21,11 +21,17 @@ const metaTemplate = ({ url, title, description, img }) => `
 const staticMetaImg =
   'https://s3.eu-west-2.amazonaws.com/bjornf.dev-public/public/images/og_img.png';
 
-const hydrateIndex = (rawIndex, request, renderedApp, resolvedData) => {
+const hydrateIndex = (
+  rawIndex,
+  request,
+  renderedApp,
+  resolvedData,
+  styleTags
+) => {
   let index = rawIndex;
   index = index.replace(
     '<div id="root"></div>',
-    `<div id="root">${renderedApp}</div>`
+    `<div id="root">${renderedApp}</div>${styleTags}`
   );
 
   const scriptInjection = `window.__RESOLVED_DATA = ${JSON.stringify(

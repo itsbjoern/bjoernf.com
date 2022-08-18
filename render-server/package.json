@@ -15,6 +15,7 @@
     "preact-render-to-string": "^5.2.2",
     "react": "npm:@preact/compat",
     "react-dom": "npm:@preact/compat",
+    "styled-components": "^5.3.5",
     "yargs": "^17.5.1"
   },
   "scripts": {
