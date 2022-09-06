@@ -199,8 +199,8 @@ jobs:
 
       - name: Upload static files to AWS
         run: |
-          aws s3 cp --recursive web/dist/browser s3://bjornf.dev-public/public/static
-          aws s3 sync --delete web/dist/browser s3://bjornf.dev-public/public/static
+          aws s3 cp --recursive web/dist/browser s3://bjornf.dev-public/static
+          aws s3 sync --delete web/dist/browser s3://bjornf.dev-public/static
 
       - name: Invalidate cache from CF
         run: |

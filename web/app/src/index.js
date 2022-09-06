@@ -1,7 +1,5 @@
 import { hydrate } from 'preact';
 
-import './index.css';
-import './remirror.css';
 import AppServer from './AppServer';
 
 if (process.env.NODE_ENV === 'development') {

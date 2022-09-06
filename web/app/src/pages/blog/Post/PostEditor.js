@@ -14,6 +14,8 @@ import Tag from 'app/components/Tag';
 import { IconButton } from 'app/components/ui/Button';
 import TextField, { Autocomplete } from 'app/components/ui/TextField';
 
+import 'app/remirror.css';
+
 const PostEditor = ({ post, updatePost }) => {
   const { sendRequest } = useRequest();
   const [newTag, setNewTag] = useState('');

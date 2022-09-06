@@ -9,7 +9,7 @@ import styled from 'styled-components';
 
 import { useRequest } from 'app/providers/RequestProvider';
 import { morphMixin } from 'app/theme';
-import { getPublicFileUrl } from 'app/util';
+import { getFileUrl } from 'app/util';
 
 import { Row, Column } from 'app/components/Flex';
 import { H2 } from 'app/components/Text';
@@ -40,7 +40,7 @@ const Header = () => {
     <BG gap={15}>
       <Row justify="between" align="center">
         <Row align="center">
-          <Avatar src={getPublicFileUrl('me.png', 'images')} />
+          <Avatar src={getFileUrl('images/me.png')} />
           <Column justify="evenly" style={{ marginLeft: 10 }}>
             <H2>Björn Friedrichs</H2>
             <Row gap={5}>
