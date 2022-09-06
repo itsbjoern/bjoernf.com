@@ -30,11 +30,12 @@ class AWS():
             DistributionId=self.cf_distribution,
             InvalidationBatch={
                 'Paths': {
-                    'Quantity': 4,
+                    'Quantity': 5,
                     'Items': [
                         "/rss",
                         "/*",
                         "/static/*",
+                        "/images/*",
                         "/rss*"
                     ]
                 },
