@@ -40,7 +40,7 @@ const Header = () => {
     <BG gap={15}>
       <Row justify="between" align="center">
         <Row align="center">
-          <Avatar src={getFileUrl('images/me.png')} />
+          <Avatar src={getFileUrl('images/me.jpg')} />
           <Column justify="evenly" style={{ marginLeft: 10 }}>
             <H2>Björn Friedrichs</H2>
             <Row gap={5}>

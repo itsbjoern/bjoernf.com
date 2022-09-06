@@ -19,7 +19,7 @@ const metaTemplate = ({ url, title, description, img }) => `
 `;
 
 const staticMetaImg =
-  'https://s3.eu-west-2.amazonaws.com/bjornf.dev-public/public/images/og_img.png';
+  'https://s3.eu-west-2.amazonaws.com/bjornf.dev-public/public/images/og_img.jpg';
 
 const hydrateIndex = (
   rawIndex,
