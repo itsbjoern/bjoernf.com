@@ -90,7 +90,7 @@ const hydrateIndex = (
 
   index = index.replace(scriptRegex, '');
   index = index.replace(
-    '@media only screen and (max-width:425px){}/*!sc*/',
+    /@media only screen and \((max|min)-width:425px\)\{\}\/\*\!sc\*\//g,
     ''
   );
 
