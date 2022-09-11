@@ -35,9 +35,10 @@ const hydrateIndex = (
     `<div id="root">${renderedApp}</div>${styleTags}`
   );
 
-  const scriptInjection = `window.__RESOLVED_DATA = ${JSON.stringify(
-    resolvedData
-  )};`;
+  // const scriptInjection = `window.__RESOLVED_DATA = ${JSON.stringify(
+  //   resolvedData
+  // )};`;
+  const scriptInjection = `window.__RESOLVED_DATA = {};`;
   index = index.replace(
     '<script id="ssr-scripts"></script>',
     `<script type="text/javascript" id="ssr-scripts">${scriptInjection}</script>`
@@ -72,10 +73,11 @@ const hydrateIndex = (
     '</body>',
     `<script>
       if (localStorage.getItem('authToken') || window.location.pathname.startsWith('/admin')) {
+        let scriptElement;
         ${allMatches
           .map((match) => {
             return `
-              const scriptElement = document.createElement('script');
+              scriptElement = document.createElement('script');
               scriptElement.src = "${match[2]}";
               ${!match[1] ? 'scriptElement.defer = "";' : ''}
               ${!match[1] ? 'scriptElement.nomodule = "true";' : ''}
