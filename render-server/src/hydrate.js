@@ -79,8 +79,8 @@ const hydrateIndex = (
             return `
               scriptElement = document.createElement('script');
               scriptElement.src = "${match[2]}";
-              ${!match[1] ? 'scriptElement.defer = "";' : ''}
-              ${!match[1] ? 'scriptElement.nomodule = "true";' : ''}
+              ${!match[1] ? 'scriptElement.defer = true;' : ''}
+              ${!match[1] ? 'scriptElement.noModule = true;' : ''}
               ${match[1] ? 'scriptElement.type = "module";' : ''}
               document.body.appendChild(scriptElement);`;
           })
