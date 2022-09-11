@@ -29,7 +29,7 @@ const About = () => {
       </span>
       <span>
         The best part: All the code is public at{' '}
-        <Ref href="https://github.com/BFriedrichs/blog" />
+        <Ref href="https://github.com/BFriedrichs/bjornf.dev" />
       </span>
       <span>
         <Divider />
