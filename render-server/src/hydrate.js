@@ -64,10 +64,12 @@ const hydrateIndex = (
 
   index = index.replace('</body>', `${clientScript}</body>`);
 
+  const scriptRegex =
+    /<script id="indexScript"(?: type="module")? src="([^"]+)"(?: defer="")?><\/script>/;
+
   if (!request.path.startsWith('/admin')) {
-    const srcUrl = index.match(
-      /<script id="indexScript" src="([^"]+)" defer=""><\/script>/
-    );
+    const srcUrl = index.match(scriptRegex);
+
     index = index.replace(
       '</body>',
       `<script>
@@ -79,10 +81,7 @@ const hydrateIndex = (
       }</script>`
     );
 
-    index = index.replace(
-      /<script id="indexScript" src="[^"]+" defer=""><\/script>/,
-      ''
-    );
+    index = index.replace(scriptRegex, '');
   }
 
   return index;

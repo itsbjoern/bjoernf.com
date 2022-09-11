@@ -85,7 +85,8 @@
   "alias": {
     "app": "./app/src",
     "canvas": false,
-    "@mui/material/utils": "./app/src/alias"
+    "@mui/material/utils": "./app/src/alias",
+    "uglify-js": false
   },
   "resolutions": {
     "prosemirror-model": "1.16.1"
