@@ -1,5 +1,4 @@
-import * as ackeeTracker from 'ackee-tracker';
-import React, { useEffect, useState, Suspense } from 'react';
+import React, { useEffect, Suspense } from 'react';
 import { BrowserRouter, Routes, Route, useLocation } from 'react-router-dom';
 import { StaticRouter } from 'react-router-dom/server';
 import { ToastContainer } from 'react-toast';
@@ -60,19 +59,9 @@ const RouterLayer = isSSR ? SSRSupport : BrowserRouter;
 
 const HistoryLayer = ({ children }) => {
   const location = useLocation();
-  const [ackee] = useState(
-    isSSR
-      ? null
-      : ackeeTracker.create('https://dashboard.bjornf.dev', {
-          ignoreLocalhost: true,
-          detailed: true,
-        })
-  );
 
   useEffect(() => {
     if (!isSSR) {
-      ackee.record('2a5590d3-ef8c-45ab-9b29-7f14459e092f');
-
       const path = location.pathname;
       let title = '';
       if (path === '/') {
