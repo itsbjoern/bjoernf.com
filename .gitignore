@@ -1,6 +1,11 @@
 dist/
+
+render-server/dist
+render-server/.env
+
 web/.parcel-cache
 web/.docker-parcel-cache
 
 docker/secret.yml
 node_modules/
+.env.secret

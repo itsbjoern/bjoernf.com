@@ -1,4 +1,4 @@
-import { hydrate } from 'preact';
+import ReactDOM from 'react-dom/client';
 
 import AppServer from './AppServer';
 
@@ -8,4 +8,6 @@ if (process.env.NODE_ENV === 'development') {
   }
 }
 
-hydrate(<AppServer />, document.getElementById('root'));
+ReactDOM.hydrateRoot(document.getElementById('root'), <AppServer />);
+
+window.appIsHydrated = true;

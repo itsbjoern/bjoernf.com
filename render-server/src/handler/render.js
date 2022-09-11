@@ -1,7 +1,8 @@
 const path = require('path');
 const fs = require('fs');
-const render = require('preact-render-to-string');
-const { h } = require('preact');
+const ReactDOMServer = require('react-dom/server');
+const React = require('react');
+const { ServerScriptRenderer } = require('react-leat');
 const { ServerStyleSheet } = require('styled-components');
 
 const { isDevelopment } = require('../util');
@@ -34,23 +35,35 @@ const renderHandler = async (req, res) => {
   try {
     const { resolveData } = createSSRContext();
 
-    const RenderComponent = h(AppServerElement, {
+    const RenderComponent = React.createElement(AppServerElement, {
       ssr: {
-        url: req.path,
+        url: req.originalUrl,
         host: process.env.API_CONNECTION_WEBHOST,
       },
     });
 
-    const sheet = new ServerStyleSheet();
-    const _prepRun = render(RenderComponent);
+    const _prepRun = ReactDOMServer.renderToString(RenderComponent);
     const resolvedData = await resolveData();
-    const renderedApp = render(sheet.collectStyles(RenderComponent));
+
+    const sheet = new ServerStyleSheet();
+    const leat = new ServerScriptRenderer({ minify: false });
+    const renderedApp = ReactDOMServer.renderToString(
+      sheet.collectStyles(leat.collectScripts(RenderComponent))
+    );
     const styleTags = sheet.getStyleTags();
     sheet.seal();
+    const clientScript = leat.getScriptTag();
 
     res.send(
       Buffer.from(
-        hydrateIndex(indexFile, req, renderedApp, resolvedData, styleTags)
+        hydrateIndex(
+          indexFile,
+          req,
+          renderedApp,
+          resolvedData,
+          clientScript,
+          styleTags
+        )
       )
     );
   } catch (e) {

@@ -1,18 +1,34 @@
 console.log('Starting server...');
 
+require('dotenv').config();
 const http = require('http');
+const path = require('path');
 const express = require('express');
 const bodyParser = require('body-parser');
-// Import for ES-Module necessary
-const nodeFetch = import('node-fetch');
+const moduleAlias = require('module-alias');
 
 const { isDevelopment, getArguments } = require('./util');
+if (isDevelopment) {
+  moduleAlias.addAliases({
+    react: path.join(__dirname, '..', 'node_modules', 'react'),
+    'react-dom': path.join(__dirname, '..', 'node_modules', 'react-dom'),
+    'styled-components': path.join(
+      __dirname,
+      '..',
+      'node_modules',
+      'styled-components'
+    ),
+  });
+}
 const { renderHandler } = require('./handler/render');
 const { staticHandler } = require('./handler/static');
 
+// Import for ES-Module necessary
 if (!global.fetch) {
-  global.fetch = nodeFetch.default;
-  global.Headers = nodeFetch.Headers;
+  const nodeFetch = import('node-fetch').then(({ default: fetch, Headers }) => {
+    global.fetch = fetch;
+    global.Headers = Headers;
+  });
 }
 
 const args = getArguments();

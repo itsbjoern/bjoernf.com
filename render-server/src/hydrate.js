@@ -26,6 +26,7 @@ const hydrateIndex = (
   request,
   renderedApp,
   resolvedData,
+  clientScript,
   styleTags
 ) => {
   let index = rawIndex;
@@ -60,6 +61,29 @@ const hydrateIndex = (
   index = index.replace('<meta id="tags">', metaTemplate(metaData));
 
   index = index.replace('<title></title>', `<title>${metaData.title}</title>`);
+
+  index = index.replace('</body>', `${clientScript}</body>`);
+
+  if (!request.path.startsWith('/admin')) {
+    const srcUrl = index.match(
+      /<script id="indexScript" src="([^"]+)" defer=""><\/script>/
+    );
+    index = index.replace(
+      '</body>',
+      `<script>
+      if (localStorage.getItem('authToken')) {
+        const scriptElement = document.createElement('script');
+        scriptElement.src = "${srcUrl[1]}";
+        scriptElement.defer = "";
+        document.body.appendChild(scriptElement);
+      }</script>`
+    );
+
+    index = index.replace(
+      /<script id="indexScript" src="[^"]+" defer=""><\/script>/,
+      ''
+    );
+  }
 
   return index;
 };

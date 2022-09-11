@@ -22,7 +22,7 @@ const reloadServer = () => {
 
 const watch = () => {
   chokidar
-    .watch('src/**', { usePolling: true })
+    .watch('(src|dist)/**', { usePolling: true })
     .on('all', (event, filename) => {
       if (timeout != null) {
         clearTimeout(timeout);

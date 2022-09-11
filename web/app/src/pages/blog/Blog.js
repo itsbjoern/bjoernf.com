@@ -2,6 +2,7 @@ import ContentCopyIcon from '@mui/icons-material/ContentCopy';
 import RssFeedIcon from '@mui/icons-material/RssFeed';
 import SearchIcon from '@mui/icons-material/Search';
 import React, { useState } from 'react';
+import { Leat } from 'react-leat';
 import { useLocation, useNavigate } from 'react-router-dom';
 import { toast } from 'react-toast';
 
@@ -31,12 +32,18 @@ const makeQuery = (page, search) => {
   return '?' + new URLSearchParams(params).toString();
 };
 
+const updateSearch = ({ getRef }) => {
+  getRef('element').addEventListener('change', (e) => {
+    if (window.appIsHydrated) return;
+
+    window.location.search = `search=${e.target.value}`;
+  });
+};
+
 const Blog = () => {
   const navigate = useNavigate();
   const location = useLocation();
   const { sendRequest } = useRequest();
-
-  const [showsRss, setShowsRss] = useState(false);
 
   const query = new URLSearchParams(location.search);
   const currentPage = parseInt(query.get('page')) || 1;
@@ -62,52 +69,86 @@ const Blog = () => {
       <Row justify="between">
         <Row align="center" gap={10}>
           <H2>Recent posts</H2>
-          <Row align="center" gap={10}>
-            <Button
-              size="small"
-              variant="text"
-              startIcon={<RssFeedIcon fontSize="7px" />}
-              onClick={() => {
-                setShowsRss((prev) => !prev);
-              }}
-            >
-              Feed
-            </Button>
-            {showsRss ? (
-              <Row align="center" gap={10}>
-                <TextField
-                  disabled
-                  inputStyle={{ padding: 5 }}
-                  value={apiUrl + '/rss'}
-                  onClick={(e) => e.target.select()}
-                />
-                <IconButton
+          <Leat
+            script={({ rssFeed, getRef }) => {
+              const copyClipboard = () => {
+                const text = getRef('textField');
+                text.focus();
+                window.navigator.clipboard.writeText(text.value);
+              };
+              const row = getRef('row');
+
+              let isOpen = false;
+              getRef('button').addEventListener('click', () => {
+                if (!isOpen) {
+                  row.appendChild(rssFeed);
+                  getRef('innerButton').addEventListener(
+                    'click',
+                    copyClipboard
+                  );
+                } else {
+                  row.removeChild(rssFeed);
+                }
+                isOpen = !isOpen;
+              });
+            }}
+            props={{
+              rssFeed: ({ addRef }) => (
+                <Row align="center" gap={10}>
+                  <TextField
+                    inputProps={addRef('textField')}
+                    disabled
+                    inputStyle={{ padding: 5 }}
+                    value={apiUrl + '/rss'}
+                    onClick={(e) => e.target.select()}
+                  />
+                  <IconButton
+                    size="small"
+                    onClick={async () => {
+                      try {
+                        await navigator.clipboard.writeText(apiUrl + '/rss');
+                        toast.success('Copied to clipboard');
+                      } catch (err) {
+                        toast.error('Copy to clipboard failed');
+                      }
+                    }}
+                    {...addRef('innerButton')}
+                  >
+                    <ContentCopyIcon />
+                  </IconButton>
+                </Row>
+              ),
+            }}
+          >
+            {({ addRef }) => (
+              <Row align="center" gap={10} {...addRef('row')}>
+                <Button
                   size="small"
-                  onClick={async () => {
-                    try {
-                      await navigator.clipboard.writeText(apiUrl + '/rss');
-                      toast.success('Copied to clipboard');
-                    } catch (err) {
-                      toast.error('Copy to clipboard failed');
-                    }
-                  }}
+                  variant="text"
+                  startIcon={<RssFeedIcon fontSize="7px" />}
+                  {...addRef('button')}
                 >
-                  <ContentCopyIcon />
-                </IconButton>
+                  Feed
+                </Button>
               </Row>
-            ) : null}
-          </Row>
+            )}
+          </Leat>
           {isLoading ? <CircularProgress size={35} /> : null}
         </Row>
         <Row justify="end" hide="mobile">
-          <TextField
-            value={currentSearch}
-            onChange={(event) =>
-              navigate(makeQuery(currentPage, event.target.value))
-            }
-            label="Search"
-            icon={<SearchIcon />}
-          />
+          <Leat script={updateSearch}>
+            {({ addRef }) => (
+              <TextField
+                value={currentSearch}
+                onChange={(event) =>
+                  navigate(makeQuery(currentPage, event.target.value))
+                }
+                label="Search"
+                icon={<SearchIcon />}
+                inputProps={addRef('element')}
+              />
+            )}
+          </Leat>
         </Row>
       </Row>
       <Row justify="center"></Row>

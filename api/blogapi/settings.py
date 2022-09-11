@@ -5,7 +5,9 @@ from typing import Union, Dict
 import pathlib
 import os
 import yaml
+from dotenv import load_dotenv
 
+load_dotenv('.env.secret')
 
 BASE_DIR = pathlib.Path(__file__).parent
 

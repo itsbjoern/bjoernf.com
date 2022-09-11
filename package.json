@@ -3,5 +3,6 @@
     "start": "docker-compose -f docker-compose.yml -f docker/dev-config.yml -f docker/secret.yml up --build",
     "down": "docker-compose -f docker-compose.yml -f docker/dev-config.yml -f docker/secret.yml down",
     "start:static": "docker-compose -f docker-compose.yml -f docker/dev-static-config.yml -f docker/secret.yml up --build"
-  }
+  },
+  "dependencies": {}
 }

@@ -8,9 +8,10 @@
     "@remirror/pm": "^1.0.22",
     "@remirror/react": "^1.0.43",
     "ackee-tracker": "^5.1.0",
-    "patch-package": "^6.4.7",
     "postinstall-postinstall": "^2.1.0",
-    "preact": "^10.10.3",
+    "react": "^18.2.0",
+    "react-dom": "^18.2.0",
+    "react-leat": "^0.3.0",
     "react-router-dom": "^6.3.0",
     "react-share": "^4.4.0",
     "react-toast": "^1.0.3",
@@ -18,10 +19,10 @@
     "styled-components": "^5.3.5"
   },
   "scripts": {
-    "start": "parcel watch",
-    "build": "rm -rf dist .parcel-cache && parcel build",
-    "build:report": "rm -rf dist .parcel-cache && parcel build --reporter @parcel/reporter-bundle-analyzer",
-    "postinstall": "patch-package"
+    "start": "parcel watch --target default --target node",
+    "dev": "parcel --target dev --port 3000",
+    "build": "rm -rf dist .parcel-cache && parcel build --target default --target node",
+    "build:report": "rm -rf dist .parcel-cache && parcel build  --target default --target node --reporter @parcel/reporter-bundle-analyzer"
   },
   "targets": {
     "default": {
@@ -34,6 +35,16 @@
         "browsers": "> 0.5%, last 2 versions, not dead"
       }
     },
+    "dev": {
+      "source": "app/src/index.html",
+      "distDir": "dist/dev",
+      "context": "browser",
+      "publicUrl": "./",
+      "scopeHoist": true,
+      "engines": {
+        "browsers": "> 0.5%, last 2 versions, not dead"
+      }
+    },
     "node": {
       "source": "app/src/AppServer.js",
       "distDir": "dist/node",
@@ -41,8 +52,10 @@
       "publicUrl": "/static",
       "outputFormat": "commonjs",
       "includeNodeModules": {
-        "preact": false,
-        "styled-components": false
+        "react": false,
+        "react-dom": false,
+        "styled-components": false,
+        "react-leat": false
       },
       "scopeHoist": false,
       "sourceMap": false,
@@ -72,10 +85,6 @@
   "alias": {
     "app": "./app/src",
     "canvas": false,
-    "react": "preact/compat",
-    "react-dom": "preact/compat",
-    "react/jsx-runtime": "preact/jsx-runtime",
-    "react/jsx-dev-runtime": "preact/compat/jsx-dev-runtime",
     "@mui/material/utils": "./app/src/alias"
   },
   "resolutions": {

@@ -44,12 +44,7 @@ const Placeholder = styled.label`
   z-index: 1;
   pointer-events: none;
 
-  ${({ focused, hasContent, theme }) =>
-    (focused || hasContent) &&
-    `
-    transform: translate(14px, -9px) scale(0.75);
-    ${focused && `color: ${theme.palette.primary.main}`}
-  `}
+  transform: translate(14px, -9px) scale(0.75);
 `;
 
 const InputWrapper = styled.div`
@@ -103,14 +98,6 @@ const FieldsetWrapper = styled.fieldset`
   min-width: 0%;
   border-color: rgba(0, 0, 0, 0.23);
 
-  ${({ focused, theme }) =>
-    focused &&
-    `
-    color: ${theme.palette.primary.main};
-    border-color: ${theme.palette.primary.main};
-    border-width: 2px;
-  `}
-
   & legend {
     float: unset;
     overflow: hidden;
@@ -124,12 +111,8 @@ const FieldsetWrapper = styled.fieldset`
     transition: max-width 50ms cubic-bezier(0, 0, 0.2, 1) 50ms;
     white-space: nowrap;
 
-    ${({ focused, hasContent }) =>
-      (focused || hasContent) &&
-      `
     max-width: 100%;
     transition: max-width 50ms cubic-bezier(0, 0, 0.2, 1) 100ms;
-  `}
 
     & span {
       font-size: 15px;
@@ -171,26 +154,20 @@ const TextField = ({
   list,
   inputStyle,
   disabled,
+  className,
+  inputProps = {},
 }) => {
   const [focused, setFocused] = useState(false);
-  const hasContent = !!value;
   return (
     <Wrapper
       onFocus={() => setFocused(true)}
       onBlur={() => setFocused(false)}
       focused={focused}
     >
-      {label ? (
-        <Placeholder focused={focused} hasContent={hasContent}>
-          {label}
-        </Placeholder>
-      ) : null}
-      <InputWrapper
-        focused={focused}
-        hasContent={hasContent}
-        hasAdornement={!!icon}
-      >
+      {label ? <Placeholder focused={focused}>{label}</Placeholder> : null}
+      <InputWrapper focused={focused} hasAdornement={!!icon}>
         <input
+          className={className}
           disabled={disabled}
           list={list}
           type={type}
@@ -198,9 +175,10 @@ const TextField = ({
           onChange={onChange}
           onKeyDown={onKeyDown}
           style={inputStyle}
+          {...inputProps}
         />
         {icon ? <InputAdornment>{icon}</InputAdornment> : null}
-        <Fieldset focused={focused} hasContent={hasContent} label={label} />
+        <Fieldset focused={focused} label={label} />
       </InputWrapper>
     </Wrapper>
   );
