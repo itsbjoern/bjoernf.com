@@ -59,30 +59,39 @@ const hydrateIndex = (
   }
 
   index = index.replace('<meta id="tags">', metaTemplate(metaData));
-
   index = index.replace('<title></title>', `<title>${metaData.title}</title>`);
-
   index = index.replace('</body>', `${clientScript}</body>`);
 
   const scriptRegex =
-    /<script id="indexScript"(?: type="module")? src="([^"]+)"(?: defer="")?><\/script>/;
+    /<script id="indexScript"( type="module")? src="([^"]+)"(?: nomodule="")?(?: defer(?:="")?)?><\/script>/g;
 
-  if (!request.path.startsWith('/admin')) {
-    const srcUrl = index.match(scriptRegex);
+  const allMatches = Array.from(index.matchAll(scriptRegex));
+  console.log(allMatches);
+  const srcUrl = index.match(scriptRegex);
 
-    index = index.replace(
-      '</body>',
-      `<script>
-      if (localStorage.getItem('authToken')) {
-        const scriptElement = document.createElement('script');
-        scriptElement.src = "${srcUrl[1]}";
-        scriptElement.defer = "";
-        document.body.appendChild(scriptElement);
-      }</script>`
-    );
+  index = index.replace(
+    '</body>',
+    `<script>
+      if (localStorage.getItem('authToken') || window.location.pathname.startsWith('/admin')) {
+        ${allMatches
+          .map((match) => {
+            return `
+              const scriptElement = document.createElement('script');
+              scriptElement.src = "${match[2]}";
+              ${!match[1] ? 'scriptElement.defer = "";' : ''}
+              ${!match[1] ? 'scriptElement.nomodule = "true";' : ''}
+              ${match[1] ? 'scriptElement.type = "module";' : ''}
+              document.body.appendChild(scriptElement);`;
+          })
+          .join('\n')}
+      }</script></body>`.replace(/(\n|  )/g, '')
+  );
 
-    index = index.replace(scriptRegex, '');
-  }
+  index = index.replace(scriptRegex, '');
+  index = index.replace(
+    '@media only screen and (max-width:425px){}/*!sc*/',
+    ''
+  );
 
   return index;
 };
