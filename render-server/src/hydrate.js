@@ -66,7 +66,6 @@ const hydrateIndex = (
     /<script id="indexScript"( type="module")? src="([^"]+)"(?: nomodule="")?(?: defer(?:="")?)?><\/script>/g;
 
   const allMatches = Array.from(index.matchAll(scriptRegex));
-  console.log(allMatches);
   const srcUrl = index.match(scriptRegex);
 
   index = index.replace(

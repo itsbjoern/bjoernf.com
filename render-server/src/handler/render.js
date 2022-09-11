@@ -46,7 +46,7 @@ const renderHandler = async (req, res) => {
     const resolvedData = await resolveData();
 
     const sheet = new ServerStyleSheet();
-    const leat = new ServerScriptRenderer({ minify: false });
+    const leat = new ServerScriptRenderer({ skipVerify: true });
     const renderedApp = ReactDOMServer.renderToString(
       sheet.collectStyles(leat.collectScripts(RenderComponent))
     );
