@@ -5791,10 +5791,10 @@ react-is@^16.13.1, react-is@^16.7.0:
   resolved "https://registry.yarnpkg.com/react-is/-/react-is-16.13.1.tgz#789729a4dc36de2999dc156dd6c1d9c18cea56a4"
   integrity sha512-24e6ynE2H+OKt4kqsOvNd8kBpV65zoxbA4BVsEOB3ARVWQki/DHzaUoC5KuON/BiccDaCCTZBuOcfZs70kR8bQ==
 
-react-leat@^0.3.1:
-  version "0.3.1"
-  resolved "https://registry.yarnpkg.com/react-leat/-/react-leat-0.3.1.tgz#9d574a92593482a4390b39f946214504a634fb64"
-  integrity sha512-6Zix/bK86CSQxVYsxs0fZg/wJkNDhftukl92jex27+BhPzrDKikds79rRluuf65buG427avyHuTaZwK8H0PeTw==
+react-leat@^0.3.2:
+  version "0.3.2"
+  resolved "https://registry.yarnpkg.com/react-leat/-/react-leat-0.3.2.tgz#941e3a024c31f7c88700a92940bf7181cd4a9f0e"
+  integrity sha512-lQaeYET5Xfgl9+uZ+I7VSZPl0e8XB1AgYeUjJkK2zyE9c2+Xlvozv7Mf5Eoj2MuvuOPnhZu6rrEw3l0af5A9cg==
   dependencies:
     esprima "^4.0.1"
     react "^18.2.0"
