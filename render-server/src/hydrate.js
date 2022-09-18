@@ -79,9 +79,21 @@ const hydrateIndex = (
             return `
               scriptElement = document.createElement('script');
               scriptElement.src = "${match[2]}";
-              ${allMatches.length > 1 && !match[1] ? 'scriptElement.defer = true;' : ''}
-              ${allMatches.length > 1 && !match[1] ? 'scriptElement.noModule = true;' : ''}
-              ${allMatches.length === 1 || match[1] ? 'scriptElement.type = "module";' : ''}
+              ${
+                allMatches.length > 1 && !match[1]
+                  ? 'scriptElement.defer = true;'
+                  : ''
+              }
+              ${
+                allMatches.length > 1 && !match[1]
+                  ? 'scriptElement.noModule = true;'
+                  : ''
+              }
+              ${
+                allMatches.length === 1 || match[1]
+                  ? 'scriptElement.type = "module";'
+                  : ''
+              }
               document.body.appendChild(scriptElement);`;
           })
           .join('\n')}
@@ -90,7 +102,7 @@ const hydrateIndex = (
 
   index = index.replace(scriptRegex, '');
   index = index.replace(
-    /@media only screen and \((max|min)-width:425px\)\{\}\/\*\!sc\*\//g,
+    /@media only screen and \((max|min)-width:425px\)\{\}\/\*\!sc\*\/\n/g,
     ''
   );
 

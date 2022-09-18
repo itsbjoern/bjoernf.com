@@ -45,14 +45,25 @@ const renderHandler = async (req, res) => {
     const _prepRun = ReactDOMServer.renderToString(RenderComponent);
     const resolvedData = await resolveData();
 
+    let sheetTags = [];
+    const renderToString = (comp) => {
+      const sheet = new ServerStyleSheet();
+      const rendered = ReactDOMServer.renderToString(sheet.collectStyles(comp));
+      const styleTags = sheet.getStyleTags();
+      sheet.seal();
+      sheetTags = sheetTags.concat(styleTags);
+      return rendered;
+    };
+
+    const leat = new ServerScriptRenderer({ skipVerify: true, renderToString });
     const sheet = new ServerStyleSheet();
-    const leat = new ServerScriptRenderer({ skipVerify: true });
     const renderedApp = ReactDOMServer.renderToString(
       sheet.collectStyles(leat.collectScripts(RenderComponent))
     );
     const styleTags = sheet.getStyleTags();
     sheet.seal();
     const clientScript = leat.getScriptTag();
+    sheetTags = sheetTags.concat(styleTags);
 
     res.send(
       Buffer.from(
@@ -62,7 +73,7 @@ const renderHandler = async (req, res) => {
           renderedApp,
           resolvedData,
           clientScript,
-          styleTags
+          sheetTags
         )
       )
     );

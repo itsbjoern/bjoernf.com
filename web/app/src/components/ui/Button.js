@@ -81,8 +81,7 @@ const ContainedButton = styled(ButtonBase)`
   padding: 6px 16px;
   transition: background-color 250ms cubic-bezier(0.4, 0, 0.2, 1) 0ms,
     box-shadow 250ms cubic-bezier(0.4, 0, 0.2, 1) 0ms,
-    border-color 250ms cubic-bezier(0.4, 0, 0.2, 1) 0ms,
-    color 250ms cubic-bezier(0.4, 0, 0.2, 1) 0ms;
+    border-color 250ms cubic-bezier(0.4, 0, 0.2, 1) 0ms;
   color: rgb(255, 255, 255);
   background-color: ${({ theme }) => theme.palette.primary.main};
   box-shadow: rgb(0 0 0 / 20%) 0px 3px 1px -2px,
@@ -100,8 +99,7 @@ const TextButton = styled(ButtonBase)`
   padding: 6px 8px;
   transition: background-color 250ms cubic-bezier(0.4, 0, 0.2, 1) 0ms,
     box-shadow 250ms cubic-bezier(0.4, 0, 0.2, 1) 0ms,
-    border-color 250ms cubic-bezier(0.4, 0, 0.2, 1) 0ms,
-    color 250ms cubic-bezier(0.4, 0, 0.2, 1) 0ms;
+    border-color 250ms cubic-bezier(0.4, 0, 0.2, 1) 0ms;
 
   &:hover {
     text-decoration: none;

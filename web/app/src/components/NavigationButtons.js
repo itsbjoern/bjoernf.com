@@ -25,8 +25,7 @@ const BottomNavigationAction = styled.button`
   vertical-align: middle;
   text-decoration: none;
   color: inherit;
-  transition: color 250ms cubic-bezier(0.4, 0, 0.2, 1) 0ms,
-    padding-top 250ms cubic-bezier(0.4, 0, 0.2, 1) 0ms;
+  transition: none;
   padding: 0px 12px;
   min-width: 80px;
   max-width: 168px;
@@ -46,7 +45,7 @@ const BottomNavigationAction = styled.button`
     display: inline-block;
     fill: currentColor;
     flex-shrink: 0;
-    transition: fill 200ms cubic-bezier(0.4, 0, 0.2, 1) 0ms;
+    transition: none;
     font-size: 1.7142857142857142rem;
   }
 `;
