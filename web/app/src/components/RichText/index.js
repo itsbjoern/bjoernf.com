@@ -25,8 +25,6 @@ import {
 // import { FileExtension } from '@remirror/extension-file'
 // import { VideoExtension } from './extensions/video'
 
-import { Column } from 'app/components/Flex';
-
 import { ImageExtension } from './extensions/fixed-image';
 import FloatingLinkToolbar from './FloatingLinkToolbar';
 import EditorMenu from './menu';
@@ -136,11 +134,11 @@ const Editor = ({ content, onChange, upload, editable = true }) => {
             });
         }}
       >
-        <Column gap={20}>
+        <div className="flex flex-col gap-5">
           {editable ? <EditorMenu /> : null}
           {editable ? <FloatingLinkToolbar /> : null}
           <EditorView />
-        </Column>
+        </div>
       </Remirror>
     </ThemeProvider>
   );

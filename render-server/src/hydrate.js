@@ -26,7 +26,6 @@ const hydrateIndex = (
   request,
   renderedApp,
   resolvedData,
-  clientScript,
   styleTags
 ) => {
   let index = rawIndex;
@@ -35,10 +34,9 @@ const hydrateIndex = (
     `<div id="root">${renderedApp}</div>${styleTags}`
   );
 
-  // const scriptInjection = `window.__RESOLVED_DATA = ${JSON.stringify(
-  //   resolvedData
-  // )};`;
-  const scriptInjection = `window.__RESOLVED_DATA = {};`;
+  const scriptInjection = `window.__RESOLVED_DATA = ${JSON.stringify(
+    resolvedData
+  )};`;
   index = index.replace(
     '<script id="ssr-scripts"></script>',
     `<script type="text/javascript" id="ssr-scripts">${scriptInjection}</script>`
@@ -61,50 +59,6 @@ const hydrateIndex = (
 
   index = index.replace('<meta id="tags">', metaTemplate(metaData));
   index = index.replace('<title></title>', `<title>${metaData.title}</title>`);
-  index = index.replace('</body>', `${clientScript}</body>`);
-
-  const scriptRegex =
-    /<script id="indexScript"( type="module")? src="([^"]+)"(?: nomodule="")?(?: defer(?:="")?)?><\/script>/g;
-
-  const allMatches = Array.from(index.matchAll(scriptRegex));
-  const srcUrl = index.match(scriptRegex);
-
-  index = index.replace(
-    '</body>',
-    `<script>
-      if (localStorage.getItem('authToken') || window.location.pathname.startsWith('/admin')) {
-        let scriptElement;
-        ${allMatches
-          .map((match) => {
-            return `
-              scriptElement = document.createElement('script');
-              scriptElement.src = "${match[2]}";
-              ${
-                allMatches.length > 1 && !match[1]
-                  ? 'scriptElement.defer = true;'
-                  : ''
-              }
-              ${
-                allMatches.length > 1 && !match[1]
-                  ? 'scriptElement.noModule = true;'
-                  : ''
-              }
-              ${
-                allMatches.length === 1 || match[1]
-                  ? 'scriptElement.type = "module";'
-                  : ''
-              }
-              document.body.appendChild(scriptElement);`;
-          })
-          .join('\n')}
-      }</script></body>`.replace(/(\n|  )/g, '')
-  );
-
-  index = index.replace(scriptRegex, '');
-  index = index.replace(
-    /@media only screen and \((max|min)-width:425px\)\{\}\/\*\!sc\*\/\n/g,
-    ''
-  );
 
   return index;
 };

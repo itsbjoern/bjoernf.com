@@ -1,13 +1,11 @@
-import VisibilityIcon from '@mui/icons-material/Visibility';
-import VisibilityOffIcon from '@mui/icons-material/VisibilityOff';
 import React, { useState } from 'react';
 import { toast } from 'react-toast';
 
 import { changePassword } from 'app/api/admin';
 import { useRequest } from 'app/providers/RequestProvider';
 
-import { Column } from 'app/components/Flex';
-import { H2 } from 'app/components/Text';
+import VisibilityIcon from 'app/components/icons/Visibility.svg';
+import VisibilityOffIcon from 'app/components/icons/VisibilityOff.svg';
 import Button, { IconButton } from 'app/components/ui/Button';
 import TextField from 'app/components/ui/TextField';
 
@@ -18,9 +16,9 @@ const Dashboard = () => {
   const [isVisible, setIsVisible] = useState(false);
 
   return (
-    <Column flexed>
-      <Column style={{ width: 400, marginTop: 30 }} gap={20}>
-        <H2>Analytics</H2>
+    <div className="flex flex-1 flex-col">
+      <div className="mt-8 flex w-96 flex-col gap-5">
+        <h2 className="text-xl font-bold">Analytics</h2>
         <Button
           variant="contained"
           onClick={() => {
@@ -29,9 +27,9 @@ const Dashboard = () => {
         >
           Visit
         </Button>
-      </Column>
-      <Column style={{ width: 400, marginTop: 30 }} gap={20}>
-        <H2>Update password</H2>
+      </div>
+      <div className="mt-8 flex w-96 flex-col gap-5">
+        <h2 className="text-xl font-bold">Update password</h2>
         <TextField
           value={pass1}
           type={isVisible ? 'text' : 'password'}
@@ -67,8 +65,8 @@ const Dashboard = () => {
         >
           Confirm change
         </Button>
-      </Column>
-    </Column>
+      </div>
+    </div>
   );
 };
 

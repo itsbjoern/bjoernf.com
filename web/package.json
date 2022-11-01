@@ -4,25 +4,20 @@
   "private": true,
   "homepage": "/public",
   "dependencies": {
-    "@mui/icons-material": "^5.8.4",
     "@remirror/pm": "^1.0.22",
     "@remirror/react": "^1.0.43",
-    "ackee-tracker": "^5.1.0",
     "postinstall-postinstall": "^2.1.0",
-    "react": "^18.2.0",
-    "react-dom": "^18.2.0",
-    "react-leat": "^0.3.2",
+    "preact": "^10.11.2",
     "react-router-dom": "^6.3.0",
     "react-share": "^4.4.0",
     "react-toast": "^1.0.3",
-    "remirror": "^1.0.89",
-    "styled-components": "^5.3.5"
+    "remirror": "^1.0.89"
   },
   "scripts": {
     "start": "parcel watch --target default --target node",
     "dev": "parcel --target dev --port 3000",
-    "build": "rm -rf dist .parcel-cache && parcel build --target default --target node",
-    "build:report": "rm -rf dist .parcel-cache && parcel build  --target default --target node --reporter @parcel/reporter-bundle-analyzer"
+    "build": "parcel build --target default --target node",
+    "build:report": "parcel build  --target default --target node --reporter @parcel/reporter-bundle-analyzer"
   },
   "targets": {
     "default": {
@@ -52,10 +47,10 @@
       "publicUrl": "/static",
       "outputFormat": "commonjs",
       "includeNodeModules": {
+        "preact": false,
         "react": false,
         "react-dom": false,
-        "styled-components": false,
-        "react-leat": false
+        "styled-components": false
       },
       "scopeHoist": false,
       "sourceMap": false,
@@ -65,8 +60,10 @@
     }
   },
   "devDependencies": {
-    "@fullhuman/postcss-purgecss": "^4.1.3",
     "@parcel/reporter-bundle-analyzer": "^2.7.0",
+    "@parcel/transformer-inline-string": "2.7.0",
+    "@parcel/transformer-sass": "2.7.0",
+    "@parcel/transformer-svg-react": "^2.7.0",
     "babel-plugin-styled-components": "^2.0.7",
     "buffer": "^6.0.3",
     "eslint": "^8.21.0",
@@ -78,15 +75,19 @@
     "eslint-plugin-react": "^7.30.1",
     "parcel": "^2.7.0",
     "parcel-resolver-shim": "link:./parcel-resolver-shim",
-    "postcss": "^8.4.16",
+    "postcss": "^8.4.18",
     "prettier": "^2.4.1",
-    "process": "^0.11.10"
+    "prettier-plugin-tailwindcss": "^0.1.13",
+    "process": "^0.11.10",
+    "tailwindcss": "^3.2.1"
   },
   "alias": {
     "app": "./app/src",
     "canvas": false,
-    "@mui/material/utils": "./app/src/alias",
-    "uglify-js": false
+    "uglify-js": false,
+    "react": "preact/compat",
+    "react-dom": "preact/compat",
+    "react/jsx-runtime": "preact/jsx-runtime"
   },
   "resolutions": {
     "prosemirror-model": "1.16.1"

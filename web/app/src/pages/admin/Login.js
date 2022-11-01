@@ -1,12 +1,11 @@
-import AccountCircleIcon from '@mui/icons-material/AccountCircle';
-import VpnKeyIcon from '@mui/icons-material/VpnKey';
 import React, { useState, useCallback } from 'react';
 import { toast } from 'react-toast';
 
 import { login } from 'app/api/admin';
 import { useRequest } from 'app/providers/RequestProvider';
 
-import { Flex, Row, Column } from 'app/components/Flex';
+import AccountCircleIcon from 'app/components/icons/AccountCircle.svg';
+import VpnKeyIcon from 'app/components/icons/VpnKey.svg';
 import Button from 'app/components/ui/Button';
 import TextField from 'app/components/ui/TextField';
 
@@ -24,8 +23,8 @@ const Login = () => {
   }, [username, password, sendRequest]);
 
   return (
-    <Flex justify="center">
-      <Column gap={15} style={{ marginTop: 100, width: '50%' }}>
+    <div className="flex justify-center">
+      <div className="mt-24 flex w-1/2 flex-col gap-4">
         <TextField
           value={username}
           onChange={(event) => setUsername(event.target.value)}
@@ -41,13 +40,13 @@ const Login = () => {
           onKeyDown={(evt) => (evt.key === 'Enter' ? tryLogin() : null)}
           icon={<VpnKeyIcon />}
         />
-        <Row justify="end">
+        <div className="jusify-end flex flex-row">
           <Button variant="outlined" onClick={tryLogin}>
             Login
           </Button>
-        </Row>
-      </Column>
-    </Flex>
+        </div>
+      </div>
+    </div>
   );
 };
 

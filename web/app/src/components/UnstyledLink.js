@@ -1,16 +1,5 @@
 import React, { useRef } from 'react';
 import { Link } from 'react-router-dom';
-import styled from 'styled-components';
-
-const UnstyledLink = styled(Link)`
-  &&& {
-    display: flex;
-    align-items: center;
-    text-decoration: none;
-    color: initial;
-    -webkit-tap-highlight-color: rgba(0, 0, 0, 0);
-  }
-`;
 
 const ConsiderSSR = ({ to, delay, ...props }) => {
   const timeout = useRef();
@@ -20,7 +9,8 @@ const ConsiderSSR = ({ to, delay, ...props }) => {
   }
 
   return (
-    <UnstyledLink
+    <Link
+      className="flex items-center"
       to={to}
       onClick={(e) => {
         if (timeout.current) {

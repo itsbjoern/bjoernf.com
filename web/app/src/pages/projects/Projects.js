@@ -1,30 +1,19 @@
 import React from 'react';
-import styled from 'styled-components';
 
-import { morphMixin } from 'app//theme';
-
-import { Column, Row } from 'app/components/Flex';
 import Ref from 'app/components/Ref';
-import { H2, H4 } from 'app/components/Text';
 import Divider from 'app/components/ui/Divider';
-
-const ProjectBlock = styled(Column)`
-  flex: 1;
-  padding: 15px;
-  ${morphMixin()}
-`;
 
 const Projects = () => {
   return (
-    <Column gap={30}>
+    <div className="flex flex-col gap-7">
       <span>
-        <H2>Projects</H2>
+        <h2 className="text-2xl font-bold">Projects</h2>
       </span>
       <span>
-        <H4>Research</H4>
+        <h3 className="text-xl font-bold">Research</h3>
       </span>
-      <Column gap={20}>
-        <Column>
+      <div className="flex flex-col gap-5">
+        <div className="flex flex-col">
           <Ref
             text="Discovering Types of Smartphone Usage Sessions from User-App Interactions"
             href="https://ieeexplore.ieee.org/abstract/document/9431034"
@@ -35,8 +24,8 @@ const Projects = () => {
           from 86 users over an 8-week period we combine feature embedding and
           unsupervised learning to extract prominent interactions within
           clusters of smartphone usage sessions.
-        </Column>
-        <Column>
+        </div>
+        <div className="flex flex-col">
           <Ref
             text="Utilising the co-occurrence of user interface interactions as a risk indicator for smartphone addiction"
             href="https://doi.org/10.1016/j.pmcj.2022.101677"
@@ -46,18 +35,18 @@ const Projects = () => {
           smartphone addiction. This is a step forward from using commonly used
           metrics such as pure screen on time which can misrepresent the
           cognitive complexities and dependencies of human behaviour.
-        </Column>
-      </Column>
+        </div>
+      </div>
       <span>
         <Divider />
       </span>
       <span>
-        <H4>Code</H4>
+        <h3 className="text-xl font-bold">Code</h3>
       </span>
-      <Column gap={30}>
-        <Row gap={30}>
-          <ProjectBlock>
-            <H4>Nintendo Switch - GBA Emulator</H4>
+      <div className="flex flex-col gap-7">
+        <div className="flex flex-row gap-7">
+          <div className="neo flex flex-1 flex-col rouded-lg p-4">
+            <b>Nintendo Switch - GBA Emulator</b>
             <Ref
               text="On GitHub"
               href="https://github.com/BFriedrichs/switch-gba"
@@ -66,9 +55,9 @@ const Projects = () => {
               Utilising the restricted Nintendo Switch browser to capture input
               and receive streamed emulator data from a remote Python server.
             </span>
-          </ProjectBlock>
-          <ProjectBlock>
-            <H4>Big Brain Sudokus</H4>
+          </div>
+          <div className="neo flex flex-1 flex-col rouded-lg p-4">
+            <b>Big Brain Sudokus</b>
             <Ref
               text="On the App Store"
               href="https://apps.apple.com/gb/app/big-brain-sudokus/id1521326123"
@@ -78,11 +67,11 @@ const Projects = () => {
               <Ref text="Expo" href="https://expo.dev/" />. The free and
               shareable Sudokus are available in 9 difficulties.
             </span>
-          </ProjectBlock>
-        </Row>
-        <Row gap={30}>
-          <ProjectBlock>
-            <H4>This website</H4>
+          </div>
+        </div>
+        <div className="flex flex-row gap-7">
+          <div className="neo flex flex-1 flex-col rouded-lg p-4">
+            <b>This website</b>
             <Ref
               text="On GitHub"
               href="https://github.com/BFriedrichs/bjornf.dev"
@@ -91,9 +80,9 @@ const Projects = () => {
               A custom built website using React + aiohttp. Includes server side
               rendering and a a ProseMirror powered WYSIWYG editor.
             </span>
-          </ProjectBlock>
-          <ProjectBlock>
-            <H4>Infrared sound remote</H4>
+          </div>
+          <div className="neo flex flex-1 flex-col rouded-lg p-4">
+            <b>Infrared sound remote</b>
             <Ref
               text="On GitHub"
               href="https://github.com/BFriedrichs/pi-remote"
@@ -104,21 +93,21 @@ const Projects = () => {
               <Ref text="RPi" href="https://www.raspberrypi.org/" /> + a local
               web server.
             </span>
-          </ProjectBlock>
-        </Row>
-        <Row gap={30}>
-          <ProjectBlock>
-            <H4>And much more...</H4>
+          </div>
+        </div>
+        <div className="flex flex-row gap-7">
+          <div className="neo flex flex-1 flex-col rouded-lg p-4">
+            <b>And much more...</b>
             <span>
               There is a lot of testing, prodding and half-finished bits. Feel
               free to visit my
               <Ref text="GitHub" href="https://github.com/BFriedrichs" />{' '}
               profile to see them.
             </span>
-          </ProjectBlock>
-        </Row>
-      </Column>
-    </Column>
+          </div>
+        </div>
+      </div>
+    </div>
   );
 };
 

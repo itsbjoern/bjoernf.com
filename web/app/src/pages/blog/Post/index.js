@@ -1,4 +1,3 @@
-import DeleteIcon from '@mui/icons-material/Delete';
 import React, {
   useRef,
   useEffect,
@@ -8,7 +7,6 @@ import React, {
 } from 'react';
 import { useLocation, useNavigate, useParams } from 'react-router-dom';
 import { toast } from 'react-toast';
-import styled from 'styled-components';
 
 import {
   updatePost as updatePostAPI,
@@ -23,8 +21,8 @@ import { useRequest } from 'app/providers/RequestProvider';
 import { useSSR } from 'app/providers/SSRProvider';
 import { isSSR } from 'app/util';
 
-import { Row, Column } from 'app/components/Flex';
 import FloatAside from 'app/components/FloatAside';
+import DeleteIcon from 'app/components/icons/Delete.svg';
 import Alert from 'app/components/ui/Alert';
 import Button from 'app/components/ui/Button';
 import { useDialog } from 'app/components/ui/Dialog';
@@ -44,12 +42,6 @@ const filterEmpty = (dict) =>
           p[k] = v;
           return p;
         }, {});
-
-const ContentColumn = styled(Column)`
-  @media only screen and (max-width: 425px) {
-    margin-top: -45px;
-  }
-`;
 
 const Post = () => {
   const location = useLocation();
@@ -208,7 +200,7 @@ const Post = () => {
     <FloatAside
       menu={
         token ? (
-          <Column gap={20}>
+          <div className="flex flex-col gap-5">
             <PublishDialog />
             <UnPublishDialog />
             <DeleteDraftDialog />
@@ -218,7 +210,7 @@ const Post = () => {
               {!post.published ? 'Draft' : `Version ${post.published.version}`}
               {post.published && post.draft ? ' (Changes)' : ''}
             </Alert>
-            <Row justify="center">
+            <div className="flex flex-row justify-center">
               <Switch
                 checked={editing}
                 onChange={() => {
@@ -226,8 +218,8 @@ const Post = () => {
                 }}
                 label="Edit Mode"
               />
-            </Row>
-            <Row justify="center">
+            </div>
+            <div className="flex flex-row justify-center">
               <Switch
                 disabled={!post.draft || !post.published}
                 checked={isComparing}
@@ -236,7 +228,7 @@ const Post = () => {
                 }}
                 label="Compare"
               />
-            </Row>
+            </div>
             <Button
               variant="contained"
               onClick={openPublishDialog}
@@ -271,13 +263,13 @@ const Post = () => {
                 <DeleteIcon />
               </Button>
             )}
-          </Column>
+          </div>
         ) : null
       }
     >
-      <ContentColumn>
-        <Row gap={20}>
-          <Column flexed style={{ maxWidth: '100%' }}>
+      <div className="flex flex-col smo:-mt-11">
+        <div className="flex flex-row gap-5">
+          <div className="flex max-w-full flex-1 flex-col">
             {token && editing ? (
               <Suspense fallback={<div>Loading...</div>}>
                 <PostEditor post={post} updatePost={updatePost} />
@@ -293,18 +285,18 @@ const Post = () => {
                 hideShare={isComparing}
               />
             )}
-          </Column>
+          </div>
           {isComparing ? (
-            <Column flexed>
+            <div className="flex flex-1 flex-col">
               <PostView
                 postData={post.published}
                 createdAt={post.createdAt}
                 hideShare
               />
-            </Column>
+            </div>
           ) : null}
-        </Row>
-      </ContentColumn>
+        </div>
+      </div>
     </FloatAside>
   );
 };

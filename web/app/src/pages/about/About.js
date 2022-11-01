@@ -1,15 +1,13 @@
 import React from 'react';
 
-import { Column } from 'app/components/Flex';
 import Ref from 'app/components/Ref';
-import { H4 } from 'app/components/Text';
 import Divider from 'app/components/ui/Divider';
 
 const About = () => {
   return (
-    <Column gap={30}>
+    <div className="flex flex-col gap-7">
       <span>
-        <H4>How it&apos;s made</H4>
+        <h3 className="text-xl font-bold">How it&apos;s made</h3>
       </span>
       <span>
         This website is built using React and delivered using{' '}
@@ -35,7 +33,7 @@ const About = () => {
         <Divider />
       </span>
       <span>
-        <H4>Privacy / Tracking</H4>
+        <h3 className="text-xl font-bold">Privacy / Tracking</h3>
       </span>
       <span>
         To get information about the behavior of my visitors, I use{' '}
@@ -50,7 +48,7 @@ const About = () => {
         to find out what Ackee collects. Please note that I do collect the
         detailed information as outlined on their page.
       </span>
-    </Column>
+    </div>
   );
 };
 

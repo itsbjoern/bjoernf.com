@@ -12,6 +12,7 @@ const Ripples = ({
   children,
   disabled,
   flex,
+  className,
   ...rest
 }) => {
   const [rippleStyle, setRippleStyle] = useState({
@@ -92,7 +93,7 @@ const Ripples = ({
   return (
     <div
       {...rest}
-      className={`react-ripples`}
+      className={`react-ripples ${className}`}
       style={{ ...boxStyle, flex: flex ? 1 : null }}
       onPointerDown={onMouseDown}
       onPointerUp={onMouseUp}

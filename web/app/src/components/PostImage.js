@@ -1,97 +1,13 @@
-import Clear from '@mui/icons-material/Clear';
-import UploadIcon from '@mui/icons-material/Upload';
 import React, { useState, useCallback, useRef } from 'react';
 import { toast } from 'react-toast';
-import styled from 'styled-components';
 
+import Clear from 'app/components/icons/Clear.svg';
+import UploadIcon from 'app/components/icons/Upload.svg';
 import { IconButton } from 'app/components/ui/Button';
 import CircularProgress from 'app/components/ui/CircularProgress';
 import { useDialog } from 'app/components/ui/Dialog';
 
-const ClearButton = styled.div`
-  position: absolute;
-  left: -14px;
-  top: -14px;
-  border-radius: 20px;
-  background-color: #f1f1f1;
-
-  padding: 4px;
-  z-index: 3;
-
-  > .MuiButtonBase-root {
-    width: 35px;
-    height: 35px;
-  }
-
-  &:hover {
-    cursor: pointer;
-  }
-`;
-
-const PostImageContainer = styled.div`
-  position: relative;
-  display: flex;
-
-  border-width: 1px;
-  border-style: solid;
-  border-color: rgba(0, 0, 0, 0.23);
-  border-radius: 4px;
-  padding: 3px;
-
-  align-items: center;
-  justify-content: center;
-
-  ${({ size }) => `
-    min-width: ${size}px;
-    width: ${size}px;
-    min-height: ${size}px;
-    height: ${size}px;
-  `}
-
-  ${({ editable, imgSrc }) =>
-    editable &&
-    `
-    &:hover {
-      border-color: #3f403f;
-      cursor: pointer;
-
-      > img {
-        filter: grayscale(1);
-      }
-
-      > svg {
-        color: #3f403f;
-      }
-
-      &&> .upload-icon {
-        display: block;
-        z-index: 2;
-      }
-    }
-
-    &> .upload-icon {
-      display: ${imgSrc ? 'none' : 'block'};
-    }
-  `}
-
-  > img {
-    width: 100%;
-    height: 100%;
-    object-fit: cover;
-  }
-
-  > svg {
-    position: absolute;
-    font-size: 50px;
-    color: rgba(0, 0, 0, 0.54);
-    display: none;
-  }
-`;
-
-const Progress = styled(CircularProgress)`
-  position: absolute;
-  color: rgba(0, 0, 0, 0.54);
-`;
+import * as classes from './styles.module.scss';
 
 const PostImage = ({
   src,
@@ -99,7 +15,6 @@ const PostImage = ({
   onImageChosen,
   onImageCleared,
   size = 150,
-  hideOnMobile,
 }) => {
   const [isUploading, setIsUploading] = useState(false);
   const [ClearDialog, openClearDialog] = useDialog(
@@ -125,12 +40,16 @@ const PostImage = ({
   return (
     <>
       <ClearDialog />
-      <PostImageContainer
-        size={size}
-        imgSrc={src}
-        editable={!isUploading && editable}
-        isUploading={isUploading}
-        hideOnMobile={hideOnMobile}
+      <div
+        className={`${classes.postImageContainer} ${
+          !isUploading && editable ? classes.editableImage : ''
+        } ${src ? classes.hasSrc : ''}`}
+        style={{
+          minWidth: size,
+          width: size,
+          minHeight: size,
+          height: size,
+        }}
         onClick={() => {
           if (!editable) return;
           if (!uploadRef.current) return;
@@ -179,7 +98,8 @@ const PostImage = ({
             />
             <UploadIcon className="upload-icon" />
             {src ? (
-              <ClearButton
+              <div
+                className="absolute -left-[14px] -top-[14px] z-[3] rounded-full bg-paper p-1 hover:cursor-pointer [&>.MuiButtonBase-root]:h-[35px] [&>.MuiButtonBase-root]:w-[35px]"
                 onClick={(e) => {
                   e.preventDefault();
                   e.stopPropagation();
@@ -189,13 +109,18 @@ const PostImage = ({
                 <IconButton>
                   <Clear />
                 </IconButton>
-              </ClearButton>
+              </div>
             ) : null}
           </>
         ) : null}
         {src ? <img src={src} /> : null}
-        {isUploading ? <Progress size={50} /> : null}
-      </PostImageContainer>
+        {isUploading ? (
+          <CircularProgress
+            className="absolute text-[rgba(0,0,0,0.54)]"
+            size={50}
+          />
+        ) : null}
+      </div>
     </>
   );
 };

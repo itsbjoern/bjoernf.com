@@ -1,12 +1,11 @@
-import AddCircleIcon from '@mui/icons-material/AddCircle';
 import React, { useState, useEffect } from 'react';
 import { useLocation, useNavigate } from 'react-router-dom';
 
 import { getDrafts, createPost } from 'app/api/admin';
 import { useRequest } from 'app/providers/RequestProvider';
 
-import { Row, Column } from 'app/components/Flex';
 import FloatAside from 'app/components/FloatAside';
+import AddCircleIcon from 'app/components/icons/AddCircle.svg';
 import PostItem from 'app/components/PostItem';
 import Button from 'app/components/ui/Button';
 import { List } from 'app/components/ui/List';
@@ -37,8 +36,8 @@ const Admin = () => {
   }
 
   return (
-    <Column>
-      <Row>
+    <div className="flex flex-col">
+      <div className="flex flex-row">
         <Button
           variant={currentTab === 0 ? 'contained' : 'text'}
           onClick={() => {
@@ -55,13 +54,13 @@ const Admin = () => {
         >
           Drafts
         </Button>
-      </Row>
+      </div>
       {currentTab === 0 ? <Dashboard /> : null}
       {currentTab === 1 ? (
         <FloatAside
           menu={
             token ? (
-              <Column>
+              <div className="flex flex-col">
                 <Button
                   startIcon={<AddCircleIcon />}
                   variant="contained"
@@ -73,7 +72,7 @@ const Admin = () => {
                 >
                   New post
                 </Button>
-              </Column>
+              </div>
             ) : null
           }
         >
@@ -84,7 +83,7 @@ const Admin = () => {
           </List>
         </FloatAside>
       ) : null}
-    </Column>
+    </div>
   );
 };
 

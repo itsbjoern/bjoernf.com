@@ -1,12 +1,12 @@
 import { useRemirrorContext } from '@remirror/react';
 import React, { useState } from 'react';
 
-import StyledEditor from './StyledEditor';
+import { editorStyle } from './style.module.scss';
 
 const View = () => {
   const { getRootProps } = useRemirrorContext();
   const [rootProps] = useState(() => getRootProps());
-  return <StyledEditor {...rootProps} />;
+  return <div className={editorStyle} {...rootProps} />;
 };
 
 export default View;

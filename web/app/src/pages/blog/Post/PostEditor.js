@@ -1,20 +1,19 @@
-import ControlPointIcon from '@mui/icons-material/ControlPoint';
-import LoyaltyIcon from '@mui/icons-material/Loyalty';
-import SubtitlesIcon from '@mui/icons-material/Subtitles';
 import React, { useState, useEffect, useCallback } from 'react';
 
 import { upload } from 'app/api/admin';
 import { getTags } from 'app/api/blog';
 import { useRequest } from 'app/providers/RequestProvider';
 
-import { Row, Column } from 'app/components/Flex';
+import ControlPointIcon from 'app/components/icons/ControlPoint.svg';
+import LoyaltyIcon from 'app/components/icons/Loyalty.svg';
+import SubtitlesIcon from 'app/components/icons/Subtitles.svg';
 import PostImage from 'app/components/PostImage';
 import RichText from 'app/components/RichText';
 import Tag from 'app/components/Tag';
 import { IconButton } from 'app/components/ui/Button';
 import TextField, { Autocomplete } from 'app/components/ui/TextField';
 
-import 'app/remirror.css';
+import './remirror.css';
 
 const PostEditor = ({ post, updatePost }) => {
   const { sendRequest } = useRequest();
@@ -46,8 +45,8 @@ const PostEditor = ({ post, updatePost }) => {
   );
 
   return (
-    <Column gap={30}>
-      <Row gap={15} align="center">
+    <div className="flex flex-col gap-7">
+      <div className="flex flex-row items-center gap-4">
         <PostImage
           src={image}
           onImageChosen={(file, options) =>
@@ -60,8 +59,8 @@ const PostEditor = ({ post, updatePost }) => {
           }}
           editable
         />
-        <Column flexed gap={30}>
-          <Row gap={15} align="center" wrapping>
+        <div className="flex flex-1 flex-col gap-7">
+          <div className="flex flex-row flex-wrap items-center gap-4">
             <Autocomplete
               value={newTag}
               options={availableTags || []}
@@ -88,7 +87,7 @@ const PostEditor = ({ post, updatePost }) => {
             >
               <ControlPointIcon />
             </IconButton>
-            <Row gap={5} flexed wrapping>
+            <div className="flex flex-1 flex-row flex-wrap gap-1">
               {tags?.map((t, i) => {
                 return (
                   <Tag
@@ -102,22 +101,22 @@ const PostEditor = ({ post, updatePost }) => {
                   />
                 );
               })}
-            </Row>
-          </Row>
+            </div>
+          </div>
           <TextField
             value={title}
             onChange={(event) => updatePost({ title: event.target.value })}
             label="Title"
             icon={<SubtitlesIcon />}
           />
-        </Column>
-      </Row>
+        </div>
+      </div>
       <RichText
         content={initialHtml}
         onChange={updatePost}
         upload={uploadHandler}
       />
-    </Column>
+    </div>
   );
 };
 

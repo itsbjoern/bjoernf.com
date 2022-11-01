@@ -1,7 +1,6 @@
 {
   "plugins": {
-    "@fullhuman/postcss-purgecss": {
-      content: ['./app/src/index.html'],
-    },
+    'tailwindcss/nesting': {},
+    tailwindcss: {},
   },
 }

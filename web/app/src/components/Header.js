@@ -1,99 +1,80 @@
-import AdminPanelSettingsIcon from '@mui/icons-material/AdminPanelSettings';
-import ArrowCircleUpIcon from '@mui/icons-material/ArrowCircleUp';
-import GitHubIcon from '@mui/icons-material/GitHub';
-import LinkedInIcon from '@mui/icons-material/LinkedIn';
-import LogoutIcon from '@mui/icons-material/Logout';
 import React from 'react';
 import { useNavigate } from 'react-router-dom';
-import styled from 'styled-components';
 
 import { useRequest } from 'app/providers/RequestProvider';
-import { morphMixin } from 'app/theme';
 import { getFileUrl } from 'app/util';
 
-import { Row, Column } from 'app/components/Flex';
-import { H2 } from 'app/components/Text';
+import AdminPanelSettingsIcon from 'app/components/icons/AdminPanelSettings.svg';
+import ArrowCircleUpIcon from 'app/components/icons/ArrowCircleUp.svg';
+import GitHubIcon from 'app/components/icons/GitHub.svg';
+import LinkedInIcon from 'app/components/icons/LinkedIn.svg';
+import LogoutIcon from 'app/components/icons/Logout.svg';
 import Chip from 'app/components/ui/Chip';
 import Divider from 'app/components/ui/Divider';
 
 import NavigationButtons from './NavigationButtons';
-
-const BG = styled(Column)`
-  background-color: ${({ theme }) => theme.palette.background.paper};
-  padding: 15px;
-  ${morphMixin()}
-  border-radius: 0 0 10px 10px;
-`;
-
-const Avatar = styled.img`
-  width: 70px;
-  height: 70px;
-  border-radius: 35px;
-  object-fit: cover;
-`;
 
 const Header = () => {
   const navigate = useNavigate();
   const { token, setToken } = useRequest();
 
   return (
-    <BG gap={15}>
-      <Row justify="between" align="center">
-        <Row align="center">
-          <Avatar src={getFileUrl('images/me.jpg')} />
-          <Column justify="evenly" style={{ marginLeft: 10 }}>
-            <H2>Björn Friedrichs</H2>
-            <Row gap={5}>
-              <ArrowCircleUpIcon sx={{ fontSize: '1.2em' }} />
+    <div className="neo flex flex-col gap-4 rounded-b-xl bg-paper p-6">
+      <div className="flex items-center justify-between">
+        <div className="flex flex-row items-center">
+          <img
+            className="h-16 w-16 rounded-full object-cover"
+            src={getFileUrl('images/me.jpg')}
+          />
+          <div className="ml-4 flex flex-col justify-evenly">
+            <h2 className="text-2xl font-bold">Björn Friedrichs</h2>
+            <div className="flex flex-row items-center gap-1">
+              <ArrowCircleUpIcon />
               <span>That&apos;s me</span>
-            </Row>
-          </Column>
-        </Row>
+            </div>
+          </div>
+        </div>
         <NavigationButtons />
-      </Row>
+      </div>
 
       <Divider />
-      <Row wrapping gap={10}>
-        <Row justify="start" flexed>
+      <div className="flex flex-wrap gap-3">
+        <div className="flex flex-1 justify-start">
           {token ? (
-            <Row gap={10}>
+            <div className="flex gap-3">
               <Chip
-                icon={<AdminPanelSettingsIcon fontSize="small" />}
+                icon={<AdminPanelSettingsIcon />}
                 label="Admin"
-                variant="outlined"
                 onClick={() => navigate('/admin')}
               />
               <Chip
-                icon={<LogoutIcon fontSize="small" />}
+                icon={<LogoutIcon />}
                 label="Sign out"
-                variant="outlined"
                 onClick={() => setToken(null)}
               />
-            </Row>
+            </div>
           ) : null}
-        </Row>
-        <Row justify="end" gap={15}>
+        </div>
+        <div className="flex justify-end gap-3">
           <Chip
-            component="a"
+            as="a"
             clickable
             icon={<GitHubIcon />}
             href="https://github.com/BFriedrichs"
             label="BFriedrichs"
-            variant="outlined"
             target="_blank"
           />
           <Chip
-            component="a"
+            as="a"
             clickable
             icon={<LinkedInIcon />}
             href="https://linkedin.com/in/bjoern-friedrichs"
             label="bjoern-friedrichs"
-            variant="outlined"
             target="_blank"
           />
-        </Row>
-      </Row>
-    </BG>
+        </div>
+      </div>
+    </div>
   );
 };
 

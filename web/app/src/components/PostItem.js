@@ -1,139 +1,57 @@
-import PendingActionsIcon from '@mui/icons-material/PendingActions';
 import React from 'react';
-import styled from 'styled-components';
 
 import Ripples from 'app/lib/Ripples';
-import { morphMixin } from 'app/theme';
 import { formatDate } from 'app/util';
 
-import { Row, Column } from 'app/components/Flex';
+import PendingActionsIcon from 'app/components/icons/PendingActions.svg';
 import PostImage from 'app/components/PostImage';
 import Tag from 'app/components/Tag';
-import { H4 } from 'app/components/Text';
 import { ListItem } from 'app/components/ui/List';
 import Skeleton from 'app/components/ui/Skeleton';
 import UnstyledLink from 'app/components/UnstyledLink';
 
-const Title = styled(H4)`
-  line-height: 1.6rem;
-  color: ${({ theme }) => theme.palette.primary.main};
-`;
-
-const ShadowButton = styled.div`
-  display: flex;
-  flex: 1;
-  overflow: hidden;
-
-  @media only screen and (max-width: 425px) {
-    padding-right: 10px;
-  }
-
-  min-height: 77px;
-  background-color: ${({ theme }) => theme.palette.background.paper};
-  position: relative;
-
-  ${morphMixin()}
-`;
-
-const PadRow = styled(Row)`
-  padding-bottom: 10px;
-  padding-left: 10px;
-  padding-top: 10px;
-  padding-right: 10%;
-`;
-
-const Outer = styled(Row)`
-  z-index: 5;
-  overflow: hidden;
-
-  @media only screen and (max-width: 425px) {
-    overflow: visible;
-    width: 100%;
-    align-self: center;
-  }
-`;
-
-const Inner = styled(Row)`
-  z-index: 5;
-  padding: 15px 20px 0 25px;
-
-  @media only screen and (max-width: 425px) {
-    padding: 0;
-    width: 100%;
-  }
-`;
-
-const PaperClip = styled(Row)`
-  background-color: ${({ theme }) => theme.palette.background.paper};
-  z-index: 5;
-  ${morphMixin()}
-  padding: 8px 8px 0px 12px;
-  border-radius: 10px 10px 0 0;
-  gap: 15px;
-
-  @media only screen and (max-width: 425px) {
-    padding: 5px 0 0 5px;
-    flex: 1;
-    box-shadow: none;
-    align-items: center;
-  }
-`;
-
-const Control = styled(Row)`
-  @media only screen and (max-width: 425px) {
-    flex-direction: column-reverse;
-    padding-bottom: 8px;
-    margin-top: 20px;
-  }
-`;
-
-const Summary = styled.span`
-  font-size: 0.9rem;
-
-  -webkit-line-clamp: 3;
-  overflow: hidden;
-  text-overflow: ellipsis;
-  -webkit-box-orient: vertical;
-  display: -webkit-box;
-`;
-
 const ClipOn = ({ children }) => (
-  <Outer>
-    <Inner>
-      <PaperClip>{children}</PaperClip>
-    </Inner>
-  </Outer>
+  <div className="z-[5] flex flex-row overflow-hidden">
+    <div className="z-[5] flex flex-row pt-4 pr-5 pb-0 pl-6">
+      <div className="neo z-[5] flex flex-row gap-4 rounded-t-xl bg-paper pt-2 pr-2 pb-0 pl-3">
+        {children}
+      </div>
+    </div>
+  </div>
 );
 
 const PostItem = ({ post }) => {
   const isSkeleton = post._id === '?';
   if (isSkeleton) {
     return (
-      <Column>
-        <Control justify="start">
+      <div className="flex flex-col">
+        <div
+          className="flex flex-row justify-start smo:mt-5 smo:flex-col-reverse smo:pb-2"
+          justify="start"
+        >
           <ClipOn>
-            <Row gap={10} align="center">
+            <div className="flex flex-row items-center gap-2">
               <Skeleton animation="wave" height={15} width={100} />
               <Skeleton animation="wave" height={15} width={50} />
-            </Row>
+            </div>
           </ClipOn>
-        </Control>
+        </div>
         <ListItem>
-          <ShadowButton>
+          <div className="neo  relative flex min-h-[100px] flex-1 overflow-hidden bg-paper smo:pr-2">
             <Ripples flex>
-              <PadRow justify="start" flexed gap={10} grow={10}>
-                <Column gap={10}>
-                  <Title>
+              <div className="flex flex-grow flex-row justify-start gap-2 pr-3 pb-2 pl-2 pt-2">
+                <div className="flex flex-col gap-2 py-1 px-2">
+                  <h3 className="text-xl font-bold leading-6">
                     <Skeleton animation="wave" height={30} width={120} />
-                  </Title>
+                  </h3>
                   <Skeleton animation="wave" height={10} width={240} />
                   <Skeleton animation="wave" height={10} width={220} />
-                </Column>
-              </PadRow>
+                </div>
+              </div>
             </Ripples>
-          </ShadowButton>
+          </div>
         </ListItem>
-      </Column>
+      </div>
     );
   }
 
@@ -142,17 +60,20 @@ const PostItem = ({ post }) => {
   const summary = draft ? draft.text?.slice(0, 100) : published.summary;
 
   return (
-    <Column style={{ marginBottom: 10 }}>
-      <Control justify="start">
+    <div className="mb-2 flex flex-col">
+      <div
+        className="flex flex-row justify-start smo:mt-5 smo:flex-col-reverse smo:pb-2"
+        justify="start"
+      >
         <ClipOn>
-          <Row gap={10}>
-            <Row>
+          <div className="flex flex-row gap-2">
+            <div className="flex flex-row">
               <span style={{ fontSize: '0.9rem' }}>
                 {formatDate(createdAt)}
               </span>
-            </Row>
-          </Row>
-          <Row gap={8} align="end">
+            </div>
+          </div>
+          <div className="flex flex-row justify-end gap-2">
             {tags
               ? tags.map((t) => (
                   <Tag
@@ -164,26 +85,37 @@ const PostItem = ({ post }) => {
                   />
                 ))
               : null}
-          </Row>
+          </div>
         </ClipOn>
-      </Control>
+      </div>
       <UnstyledLink delay={300} to={`/blog/${post._id}`}>
         <ListItem>
-          <ShadowButton>
+          <div className="neo relative flex min-h-[100px] flex-1 overflow-hidden rounded-lg bg-paper smo:pr-2">
             <Ripples flex>
-              <PadRow gap={10}>
+              <div className="flex flex-row gap-2 pr-3 pb-2 pl-2 pt-2">
                 {!published ? <PendingActionsIcon /> : null}
                 {image ? <PostImage size={100} src={image} /> : null}
-                <Column wrapping="mobile">
-                  <Title>{title || 'No title'}</Title>
-                  <Summary>{summary}</Summary>
-                </Column>
-              </PadRow>
+                <div className="flex flex-col px-2 py-1 smo:flex-wrap">
+                  <h3 className="text-xl font-bold leading-6 text-primary">
+                    {title || 'No title'}
+                  </h3>
+                  <div
+                    className="flex flex-row overflow-hidden text-ellipsis text-sm"
+                    style={{
+                      '-webkit-line-clamp': 3,
+                      '-webkit-box-orient': 'vertical',
+                      display: '-webkit-box',
+                    }}
+                  >
+                    {summary}
+                  </div>
+                </div>
+              </div>
             </Ripples>
-          </ShadowButton>
+          </div>
         </ListItem>
       </UnstyledLink>
-    </Column>
+    </div>
   );
 };
 

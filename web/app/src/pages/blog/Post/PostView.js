@@ -10,12 +10,10 @@ import { useSSRProps } from 'app/providers/SSRProvider';
 import { emailLink, linkedinLink, whatsappLink, twitterLink } from 'app/share';
 import { formatDate } from 'app/util';
 
-import { Column, Row } from 'app/components/Flex';
 import FloatAside from 'app/components/FloatAside';
 import PostImage from 'app/components/PostImage';
-import StyledEditor from 'app/components/RichText/StyledEditor';
+import { editorStyle } from 'app/components/RichText/style.module.scss';
 import Tag from 'app/components/Tag';
-import { H2 } from 'app/components/Text';
 import { IconButton } from 'app/components/ui/Button';
 
 const ShareIcon = ({ href, size, Icon }) => (
@@ -44,7 +42,7 @@ const PostView = ({ postData, createdAt, hideShare }) => {
       width={iconSize}
       gap={30}
       menu={
-        <Column gap={0} flip="mobile" justify="center">
+        <div className="flex flex-col justify-center smo:flex-row">
           <ShareIcon
             size={iconSize}
             Icon={EmailIcon}
@@ -65,32 +63,36 @@ const PostView = ({ postData, createdAt, hideShare }) => {
             Icon={TwitterIcon}
             href={twitterLink({ title, url, tags })}
           />
-        </Column>
+        </div>
       }
       left={false}
     >
-      <Column gap={20}>
-        <Row gap={20} align="center" flip="mobile">
+      <div className="flex flex-col gap-5">
+        <div className="flex flex-row items-center gap-5 smo:flex-col">
           {image ? <PostImage src={image} /> : null}
-          <Column gap={20} justify="center">
-            <Row justify="between" wrapping gap={10}>
-              <Row gap={10}>
-                {tags
-                  ? tags.map((t) => <Tag size="small" key={t} name={t} />)
-                  : null}
-              </Row>
-              <div>Published {formatDate(createdAt)}</div>
-            </Row>
-            <H2 mobileSize="1.2rem">{title}</H2>
-          </Column>
-        </Row>
-        <StyledEditor>
+          <div className="flex flex-col justify-center gap-2">
+            <div className="flex flex-row flex-wrap justify-between gap-2">
+              {tags && tags.length ? (
+                <div className="flex flex-row gap-2">
+                  {tags.map((t) => (
+                    <Tag size="small" key={t} name={t} />
+                  ))}
+                </div>
+              ) : null}
+              <span style={{ fontSize: '0.9rem' }}>
+                Published {formatDate(createdAt)}
+              </span>
+            </div>
+            <h2 className="text-xl font-bold">{title}</h2>
+          </div>
+        </div>
+        <div className={editorStyle}>
           <div
             className="remirror-editor"
             dangerouslySetInnerHTML={{ __html: html }}
           />
-        </StyledEditor>
-      </Column>
+        </div>
+      </div>
     </FloatAside>
   );
 };

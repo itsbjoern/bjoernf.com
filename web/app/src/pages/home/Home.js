@@ -4,10 +4,8 @@ import { getPosts } from 'app/api/blog';
 import { useRequest } from 'app/providers/RequestProvider';
 import { useSSR } from 'app/providers/SSRProvider';
 
-import { Column } from 'app/components/Flex';
 import PostItem from 'app/components/PostItem';
 import Ref from 'app/components/Ref';
-import { H2, H4 } from 'app/components/Text';
 import Divider from 'app/components/ui/Divider';
 import { List } from 'app/components/ui/List';
 
@@ -22,9 +20,9 @@ const Home = () => {
   );
 
   return (
-    <Column gap={30}>
+    <div className="flex flex-col gap-7">
       <span>
-        <H2>This is home</H2>
+        <h2 className="text-xl font-bold">This is home</h2>
       </span>
       <span>
         I am someone that likes to dabble and try things. And sometimes it just
@@ -46,7 +44,7 @@ const Home = () => {
         <Divider />
       </span>
       <span>
-        <H4>Brief background</H4>
+        <h3 className="text-xl font-bold">Me briefly</h3>
       </span>
       <span>
         I&apos;m a software engineer, orginally from Germany and now living and
@@ -64,16 +62,16 @@ const Home = () => {
         <Divider />
       </span>
       <span>
-        <H4 style={{ marginBottom: '20px' }}>Recent posts</H4>
-        <Column>
+        <h3 className="text-xl font-bold">Recent posts</h3>
+        <div className="flex flex-col">
           <List>
             {posts.map((p, i) => (
               <PostItem key={p._id === '?' ? i : p._id} post={p} />
             ))}
           </List>
-        </Column>
+        </div>
       </span>
-    </Column>
+    </div>
   );
 };
 

@@ -1,31 +1,23 @@
-import TransitEnterexitIcon from '@mui/icons-material/TransitEnterexit';
 import React from 'react';
 import { Link } from 'react-router-dom';
-import styled from 'styled-components';
 
-const RouterLink = styled(Link)`
-  color: ${({ theme }) => theme.palette.primary.main};
-  text-decoration-color: rgba(255, 87, 10, 0.4);
-
-  &:hover {
-    text-decoration-color: rgba(255, 87, 10, 1);
-  }
-`;
-
-const ExternalLink = styled.a`
-  color: ${({ theme }) => theme.palette.primary.main};
-  text-decoration-color: rgba(255, 87, 10, 0.4);
-
-  &:hover {
-    text-decoration-color: rgba(255, 87, 10, 1);
-  }
-`;
+import TransitEnterexitIcon from 'app/components/icons/TransitEnterexit.svg';
 
 const LinkRender = ({ external, href, ...props }) =>
   external ? (
-    <ExternalLink href={href} target="_blank" {...props} />
+    <a
+      className="inline text-primary underline decoration-primary hover:decoration-orange-200"
+      href={href}
+      rel="noreferrer"
+      target="_blank"
+      {...props}
+    />
   ) : (
-    <RouterLink to={href} {...props} />
+    <Link
+      className="text-primary underline decoration-primary hover:decoration-orange-200"
+      to={href}
+      {...props}
+    />
   );
 
 const Ref = ({ text, href }) => {
@@ -39,6 +31,7 @@ const Ref = ({ text, href }) => {
           <TransitEnterexitIcon
             color="primary"
             style={{
+              display: 'inline',
               marginLeft: 0,
               fontSize: '1rem',
               transform: 'rotate(180deg)',
