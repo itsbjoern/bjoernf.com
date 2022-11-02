@@ -172,8 +172,8 @@ jobs:
                   ACKEE_PASSWORD: ${{ secrets.ACKEE_PASSWORD }}
             EOL
 
-            sudo docker-compose docker/prod-config.yml -f release.yml down
-            sudo docker-compose docker/prod-config.yml -f release.yml up -V -d
+            sudo docker-compose -f docker/prod-config.yml -f release.yml down
+            sudo docker-compose -f docker/prod-config.yml -f release.yml up -V -d
             sudo docker system prune -f
 
   s3-upload:
