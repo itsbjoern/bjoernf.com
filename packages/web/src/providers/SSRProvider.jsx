@@ -67,7 +67,7 @@ const SSRProvider = ({ children, ssrProps }) => {
 // eslint-disable-next-line no-unused-vars
 const ssrDidChain = {};
 const makePseudoId = (options) =>
-  btoa(encodeURIComponent(JSON.stringify(options).replace(' ', '')));
+  btoa(encodeURIComponent(JSON.stringify(options).replace(' ', ''))).slice(-12);
 const windowData = () =>
   (globalThis.window && globalThis.window.__RESOLVED_DATA) || {};
 

@@ -1,10 +1,4 @@
-import React, {
-  useRef,
-  useEffect,
-  useCallback,
-  useState,
-  Suspense,
-} from 'react';
+import React, { useRef, useCallback, useState, Suspense } from 'react';
 import { useLocation, useNavigate, useParams } from 'react-router-dom';
 import { toast } from 'react-toast';
 
@@ -67,7 +61,6 @@ const Post = () => {
     chainFinally: () => setLoading(false),
     dataId: 'post',
   });
-  const update = post?.draft;
 
   const updatePost = useCallback(
     (update) => {
@@ -79,38 +72,32 @@ const Post = () => {
           ...update,
         },
       }));
+
+      if (updateTimeout.current) {
+        clearTimeout(updateTimeout.current);
+        updateTimeout.current = null;
+      }
+
+      const { title, tags, html, text, image } = update;
+      queuedUpdate.current = (then) => {
+        sendRequest(
+          updatePostAPI(postId, filterEmpty({ title, tags, html, text, image }))
+        ).success(() => {
+          toast.success('Post saved');
+          if (then) {
+            then();
+          }
+        });
+      };
+
+      updateTimeout.current = setTimeout(() => {
+        if (queuedUpdate.current) {
+          queuedUpdate.current();
+        }
+      }, 700);
     },
     [postId]
   );
-
-  useEffect(() => {
-    if (!update) {
-      return;
-    }
-
-    if (updateTimeout.current) {
-      clearTimeout(updateTimeout.current);
-      updateTimeout.current = null;
-    }
-
-    const { title, tags, html, text, image } = update;
-    queuedUpdate.current = (then) => {
-      sendRequest(
-        updatePostAPI(postId, { title, tags, html, text, image })
-      ).success(() => {
-        toast.success('Post saved');
-        if (then) {
-          then();
-        }
-      });
-    };
-
-    updateTimeout.current = setTimeout(() => {
-      if (queuedUpdate.current) {
-        queuedUpdate.current();
-      }
-    }, 700);
-  }, [update]);
 
   const publishPost = useCallback(() => {
     const doPublish = () => {
