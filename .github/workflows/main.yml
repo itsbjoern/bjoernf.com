@@ -11,7 +11,7 @@ jobs:
     outputs:
       hash: ${{ steps.web-hash.outputs.hash }}
     steps:
-      - uses: actions/checkout@v2
+      - uses: actions/checkout@v3
 
       - name: Set web hash
         id: web-hash
@@ -108,7 +108,7 @@ jobs:
     needs: build-images
     runs-on: ubuntu-latest
     steps:
-      - uses: actions/checkout@v2
+      - uses: actions/checkout@v3
 
       - name: Create folder
         run: |
@@ -183,7 +183,7 @@ jobs:
       - build-web
     runs-on: ubuntu-latest
     steps:
-      - uses: actions/checkout@v2
+      - uses: actions/checkout@v3
 
       - name: Cache web build
         id: cache-build
