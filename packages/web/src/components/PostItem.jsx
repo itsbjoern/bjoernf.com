@@ -20,7 +20,7 @@ const ClipOn = ({ children }) => (
   </div>
 );
 
-const PostItem = ({ post }) => {
+const PostItem = ({ post, showDraft = false }) => {
   const isSkeleton = post._id === '?';
   if (isSkeleton) {
     return (
@@ -56,8 +56,8 @@ const PostItem = ({ post }) => {
   }
 
   const { draft, published, createdAt } = post;
-  const { title, tags, image } = draft ?? published;
-  const summary = draft ? draft.text?.slice(0, 100) : published.summary;
+  const { title, tags, image } = showDraft ? draft : published ?? {};
+  const summary = showDraft ? draft.text?.slice(0, 100) : published?.summary;
 
   return (
     <div className="mb-2 flex flex-col">

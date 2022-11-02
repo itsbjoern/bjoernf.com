@@ -37,7 +37,7 @@ const Admin = () => {
 
   return (
     <div className="flex flex-col">
-      <div className="flex flex-row">
+      <div className="flex flex-row gap-4">
         <Button
           variant={currentTab === 0 ? 'contained' : 'text'}
           onClick={() => {
@@ -57,31 +57,24 @@ const Admin = () => {
       </div>
       {currentTab === 0 ? <Dashboard /> : null}
       {currentTab === 1 ? (
-        <FloatAside
-          menu={
-            token ? (
-              <div className="flex flex-col">
-                <Button
-                  startIcon={<AddCircleIcon />}
-                  variant="contained"
-                  onClick={() => {
-                    sendRequest(createPost()).success(({ post }) => {
-                      navigate(`/blog/${post._id}/edit`);
-                    });
-                  }}
-                >
-                  New post
-                </Button>
-              </div>
-            ) : null
-          }
-        >
+        <div className="mt-8 flex flex-col">
+          <Button
+            startIcon={<AddCircleIcon />}
+            variant="contained"
+            onClick={() => {
+              sendRequest(createPost()).success(({ post }) => {
+                navigate(`/blog/${post._id}/edit`);
+              });
+            }}
+          >
+            New post
+          </Button>
           <List>
             {draftPosts.map((p) => (
-              <PostItem key={p._id} post={p} />
+              <PostItem key={p._id} post={p} showDraft={true} />
             ))}
           </List>
-        </FloatAside>
+        </div>
       ) : null}
     </div>
   );
