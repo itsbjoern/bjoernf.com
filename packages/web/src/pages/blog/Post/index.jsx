@@ -171,7 +171,7 @@ const Post = () => {
     deleteDraft
   );
 
-  if (loading) {
+  if (loading && !post) {
     return (
       <div className="flex flex-col gap-8">
         <div className="flex flex-row items-center justify-between">
