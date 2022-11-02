@@ -16,6 +16,7 @@ const PostImage = ({
   onImageCleared,
   size = 150,
 }) => {
+  const [isDragging, setIsDragging] = useState(false);
   const [isUploading, setIsUploading] = useState(false);
   const [ClearDialog, openClearDialog] = useDialog(
     'Are you sure you want to clear this image?',
@@ -58,6 +59,14 @@ const PostImage = ({
         }}
         onDragOver={(ev) => {
           ev.preventDefault();
+          if (editable) {
+            setIsDragging(true);
+          }
+        }}
+        onDragLeave={() => {
+          if (editable) {
+            setIsDragging(false);
+          }
         }}
         onDrop={(event) => {
           event.preventDefault();
@@ -77,6 +86,7 @@ const PostImage = ({
           }
 
           onFileChosen(file);
+          setIsDragging(false);
         }}
       >
         {editable ? (
@@ -96,7 +106,11 @@ const PostImage = ({
                 event.currentTarget.value = '';
               }}
             />
-            <UploadIcon className="upload-icon" />
+            <div
+              className={`upload-icon ${isDragging ? '!block rotate-180' : ''}`}
+            >
+              <UploadIcon />
+            </div>
             {src ? (
               <div
                 className="absolute -left-[14px] -top-[14px] z-[3] rounded-full bg-paper p-1 hover:cursor-pointer [&>.MuiButtonBase-root]:h-[35px] [&>.MuiButtonBase-root]:w-[35px]"

@@ -17,11 +17,14 @@
     object-fit: cover;
   }
 
-  > svg {
+  > :global(.upload-icon) {
     position: absolute;
-    font-size: 50px;
     color: rgba(0, 0, 0, 0.54);
     display: none;
+
+    svg {
+      font-size: 50px;
+    }
   }
 }
 
@@ -38,7 +41,7 @@
       color: #3f403f;
     }
 
-    &> .upload-icon {
+    &> :global(.upload-icon) {
       display: block;
       z-index: 2;
     }
@@ -46,8 +49,8 @@
 }
 
 .hasSrc {
-  &> .upload-icon {
-    display: 'none';
+  &> :global(.upload-icon) {
+    display: none;
   }
 }
 
