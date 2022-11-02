@@ -11,7 +11,8 @@ module.exports = {
         secondary: '#381D2A',
       },
       screens: {
-        smo: { max: '600px' },
+        smo: { max: '639px' },
+        lgo: { max: '1023px' },
       },
     },
   },

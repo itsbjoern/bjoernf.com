@@ -40,7 +40,7 @@ const PostView = ({ postData, createdAt, hideShare }) => {
       width={iconSize}
       gap={30}
       menu={
-        <div className="flex flex-col justify-center smo:flex-row">
+        <div className="flex flex-col justify-center lgo:flex-row">
           <ShareIcon
             size={iconSize}
             Icon={EmailIcon}
