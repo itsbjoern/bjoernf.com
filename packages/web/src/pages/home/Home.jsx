@@ -44,7 +44,7 @@ const Home = () => {
         <Divider />
       </span>
       <span>
-        <h3 className="text-xl font-bold">Me briefly</h3>
+        <h3 className="text-xl font-bold">Me (briefly)</h3>
       </span>
       <span>
         I&apos;m a software engineer, orginally from Germany and now living and

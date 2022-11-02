@@ -40,7 +40,7 @@ export default defineConfig(({ mode }) => {
     },
     optimizeDeps: {
       // We manually add a list of dependencies to be pre-bundled, in order to avoid a page reload at dev start which breaks the preact plugin
-      include: ['preact/devtools', 'preact/debug', 'preact/jsx-dev-runtime', 'preact', 'preact/hooks']
+      include: ['preact/devtools', 'preact/debug', 'preact/jsx-dev-runtime', 'preact', 'preact/hooks', 'react-router']
     }
   };
 
