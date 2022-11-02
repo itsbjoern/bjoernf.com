@@ -5,7 +5,7 @@ import Clear from 'src/components/icons/Clear.svg';
 import UploadIcon from 'src/components/icons/Upload.svg';
 import { IconButton } from 'src/components/ui/Button';
 import CircularProgress from 'src/components/ui/CircularProgress';
-import { useDialog } from 'src/components/ui/Dialog';
+import useDialog from 'src/components/ui/Dialog/useDialog';
 
 import * as classes from './styles.module.scss';
 

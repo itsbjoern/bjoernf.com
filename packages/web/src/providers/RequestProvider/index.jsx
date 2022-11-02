@@ -1,15 +1,9 @@
-import React, {
-  useState,
-  useEffect,
-  useCallback,
-  useContext,
-  forwardRef,
-} from 'react';
+import React, { useState, useEffect, useCallback } from 'react';
 
 import { request } from 'src/api';
 import { isSSR } from 'src/util';
 
-export const RequestContext = React.createContext(null);
+import { RequestContext } from './hooks';
 
 const UserProvider = ({ children }) => {
   const [token, _setToken] = useState('');
@@ -60,23 +54,6 @@ const UserProvider = ({ children }) => {
       {children}
     </RequestContext.Provider>
   );
-};
-
-export const withRequest = (cls) => {
-  const clsRenderer = cls.render || cls;
-  const Wrapper = forwardRef((props, ref) => {
-    const context = useContext(RequestContext);
-
-    return clsRenderer({ ...props, ...context, ref });
-  });
-  Wrapper.displayName = clsRenderer.displayName;
-
-  return Wrapper;
-};
-
-export const useRequest = () => {
-  const context = useContext(RequestContext);
-  return context;
 };
 
 export default UserProvider;

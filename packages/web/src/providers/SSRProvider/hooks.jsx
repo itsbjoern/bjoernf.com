@@ -1,68 +1,8 @@
-import React, {
-  useState,
-  useEffect,
-  useContext,
-  useRef,
-  useCallback,
-} from 'react';
+import { useState, useEffect, useContext, useRef, useCallback } from 'react';
 
 import { isSSR } from 'src/util';
 
-export let SSRContext = null;
-let toResolve = null;
-let resolvedData = null;
-
-export const createSSRContext = () => {
-  SSRContext = React.createContext(null);
-  toResolve = {};
-  resolvedData = {};
-
-  const resolveData = () => {
-    const isDone = Object.keys(toResolve).map(() => false);
-
-    return new Promise((resolve) => {
-      if (isDone.length === 0) {
-        resolve(resolvedData);
-      }
-      Object.entries(toResolve).forEach(([name, request], i) => {
-        request
-          .then((data) => {
-            resolvedData[name] = data;
-          })
-          .catch((e) => {
-            console.log(e);
-          })
-          .finally(() => {
-            isDone[i] = true;
-            if (isDone.every((e) => e)) {
-              resolve(resolvedData);
-            }
-          });
-      });
-    });
-  };
-
-  return { resolveData };
-};
-createSSRContext();
-
-const SSRProvider = ({ children, ssrProps }) => {
-  const [props] = useState(ssrProps);
-  if (!SSRContext) {
-    new Error('Call "createSSRContext" before render');
-  }
-
-  const addResolve = (id, req) => {
-    toResolve[id] = req;
-  };
-  const getResolvedData = (id) => resolvedData[id];
-
-  return (
-    <SSRContext.Provider value={{ addResolve, getResolvedData, props }}>
-      {children}
-    </SSRContext.Provider>
-  );
-};
+import { SSRContext } from './createContext';
 
 // eslint-disable-next-line no-unused-vars
 const ssrDidChain = {};
@@ -150,5 +90,3 @@ export const useSSR = (request, options) => {
 
   return [data, setData];
 };
-
-export default SSRProvider;

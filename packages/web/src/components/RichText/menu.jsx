@@ -50,7 +50,7 @@ const Menu = () => {
       }}
     >
       <div
-        className="flex flex-row flex-wrap gap-3 p-10"
+        className="flex flex-row flex-wrap gap-3 p-2"
         style={{
           border: '0.5px solid rgba(0,0,0,0.2)',
           background: '#fff',

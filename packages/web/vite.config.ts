@@ -1,7 +1,6 @@
 import preact from '@preact/preset-vite';
 import dns from 'dns';
 import path from 'path';
-import { fileURLToPath } from 'url';
 import { loadEnv, defineConfig, UserConfigExport } from 'vite';
 import svgr from 'vite-plugin-svgr';
 
@@ -26,6 +25,7 @@ export default defineConfig(({ mode }) => {
       }),
     ],
     resolve: {
+      extensions: ['.js', '.jsx', '.ts', '.tsx'],
       alias: {
         src: path.resolve(__dirname, 'src'),
         react: 'preact/compat',
@@ -38,6 +38,10 @@ export default defineConfig(({ mode }) => {
         requireReturnsDefault: true,
       },
     },
+    optimizeDeps: {
+      // We manually add a list of dependencies to be pre-bundled, in order to avoid a page reload at dev start which breaks the preact plugin
+      include: ['preact/devtools', 'preact/debug', 'preact/jsx-dev-runtime', 'preact', 'preact/hooks']
+    }
   };
 
   return config;

@@ -1,4 +1,4 @@
-import React, { useState, useCallback } from 'react';
+import React from 'react';
 import { createPortal } from 'react-dom';
 
 import { isSSR } from 'src/util';
@@ -47,26 +47,6 @@ const Dialog = ({ open, onConfirm, onClose, content }) => {
     </div>,
     dialogContainer
   );
-};
-
-export const useDialog = (content, onConfirm) => {
-  const [open, setOpen] = useState(false);
-
-  const wrappedConfirm = useCallback(() => {
-    onConfirm && onConfirm();
-    setOpen(false);
-  }, [onConfirm]);
-
-  const Component = () => (
-    <Dialog
-      content={content}
-      onConfirm={wrappedConfirm}
-      onClose={() => setOpen(false)}
-      open={open}
-    />
-  );
-
-  return [Component, () => setOpen(true)];
 };
 
 export default Dialog;

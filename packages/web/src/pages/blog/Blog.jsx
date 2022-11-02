@@ -4,8 +4,8 @@ import { toast } from 'react-toast';
 
 import { apiUrl } from 'src/api';
 import { getPosts } from 'src/api/blog';
-import { useRequest } from 'src/providers/RequestProvider';
-import { useSSR } from 'src/providers/SSRProvider';
+import { useRequest } from 'src/providers/RequestProvider/hooks';
+import { useSSR } from 'src/providers/SSRProvider/hooks';
 
 import ContentCopyIcon from 'src/components/icons/ContentCopy.svg';
 import RssFeedIcon from 'src/components/icons/RssFeed.svg';

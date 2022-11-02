@@ -2,7 +2,7 @@ import React, { useState } from 'react';
 import { toast } from 'react-toast';
 
 import { changePassword } from 'src/api/admin';
-import { useRequest } from 'src/providers/RequestProvider';
+import { useRequest } from 'src/providers/RequestProvider/hooks';
 
 import VisibilityIcon from 'src/components/icons/Visibility.svg';
 import VisibilityOffIcon from 'src/components/icons/VisibilityOff.svg';

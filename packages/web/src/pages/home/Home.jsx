@@ -1,8 +1,8 @@
 import React from 'react';
 
 import { getPosts } from 'src/api/blog';
-import { useRequest } from 'src/providers/RequestProvider';
-import { useSSR } from 'src/providers/SSRProvider';
+import { useRequest } from 'src/providers/RequestProvider/hooks';
+import { useSSR } from 'src/providers/SSRProvider/hooks';
 
 import PostItem from 'src/components/PostItem';
 import Ref from 'src/components/Ref';

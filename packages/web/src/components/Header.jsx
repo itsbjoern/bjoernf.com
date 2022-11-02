@@ -1,7 +1,7 @@
 import React from 'react';
 import { useNavigate } from 'react-router-dom';
 
-import { useRequest } from 'src/providers/RequestProvider';
+import { useRequest } from 'src/providers/RequestProvider/hooks';
 import { getFileUrl } from 'src/util';
 
 import AdminPanelSettingsIcon from 'src/components/icons/AdminPanelSettings.svg';

@@ -1,6 +1,7 @@
 import React from 'react';
 
-import SSRProvider, { createSSRContext } from 'src/providers/SSRProvider';
+import SSRProvider from 'src/providers/SSRProvider';
+import { createSSRContext } from 'src/providers/SSRProvider/createContext';
 
 import App from './App';
 import './index.css';

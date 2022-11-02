@@ -2,7 +2,7 @@ import React, { useState, useCallback } from 'react';
 import { toast } from 'react-toast';
 
 import { login } from 'src/api/admin';
-import { useRequest } from 'src/providers/RequestProvider';
+import { useRequest } from 'src/providers/RequestProvider/hooks';
 
 import AccountCircleIcon from 'src/components/icons/AccountCircle.svg';
 import VpnKeyIcon from 'src/components/icons/VpnKey.svg';

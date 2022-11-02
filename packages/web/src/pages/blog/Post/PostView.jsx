@@ -1,6 +1,6 @@
 import React, { useState } from 'react';
 
-import { useSSRProps } from 'src/providers/SSRProvider';
+import { useSSRProps } from 'src/providers/SSRProvider/hooks';
 import { emailLink, linkedinLink, whatsappLink, twitterLink } from 'src/share';
 import { formatDate } from 'src/util';
 

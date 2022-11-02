@@ -11,15 +11,15 @@ import {
 } from 'src/api/admin';
 import { getPost } from 'src/api/blog';
 import NotFound from 'src/pages/404';
-import { useRequest } from 'src/providers/RequestProvider';
-import { useSSR } from 'src/providers/SSRProvider';
+import { useRequest } from 'src/providers/RequestProvider/hooks';
+import { useSSR } from 'src/providers/SSRProvider/hooks';
 import { isSSR } from 'src/util';
 
 import FloatAside from 'src/components/FloatAside';
 import DeleteIcon from 'src/components/icons/Delete.svg';
 import Alert from 'src/components/ui/Alert';
 import Button from 'src/components/ui/Button';
-import { useDialog } from 'src/components/ui/Dialog';
+import useDialog from 'src/components/ui/Dialog/useDialog';
 import Switch from 'src/components/ui/Switch';
 
 const PostEditor = React.lazy(() => import('./PostEditor'));

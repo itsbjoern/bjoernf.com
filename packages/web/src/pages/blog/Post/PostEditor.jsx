@@ -2,7 +2,7 @@ import React, { useState, useEffect, useCallback } from 'react';
 
 import { upload } from 'src/api/admin';
 import { getTags } from 'src/api/blog';
-import { useRequest } from 'src/providers/RequestProvider';
+import { useRequest } from 'src/providers/RequestProvider/hooks';
 
 import ControlPointIcon from 'src/components/icons/ControlPoint.svg';
 import LoyaltyIcon from 'src/components/icons/Loyalty.svg';
