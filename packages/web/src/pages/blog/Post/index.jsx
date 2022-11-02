@@ -193,7 +193,8 @@ const Post = () => {
   const draftEqualsLive =
     !post.draft ||
     (post.draft?.html === post.published?.html &&
-      post.draft?.title === post.draft?.title &&
+      post.draft?.title === post.published?.title &&
+      post.draft?.image === post.published?.image &&
       post.draft?.tags?.length === post.published?.tags?.length);
 
   return (
