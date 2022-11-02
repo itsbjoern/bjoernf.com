@@ -61,7 +61,7 @@ const Post = () => {
       return data.post;
     },
     chainFinally: () => setLoading(false),
-    dataId: 'post',
+    dataId: isSSR ? 'post' : undefined,
   });
 
   const updatePost = useCallback(
