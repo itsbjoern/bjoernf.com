@@ -4,7 +4,6 @@ import { useLocation, useNavigate } from 'react-router-dom';
 import { getDrafts, createPost } from 'src/api/admin';
 import { useRequest } from 'src/providers/RequestProvider';
 
-import FloatAside from 'src/components/FloatAside';
 import AddCircleIcon from 'src/components/icons/AddCircle.svg';
 import PostItem from 'src/components/PostItem';
 import Button from 'src/components/ui/Button';
