@@ -45,7 +45,8 @@ const hydrateIndex = (rawIndex, request, renderedApp, resolvedData) => {
   };
 
   const entries = Object.entries(resolvedData);
-  const [postData] = entries.find(([key, val]) => key.startsWith('post-'));
+  const [_key, postData] =
+    entries.find(([key, val]) => key.startsWith('post-')) ?? [];
   if (postData?.published) {
     metaData.title = postData.published.title;
     metaData.description =
