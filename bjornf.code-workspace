@@ -20,7 +20,7 @@
       "name": "🪛 Deployment",
       "path": ".github/workflows"
     },
-    {
+   {
       "name": "🪛 Docker",
       "path": "docker"
     }

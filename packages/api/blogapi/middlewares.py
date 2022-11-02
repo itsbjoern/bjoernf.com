@@ -36,7 +36,13 @@ async def auth_middleware(app: web.Application, handler):
 
 
 def setup_middlewares(app: BlogApplication):
-    origins = [cast(str, app.config['connection.webhost'])]
+    origins = []
+    if (app.config['isdev']):
+        origins.append('http://localhost:3000')
+        origins.append('http://localhost:9009')
+    else:
+        origins = [cast(str, app.config['connection.webhost'])]
+
     app.middlewares.extend([
         cors_middleware(
             origins=origins,

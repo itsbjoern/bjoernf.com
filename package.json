@@ -1,4 +1,7 @@
 {
-  "scripts": {},
+  "scripts": {
+    "start": "tmuxinator start -p tmux/hot.yml",
+    "all": "tmuxinator start -p tmux/all.yml"
+  },
   "dependencies": {}
 }

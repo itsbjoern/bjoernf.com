@@ -228,13 +228,17 @@ async def upload(request: BlogRequest):
     if quality:
         options['quality'] = int(quality)
 
+    upload_folder = 'uploads'
+    if request.app.config['isdev']:
+        upload_folder = 'uploads-dev'
+
     adjusted = image.compress_image(upload_data, options=options)
     s3_url = request.app.aws.s3_upload_file(
-        file_name, adjusted, path='uploads')
+        file_name, adjusted, path=upload_folder)
     if not s3_url:
         return web.HTTPBadRequest(reason="Upload failed")
 
-    file_url = f'https://bjornf.dev/uploads/{file_name}'
+    file_url = f'https://bjornf.dev/{upload_folder}/{file_name}'
     return utils.json_response({
         'src': file_url,
         'fileName': file_name,

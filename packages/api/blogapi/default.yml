@@ -18,4 +18,4 @@ mongo:
     username: admin
     password: password
 
-dev: True
+isdev: false

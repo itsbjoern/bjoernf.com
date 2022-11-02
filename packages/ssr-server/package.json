@@ -28,8 +28,8 @@
     "preact": "./node_modules/preact"
   },
   "scripts": {
-    "start": "node src/index.js",
-    "dev": "NODE_ENV=development node watch.js"
+    "start": "NODE_ENV=development node watch.js",
+    "deploy": "node src/index.js"
   },
   "devDependencies": {
     "chokidar": "^3.5.3",

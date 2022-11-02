@@ -1,5 +1,5 @@
 {
   "scripts": {
-    "start": "adev runserver blogapi"
+    "start": "API_ISDEV=True adev runserver blogapi"
   }
 }
