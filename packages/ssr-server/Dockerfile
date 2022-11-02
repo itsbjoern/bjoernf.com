@@ -1,5 +1,5 @@
 FROM node:18-alpine
-WORKDIR /render-server
+WORKDIR /ssr-server
 COPY package.json package.json
 COPY yarn.lock yarn.lock
 RUN yarn install

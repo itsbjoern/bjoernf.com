@@ -15,7 +15,7 @@
     "start": "vite",
     "build:client": "vite build --outDir dist/browser",
     "build:server": "vite build --outDir dist/node --ssr src/AppServer.jsx",
-    "watch:server": "vite build -w --outDir ../render-server/dist/node --ssr src/AppServer.jsx"
+    "watch:server": "vite build -w --outDir ../ssr-server/dist/node --ssr src/AppServer.jsx"
   },
   "devDependencies": {
     "@parcel/reporter-bundle-analyzer": "^2.7.0",

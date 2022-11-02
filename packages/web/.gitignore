@@ -2,7 +2,7 @@
 
 # dependencies
 /node_modules
-/render-server/node_modules
+/ssr-server/node_modules
 /.pnp
 /dist
 .pnp.js

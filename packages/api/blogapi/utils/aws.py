@@ -11,7 +11,7 @@ from botocore.exceptions import ClientError
 
 class AWS():
     def __init__(self, access_key: str, secret_key: str):
-        self.bucket: str = 'bjornf.dev-public'
+        self.bucket: str = 'bjornf.dev-uploads'
         self.region: str = 'eu-west-2'
 
         self.cf_distribution: str = 'E16OOQSQGDXBD'
@@ -34,12 +34,12 @@ class AWS():
                     'Items': [
                         "/rss",
                         "/*",
-                        "/static/*",
+                        "/assets/*",
                         "/images/*",
                         "/rss*"
                     ]
                 },
-                'CallerReference': 'string'
+                'CallerReference': 'api-invalid-1'
             }
         )
 

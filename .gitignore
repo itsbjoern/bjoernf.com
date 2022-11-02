@@ -1,7 +1,7 @@
 dist/
 
-render-server/dist
-render-server/.env
+ssr-server/dist
+ssr-server/.env
 
 web/.parcel-cache
 web/.docker-parcel-cache

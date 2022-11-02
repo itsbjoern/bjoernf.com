@@ -1,0 +1,28 @@
+{
+  "folders": [
+    {
+      "name": "✨ Root",
+      "path": "."
+    },
+    {
+      "name": "🚀 Frontend",
+      "path": "packages/web"
+    },
+    {
+      "name": "🚀 SSR Server",
+      "path": "packages/ssr-server"
+    },
+    {
+      "name": "🚀 Backend",
+      "path": "packages/api"
+    },
+    {
+      "name": "🪛 Deployment",
+      "path": ".github/workflows"
+    },
+    {
+      "name": "🪛 Docker",
+      "path": "docker"
+    }
+  ],
+}
