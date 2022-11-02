@@ -29,6 +29,8 @@ services:
       API_DEV: "false"
     networks:
       - nginx-proxy
+      - default
+    restart: unless-stopped
 
   analytics:
     image: electerious/ackee
@@ -47,3 +49,6 @@ services:
 networks:
   nginx-proxy:
     external: true
+  default:
+    name: app-network
+    driver: bridge
