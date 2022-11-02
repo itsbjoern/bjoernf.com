@@ -208,7 +208,7 @@ jobs:
         run: |
           aws cloudfront create-invalidation \
             --distribution-id E16OOQSQGDXBD \
-            --paths "/*" "/static/*" "/images/*" "/rss" "/rss*"
+            --paths "/*" "/assets/*" "/images/*" "/rss" "/rss*"
 
   cleanup:
     needs:
@@ -216,10 +216,9 @@ jobs:
     runs-on: ubuntu-latest
     if: always()
     steps:
-      - uses: geekyeggo/delete-artifact@1-glob-support
+      - uses: geekyeggo/delete-artifact@v2
         if: always()
         with:
-          useGlob: true
           name: |
             *-image
 
