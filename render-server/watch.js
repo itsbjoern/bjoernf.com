@@ -1,8 +1,13 @@
-const chokidar = require('chokidar');
-const path = require('path');
-const spawn = require('child_process').spawn;
+import chokidar from 'chokidar';
+import path, { dirname } from 'path';
+import { spawn } from 'child_process';
+import { fileURLToPath } from 'url';
+
+const __filename = fileURLToPath(import.meta.url);
+const __dirname = dirname(__filename);
 
 let serverProcess = null;
+let buildProcess = null;
 let timeout = null;
 
 const reloadServer = () => {

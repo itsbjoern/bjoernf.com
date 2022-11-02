@@ -1,5 +1,7 @@
+import yargs from 'yargs';
+
 const getArguments = () =>
-  require('yargs')
+  yargs(process.argv.slice(2))
     .option('p', {
       alias: 'port',
       description: "Specify the server's port",
@@ -16,7 +18,7 @@ const getArguments = () =>
 
 const isDevelopment = process.env.NODE_ENV === 'development';
 
-module.exports = {
+export {
   isDevelopment,
   getArguments,
 };

@@ -1,27 +1,33 @@
-const path = require('path');
-const fs = require('fs');
-const { render } = require('preact-render-to-string');
-const { h } = require('preact');
-const { ServerStyleSheet } = require('styled-components');
+import path, { dirname } from 'path';
+import fs from 'fs';
+import { render } from 'preact-render-to-string';
+import { h } from 'preact';
+import { ServerStyleSheet } from 'styled-components';
+import { fileURLToPath } from 'url';
 
-const { isDevelopment } = require('../util');
-const { hydrateIndex } = require('../hydrate');
+import { isDevelopment } from '../util.js';
+import { hydrateIndex } from '../hydrate.js';
+
+const __filename = fileURLToPath(import.meta.url);
+const __dirname = dirname(__filename);
 
 const distPath = path.join(__dirname, '..', '..', 'dist');
-const appServerPath = path.join(distPath, 'node', 'AppServer.js');
-let AppServer = require(appServerPath);
+const appServerPath = path.join(distPath, 'node', 'AppServer.mjs');
+
+let AppServer = null;
+import(appServerPath).then((AS) => {
+  AppServer = AS;
+});
 
 const indexFilePath = path.join(distPath, 'browser', 'index.html');
 let indexFile = fs.readFileSync(indexFilePath, { encoding: 'utf-8' });
 
 const reloadInDev = () => {
   if (isDevelopment) {
-    delete require.cache[
-      Object.keys(require.cache).find((k) => k.endsWith('AppServer.js'))
-    ];
-    AppServer = null;
+    import(appServerPath).then((AS) => {
+      AppServer = AS;
+    });
 
-    AppServer = require(appServerPath);
     indexFile = fs.readFileSync(indexFilePath, { encoding: 'utf-8' });
   }
 };
@@ -44,16 +50,10 @@ const renderHandler = async (req, res) => {
     const _prepRun = render(RenderComponent);
     const resolvedData = await resolveData();
 
-    const sheet = new ServerStyleSheet();
-    const renderedApp = render(sheet.collectStyles(RenderComponent));
-    const sheetTags = sheet.getStyleTags();
-    sheet.seal();
+    const renderedApp = render(RenderComponent);
+    const html = hydrateIndex(indexFile, req, renderedApp, resolvedData);
 
-    res.send(
-      Buffer.from(
-        hydrateIndex(indexFile, req, renderedApp, resolvedData, sheetTags)
-      )
-    );
+    res.status(200).set({ 'Content-Type': 'text/html' }).end(html);
   } catch (e) {
     console.log(e);
     res.status(200);
@@ -61,4 +61,4 @@ const renderHandler = async (req, res) => {
   }
 };
 
-module.exports = { renderHandler };
+export { renderHandler };

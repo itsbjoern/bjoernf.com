@@ -10,7 +10,7 @@ services:
       - 9010:9010
       - 9009:9009
     environment:
-      REACT_APP_API_URL: http://localhost:8000
+      VITE_API_URL: http://localhost:8000
     volumes:
       - ./web:/web
       - /web/node_modules

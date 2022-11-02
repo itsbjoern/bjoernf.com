@@ -3,6 +3,9 @@
     "node": true,
     "es2021": true
   },
+  "parserOptions": {
+    "sourceType": "module"
+  },
   "extends": [
       "plugin:import/errors",
       "plugin:import/warnings",
@@ -26,7 +29,7 @@
         "singleQuote": true
       }
     ],
-    "import/extensions": ["error", "never"],
+    "import/extensions": ["error", "always"],
     "no-param-reassign": ["error", { "props": false }],
     "no-undef": ["error"],
     "no-underscore-dangle": "off",
@@ -35,7 +38,7 @@
       "newlines-between": "always",
       "pathGroups": [
         {
-          "pattern": "{app}/**",
+          "pattern": "{src}/**",
           "group": "internal"
         }, {
           "pattern": "types/**",
@@ -52,7 +55,7 @@
     "import/resolver": {
       "alias": {
         "map": [
-          ["app", "./app/src"]
+          ["src", "./src"]
         ],
         "extensions": [".ts", ".js", ".jsx", ".tsx", ".json"]
       }

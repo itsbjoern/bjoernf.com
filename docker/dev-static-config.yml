@@ -10,7 +10,7 @@ services:
       - 1234:1234
       - 8080:8080
     environment:
-      REACT_APP_API_URL: http://localhost:8000
+      VITE_API_URL: http://localhost:8000
     volumes:
       - ./web/dist/:/web/dist
       - ./web/app:/web/app
@@ -24,7 +24,7 @@ services:
       - api
     environment:
       NODE_ENV: development
-      REACT_APP_API_URL: http://api:8000
+      VITE_API_URL: http://api:8000
       API_CONNECTION_WEBHOST: http://localhost:9009
     expose:
       - 9009

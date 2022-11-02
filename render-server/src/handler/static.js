@@ -1,12 +1,16 @@
-const path = require('path');
-const fs = require('fs');
+import path, { dirname } from 'path';
+import fs from 'fs';
+import { fileURLToPath } from 'url';
+
+const __filename = fileURLToPath(import.meta.url);
+const __dirname = dirname(__filename);
 
 const distPath = path.join(__dirname, '..', '..', 'dist');
 
 const staticHandler = async (req, res) => {
   const split = req.path.split('/');
   const file = split[split.length - 1];
-  const filePath = path.resolve(distPath, 'browser', file);
+  const filePath = path.resolve(distPath, 'browser', 'assets', file);
 
   if (file.endsWith('.css')) {
     res.set('Content-Type', 'text/css');
@@ -25,4 +29,4 @@ const staticHandler = async (req, res) => {
   res.send(Buffer.from(staticFile));
 };
 
-module.exports = { staticHandler };
+export { staticHandler };

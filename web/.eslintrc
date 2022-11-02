@@ -55,11 +55,11 @@
       "newlines-between": "always",
       "pathGroups": [
         {
-          "pattern": "app/components/**",
+          "pattern": "src/components/**",
           "group": "internal"
         },
         {
-          "pattern": "app/**",
+          "pattern": "src/**",
           "group": "type"
         }
       ],
@@ -77,7 +77,7 @@
     "import/resolver": {
       "alias": {
         "map": [
-          ["app", "./app/src"]
+          ["src", "./src"]
         ],
         "extensions": [".ts", ".js", ".jsx", ".tsx", ".json"]
       }

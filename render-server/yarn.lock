@@ -2102,6 +2102,11 @@ eslint@^8.21.0:
     strip-json-comments "^3.1.0"
     text-table "^0.2.0"
 
+esm-module-alias@^2.0.1:
+  version "2.0.1"
+  resolved "https://registry.yarnpkg.com/esm-module-alias/-/esm-module-alias-2.0.1.tgz#09fff91e5944728998e127080c86060a50576384"
+  integrity sha512-xefJt+fUOoAYmCRNhS5MAcA8kl1zZ376+YIn83POHaaqYyCYiNMintLQ2h8Avd3eEMeqHmFg/IeHk+QZGIdFUw==
+
 espree@^9.4.0:
   version "9.4.0"
   resolved "https://registry.npmjs.org/espree/-/espree-9.4.0.tgz"
@@ -2842,7 +2847,7 @@ minimist@^1.2.0, minimist@^1.2.6:
 
 module-alias@^2.2.2:
   version "2.2.2"
-  resolved "https://registry.npmjs.org/module-alias/-/module-alias-2.2.2.tgz"
+  resolved "https://registry.yarnpkg.com/module-alias/-/module-alias-2.2.2.tgz#151cdcecc24e25739ff0aa6e51e1c5716974c0e0"
   integrity sha512-A/78XjoX2EmNvppVWEhM2oGk3x4lLxnkEA4jTbaK97QKSDjkIoOsKQlfylt/d3kKKi596Qy3NP5XrXJ6fZIC9Q==
 
 ms@2.0.0:

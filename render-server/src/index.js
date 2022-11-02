@@ -1,34 +1,27 @@
 console.log('Starting server...');
 
-require('dotenv').config();
-const http = require('http');
-const path = require('path');
-const express = require('express');
-const bodyParser = require('body-parser');
-const moduleAlias = require('module-alias');
+import dotenv from 'dotenv';
+dotenv.config();
 
-const { isDevelopment, getArguments } = require('./util');
-if (isDevelopment) {
-  moduleAlias.addAliases({
-    react: path.join(__dirname, '..', 'node_modules', 'react'),
-    'react-dom': path.join(__dirname, '..', 'node_modules', 'react-dom'),
-    'styled-components': path.join(
-      __dirname,
-      '..',
-      'node_modules',
-      'styled-components'
-    ),
-  });
-}
-const { renderHandler } = require('./handler/render');
-const { staticHandler } = require('./handler/static');
+import http from 'http';
+import path, { dirname } from 'path';
+import express from 'express';
+import bodyParser from 'body-parser';
+import moduleAlias from 'module-alias';
+import fetch, { Headers } from 'node-fetch';
+import { fileURLToPath } from 'url';
+
+const __filename = fileURLToPath(import.meta.url);
+const __dirname = dirname(__filename);
+
+import { isDevelopment, getArguments } from './util.js';
+import { renderHandler } from './handler/render.js';
+import { staticHandler } from './handler/static.js';
 
 // Import for ES-Module necessary
 if (!global.fetch) {
-  const nodeFetch = import('node-fetch').then(({ default: fetch, Headers }) => {
-    global.fetch = fetch;
-    global.Headers = Headers;
-  });
+  global.fetch = fetch;
+  global.Headers = Headers;
 }
 
 const args = getArguments();
@@ -43,7 +36,7 @@ const createApp = () => {
   app.get('/*', async function (req, res) {
     if (
       isDevelopment &&
-      (req.path.indexOf('static/') !== -1 || req.path.endsWith('.js.map'))
+      (req.path.indexOf('assets/') !== -1 || req.path.endsWith('.js.map'))
     ) {
       return await staticHandler(req, res);
     }
