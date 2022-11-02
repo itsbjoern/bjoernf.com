@@ -20,6 +20,7 @@ import DeleteIcon from 'src/components/icons/Delete.svg';
 import Alert from 'src/components/ui/Alert';
 import Button from 'src/components/ui/Button';
 import useDialog from 'src/components/ui/Dialog/useDialog';
+import Skeleton from 'src/components/ui/Skeleton';
 import Switch from 'src/components/ui/Switch';
 
 const PostEditor = React.lazy(() => import('./PostEditor'));
@@ -44,13 +45,14 @@ const Post = () => {
   const { token, sendRequest } = useRequest();
 
   const postId = params.id;
-  const [loading, setLoading] = useState(false);
+  const [loading, setLoading] = useState(true);
   const [isComparing, setIsComparing] = useState(false);
   const editing = location.pathname.endsWith('/edit') && !!token;
   const updateTimeout = useRef();
   const queuedUpdate = useRef();
 
   const [post, setPost] = useSSR(() => sendRequest(getPost(postId)), {
+    chainFirst: () => setLoading(true),
     chainSuccess: (data) => {
       if (!isSSR) {
         const title = (data.post.published ?? data.post.draft).title;
@@ -170,7 +172,34 @@ const Post = () => {
   );
 
   if (loading) {
-    return null;
+    return (
+      <div className="flex flex-col gap-8">
+        <div className="flex flex-row items-center justify-between">
+          <Skeleton width={150} height={150} />
+          <div className="flex flex-col gap-3">
+            <Skeleton width={500} height={20} />
+            <Skeleton width={500} height={40} />
+          </div>
+        </div>
+        <div className="flex flex-col gap-2">
+          <Skeleton width={600} height={10} />
+          <Skeleton width={400} height={10} />
+          <Skeleton width={500} height={10} />
+          <Skeleton width={300} height={10} />
+          <Skeleton width={500} height={10} />
+          <Skeleton width={600} height={10} />
+          <Skeleton width={500} height={10} />
+        </div>
+        <div className="flex flex-col gap-2">
+          <Skeleton width={400} height={10} />
+          <Skeleton width={400} height={10} />
+          <Skeleton width={600} height={10} />
+          <Skeleton width={600} height={10} />
+          <Skeleton width={500} height={10} />
+          <Skeleton width={600} height={10} />
+        </div>
+      </div>
+    );
   }
 
   if (!loading && !post) {
