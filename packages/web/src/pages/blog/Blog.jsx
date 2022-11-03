@@ -42,7 +42,10 @@ const Blog = () => {
   const [rssVisible, setRssVisible] = useState(false);
 
   const [data] = useSSR(
-    () => sendRequest(getPosts({ page: currentPage, search: currentSearch })),
+    () =>
+      sendRequest(
+        getPosts({ page: currentPage, search: currentSearch, preview: true })
+      ),
     {
       deps: [currentPage, currentSearch],
       init: { posts: new Array(5).fill({ _id: '?' }), numPages: 1 },

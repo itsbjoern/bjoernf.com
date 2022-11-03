@@ -50,14 +50,24 @@ async def get_all_posts_handler(request: BlogRequest, return_all=False):
                               limit=limit,
                               projection=projection)
 
-    posts, num_pages, current_page = paginated
+    post_cursor, num_pages, current_page = paginated
     if return_all:
-        posts = database.posts.find(query, projection).collation(
+        post_cursor = database.posts.find(query, projection).collation(
             Collation(locale='en', strength=2))
 
-    posts = posts.sort('createdAt', pymongo.DESCENDING)
+    post_cursor = post_cursor.sort('createdAt', pymongo.DESCENDING)
 
-    return utils.json_response({'posts': list(posts), 'numPages': num_pages, 'page': current_page})
+    preview = request.query.get('preview', False)
+    all_posts = []
+    for post in post_cursor:
+        if preview:
+            if post.get('published'):
+                del post['published']['text']
+                del post['published']['html']
+                del post['published']['version']
+        all_posts.append(post)
+
+    return utils.json_response({'posts': all_posts, 'numPages': num_pages, 'page': current_page})
 
 
 async def get_post_handler(request: BlogRequest):

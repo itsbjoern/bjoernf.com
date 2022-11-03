@@ -12,7 +12,8 @@ import { List } from 'src/components/ui/List';
 const Home = () => {
   const { sendRequest } = useRequest();
   const [posts] = useSSR(
-    () => sendRequest(getPosts({ page: 1, limit: 2, search: '' })),
+    () =>
+      sendRequest(getPosts({ page: 1, limit: 2, search: '', preview: true })),
     {
       init: new Array(2).fill({ _id: '?' }),
       chainSuccess: (data) => data.posts,
