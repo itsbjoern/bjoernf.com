@@ -3,6 +3,7 @@ import dns from 'dns';
 import path from 'path';
 import { loadEnv, defineConfig, UserConfigExport } from 'vite';
 import svgr from 'vite-plugin-svgr';
+import cleanup from 'rollup-plugin-cleanup';
 
 dns.setDefaultResultOrder('verbatim');
 
@@ -31,6 +32,15 @@ export default defineConfig(({ mode }) => {
         react: 'preact/compat',
         'react-dom': 'preact/compat',
         'react/jsx-runtime': 'preact/jsx-runtime',
+      },
+    },
+    build: {
+      rollupOptions: {
+        plugins: [
+          cleanup({
+            comments: 'none'
+          }),
+        ],
       },
     },
     optimizeDeps: {
