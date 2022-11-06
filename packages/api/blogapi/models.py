@@ -27,7 +27,7 @@ class PostContent(TypedDict):
     tags: NotRequired[List[str]]
     publishedAt: NotRequired[datetime]
 
-
 class Post(Model):
     draft: NotRequired[PostContent]
     published: NotRequired[PostContent]
+    createdAt: NotRequired[datetime]

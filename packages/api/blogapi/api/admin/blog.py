@@ -16,6 +16,33 @@ from blogapi.models import PostContent, Options
 
 @auth.require
 async def create_post(request: BlogRequest):
+    """
+    ---
+    post:
+        description: Create a new post
+        responses:
+            200:
+                content:
+                    application/json:
+                        schema:
+                            type: object
+                            required:
+                                - post
+                            properties:
+                                post:
+                                    type: object
+                                    required:
+                                        - _id
+                                        - draft
+                                        - createdAt
+                                    properties:
+                                        _id:
+                                            type: string
+                                        draft:
+                                            type: object
+                                        createdAt:
+                                            type: number
+    """
     database = request.app.database
 
     insert = {'createdAt': datetime.datetime.utcnow(), 'draft': {}}
@@ -26,6 +53,41 @@ async def create_post(request: BlogRequest):
 
 @auth.require
 async def get_drafts(request: BlogRequest):
+    """
+    ---
+    get:
+        description: Receive all drafted posts
+        parameters:
+        -   in: query
+            name: page
+            schema:
+                type: number
+            description: The page to load
+        -   in: query
+            name: limit
+            schema:
+                type: number
+            description: Maximum amount of posts to load
+        responses:
+            200:
+                content:
+                    application/json:
+                        schema:
+                            type: object
+                            required:
+                                - posts
+                                - numPages
+                                - page
+                            properties:
+                                posts:
+                                    type: array
+                                    items:
+                                        "$ref": "#/components/schemas/Post"
+                                numPages:
+                                    type: number
+                                page:
+                                    type: number
+    """
     database = request.app.database
     query = {'draft': {'$exists': 1}}
 
@@ -40,6 +102,52 @@ async def get_drafts(request: BlogRequest):
 
 @auth.require
 async def update_post(request: BlogRequest):
+    """
+    ---
+    post:
+        description: Update a single post
+        parameters:
+        -   in: path
+            name: id
+            required: true
+            schema:
+                type: string
+            description: The post id
+        requestBody:
+            content:
+                application/json:
+                    schema:
+                        type: object
+                        properties:
+                            title:
+                                type: string
+                            text:
+                                type: string
+                            html:
+                                type: string
+                            image:
+                                type: string
+                            tags:
+                                type: array
+                                items:
+                                    type: string
+        responses:
+            200:
+                content:
+                    application/json:
+                        schema:
+                            type: object
+                            required:
+                                - post
+                            properties:
+                                post:
+                                    type: object
+                                    required:
+                                        - post
+                                    properties:
+                                        post:
+                                            "$ref": "#/components/schemas/Post"
+    """
     data = await request.json()
     allowed_keys = ['title', 'tags', 'text', 'html', 'image']
     for key in data.keys():
@@ -65,6 +173,18 @@ async def update_post(request: BlogRequest):
 
 @auth.require
 async def delete_draft(request: BlogRequest):
+    """
+    ---
+    delete:
+        description: Delete a single blog post draft
+        parameters:
+        -   in: path
+            name: id
+            required: true
+            schema:
+                type: string
+            description: The post id
+    """
     post_id = request.match_info.get('id', None)
     if not post_id:
         return web.HTTPBadRequest(reason="No post id")
@@ -79,13 +199,28 @@ async def delete_draft(request: BlogRequest):
 
 @auth.require
 async def publish(request: BlogRequest):
-    """Publishes a post by merging the draft into the current published object
-
-    Args:
-        request (werkzeug.Request): The request object
-
-    Returns:
-       web.Response: Updated post data
+    """
+    ---
+    post:
+        description: Publishes the current draft of a post
+        parameters:
+        -   in: path
+            name: id
+            required: true
+            schema:
+                type: string
+            description: The post id
+        responses:
+            200:
+                content:
+                    application/json:
+                        schema:
+                            type: object
+                            required:
+                                - post
+                            properties:
+                                post:
+                                    "$ref": "#/components/schemas/Post"
     """
     post_id = request.match_info.get('id', None)
     if not post_id:
@@ -143,6 +278,29 @@ async def publish(request: BlogRequest):
 
 @auth.require
 async def unpublish(request: BlogRequest):
+    """
+    ---
+    delete:
+        description: Removes the current published version of a post and moves it to draft.
+        parameters:
+        -   in: path
+            name: id
+            required: true
+            schema:
+                type: string
+            description: The post id
+        responses:
+            200:
+                content:
+                    application/json:
+                        schema:
+                            type: object
+                            required:
+                                - post
+                            properties:
+                                post:
+                                    "$ref": "#/components/schemas/Post"
+    """
     post_id = request.match_info.get('id', None)
     if not post_id:
         return web.HTTPBadRequest(reason="No post id")
@@ -169,6 +327,29 @@ async def unpublish(request: BlogRequest):
 
 @auth.require
 async def delete_post(request: BlogRequest):
+    """
+    ---
+    delete:
+        description: Delete a single blog post
+        parameters:
+        -   in: path
+            name: id
+            required: true
+            schema:
+                type: string
+            description: The post id
+        responses:
+            200:
+                content:
+                    application/json:
+                        schema:
+                            type: object
+                            required:
+                                - post
+                            properties:
+                                post:
+                                    "$ref": "#/components/schemas/Post"
+    """
     post_id = request.match_info.get('id', None)
     if not post_id:
         return web.HTTPBadRequest(reason="No post id")
@@ -187,6 +368,60 @@ async def delete_post(request: BlogRequest):
 
 @auth.require
 async def upload(request: BlogRequest):
+    """
+    ---
+    post:
+        description: Upload a new file
+        parameters:
+        -   in: path
+            name: id
+            required: true
+            schema:
+                type: string
+            description: The post id
+        -   in: query
+            name: ext
+            schema:
+                type: string
+            description: Force the file extension
+        -   in: query
+            name: max_size
+            schema:
+                type: string
+            description: Maximum width or height
+        -   in: query
+            name: quality
+            schema:
+                type: string
+            description: Quality of the image (1-100)
+        requestBody:
+            content:
+                multipart/form-data:
+                    schema:
+                        type: object
+                        properties:
+                            data:
+                                type: string
+                                format: binary
+        responses:
+            200:
+                description: Return login details
+                content:
+                    application/json:
+                        schema:
+                            type: object
+                            required:
+                                - src
+                                - fileName
+                                - fileSize
+                            properties:
+                                src:
+                                    type: string
+                                fileName:
+                                    type: string
+                                fileSize:
+                                    type: number
+    """
     post_id = request.match_info.get('id', None)
     if not post_id:
         return web.HTTPBadRequest(reason="No post id")

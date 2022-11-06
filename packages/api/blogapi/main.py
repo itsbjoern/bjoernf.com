@@ -1,9 +1,13 @@
 """
 Main application entry point
 """
+import os
+import sys
 import logging
 from typing import cast
 from aiohttp import web
+
+from subprocess import Popen, DEVNULL
 
 from blogapi.db import mongo_ctx
 from blogapi.middlewares import setup_middlewares
@@ -23,6 +27,10 @@ async def init_app() -> BlogApplication:
 
 
 async def get_app() -> BlogApplication:
+    this_dir = os.path.dirname(os.path.realpath(__file__))
+    parent_dir = os.path.join(this_dir, '..')
+    Popen(['yarn', 'run', 'schema'], stdout=sys.stdout, stderr=sys.stderr, cwd=parent_dir).communicate()
+
     app = await init_app()
     return app
 

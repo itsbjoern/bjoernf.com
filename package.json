@@ -3,5 +3,12 @@
     "start": "tmuxinator start -p tmux/hot.yml",
     "all": "tmuxinator start -p tmux/all.yml"
   },
-  "dependencies": {}
+  "dependencies": {},
+  "devDependencies": {
+    "@types/react": "^18.0.25",
+    "@typescript-eslint/eslint-plugin": "^5.42.0",
+    "@typescript-eslint/parser": "^5.42.0",
+    "eslint": "^8.26.0",
+    "typescript": "^4.8.4"
+  }
 }

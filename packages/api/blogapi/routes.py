@@ -17,8 +17,8 @@ def setup_routes(app: BlogApplication):
                         admin.index.change_password)
     app.router.add_get('/admin/blog/posts', admin.blog.get_drafts)
     app.router.add_post('/admin/blog/posts', admin.blog.create_post)
-    app.router.add_post('/admin/blog/posts/{id}', admin.blog.update_post)
-    app.router.add_delete('/admin/blog/posts/{id}', admin.blog.delete_post)
+    app.router.add_post('/admin/blog/posts/{id}/edit', admin.blog.update_post)
+    app.router.add_delete('/admin/blog/posts/{id}/edit', admin.blog.delete_post)
     app.router.add_delete(
         '/admin/blog/posts/{id}/draft', admin.blog.delete_draft)
     app.router.add_post('/admin/blog/posts/{id}/publish', admin.blog.publish)

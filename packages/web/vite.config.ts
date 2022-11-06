@@ -1,9 +1,9 @@
 import preact from '@preact/preset-vite';
 import dns from 'dns';
 import path from 'path';
+import cleanup from 'rollup-plugin-cleanup';
 import { loadEnv, defineConfig, UserConfigExport } from 'vite';
 import svgr from 'vite-plugin-svgr';
-import cleanup from 'rollup-plugin-cleanup';
 
 dns.setDefaultResultOrder('verbatim');
 
@@ -19,12 +19,7 @@ export default defineConfig(({ mode }) => {
       external: ['react', 'preact', 'react-dom'],
       noExternal: true,
     },
-    plugins: [
-      preact(),
-      svgr({
-        exportAsDefault: true,
-      }),
-    ],
+    plugins: [preact(), svgr()],
     resolve: {
       extensions: ['.js', '.jsx', '.ts', '.tsx'],
       alias: {
@@ -38,15 +33,22 @@ export default defineConfig(({ mode }) => {
       rollupOptions: {
         plugins: [
           cleanup({
-            comments: 'none'
+            comments: 'none',
           }),
         ],
       },
     },
     optimizeDeps: {
       // We manually add a list of dependencies to be pre-bundled, in order to avoid a page reload at dev start which breaks the preact plugin
-      include: ['preact/devtools', 'preact/debug', 'preact/jsx-dev-runtime', 'preact', 'preact/hooks', 'react-router']
-    }
+      include: [
+        'preact/devtools',
+        'preact/debug',
+        'preact/jsx-dev-runtime',
+        'preact',
+        'preact/hooks',
+        'react-router',
+      ],
+    },
   };
 
   return config;

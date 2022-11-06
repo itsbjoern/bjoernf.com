@@ -15,6 +15,55 @@ public_projection = {'published': 1, 'createdAt': 1}
 
 
 async def get_all_posts_handler(request: BlogRequest, return_all=False):
+    """
+    ---
+    get:
+        description: Return all blog posts based on the query
+        parameters:
+        -   in: query
+            name: page
+            required: true
+            schema:
+                type: number
+            description: The page to load
+        -   in: query
+            name: limit
+            required: true
+            schema:
+                type: number
+            description: How many posts to load
+        -   in: query
+            name: search
+            required: true
+            schema:
+                type: string
+            description: A string to be searched
+        -   in: query
+            name: preview
+            required: true
+            schema:
+                type: boolean
+            description: Whether or not to only return preview data
+        responses:
+            200:
+                content:
+                    application/json:
+                        schema:
+                            type: object
+                            required:
+                                - posts
+                                - numPages
+                                - page
+                            properties:
+                                posts:
+                                    type: array
+                                    items:
+                                        "$ref": "#/components/schemas/Post"
+                                numPages:
+                                    type: number
+                                page:
+                                    type: number
+    """
     database = request.app.database
     query = {'published': {'$exists': True}}
 
@@ -71,6 +120,29 @@ async def get_all_posts_handler(request: BlogRequest, return_all=False):
 
 
 async def get_post_handler(request: BlogRequest):
+    """
+    ---
+    get:
+        description: Return a single blog post
+        parameters:
+        -   in: path
+            name: id
+            required: true
+            schema:
+                type: string
+            description: The post id
+        responses:
+            200:
+                content:
+                    application/json:
+                        schema:
+                            type: object
+                            required:
+                                - post
+                            properties:
+                                post:
+                                    "$ref": "#/components/schemas/Post"
+    """
     post_id = request.match_info.get('id', None)
     if not post_id:
         return web.HTTPBadRequest(reason="No post id")
@@ -91,6 +163,22 @@ async def get_post_handler(request: BlogRequest):
 
 
 async def get_tags(request: BlogRequest):
+    """
+    ---
+    get:
+        description: A distinct view of all available tags
+        responses:
+            200:
+                content:
+                    application/json:
+                        schema:
+                            type: object
+                            properties:
+                                tags:
+                                    type: array
+                                    items:
+                                        type: string
+    """
     database = request.app.database
 
     tags = database.posts.distinct('published.tags')

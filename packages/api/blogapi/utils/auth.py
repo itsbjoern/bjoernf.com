@@ -1,7 +1,7 @@
 """
 Utility functions that support authentication
 """
-
+from functools import wraps
 import base64
 import jwt
 import bcrypt
@@ -24,6 +24,7 @@ def check_password_hash(encoded: str, password: str) -> bool:
 
 
 def require(func):
+    @wraps(func)
     def route(request):
         if not request.user:
             raise web.HTTPForbidden(reason="No access")

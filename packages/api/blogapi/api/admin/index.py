@@ -10,6 +10,39 @@ from blogapi.application import BlogRequest
 
 
 async def login_handler(request: BlogRequest):
+    """
+    ---
+    post:
+        description: Login with credentials
+        requestBody:
+            content:
+                application/json:
+                    schema:
+                        type: object
+                        required:
+                            - username
+                            - password
+                        properties:
+                            username:
+                                type: string
+                            password:
+                                type: string
+        responses:
+            200:
+                description: Return login details
+                content:
+                    application/json:
+                        schema:
+                            type: object
+                            required:
+                                - user
+                                - token
+                            properties:
+                                user:
+                                    type: string
+                                token:
+                                    type: string
+    """
     auth_header = request.headers.get('Authorization', None)
     if auth_header:
         raise web.HTTPBadRequest(reason="Already logged in")
@@ -17,7 +50,7 @@ async def login_handler(request: BlogRequest):
     data = await request.json()
 
     username: str = data.get('username')
-    password = data.get('password')
+    password: str = data.get('password')
     if not username or not password:
         raise web.HTTPBadRequest(reason="Username and password are required")
 
@@ -39,6 +72,27 @@ async def login_handler(request: BlogRequest):
 
 @auth.require
 async def change_password(request: BlogRequest):
+    """
+    ---
+    post:
+        description: Change login credentials
+        requestBody:
+            content:
+                application/json:
+                    schema:
+                        type: object
+                        required:
+                            - password
+                        properties:
+                            password:
+                                type: string
+        responses:
+            200:
+                content:
+                    application/json:
+                        schema:
+                            type: object
+    """
     database = request.app.database
 
     data = await request.json()

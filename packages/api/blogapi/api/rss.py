@@ -34,6 +34,18 @@ def with_cdata(element, text):
 
 
 async def create_feed(request):
+    """
+    ---
+    get:
+        description: Return a single blog post
+        parameters:
+        -   in: path
+            name: tag
+            required: true
+            schema:
+                type: string
+            description: The current feed tag
+    """
     tag = request.match_info.get('tag', None)
     if tag:
         if tag.endswith('.xml'):
