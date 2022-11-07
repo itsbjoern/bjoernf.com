@@ -69,11 +69,18 @@
 
     ul {
       padding-inline-start: 30px;
+      list-style-type: disc;
     }
 
     ol {
       list-style-position: inside;
       padding-inline-start: 7px;
+      counter-reset: item;
+
+      li:before {
+        content: counters(item, ".") ". ";
+        counter-increment: item
+      }
 
       p {
         display: inline;

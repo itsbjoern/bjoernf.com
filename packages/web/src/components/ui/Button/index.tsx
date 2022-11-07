@@ -25,22 +25,21 @@ type ButtonProps = {
 } & HTMLAttributes<HTMLButtonElement>;
 
 const Button: FunctionalComponent<ButtonProps> = ({
-  variant,
+  variant = 'text',
   onClick,
   children,
   startIcon,
   disabled,
+  className,
   ...props
 }) => {
   return (
-    <div>
+    <div className="overflow-hidden rounded-md">
       <Ripples>
         <button
           onClick={onClick}
-          className={`${
-            variant === 'contained'
-              ? `${classes.contained} bg-primary`
-              : `${classes.text} text-primary`
+          className={`${className} ${classes[variant]} ${
+            variant === 'text' ? 'text-primary' : 'bg-primary'
           } ${disabled ? 'bg-zinc-400' : ''}`}
           disabled={disabled}
           {...props}

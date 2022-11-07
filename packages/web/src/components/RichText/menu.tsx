@@ -36,8 +36,8 @@ const ToggleButton: FunctionalComponent<ToggleButtonProps> = ({
 
   return (
     <Button
-      className="min-w-11 w-11"
-      variant={active?.(param) ? 'contained' : 'outlined'}
+      className="!px-2 !py-2"
+      variant={active?.(param) ? 'contained' : 'text'}
       onClick={() => chain(param).run()}
       {...props}
     >
@@ -51,15 +51,10 @@ const Menu = () => {
 
   return (
     <div
-      className="flex flex-row"
+      className="sticky top-2 z-50 flex flex-row justify-center"
       onMouseDown={(e) => {
         e.preventDefault();
         e.stopPropagation();
-      }}
-      style={{
-        position: 'sticky',
-        top: 10,
-        zIndex: 100,
       }}
     >
       <div

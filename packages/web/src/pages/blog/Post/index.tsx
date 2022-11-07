@@ -285,7 +285,7 @@ const Post = () => {
         ) : null
       }
     >
-      <div className="flex flex-col smo:-mt-11">
+      <div className="flex flex-col">
         <div className="flex flex-row gap-5">
           <div className="flex max-w-full flex-1 flex-col">
             {token && editing ? (

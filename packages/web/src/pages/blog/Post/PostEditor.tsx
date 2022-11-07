@@ -58,7 +58,7 @@ const PostEditor: FunctionalComponent<PostEditorProps> = ({
 
   return (
     <div className="flex flex-col gap-7">
-      <div className="flex flex-row items-center gap-4">
+      <div className="flex flex-row items-center gap-4 smo:flex-col">
         <PostImage
           src={image}
           onImageChosen={(file, options) =>
