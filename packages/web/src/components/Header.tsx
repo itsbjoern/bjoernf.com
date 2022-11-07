@@ -7,7 +7,7 @@ import { getFileUrl } from 'src/util';
 import { ReactComponent as AdminPanelSettingsIcon } from 'src/components/icons/AdminPanelSettings.svg';
 import { ReactComponent as ArrowCircleUpIcon } from 'src/components/icons/ArrowCircleUp.svg';
 import { ReactComponent as GitHubIcon } from 'src/components/icons/GitHub.svg';
-import { ReactComponent as LinkedInIcon } from 'src/components/icons/LinkedIn.svg';
+import { ReactComponent as TwitterIcon } from 'src/components/icons/Twitter.svg';
 import { ReactComponent as LogoutIcon } from 'src/components/icons/Logout.svg';
 import Chip from 'src/components/ui/Chip';
 import Divider from 'src/components/ui/Divider';
@@ -67,9 +67,9 @@ const Header = () => {
           <Chip
             as="a"
             clickable
-            icon={<LinkedInIcon />}
-            href="https://linkedin.com/in/bjoern-friedrichs"
-            label="bjoern-friedrichs"
+            icon={<TwitterIcon />}
+            href="https://twitter.com/bjornf_dev"
+            label="bjornf_dev"
             target="_blank"
           />
         </div>
