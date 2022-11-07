@@ -34,16 +34,12 @@ const TextField: FunctionalComponent<TextFieldProps> = ({
 }) => {
   const [focused, setFocused] = useState(false);
   return (
-    <div
-      className={`${classes.wrapper} ${focused ? 'focused' : ''}`}
-      onFocus={() => setFocused(true)}
-      onBlur={() => setFocused(false)}
-    >
+    <div className={`${classes.wrapper} ${focused ? 'focused' : ''}`}>
       {label ? (
         <label
           className={`${classes.placeholder} ${
             value ? classes.placeholderFilled : ''
-          }`}
+          } ${focused && value ? '!text-primary' : ''}`}
         >
           {label}
         </label>
@@ -58,6 +54,8 @@ const TextField: FunctionalComponent<TextFieldProps> = ({
           disabled={disabled}
           list={list}
           type={type}
+          onFocus={() => setFocused(true)}
+          onBlur={() => setFocused(false)}
           value={value}
           onChange={onChange}
           onClick={onClick}
@@ -69,7 +67,7 @@ const TextField: FunctionalComponent<TextFieldProps> = ({
         <fieldset
           className={`${classes.fieldset} ${
             value ? classes.fieldsetFilled : ''
-          }`}
+          } ${focused ? '!border-primary' : ''}`}
         >
           <legend>
             <span>{label}</span>

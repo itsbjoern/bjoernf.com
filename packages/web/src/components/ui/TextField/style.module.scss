@@ -17,6 +17,12 @@
       border-color: rgba(0, 0, 0, 0.53);
     }
   }
+
+  :hover {
+    .fieldset {
+        border-width: 1.5px;
+    }
+  }
 }
 
 .placeholder {
