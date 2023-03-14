@@ -57,8 +57,7 @@ async def create_feed(request):
     post_response = await blog.get_all_posts_handler(request, return_all=True)
     posts = post_response.json['posts']
 
-    config = request.app.config
-    url = config['connection.webhost']
+    url = 'https://xn--bjrnf-kua.com'
 
     root = ET.Element("rss", {
         'xmlns:dc': "http://purl.org/dc/elements/1.1/",
