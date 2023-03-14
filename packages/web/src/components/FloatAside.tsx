@@ -1,13 +1,12 @@
-import { FunctionalComponent, VNode } from 'preact';
-import React from 'react';
+import React, { FunctionComponent } from 'react';
 
 type FloatAsideProps = {
-  menu: VNode | null;
+  menu: JSX.Element | null;
   hideMenu?: boolean;
   left?: boolean;
 };
 
-const FloatAside: FunctionalComponent<FloatAsideProps> = ({
+const FloatAside: FunctionComponent<FloatAsideProps> = ({
   children,
   menu,
   hideMenu,

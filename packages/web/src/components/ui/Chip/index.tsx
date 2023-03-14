@@ -1,4 +1,3 @@
-import { FunctionalComponent, VNode } from 'preact';
 import { CSSProperties } from 'react';
 import { Link } from 'react-router-dom';
 
@@ -12,7 +11,7 @@ type ChipProps = {
   onClick?: (evt: MouseEvent) => void;
   onDelete?: (evt: MouseEvent) => void;
   label?: string;
-  icon?: VNode;
+  icon?: JSX.Element;
   clickable?: boolean;
   variant?: 'outlined' | 'contained';
   className?: string;
@@ -32,7 +31,7 @@ type ChipProps = {
     }
 );
 
-const Chip: FunctionalComponent<ChipProps> = ({
+const Chip: FunctionComponent<ChipProps> = ({
   as = 'div',
   onClick,
   onDelete,

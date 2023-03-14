@@ -1,5 +1,4 @@
-import { FunctionalComponent, VNode } from 'preact';
-import React, { useEffect, useState, Suspense } from 'react';
+import React, { useEffect, useState, Suspense, FC as FunctionComponent } from 'react';
 import { BrowserRouter, Routes, Route, useLocation } from 'react-router-dom';
 import { StaticRouter } from 'react-router-dom/server';
 import { ToastContainer } from 'react-toast';
@@ -25,7 +24,7 @@ type SSRSupportProps = {
   ssr: SSRProviderProps['ssrProps'];
 };
 
-const SSRSupport: FunctionalComponent<SSRSupportProps> = ({
+const SSRSupport: FunctionComponent<SSRSupportProps> = ({
   ssr,
   children,
 }) => {
@@ -36,14 +35,14 @@ type AppProps = {
   ssr?: SSRProviderProps['ssrProps'];
 };
 
-const RouterLayer: FunctionalComponent<AppProps> = ({ children, ssr }) =>
+const RouterLayer: FunctionComponent<AppProps> = ({ children, ssr }) =>
   isSSR ? (
     <SSRSupport ssr={ssr}>{children}</SSRSupport>
   ) : (
     <BrowserRouter>{children}</BrowserRouter>
   );
 
-const HistoryLayer: FunctionalComponent<{ children: VNode }> = ({
+const HistoryLayer: FunctionComponent<{ children: JSX.Element }> = ({
   children,
 }) => {
   const location = useLocation();
@@ -76,7 +75,7 @@ const HistoryLayer: FunctionalComponent<{ children: VNode }> = ({
   return children;
 };
 
-const App: FunctionalComponent<AppProps> = (props) => {
+const App: FunctionComponent<AppProps> = (props) => {
   return (
     <div className="flex flex-1 bg-default">
       <RequestProvider>

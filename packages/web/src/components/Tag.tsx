@@ -1,5 +1,4 @@
-import { FunctionalComponent } from 'preact';
-import React, { CSSProperties } from 'react';
+import React, { CSSProperties, FunctionComponent } from 'react';
 import { Link } from 'react-router-dom';
 
 import Chip from 'src/components/ui/Chip';
@@ -10,7 +9,7 @@ type TagProps = {
   style?: CSSProperties;
 };
 
-const Tag: FunctionalComponent<TagProps> = ({ name, onDelete, style }) => (
+const Tag: FunctionComponent<TagProps> = ({ name, onDelete, style }) => (
   <Chip
     variant="contained"
     as={onDelete ? 'div' : Link}

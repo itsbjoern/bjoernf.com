@@ -339,20 +339,20 @@ export type paths = {
 export type components = {
   schemas: {
     PostContent: {
-      text: string;
-      version: number;
-      image: string;
+      tags: string[];
       publishedAt: number;
       html: string;
+      version: number;
       summary: string;
+      image: string;
       title: string;
-      tags: string[];
+      text: string;
     };
     Post: {
+      draft: components["schemas"]["PostContent"];
       published: components["schemas"]["PostContent"];
       createdAt: number;
       _id: string;
-      draft: components["schemas"]["PostContent"];
     };
   };
 };

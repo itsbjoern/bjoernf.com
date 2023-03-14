@@ -1,6 +1,5 @@
 import { useActive, useChainedCommands, useCommands } from '@remirror/react';
-import { FunctionalComponent, VNode } from 'preact';
-import React from 'react';
+import React, { FunctionComponent } from 'react';
 
 import { ReactComponent as FormatAlignCenterIcon } from 'src/components/icons/FormatAlignCenter.svg';
 import { ReactComponent as FormatAlignLeftIcon } from 'src/components/icons/FormatAlignLeft.svg';
@@ -20,11 +19,11 @@ type ToggleButtonProps = {
   type: string;
   command: string;
   param?: any;
-  icon: VNode;
+  icon: JSX.Element;
 };
 
 // eslint-disable-next-line no-unused-vars
-const ToggleButton: FunctionalComponent<ToggleButtonProps> = ({
+const ToggleButton: FunctionComponent<ToggleButtonProps> = ({
   type,
   command,
   param,

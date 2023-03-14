@@ -1,4 +1,4 @@
-import { FunctionalComponent } from 'preact';
+import { FunctionComponent } from "react";
 
 type SwitchProps = {
   checked: boolean;
@@ -7,7 +7,7 @@ type SwitchProps = {
   disabled?: boolean;
 };
 
-const Switch: FunctionalComponent<SwitchProps> = ({
+const Switch: FunctionComponent<SwitchProps> = ({
   checked,
   onChange,
   label,

@@ -6,8 +6,7 @@ import {
   ThemeProvider,
   useKeymap,
 } from '@remirror/react';
-import { FunctionalComponent } from 'preact';
-import React, { useState } from 'react';
+import React, { FunctionComponent, useState } from 'react';
 import {
   BoldExtension,
   UnderlineExtension,
@@ -109,7 +108,7 @@ type EditorProps = {
   editable?: boolean;
 };
 
-const Editor: FunctionalComponent<EditorProps> = ({
+const Editor: FunctionComponent<EditorProps> = ({
   content,
   onChange,
   upload,

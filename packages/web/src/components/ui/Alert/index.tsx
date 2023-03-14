@@ -1,4 +1,3 @@
-import { FunctionalComponent } from 'preact';
 
 import classes from './style.module.scss';
 
@@ -11,7 +10,7 @@ type AlertProps = {
   severity: 'warning' | 'success';
 };
 
-const Alert: FunctionalComponent<AlertProps> = ({ severity, ...props }) => (
+const Alert: FunctionComponent<AlertProps> = ({ severity, ...props }) => (
   <div
     style={{
       backgroundColor: severities[severity][0],

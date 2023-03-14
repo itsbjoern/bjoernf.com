@@ -1,5 +1,4 @@
-import { FunctionalComponent } from 'preact';
-import { HTMLAttributes } from 'preact/compat';
+import { FunctionComponent, HTMLAttributes } from 'react';
 
 import classes from './style.module.scss';
 
@@ -8,7 +7,7 @@ type SkeletonProps = HTMLAttributes<HTMLDivElement> & {
   height: number;
 };
 
-const Skeleton: FunctionalComponent<SkeletonProps> = ({
+const Skeleton: FunctionComponent<SkeletonProps> = ({
   width,
   height,
   ...props

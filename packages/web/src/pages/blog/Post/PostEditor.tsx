@@ -1,5 +1,4 @@
-import { FunctionalComponent } from 'preact';
-import React, { useState, useEffect, useCallback } from 'react';
+import React, { useState, useEffect, useCallback, FunctionComponent } from 'react';
 
 import { upload } from 'src/api/admin';
 import { getTags } from 'src/api/blog';
@@ -22,7 +21,7 @@ type PostEditorProps = {
   updatePost: (update: Partial<components['schemas']['PostContent']>) => void;
 };
 
-const PostEditor: FunctionalComponent<PostEditorProps> = ({
+const PostEditor: FunctionComponent<PostEditorProps> = ({
   post,
   updatePost,
 }) => {

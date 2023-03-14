@@ -1,5 +1,4 @@
-import { FunctionalComponent } from 'preact';
-import { useMemo } from 'react';
+import { FunctionComponent, useMemo } from 'react';
 
 import Button from 'src/components/ui/Button';
 
@@ -9,7 +8,7 @@ type PaginationProps = {
   count: number;
 };
 
-const Pagination: FunctionalComponent<PaginationProps> = ({
+const Pagination: FunctionComponent<PaginationProps> = ({
   onChange,
   page,
   count,

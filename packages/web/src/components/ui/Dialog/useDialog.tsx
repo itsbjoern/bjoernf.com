@@ -1,12 +1,11 @@
-import { FunctionalComponent, VNode } from 'preact';
-import React, { useState, useCallback } from 'react';
+import React, { useState, useCallback, FunctionComponent } from 'react';
 
 import Dialog from './index';
 
 const useDialog = (
-  content: string | VNode,
+  content: string | JSX.Element,
   onConfirm?: () => void
-): [FunctionalComponent, () => void] => {
+): [FunctionComponent, () => void] => {
   const [open, setOpen] = useState(false);
 
   const wrappedConfirm = useCallback(() => {

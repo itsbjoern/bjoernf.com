@@ -1,4 +1,3 @@
-import { FunctionalComponent } from 'preact';
 
 import classes from './style.module.scss';
 
@@ -7,7 +6,7 @@ type CircularProgressProps = {
   className?: string;
 };
 
-const CircularProgress: FunctionalComponent<CircularProgressProps> = ({
+const CircularProgress: FunctionComponent<CircularProgressProps> = ({
   size = 40,
   className,
   ...props

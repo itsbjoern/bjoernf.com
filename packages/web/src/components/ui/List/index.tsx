@@ -1,13 +1,12 @@
-import { FunctionalComponent } from 'preact';
-import { HTMLAttributes } from 'preact/compat';
+import { FunctionComponent, HTMLAttributes } from 'react';
 
 import classes from './style.module.scss';
 
-const List: FunctionalComponent<HTMLAttributes<HTMLUListElement>> = (props) => (
+const List: FunctionComponent<HTMLAttributes<HTMLUListElement>> = (props) => (
   <ul className={classes.list} {...props} />
 );
 
-const ListItem: FunctionalComponent<HTMLAttributes<HTMLLIElement>> = (
+const ListItem: FunctionComponent<HTMLAttributes<HTMLLIElement>> = (
   props
 ) => <li className={classes.item} {...props} />;
 

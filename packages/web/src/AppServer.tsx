@@ -1,5 +1,4 @@
-import { FunctionalComponent } from 'preact';
-import React from 'react';
+import React, { FunctionComponent } from 'react';
 
 import SSRProvider, {
   SSRProviderProps,
@@ -13,7 +12,7 @@ type AppServerProps = {
   ssr: SSRProviderProps['ssrProps'];
 };
 
-const AppServer: FunctionalComponent<AppServerProps> = (props) => {
+const AppServer: FunctionComponent<AppServerProps> = (props) => {
   return (
     <SSRProvider ssrProps={props.ssr}>
       <App {...props} />

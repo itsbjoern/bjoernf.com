@@ -1,5 +1,4 @@
-import { FunctionalComponent } from 'preact';
-import React from 'react';
+import React, { FunctionComponent } from 'react';
 
 import { components } from 'src/api/schema';
 import Ripples from 'src/lib/Ripples';
@@ -12,7 +11,7 @@ import { ListItem } from 'src/components/ui/List';
 import Skeleton from 'src/components/ui/Skeleton';
 import UnstyledLink from 'src/components/UnstyledLink';
 
-const ClipOn: FunctionalComponent = ({ children }) => (
+const ClipOn: FunctionComponent = ({ children }) => (
   <div className="z-[5] flex flex-row overflow-hidden">
     <div className="z-[5] flex flex-row pt-4 pr-5 pb-0 pl-6">
       <div className="neo z-[5] flex flex-row gap-4 rounded-t-xl bg-paper pt-2 pr-2 pb-0 pl-3">
@@ -27,7 +26,7 @@ type PostItemProps = {
   showDraft?: boolean;
 };
 
-const PostItem: FunctionalComponent<PostItemProps> = ({
+const PostItem: FunctionComponent<PostItemProps> = ({
   post,
   showDraft = false,
 }) => {

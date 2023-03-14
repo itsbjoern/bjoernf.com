@@ -1,7 +1,6 @@
 /// <reference types="vite-plugin-svgr/client" />
 
-import { FunctionalComponent } from 'preact';
-import React from 'react';
+import React, { FunctionComponent } from 'react';
 import { Link } from 'react-router-dom';
 
 import { ReactComponent as TransitEnterexitIcon } from 'src/components/icons/TransitEnterexit.svg';
@@ -11,7 +10,7 @@ type LinkRenderProps = {
   href: string;
 };
 
-const LinkRender: FunctionalComponent<LinkRenderProps> = ({
+const LinkRender: FunctionComponent<LinkRenderProps> = ({
   external,
   href,
   ...props
@@ -37,7 +36,7 @@ type RefProps = {
   href: string;
 };
 
-const Ref: FunctionalComponent<RefProps> = ({ text, href }) => {
+const Ref: FunctionComponent<RefProps> = ({ text, href }) => {
   const isExternal = href.slice(0, 1) !== '/';
   return (
     <React.Fragment>

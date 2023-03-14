@@ -1,5 +1,4 @@
-import { FunctionalComponent, VNode } from 'preact';
-import { HTMLAttributes } from 'preact/compat';
+import { HTMLAttributes } from 'react';
 
 import Ripples from 'src/lib/Ripples';
 
@@ -20,11 +19,11 @@ export { ButtonGroup };
 type ButtonProps = {
   variant?: 'contained' | 'outlined' | 'text';
   onClick?: (e: MouseEvent) => void;
-  startIcon?: VNode;
+  startIcon?: JSX.Element;
   disabled?: boolean;
 } & HTMLAttributes<HTMLButtonElement>;
 
-const Button: FunctionalComponent<ButtonProps> = ({
+const Button: FunctionComponent<ButtonProps> = ({
   variant = 'text',
   onClick,
   children,

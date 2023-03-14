@@ -1,4 +1,3 @@
-import { FunctionalComponent } from 'preact';
 import React, { useState } from 'react';
 
 import { components } from 'src/api/schema';
@@ -22,7 +21,7 @@ type ShareIconProps = {
   Icon: typeof EmailIcon;
 };
 
-const ShareIcon: FunctionalComponent<ShareIconProps> = ({
+const ShareIcon: FunctionComponent<ShareIconProps> = ({
   href,
   size,
   Icon,
@@ -40,7 +39,7 @@ type PostViewProps = {
   hideShare?: boolean;
 };
 
-const PostView: FunctionalComponent<PostViewProps> = ({
+const PostView: FunctionComponent<PostViewProps> = ({
   postData,
   createdAt,
   hideShare,

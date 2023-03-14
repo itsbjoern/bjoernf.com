@@ -1,4 +1,4 @@
-import { hydrate } from 'preact/compat';
+import { hydrate } from 'react';
 
 import App from './AppClient';
 

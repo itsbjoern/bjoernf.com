@@ -1,5 +1,4 @@
-import { FunctionalComponent } from 'preact';
-import React, { useRef } from 'react';
+import React, { FunctionComponent, useRef } from 'react';
 import { Link } from 'react-router-dom';
 
 type UnstyledLinkProps = {
@@ -7,7 +6,7 @@ type UnstyledLinkProps = {
   delay?: number;
 };
 
-const UnstyledLink: FunctionalComponent<UnstyledLinkProps> = ({
+const UnstyledLink: FunctionComponent<UnstyledLinkProps> = ({
   to,
   delay,
   ...props

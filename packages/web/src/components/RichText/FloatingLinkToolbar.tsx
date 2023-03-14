@@ -9,13 +9,12 @@ import {
   useExtension,
   useUpdateReason,
 } from '@remirror/react';
-import { FunctionalComponent } from 'preact';
-import React, { useEffect, useLayoutEffect, useState } from 'react';
+import React, { FunctionComponent, useEffect, useLayoutEffect, useState } from 'react';
 import { LinkExtension, ShortcutHandlerProps } from 'remirror/extensions';
 
 import Button from '../ui/Button';
 
-const RemirrorIcon: FunctionalComponent<{
+const RemirrorIcon: FunctionComponent<{
   icon: IconTree[];
 }> = ({ icon }) => (
   <svg>

@@ -1,5 +1,4 @@
-import { FunctionalComponent, VNode } from 'preact';
-import React from 'react';
+import React, { FunctionComponent } from 'react';
 import { createPortal } from 'react-dom';
 
 import { isSSR } from 'src/util';
@@ -12,10 +11,10 @@ type DialogProps = {
   open: boolean;
   onConfirm?: () => void;
   onClose: () => void;
-  content: string | VNode;
+  content: string | JSX.Element;
 };
 
-const Dialog: FunctionalComponent<DialogProps> = ({
+const Dialog: FunctionComponent<DialogProps> = ({
   open,
   onConfirm,
   onClose,

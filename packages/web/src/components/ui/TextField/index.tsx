@@ -1,5 +1,4 @@
-import { FunctionalComponent, VNode } from 'preact';
-import { ChangeEvent, CSSProperties, HTMLAttributes } from 'preact/compat';
+import { ChangeEvent, CSSProperties, FunctionComponent, HTMLAttributes } from 'react';
 import { useState } from 'react';
 
 import classes from './style.module.scss';
@@ -7,7 +6,7 @@ type TextFieldProps = {
   value?: string;
   label?: string;
   type?: 'text' | 'password';
-  icon?: VNode;
+  icon?: JSX.Element;
   onChange?: (evt: ChangeEvent<HTMLInputElement>) => void;
   onKeyDown?: (evt: KeyboardEvent) => void;
   onClick?: (evt: MouseEvent) => void;
@@ -18,7 +17,7 @@ type TextFieldProps = {
   inputProps?: HTMLAttributes<HTMLInputElement>;
 };
 
-const TextField: FunctionalComponent<TextFieldProps> = ({
+const TextField: FunctionComponent<TextFieldProps> = ({
   value,
   type = 'text',
   label,
@@ -84,7 +83,7 @@ type AutocompleteProps = TextFieldProps & {
   options: string[];
 };
 
-const Autocomplete: FunctionalComponent<AutocompleteProps> = ({
+const Autocomplete: FunctionComponent<AutocompleteProps> = ({
   options,
   ...rest
 }) => {

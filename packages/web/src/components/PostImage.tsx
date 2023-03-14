@@ -1,5 +1,4 @@
-import { FunctionalComponent } from 'preact';
-import React, { useState, useCallback, useRef } from 'react';
+import React, { useState, useCallback, useRef, FunctionComponent } from 'react';
 import { toast } from 'react-toast';
 
 import { ReactComponent as Clear } from 'src/components/icons/Clear.svg';
@@ -23,7 +22,7 @@ type PostImageProps = {
   size?: number;
 };
 
-const PostImage: FunctionalComponent<PostImageProps> = ({
+const PostImage: FunctionComponent<PostImageProps> = ({
   src,
   editable,
   onImageChosen,

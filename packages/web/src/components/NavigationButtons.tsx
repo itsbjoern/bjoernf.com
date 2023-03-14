@@ -1,5 +1,4 @@
-import { FunctionalComponent, VNode } from 'preact';
-import React from 'react';
+import React, { FunctionComponent } from 'react';
 import { useLocation, Link } from 'react-router-dom';
 
 import Ripples from 'src/lib/Ripples';
@@ -12,12 +11,12 @@ import classes from './styles.module.scss';
 
 type FullButtonProps = {
   label: string;
-  icon: VNode;
+  icon: JSX.Element;
   to: string;
   selected: boolean;
 };
 
-const FullButton: FunctionalComponent<FullButtonProps> = ({
+const FullButton: FunctionComponent<FullButtonProps> = ({
   label,
   icon,
   to,
@@ -44,7 +43,7 @@ type NavigationButtonProps = {
 };
 
 const paths = ['/', '/blog', '/projects'];
-const NavigationButtons: FunctionalComponent<NavigationButtonProps> = ({
+const NavigationButtons: FunctionComponent<NavigationButtonProps> = ({
   mobile,
 }) => {
   const location = useLocation();

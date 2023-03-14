@@ -1,5 +1,4 @@
-import { FunctionalComponent } from 'preact';
-import React, { useState, useEffect, useContext } from 'react';
+import React, { useState, useEffect, useContext, FunctionComponent } from 'react';
 
 import { APIResponse, request, RequestInfo, RequestOptions } from 'src/api';
 import { paths } from 'src/api/schema';
@@ -30,7 +29,7 @@ export const useRequest = () => {
   return context!;
 };
 
-const UserProvider: FunctionalComponent = ({ children }) => {
+const UserProvider: FunctionComponent = ({ children }) => {
   const [token, _setToken] = useState('');
   useEffect(() => {
     setToken(localStorage.getItem('authToken') ?? '');

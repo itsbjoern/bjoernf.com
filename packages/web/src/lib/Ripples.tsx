@@ -1,5 +1,4 @@
-import { FunctionalComponent } from 'preact';
-import React, { useState, useRef, useEffect, useCallback } from 'react';
+import React, { useState, useRef, useEffect, useCallback, FunctionComponent } from 'react';
 
 const boxStyle = {
   position: 'relative',
@@ -15,7 +14,7 @@ type RippleProps = {
   className?: string;
 };
 
-const Ripples: FunctionalComponent<RippleProps> = ({
+const Ripples: FunctionComponent<RippleProps> = ({
   during = 600,
   color = 'rgba(0, 0, 0, .08)',
   children,
