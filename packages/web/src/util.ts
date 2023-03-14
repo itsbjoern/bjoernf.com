@@ -3,7 +3,7 @@ export const isDev = import.meta.env.DEV;
 export const isSSR = typeof window === 'undefined';
 
 export const getFileUrl = (fileName: string) =>
-  `https://bjornf.dev/${fileName}`;
+  `https://xn--bjrnf-kua.com/${fileName}`;
 
 const months = [
   'January',

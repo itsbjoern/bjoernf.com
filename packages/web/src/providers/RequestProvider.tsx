@@ -59,7 +59,7 @@ const UserProvider: FunctionComponent = ({ children }) => {
       rewrittenHeaders['Authorization'] = `Bearer ${currentToken}`;
     }
     if (isSSR) {
-      rewrittenHeaders['user-agent'] = 'Node;https://bjornf.dev';
+      rewrittenHeaders['user-agent'] = 'Node;https://xn--bjrnf-kua.com';
     }
     return request({ ...payload, headers: rewrittenHeaders }, options).failure(
       (e) => {

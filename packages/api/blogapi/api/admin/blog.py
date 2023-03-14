@@ -473,7 +473,7 @@ async def upload(request: BlogRequest):
     if not s3_url:
         return web.HTTPBadRequest(reason="Upload failed")
 
-    file_url = f'https://bjornf.dev/{upload_folder}/{file_name}'
+    file_url = f'https://xn--bjrnf-kua.com/{upload_folder}/{file_name}'
     return utils.json_response({
         'src': file_url,
         'fileName': file_name,

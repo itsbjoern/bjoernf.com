@@ -38,7 +38,7 @@ const hydrateIndex = (rawIndex, request, renderedApp, resolvedData) => {
 
   const pathName = request.path === '/' ? 'Home' : request.path.split('/')[1];
   const metaData = {
-    url: 'https://bjornf.dev/' + request.path,
+    url: 'https://xn--bjrnf-kua.com/' + request.path,
     title: 'Björn Friedrichs',
     description: 'Personal website and blog by Björn Friedrichs',
     img: staticMetaImg,

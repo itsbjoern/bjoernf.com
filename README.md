@@ -1,6 +1,6 @@
 # Blog
 
-Repository for my personal website and blog at [bjornf.dev](https://bjornf.dev).
+Repository for my personal website and blog at [björnf.com](https://xn--bjrnf-kua.com.com).
 
 # The deployment
 ![Infrastructure](./docs/infrastructure.png)

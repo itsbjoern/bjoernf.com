@@ -1,4 +1,4 @@
-import React, { useEffect, useState, Suspense, FC as FunctionComponent } from 'react';
+import React, { useEffect, useState, Suspense, FunctionComponent } from 'react';
 import { BrowserRouter, Routes, Route, useLocation } from 'react-router-dom';
 import { StaticRouter } from 'react-router-dom/server';
 import { ToastContainer } from 'react-toast';
