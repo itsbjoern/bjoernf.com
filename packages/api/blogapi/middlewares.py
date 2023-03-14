@@ -41,7 +41,10 @@ def setup_middlewares(app: BlogApplication):
         origins.append('http://localhost:3000')
         origins.append('http://localhost:9009')
     else:
-        origins = [cast(str, app.config['connection.webhost'])]
+        origins = [
+            'https://bjornf.dev',
+            'https://xn--bjrnf-kua.com'
+        ]
 
     app.middlewares.extend([
         cors_middleware(
