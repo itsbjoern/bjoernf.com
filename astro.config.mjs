@@ -3,7 +3,6 @@ import node from "@astrojs/node";
 
 import tailwind from "@astrojs/tailwind";
 
-const port = process.env.ASTRO_PORT || 4321;
 
 // https://astro.build/config
 export default defineConfig({
@@ -12,7 +11,4 @@ export default defineConfig({
   adapter: node({
     mode: "standalone"
   }),
-  server: {
-    port: parseInt(port, 10)
-  }
 });
