@@ -1,6 +1,6 @@
 # syntax=docker/dockerfile:1
 FROM oven/bun:latest
-COPY dist ./
+COPY dist ./dist
 COPY package.json ./
 COPY bun.lockb ./
 RUN bun install
