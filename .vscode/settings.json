@@ -1,29 +1,7 @@
 {
-  "python.linting.pylintEnabled": true,
-  "eslint.workingDirectories": [{
-    "directory": "web",
-    "changeProcessCWD": true
-  }, {
-    "directory": "ssr-server",
-    "changeProcessCWD": true
-  }],
-  "[python]": {
-    "editor.tabSize": 4
+  "prettier.documentSelectors": ["**/*.astro"],
+  "[astro]": {
+    "editor.defaultFormatter": "esbenp.prettier-vscode"
   },
-  "python.linting.pycodestyleEnabled": false,
-  "python.linting.enabled": true,
-  "python.linting.pylintArgs": [
-    "--init-hook",
-    "import sys; sys.path.append('${env:VIRTUAL_ENV}/src/bjornf.dev/api')",
-    "--max-line-length=240",
-    "--disable=missing-function-docstring,missing-class-docstring,too-few-public-methods"
-  ],
-  "autoDocstring.docstringFormat": "google",
-  "python.analysis.typeCheckingMode": "basic",
-  "search.exclude": {
-    "**/node_modules": true,
-    "**/bower_components": true,
-    "**/*.code-search": true,
-    "**/dist": true
-  }
+  "editor.formatOnSave": true,
 }
