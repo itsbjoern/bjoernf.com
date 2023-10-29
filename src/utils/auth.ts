@@ -33,6 +33,6 @@ export const checkPasswordHash = async (hashed: string, password: string) => {
 };
 
 export const createToken = (userId: string) => {
-  const token = jwt.sign({ userId }, import.meta.env.JWT_SECRET);
+  const token = jwt.sign({ userId }, process.env.JWT_SECRET!);
   return token;
 };

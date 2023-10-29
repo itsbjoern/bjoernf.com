@@ -6,8 +6,8 @@ class Database {
   private db?: Db;
 
   async connect() {
-    this.client = await MongoClient.connect(import.meta.env.MONGO_URL);
-    this.db = this.client.db(import.meta.env.MONGO_DATABASE);
+    this.client = await MongoClient.connect(process.env.MONGO_URL!);
+    this.db = this.client.db(process.env.MONGO_DATABASE!);
   }
 
   posts() {
