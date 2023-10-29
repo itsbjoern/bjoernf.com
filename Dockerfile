@@ -5,5 +5,8 @@ COPY package.json ./
 COPY bun.lockb ./
 RUN bun install
 ENV NODE_ENV=production
+ENV HOST=0.0.0.0
+ENV PORT=80
+EXPOSE 80
 
 CMD ["bun", "run", "./dist/server/entry.mjs"]
