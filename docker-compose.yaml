@@ -3,10 +3,10 @@ services:
   web:
     image: bjornf
     expose:
-      - 80
+      - 4321
     environment:
-      PORT: 80
-      VIRTUAL_PORT: 80
+      PORT: 4321
+      VIRTUAL_PORT: 4321
       VIRTUAL_HOST: web.bjornf.dev
       LETSENCRYPT_HOST: web.bjornf.dev
     networks:
