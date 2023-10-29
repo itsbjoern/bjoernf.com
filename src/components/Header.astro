@@ -4,7 +4,7 @@ import Me from "@/images/me.jpg";
 import LogoutIcon from "@/images/icons/Logout.svg?raw";
 import AdminPanelSettingsIcon from "@/images/icons/AdminPanelSettings.svg?raw";
 import ArrowCircleUpIcon from "@/images/icons/ArrowCircleUp.svg?raw";
-import GithubIcon from "@/images/icons/Github.svg?raw";
+// import GithubIcon from "@/images/icons/Github.svg?raw";
 import TwitterIcon from "@/images/icons/Twitter.svg?raw";
 
 import Divider from "./Divider.astro";
@@ -57,12 +57,12 @@ const isLoggedIn = Astro.cookies.has("token");
       }
     </div>
     <div class="flex justify-end gap-3">
-      <Chip
+      <!-- <Chip
         clickable
         icon={GithubIcon}
         to="https://github.com/BFriedrichs"
         label="BFriedrichs"
-      />
+      /> -->
       <Chip
         clickable
         icon={TwitterIcon}
