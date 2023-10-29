@@ -6,7 +6,7 @@ import { PutObjectCommand, S3Client } from "@aws-sdk/client-s3";
 
 const bucket = "bjornf.dev-uploads";
 const region = "eu-west-2";
-const cfDist = "E16OOQSQGDXBD";
+const cfDist = "EP23KDGK9RC0N";
 
 console.log(123, import.meta.env.AWS_ACCESS_KEY_ID!);
 
