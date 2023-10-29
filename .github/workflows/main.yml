@@ -105,10 +105,10 @@ jobs:
               web:
                 environment:
                   JWT_SECRET: ${{ secrets.JWT_SECRET }}
-                  MONGO_URI: ${{ secrets.MONGO_URL }}
-                  MONGO_DB: ${{ secrets.MONGO_DB }}
+                  MONGO_URL: ${{ secrets.MONGO_URL }}
+                  MONGO_DATABASE: ${{ secrets.MONGO_DATABASE }}
                   ADMIN_USERNAME: ${{ secrets.ADMIN_USERNAME }}
-                  ADMIN_PASSWORD: ${{ secrets.MONGO_USER_PASSWORD }}
+                  MONGO_USER_PASSWORD: ${{ secrets.MONGO_USER_PASSWORD }}
                   AWS_ACCESS_KEY: ${{ secrets.AWS_ACCESS_KEY }}
                   AWS_SECRET_KEY: ${{ secrets.AWS_SECRET_KEY }}
               analytics:
