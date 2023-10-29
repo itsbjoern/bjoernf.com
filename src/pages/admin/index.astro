@@ -1,0 +1,32 @@
+---
+import Button from "@/components/Button.astro";
+import Layout from "@/layouts/Layout.astro";
+import { getDb } from "@/utils/database";
+
+const token = Astro.cookies.get("token");
+if (!token) {
+  return Astro.redirect("/admin/login");
+}
+
+const database = await getDb();
+const user = await database.users().findOne({ token: token.value });
+
+if (!user) {
+  Astro.cookies.delete("token");
+  return Astro.redirect("/admin/login");
+}
+---
+
+<Layout title="Admin">
+  <h1 class="text-3xl font-bold">Admin</h1>
+  <p>Welcome {user.username}</p>
+  <div class="h-4"></div>
+  <Button id="post-edit" to="/admin/edit" variant="contained">
+    Edit posts
+  </Button>
+  <div class="h-4"></div>
+  <h1 class="text-2xl font-bold">Analytics</h1>
+  <Button id="post-edit" to="/admin/edit" variant="contained">
+    View analytics
+  </Button>
+</Layout>

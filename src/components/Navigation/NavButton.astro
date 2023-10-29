@@ -1,0 +1,65 @@
+---
+import Icon from "../Icon.astro";
+interface Props {
+  icon: string;
+  label: string;
+  to: string;
+  selected: boolean;
+}
+
+const { icon, label, to, selected } = Astro.props;
+---
+
+<a class:list={["nav-action", selected && "selected"]} href={to}>
+  <Icon icon={icon} class="svg" />
+  <span>{label}</span>
+</a>
+
+<style>
+  .nav-action {
+    display: inline-flex;
+    flex: 1;
+    align-items: center;
+    justify-content: center;
+    position: relative;
+    box-sizing: border-box;
+    -webkit-tap-highlight-color: transparent;
+    background-color: transparent;
+    color: #9e829c;
+    outline: 0;
+    border: 0;
+    margin: 0;
+    border-radius: 0;
+    padding: 0;
+    cursor: pointer;
+    user-select: none;
+    vertical-align: middle;
+    text-decoration: none;
+    transition: none;
+    padding: 0px 12px;
+    min-width: 85px;
+    max-width: 168px;
+    flex-direction: column;
+    flex: 1;
+
+    transition:
+      background-color 300ms cubic-bezier(0.4, 0, 0.2, 1) 0ms,
+      box-shadow 300ms cubic-bezier(0.4, 0, 0.2, 1) 0ms;
+  }
+
+  .nav-action.selected {
+    color: var(--tw-color-primary);
+  }
+
+  .nav-action:hover {
+    background-color: rgba(0, 0, 0, 0.04);
+  }
+
+  .nav-action span {
+    font-size: 1rem;
+  }
+
+  .svg {
+    font-size: 1.7142857142857142rem;
+  }
+</style>

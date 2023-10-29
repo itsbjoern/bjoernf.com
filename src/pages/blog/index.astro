@@ -1,0 +1,60 @@
+---
+import SearchIcon from "@/images/icons/Search.svg?raw";
+import { getDb } from "@/utils/database";
+import PostItem from "@/components/PostItem.astro";
+import Layout from "@/layouts/Layout.astro";
+import type { Filter } from "mongodb";
+import type { Post } from "@/utils/models";
+import TextField from "@/components/TextField.astro";
+
+const query: Filter<Post> = { published: { $exists: true } };
+const search = Astro.url.searchParams.get("search");
+if (search) {
+  query.$or = [
+    { "published.title": { $regex: search, $options: "i" } },
+    { "published.content": { $regex: search, $options: "i" } },
+    { "published.tags": search },
+  ];
+}
+
+const database = await getDb();
+const posts = await database
+  .posts()
+  .find(query, { projection: { published: 1, createdAt: 1 } })
+  .sort({ "published.publishedAt": -1 });
+---
+
+<Layout title="Blog">
+  <div class="flex flex-col">
+    <div class="flex justify-end">
+      <TextField
+        id="search-input"
+        label="Search"
+        value={search ?? undefined}
+        icon={SearchIcon}
+      />
+    </div>
+    <div class="flex flex-col">
+      {posts.map((p) => <PostItem post={p} />)}
+    </div>
+  </div>
+</Layout>
+
+<script>
+  import { debounce } from "@/utils/debounce";
+
+  const searchInput = document.getElementById(
+    "search-input",
+  ) as HTMLInputElement;
+  searchInput.addEventListener(
+    "input",
+    debounce((e) => {
+      const search = searchInput.value;
+      if (search) {
+        window.location.search = `?search=${search}`;
+      } else {
+        window.location.search = "";
+      }
+    }, 400),
+  );
+</script>

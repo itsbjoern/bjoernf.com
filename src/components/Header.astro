@@ -1,0 +1,74 @@
+---
+import { Image } from "astro:assets";
+import Me from "@/images/me.jpg";
+import LogoutIcon from "@/images/icons/Logout.svg?raw";
+import AdminPanelSettingsIcon from "@/images/icons/AdminPanelSettings.svg?raw";
+import ArrowCircleUpIcon from "@/images/icons/ArrowCircleUp.svg?raw";
+import GithubIcon from "@/images/icons/Github.svg?raw";
+import TwitterIcon from "@/images/icons/Twitter.svg?raw";
+
+import Divider from "./Divider.astro";
+import Chip from "./Chip.astro";
+import Navigation from "./Navigation/Navigation.astro";
+import Icon from "./Icon.astro";
+
+const isLoggedIn = Astro.cookies.has("token");
+---
+
+<div class="neo flex flex-col gap-4 rounded-b-xl bg-paper p-6">
+  <div class="flex items-center justify-between">
+    <div class="flex flex-row items-center">
+      <Image
+        class="h-16 w-16 rounded-full object-cover"
+        src={Me}
+        alt="Picture of myself"
+      />
+      <div class="ml-4 flex flex-col justify-evenly">
+        <h2 class="text-2xl font-bold">Björn Friedrichs</h2>
+        <div class="flex flex-row items-center gap-1">
+          <Icon icon={ArrowCircleUpIcon} />
+          <span>That&apos;s me</span>
+        </div>
+      </div>
+    </div>
+    <Navigation />
+  </div>
+
+  <Divider />
+  <div class="flex flex-wrap gap-3">
+    <div class="flex flex-1 justify-start">
+      {
+        isLoggedIn ? (
+          <div class="flex gap-3">
+            <Chip
+              clickable
+              icon={AdminPanelSettingsIcon}
+              label="Admin"
+              to="/admin"
+            />
+            <Chip
+              clickable
+              icon={LogoutIcon}
+              label="Sign out"
+              to="/admin/logout"
+            />
+          </div>
+        ) : null
+      }
+    </div>
+    <div class="flex justify-end gap-3">
+      <Chip
+        clickable
+        icon={GithubIcon}
+        to="https://github.com/BFriedrichs"
+        label="BFriedrichs"
+      />
+      <Chip
+        clickable
+        icon={TwitterIcon}
+        to="https://twitter.com/bjornf_dev"
+        label="bjornf_dev"
+      />
+    </div>
+  </div>
+</div>

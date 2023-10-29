@@ -1,0 +1,42 @@
+---
+import ControlPoint from "@/images/icons/ControlPoint.svg?raw";
+import Loyalty from "@/images/icons/Loyalty.svg?raw";
+import Subtitles from "@/images/icons/Subtitles.svg?raw";
+import { getDb } from "@/utils/database";
+import { ObjectId } from "mongodb";
+import Layout from "@/layouts/Layout.astro";
+
+import { ensureAuth } from "@/utils/auth";
+import PostView from "@/components/PostView.astro";
+import Button from "@/components/Button.astro";
+
+try {
+  await ensureAuth(Astro.cookies.get("token")?.value);
+} catch {
+  return Astro.redirect("/admin/login");
+}
+
+const { draft: postId } = Astro.params;
+
+const database = await getDb();
+const post = await database.posts().findOne({ _id: new ObjectId(postId) });
+
+if (!post) {
+  return new Response(null, {
+    status: 404,
+    statusText: "Not found",
+  });
+}
+
+const data = post.draft ?? post.published; // backwards compat
+---
+
+<Layout title="Preview">
+  <PostView post={data!} />
+
+  <div class="flex flex-1 justify-end">
+    <Button id="edit" variant="contained" to={`/admin/edit/${postId}`}>
+      Edit
+    </Button>
+  </div>
+</Layout>

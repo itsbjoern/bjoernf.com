@@ -1,0 +1,43 @@
+---
+import NavButton from "./NavButton.astro";
+import HomeIcon from "@/images/icons/Home.svg?raw";
+import ReceiptIcon from "@/images/icons/Receipt.svg?raw";
+import AccountTreeIcon from "@/images/icons/AccountTree.svg?raw";
+
+interface Props {
+  mobile?: boolean;
+}
+
+const paths = ["/", "/blog", "/projects"];
+const currentPath = Astro.url.pathname;
+const currentMainSegment = currentPath.split("/")[1];
+const menuIndex = paths.indexOf(`/${currentMainSegment}`);
+
+const { mobile = false } = Astro.props;
+---
+
+<div
+  class:list={[
+    "smo:shadow-[0 1px 10px 4px rgb(0 0 0 / 20%)] z-[100] h-[56px] content-evenly justify-center smo:sticky smo:bottom-0 smo:left-0 smo:w-full smo:bg-paper",
+    mobile ? "hidden smo:flex" : "flex smo:hidden",
+  ]}
+>
+  <NavButton
+    label="Home"
+    icon={HomeIcon}
+    selected={menuIndex === 0}
+    to={paths[0]}
+  />
+  <NavButton
+    label="Blog"
+    icon={ReceiptIcon}
+    selected={menuIndex === 1}
+    to={paths[1]}
+  />
+  <NavButton
+    label="Projects"
+    icon={AccountTreeIcon}
+    selected={menuIndex === 2}
+    to={paths[2]}
+  />
+</div>

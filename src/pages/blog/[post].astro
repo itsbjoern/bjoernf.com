@@ -1,0 +1,95 @@
+---
+import { getDb } from "@/utils/database";
+import { ObjectId } from "mongodb";
+import Layout from "@/layouts/Layout.astro";
+import ShareIcon from "@/components/ShareIcon.astro";
+
+import EmailIcon from "@/images/icons/share/EmailIcon.svg?raw";
+import LinkedinIcon from "@/images/icons/share/LinkedinIcon.svg?raw";
+import TwitterIcon from "@/images/icons/share/TwitterIcon.svg?raw";
+import WhatsappIcon from "@/images/icons/share/WhatsappIcon.svg?raw";
+
+import {
+  emailLink,
+  linkedinLink,
+  whatsappLink,
+  twitterLink,
+} from "@/utils/share";
+import Tag from "@/components/Tag.astro";
+import { formatDate } from "@/utils/formatDate";
+import { Image } from "astro:assets";
+
+import { ensureAuth } from "@/utils/auth";
+import Button from "@/components/Button.astro";
+import PostView from "@/components/PostView.astro";
+
+// export const prerender = true;
+// export async function getStaticPaths() {
+//   const db = await getDb();
+//   const posts = await db.posts().find({}).sort({ createdAt: -1 }).toArray();
+//   return {
+//     paths: posts.map((p) => ({ params: { post: p._id.toString() } })),
+//   };
+// }
+
+let user = null;
+try {
+  user = await ensureAuth(Astro.cookies.get("token")?.value);
+} catch {}
+
+const { post: postId } = Astro.params;
+
+const database = await getDb();
+const post = await database.posts().findOne({ _id: new ObjectId(postId) });
+
+if (!post || !post?.published) {
+  return new Response(null, {
+    status: 404,
+    statusText: "Not found",
+  });
+}
+
+const { image, title, html, tags, summary, publishedAt } = post.published;
+const url = Astro.url.toString();
+---
+
+<Layout title={title} description={summary} image={image}>
+  <div class="flex h-auto flex-col">
+    <div
+      class={`lg:sticky lg:top-4 lg:h-0 lg:w-52 lg:gap-12 lg:translate-x-64 lg:self-end mb-2`}
+    >
+      <div class="flex flex-col justify-center lgo:flex-row text-white">
+        <ShareIcon
+          size={45}
+          icon={EmailIcon}
+          href={emailLink({ title, url, tags })}
+        />
+        <ShareIcon
+          size={45}
+          icon={LinkedinIcon}
+          href={linkedinLink({ title, url, tags })}
+        />
+        <ShareIcon
+          size={45}
+          icon={WhatsappIcon}
+          href={whatsappLink({ title, url, tags }, true)}
+        />
+        <ShareIcon
+          size={45}
+          icon={TwitterIcon}
+          href={twitterLink({ title, url, tags })}
+        />
+      </div>
+    </div>
+  </div>
+  <PostView post={post.published} />
+  {
+    user ? (
+      <div class="flex flex-1 justify-end">
+        <Button id="edit" variant="contained" to={`/admin/edit/${postId}`}>
+          Edit
+        </Button>
+      </div>
+    ) : null
+  }
+</Layout>

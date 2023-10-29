@@ -1,0 +1,18 @@
+---
+import { generatePasswordHash } from "@/utils/auth";
+import { getDb } from "@/utils/database";
+
+const database = await getDb();
+const user = await database.users().findOne();
+
+if (!user) {
+  const password = await generatePasswordHash(import.meta.env.ADMIN_PASSWORD);
+  await database.users().insertOne({
+    username: import.meta.env.ADMIN_USERNAME,
+    password,
+    createdAt: new Date(),
+  });
+}
+
+return Astro.redirect("/admin/login");
+---

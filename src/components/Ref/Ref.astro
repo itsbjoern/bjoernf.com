@@ -1,0 +1,22 @@
+---
+import TransitEnterexitIcon from "@/images/icons/TransitEnterexit.svg?raw";
+import LinkRender from "./LinkRender.astro";
+import Icon from "../Icon.astro";
+
+interface Props {
+  text?: string;
+  href: string;
+}
+
+const { text, href } = Astro.props;
+const isExternal = href.slice(0, 1) !== "/";
+---
+
+<LinkRender external={isExternal} href={href}>
+  {` ${text || href}`}
+  {
+    isExternal ? (
+      <Icon icon={TransitEnterexitIcon} class="inline ml-0 rotate-180" />
+    ) : null
+  }
+</LinkRender>

@@ -1,0 +1,28 @@
+version: "3.9"
+services:
+  web:
+    image: bjornf
+    expose:
+      - 80
+    environment:
+      VIRTUAL_PORT: 80
+      API_CONNECTION_PORT: 80
+      VIRTUAL_HOST: web.bjornf.dev
+      LETSENCRYPT_HOST: web.bjornf.dev
+    networks:
+      - nginx-proxy
+      - default
+    restart: unless-stopped
+  analytics:
+    image: electerious/ackee
+    restart: unless-stopped
+    expose:
+      - 80
+    environment:
+      VIRTUAL_HOST: dashboard.bjornf.dev
+      LETSENCRYPT_HOST: dashboard.bjornf.dev
+      VIRTUAL_PORT: 80
+      ACKEE_PORT: 80
+      ACKEE_ALLOW_ORIGIN: https://bjornf.dev,https://xn--bjrnf-kua.com
+    networks:
+      - nginx-proxy

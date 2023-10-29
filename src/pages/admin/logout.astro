@@ -1,0 +1,8 @@
+---
+if (Astro.cookies.has("token")) {
+  Astro.cookies.delete("token", {
+    path: "/",
+  });
+}
+return Astro.redirect("/");
+---

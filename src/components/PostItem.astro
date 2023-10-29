@@ -1,0 +1,95 @@
+---
+import { Image } from "astro:assets";
+import type { Post } from "@/utils/models";
+import { formatDate } from "@/utils/formatDate";
+import Tag from "./Tag.astro";
+import type { WithId } from "mongodb";
+
+interface Props {
+  post: WithId<Post>;
+}
+
+const { post } = Astro.props;
+const { _id, draft, published, createdAt } = post;
+const { title, summary, tags, image } = published ?? draft ?? {};
+---
+
+<div class="mb-2 flex flex-col">
+  <div
+    class="flex flex-row justify-start smo:mt-5 smo:flex-col-reverse smo:pb-2"
+  >
+    <div class="z-[5] flex flex-row overflow-hidden">
+      <div class="z-[5] flex flex-row pt-4 pr-5 pb-0 pl-6">
+        <div
+          class="neo z-[5] flex flex-row gap-4 rounded-t-xl bg-paper pt-2 pr-2 pb-0 pl-3"
+        >
+          <a class="flex flex-row gap-2" href={`/blog/${_id}`}>
+            <div class="flex flex-row">
+              <span style={{ fontSize: "0.75rem" }}>
+                {formatDate(createdAt)}
+              </span>
+            </div>
+          </a>
+          <div class="flex flex-row justify-end gap-2">
+            {tags ? tags.map((tag) => <Tag name={tag} />) : null}
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+  <a
+    class="neo relative flex min-h-[100px] flex-1 overflow-hidden rounded-lg bg-paper smo:pr-2"
+    href={published ? `/blog/${_id}` : `/admin/edit/${_id}`}
+  >
+    <div class="flex flex-row gap-2 pr-3 pb-2 pl-2 pt-2">
+      <!-- {!published ? <PendingActionsIcon /> : null} -->
+      {
+        image ? (
+          <div class="image-container">
+            <Image width={100} height={100} src={image} alt="" />
+          </div>
+        ) : null
+      }
+      <div class="flex flex-col px-2 py-1 smo:flex-wrap">
+        <h3 class="text-xl font-bold leading-6 text-primary">
+          {title || "No title"}
+        </h3>
+        <div
+          class="flex flex-row overflow-hidden text-ellipsis text-sm"
+          style={{
+            "-webkit-line-clamp": 3,
+            "-webkit-box-orient": "vertical",
+            display: "-webkit-box",
+          }}
+        >
+          {summary}
+        </div>
+      </div>
+    </div>
+  </a>
+</div>
+
+<style>
+  .image-container {
+    width: 100px;
+    min-width: 100px;
+    height: 100px;
+
+    position: relative;
+    display: flex;
+
+    border-width: 1px;
+    border-style: solid;
+    border-color: rgba(0, 0, 0, 0.23);
+    border-radius: 4px;
+    padding: 3px;
+
+    align-items: center;
+    justify-content: center;
+  }
+  .image-container img {
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+  }
+</style>

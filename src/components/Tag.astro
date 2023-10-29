@@ -1,0 +1,20 @@
+---
+import Chip from "./Chip.astro";
+
+interface Props {
+  name: string;
+  deletable?: boolean;
+  class?: string;
+}
+
+const { name, class: className, deletable } = Astro.props;
+---
+
+<Chip
+  variant="contained"
+  to={deletable ? undefined : `/blog?search=${name}`}
+  deletable={deletable}
+  clickable
+  class:list={["-mt-1", "!text-xs", className, deletable && "deletable"]}
+  label={name}
+/>

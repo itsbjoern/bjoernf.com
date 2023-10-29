@@ -1,0 +1,55 @@
+---
+import TextField from "@/components/TextField.astro";
+import Layout from "@/layouts/Layout.astro";
+
+import AccountCircleIcon from "@/images/icons/AccountCircle.svg?raw";
+import VpnKeyIcon from "@/images/icons/VpnKey.svg?raw";
+import Button from "@/components/Button.astro";
+
+if (Astro.cookies.has("token")) {
+  return Astro.redirect("/admin");
+}
+---
+
+<Layout title="Admin">
+  <div class="flex justify-center">
+    <div class="mt-24 flex w-1/2 flex-col gap-4">
+      <TextField id="username" label="Username" icon={AccountCircleIcon} />
+      <TextField id="password" label="Password" icon={VpnKeyIcon} />
+      <div class="jusify-end flex flex-row">
+        <Button id="login" variant="contained">Login</Button>
+      </div>
+    </div>
+  </div>
+</Layout>
+
+<script>
+  import { POST } from "@/utils/api";
+
+  const usernameInput = document.getElementById("username") as HTMLInputElement;
+  const passwordInput = document.getElementById("password") as HTMLInputElement;
+  const loginButton = document.getElementById("login");
+
+  const doLogin = async () => {
+    const username = usernameInput?.value;
+    const password = passwordInput?.value;
+
+    const data = await POST("/api/login", {
+      username,
+      password,
+    });
+
+    if (!data.success) {
+      return;
+    }
+
+    window.location.href = "/admin";
+  };
+
+  document.addEventListener("keydown", (event) => {
+    if (event.key === "Enter") {
+      doLogin();
+    }
+  });
+  loginButton?.addEventListener("click", doLogin);
+</script>

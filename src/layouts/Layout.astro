@@ -1,0 +1,136 @@
+---
+import Footer from "@/components/Footer.astro";
+import Header from "@/components/Header.astro";
+import Navigation from "@/components/Navigation/Navigation.astro";
+import { getDb } from "@/utils/database";
+interface Props {
+  title: string;
+  description?: string;
+  image?: string;
+}
+
+const { title, description = "", image = "" } = Astro.props;
+
+const database = await getDb();
+const posts = await database
+  .posts()
+  .find({ "published.tags": { $exists: 1 } })
+  .toArray();
+
+const uniqueTags = new Set<string>();
+for (const post of posts) {
+  for (const tag of post.published?.tags ?? []) {
+    uniqueTags.add(tag);
+  }
+}
+---
+
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta
+      prefix="og: http://ogp.me/ns#"
+      name="og:title"
+      content={`${title} | Björn Friedrichs`}
+    />
+    <meta
+      prefix="og: http://ogp.me/ns#"
+      name="og:description"
+      content={description}
+    />
+    <meta prefix="og: http://ogp.me/ns#" name="og:image" content={image} />
+    <meta prefix="og: http://ogp.me/ns#" name="og:type" content="website" />
+    <meta
+      name="description"
+      content={description ?? "Personal website and blog by Björn Friedrichs"}
+    />
+    <meta prefix="og: http://ogp.me/ns#" name="og:url" content={Astro.url} />
+    <meta
+      prefix="og: http://ogp.me/ns#"
+      name="og:site_name"
+      content="Björn Friedrichs"
+    />
+    <link
+      rel="alternate"
+      type="application/rss+xml"
+      title="Björn Friedrichs' Blog"
+      href="/rss.xml"
+    />
+    {
+      Array.from(uniqueTags).map((tag) => (
+        <link
+          rel="alternate"
+          type="application/rss+xml"
+          title={`Björn Friedrichs' Blog | ${tag}`}
+          href={`/rss/${tag.toLowerCase()}.xml`}
+        />
+      ))
+    }
+    <meta name="viewport" content="width=device-width" />
+    <link rel="icon" type="image/svg+xml" href="/favicon.svg" />
+    <meta name="generator" content={Astro.generator} />
+    <title>{title} | Björn Friedrichs</title>
+  </head>
+  <body>
+    <div class="flex flex-1 bg-default">
+      <div class="flex flex-1 flex-col">
+        <div
+          class="smo:pr0 ml-auto mr-auto box-border flex w-full flex-1 flex-col md:max-w-[700px] smo:pl-0"
+        >
+          <div class="flex flex-1 flex-col">
+            <Header />
+            <div
+              class="flex flex-1 flex-col px-1 py-11"
+              style={{ maxWidth: "100vw" }}
+            >
+              <slot />
+            </div>
+            <Footer />
+            <Navigation mobile />
+          </div>
+        </div>
+      </div>
+    </div>
+  </body>
+</html>
+<style is:global>
+  :root {
+    --tw-color-primary: theme("colors.primary");
+  }
+
+  * {
+    margin: 0;
+    padding: 0;
+    box-sizing: border-box;
+  }
+
+  html {
+    font-family: system-ui, sans-serif;
+    background: #13151a;
+    background-size: 224px;
+
+    font-family: "Raleway", "-apple-system", "BlinkMacSystemFont",
+      "Helvetica Neue", "Arial", "sans-serif";
+  }
+
+  html,
+  body {
+    min-height: 100vh;
+  }
+
+  body {
+    display: flex;
+  }
+
+  code {
+    font-family: source-code-pro, Menlo, Monaco, Consolas, "Courier New",
+      monospace;
+  }
+
+  .neo {
+    box-shadow:
+      5px 5px 10px #e3e3e3,
+      -5px -5px 10px #ffffff;
+  }
+</style>

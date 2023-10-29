@@ -1,0 +1,65 @@
+.tiptap,
+.post-content {
+  ul,
+  ol {
+    padding: 0 1rem;
+  }
+
+  ul {
+    list-style-type: disc;
+  }
+
+  ol {
+    list-style-type: decimal;
+  }
+
+  h1,
+  h2,
+  h3,
+  h4,
+  h5,
+  h6 {
+    line-height: 1.1;
+  }
+
+  code {
+    background-color: rgba(97, 97, 97, 0.1);
+    color: var(--tw-color-primary);
+    border-radius: 4px;
+    padding: 2px 3px;
+    font-family: monospace;
+  }
+
+  pre {
+    background: #0d0d0d;
+    color: #fff;
+    font-family: monospace;
+    padding: 0.75rem 1rem;
+    border-radius: 0.5rem;
+    margin: 6px 0;
+  }
+
+  pre code {
+    color: inherit;
+    padding: 0;
+    background: none;
+    font-size: 0.8rem;
+  }
+
+  img {
+    max-width: 100%;
+    height: auto;
+    display: inline-block;
+  }
+
+  blockquote {
+    padding-left: 1rem;
+    border-left: 2px solid rgba(13, 13, 13, 0.1);
+  }
+
+  hr {
+    border: none;
+    border-top: 2px solid rgba(13, 13, 13, 0.1);
+    margin: 1.5rem 0;
+  }
+}
