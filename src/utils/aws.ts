@@ -8,13 +8,11 @@ const bucket = "bjornf.dev-uploads";
 const region = "eu-west-2";
 const cfDist = "EP23KDGK9RC0N";
 
-console.log(123, import.meta.env.AWS_ACCESS_KEY_ID!);
-
 const s3 = new S3Client({
   region,
   credentials: {
-    accessKeyId: import.meta.env.AWS_ACCESS_KEY_ID!,
-    secretAccessKey: import.meta.env.AWS_SECRET_ACCESS_KEY!,
+    accessKeyId: import.meta.env.AWS_ACCESS_KEY!,
+    secretAccessKey: import.meta.env.AWS_SECRET_KEY!,
   },
 });
 
@@ -36,8 +34,8 @@ export const uploadFile = async (
 const cf = new CloudFront({
   region,
   credentials: {
-    accessKeyId: import.meta.env.AWS_ACCESS_KEY_ID!,
-    secretAccessKey: import.meta.env.AWS_SECRET_ACCESS_KEY!,
+    accessKeyId: import.meta.env.AWS_ACCESS_KEY!,
+    secretAccessKey: import.meta.env.AWS_SECRET_KEY!,
   },
 });
 
