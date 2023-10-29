@@ -26,3 +26,8 @@ services:
       ACKEE_ALLOW_ORIGIN: https://bjornf.dev,https://xn--bjrnf-kua.com
     networks:
       - nginx-proxy
+
+networks:
+  nginx-proxy:
+    external:
+      name: nginx-proxy
