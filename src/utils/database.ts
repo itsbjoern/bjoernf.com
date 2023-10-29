@@ -1,4 +1,4 @@
-import { type Db, MongoClient } from "mongodb";
+import { type Db, MongoClient, ServerApiVersion } from "mongodb";
 import type * as Models from "./models";
 
 class Database {
@@ -6,7 +6,13 @@ class Database {
   private db?: Db;
 
   async connect() {
-    this.client = await MongoClient.connect(process.env.MONGO_URL!);
+    this.client = await MongoClient.connect(process.env.MONGO_URL!, {
+      serverApi: {
+        version: ServerApiVersion.v1,
+        strict: true,
+        deprecationErrors: true,
+      },
+    });
     this.db = this.client.db(process.env.MONGO_DATABASE!);
   }
 
