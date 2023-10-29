@@ -132,5 +132,5 @@ jobs:
       - name: Invalidate cache from CF
         run: |
           aws cloudfront create-invalidation \
-            --distribution-id E16OOQSQGDXBD \
+            --distribution-id EP23KDGK9RC0N \
             --paths "/*" "/assets/*" "/images/*" "/rss" "/rss*"
