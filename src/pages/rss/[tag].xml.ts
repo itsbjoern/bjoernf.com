@@ -11,12 +11,8 @@ export const GET: APIRoute = async ({ url, params }) => {
   }
   const database = await getDb();
   const posts = await database.posts().find(query).toArray();
-
-  return {
-    headers: {
-      "Content-Type": "text/xml",
-    },
-    body: `<rss xmlns:dc="http://purl.org/dc/elements/1.1/" xmlns:content="http://purl.org/rss/1.0/modules/content/" xmlns:atom="http://www.w3.org/2005/Atom" version="2.0">
+  return new Response(
+    `<rss xmlns:dc="http://purl.org/dc/elements/1.1/" xmlns:content="http://purl.org/rss/1.0/modules/content/" xmlns:atom="http://www.w3.org/2005/Atom" version="2.0" encoding="UTF-8">
   <channel>
     <title>
     <![CDATA[ Björn Friedrichs' Blog${tag ? ` | ${tag}` : ""} ]]>
@@ -34,19 +30,25 @@ export const GET: APIRoute = async ({ url, params }) => {
             <![CDATA[ ${post.published?.title} ]]>
             </title>
             <description>
-            <![CDATA[ ${post.published?.summary ?? ""} ]]>
+            <![CDATA[ ${post.published?.summary?.replace(/\0/g, "") ?? ""} ]]>
             </description>
             <link>${url.origin}/blog/${post._id.toString()}</link>
             <guid isPermaLink="false">${
               url.origin
             }/blog/${post._id.toString()}</guid>
             <pubDate>${post.published?.publishedAt?.toUTCString()}</pubDate>
-            <content:encoded><![CDATA[ ${post.published
-              ?.html} ]]></content:encoded>
+            <content:encoded><![CDATA[ ${
+              post.published?.html?.replace(/\0/g, "") ?? ""
+            } ]]></content:encoded>
           </item>`,
       )
       .join("")}
   </channel>
 </rss>`,
-  };
+    {
+      headers: {
+        "Content-Type": "text/xml; charset=utf-8",
+      },
+    },
+  );
 };
