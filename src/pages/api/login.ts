@@ -36,7 +36,7 @@ export const POST = Endpoint<LoginRequestBody, LoginReturnData>(
       throw new APIError(400, "Invalid password");
     }
 
-    const token = createToken(user["_id"]);
+    const token = createToken(user["_id"].toString());
     await database.users().updateOne({ _id: user["_id"] }, { $set: { token } });
 
     cookies.set("token", token, {

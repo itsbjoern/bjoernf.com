@@ -69,7 +69,7 @@ export const request = async <URL extends keyof Endpoints>(
 
 export const POST = async <URL extends keyof Endpoints>(
   url: URL,
-  body?: Endpoints[URL]["requestBody"],
+  body: Endpoints[URL]["requestBody"],
 ) => request(url, body, { method: "POST" });
 
 // export const DELETE = async <URL extends keyof Endpoints>(url: URL) =>

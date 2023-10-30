@@ -28,9 +28,9 @@ export const Endpoint =
   <RequestBody, ReturnData>(
     func: (funcParams: FuncParams<RequestBody>) => Promise<ReturnData>,
   ) =>
-  async ({ params, request, ...rest }: FuncParams<RequestBody>) => {
+  async (funcParams: FuncParams<RequestBody>) => {
     try {
-      const response = await func({ params, request, ...rest });
+      const response = await func(funcParams);
       return new Response(JSON.stringify(response), {
         status: 200,
         headers: {

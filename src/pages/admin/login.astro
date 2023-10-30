@@ -15,7 +15,7 @@ if (Astro.cookies.has("token")) {
   <div class="flex justify-center">
     <div class="mt-24 flex w-1/2 flex-col gap-4">
       <TextField id="username" label="Username" icon={AccountCircleIcon} />
-      <TextField id="password" label="Password" icon={VpnKeyIcon} />
+      <TextField id="password" label="Password" icon={VpnKeyIcon} type="password" />
       <div class="jusify-end flex flex-row">
         <Button id="login" variant="contained">Login</Button>
       </div>

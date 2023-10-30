@@ -6,10 +6,11 @@ interface Props {
   label?: string;
   icon?: string;
   value?: string;
+  type?: "text" | "file" | "password";
   suggestions?: string[];
 }
 
-const { label, id, icon, value, suggestions } = Astro.props;
+const { label, id, icon, value, suggestions, type } = Astro.props;
 ---
 
 <div
@@ -17,6 +18,7 @@ const { label, id, icon, value, suggestions } = Astro.props;
 >
   {label ? <label class="placeholder">{label}</label> : null}
   <input
+    type={type}
     autocomplete="off"
     id={id}
     class="input"

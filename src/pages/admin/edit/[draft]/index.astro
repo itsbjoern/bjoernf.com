@@ -205,7 +205,7 @@ const data = post.draft ?? post.published; // backwards compat
     if (!check) {
       return;
     }
-    const result = await POST(`/api/${postId}/publish`);
+    const result = await POST(`/api/${postId}/publish`, null);
     if (result.success) {
       window.location.reload();
     }
@@ -217,7 +217,7 @@ const data = post.draft ?? post.published; // backwards compat
     if (!check) {
       return;
     }
-    const result = await POST(`/api/${postId}/unpublish`);
+    const result = await POST(`/api/${postId}/unpublish`, null);
     if (result.success) {
       window.location.reload();
     }
