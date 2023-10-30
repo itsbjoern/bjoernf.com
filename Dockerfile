@@ -1,8 +1,6 @@
 # syntax=docker/dockerfile:1
 FROM oven/bun:latest
-COPY dist ./dist
-COPY package.json ./
-COPY bun.lockb ./
+COPY . .
 RUN bun install
 ENV NODE_ENV=production
 ENV HOST=0.0.0.0
