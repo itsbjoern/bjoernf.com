@@ -94,6 +94,14 @@ for (const post of posts) {
     </div>
   </body>
 </html>
+<script>
+  // @ts-ignore
+  import * as ackeeTracker from "ackee-tracker";
+  ackeeTracker.create("https://dashboard.bjornf.dev", {
+    ignoreLocalhost: true,
+    detailed: true,
+  });
+</script>
 <style is:global>
   :root {
     --tw-color-primary: theme("colors.primary");
