@@ -1,7 +1,7 @@
 # syntax=docker/dockerfile:1
 FROM oven/bun:latest
 COPY . .
-RUN bun install --frozen-lockfile
+RUN bun install
 RUN ASTRO_TELEMETRY_DISABLED=1 bun run build
 ENV NODE_ENV=production
 ENV HOST=0.0.0.0
