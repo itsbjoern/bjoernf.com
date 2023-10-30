@@ -2,18 +2,23 @@ import { type Db, MongoClient, ServerApiVersion } from "mongodb";
 import type * as Models from "./models";
 
 class Database {
-  private client?: MongoClient;
+  private connection?: Promise<MongoClient>;
   private db?: Db;
 
   async connect() {
-    this.client = await MongoClient.connect(process.env.MONGO_URL!, {
-      serverApi: {
-        version: ServerApiVersion.v1,
-        strict: true,
-        deprecationErrors: true,
-      },
-    });
-    this.db = this.client.db(process.env.MONGO_DATABASE!);
+    if (!this.connection) {
+      this.connection = MongoClient.connect(process.env.MONGO_URL!, {
+        serverApi: {
+          version: ServerApiVersion.v1,
+          strict: true,
+          deprecationErrors: true,
+        },
+      });
+    }
+
+    const client = await this.connection;
+    this.db = client.db(process.env.MONGO_DATABASE!);
+    return this;
   }
 
   posts() {
@@ -25,13 +30,8 @@ class Database {
   }
 }
 
-let db: Database | null = null;
+let db: Database = new Database();
 
 export const getDb = async () => {
-  if (!db) {
-    db = new Database();
-    await db.connect();
-  }
-
-  return db;
+  return db.connect();
 };
