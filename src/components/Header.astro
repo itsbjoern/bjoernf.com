@@ -1,5 +1,4 @@
 ---
-import { Image } from "astro:assets";
 import Me from "@/images/me.jpg";
 import LogoutIcon from "@/images/icons/Logout.svg?raw";
 import AdminPanelSettingsIcon from "@/images/icons/AdminPanelSettings.svg?raw";
@@ -18,9 +17,11 @@ const isLoggedIn = Astro.cookies.has("token");
 <div class="neo flex flex-col gap-4 rounded-b-xl bg-paper p-6">
   <div class="flex items-center justify-between">
     <div class="flex flex-row items-center">
-      <Image
+      <img
         class="h-16 w-16 rounded-full object-cover"
-        src={Me}
+        src={Me.src}
+        width={Me.width}
+        height={Me.height}
         alt="Picture of myself"
       />
       <div class="ml-4 flex flex-col justify-evenly">
