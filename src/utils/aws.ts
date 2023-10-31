@@ -4,7 +4,7 @@ import {
 } from "@aws-sdk/client-cloudfront";
 import { PutObjectCommand, S3Client } from "@aws-sdk/client-s3";
 
-const bucket = "bjornf.dev-uploads";
+const bucket = "bjoernf.com-uploads";
 const region = "eu-west-2";
 const cfDist = "EP23KDGK9RC0N";
 
