@@ -1,7 +1,4 @@
 ---
-import ControlPoint from "@/images/icons/ControlPoint.svg?raw";
-import Loyalty from "@/images/icons/Loyalty.svg?raw";
-import Subtitles from "@/images/icons/Subtitles.svg?raw";
 import { getDb } from "@/utils/database";
 import { ObjectId } from "mongodb";
 import Layout from "@/layouts/Layout.astro";
@@ -9,6 +6,7 @@ import Layout from "@/layouts/Layout.astro";
 import { ensureAuth } from "@/utils/auth";
 import PostView from "@/components/PostView.astro";
 import Button from "@/components/Button.astro";
+import type { PostInner } from "@/utils/models";
 
 try {
   await ensureAuth(Astro.cookies.get("token")?.value);
@@ -28,7 +26,7 @@ if (!post) {
   });
 }
 
-const data = post.draft ?? post.published; // backwards compat
+const data = post.draft ?? post.published ?? ({} as PostInner); // backwards compat
 ---
 
 <Layout title="Preview">
