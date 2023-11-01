@@ -44,6 +44,10 @@ export const request = async <URL extends keyof Endpoints>(
     if (body instanceof FormData) {
       options.body = body;
     } else {
+      options.headers = {
+        ...(options.headers || {}),
+        "Content-Type": "application/json",
+      };
       options.body = JSON.stringify(body);
     }
   }

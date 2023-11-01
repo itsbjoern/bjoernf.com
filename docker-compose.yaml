@@ -7,8 +7,8 @@ services:
     environment:
       PORT: 80
       VIRTUAL_PORT: 80
-      VIRTUAL_HOST: web.bjoernf.com
-      LETSENCRYPT_HOST: web.bjoernf.com
+      VIRTUAL_HOST: bjoernf.com,web.bjoernf.com
+      LETSENCRYPT_HOST: bjoernf.com,web.bjoernf.com
     networks:
       - nginx-proxy
     restart: unless-stopped
