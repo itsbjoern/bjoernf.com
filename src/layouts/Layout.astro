@@ -97,10 +97,12 @@ for (const post of posts) {
 <script>
   // @ts-ignore
   import * as ackeeTracker from "ackee-tracker";
-  ackeeTracker.create("https://dashboard.bjoernf.com", {
-    ignoreLocalhost: true,
-    detailed: true,
-  });
+  ackeeTracker
+    .create("https://dashboard.bjoernf.com", {
+      ignoreLocalhost: true,
+      detailed: true,
+    })
+    .record("b047640d-67e7-4545-9fef-515886c30ff0");
 </script>
 <style is:global>
   :root {
