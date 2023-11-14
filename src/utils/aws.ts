@@ -40,13 +40,16 @@ const cf = new CloudFront({
 });
 
 export const invalidateCache = async (path: string) => {
+  if (import.meta.env.DEV) {
+    return;
+  }
   await cf.send(
     new CreateInvalidationCommand({
       DistributionId: cfDist,
       InvalidationBatch: {
         Paths: {
-          Quantity: 2,
-          Items: ["/", path],
+          Quantity: 3,
+          Items: ["/", "/rss*", path],
         },
         CallerReference: "astro-dist",
       },

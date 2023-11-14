@@ -1,4 +1,5 @@
 import { SecureEndpoint, APIError } from "@/pages/api/_def";
+import { invalidateCache } from "@/utils/aws";
 import { getDb } from "@/utils/database";
 import type { Post } from "@/utils/models";
 import { ObjectId, type WithId } from "mongodb";
@@ -47,6 +48,8 @@ export const POST = SecureEndpoint<PublishRequestBody, PublishReturnData>(
     const post = await database
       .posts()
       .findOneAndUpdate({ _id: hasPost._id }, { $set: theUpdate });
+
+    await invalidateCache(`/blog/${hasPost._id}`);
 
     return {
       post: post!,
