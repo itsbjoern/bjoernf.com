@@ -1,0 +1,14 @@
+version: "3.9"
+services:
+  web:
+    build: .
+    ports:
+      - 4321:4321
+    environment:
+      HOST: 0.0.0.0
+      PORT: 4321
+      MONGO_URL: mongodb://host.docker.internal:27017
+      MONGO_DATABASE: bfriedrichs
+      JWT_SECRET: secret
+
+    restart: unless-stopped
