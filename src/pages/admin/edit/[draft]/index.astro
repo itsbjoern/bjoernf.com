@@ -38,6 +38,7 @@ const data = post.draft ?? post.published; // backwards compat
   <div id="edit-wrapper" data-post={post._id}>
     <div class="flex flex-row gap-2">
       <div class="image-container">
+        <div class="loading-text">Loading</div>
         <input type="file" id="image-input" hidden />
         {
           data?.image ? (
@@ -120,12 +121,42 @@ const data = post.draft ?? post.published; // backwards compat
     width: 120px;
     height: 120px;
     background-color: gray;
+    cursor: pointer;
+  }
+
+  .image-container {
+    position: relative;
+
+    .loading-text {
+      font-size: 1.5em;
+      position: absolute;
+      top: 40px;
+      right: 0;
+      bottom: 0;
+      left: 20px;
+    }
+  }
+
+  .image-container:not(.loading) {
+    .loading-text {
+      display: none;
+    }
+  }
+
+  .image-container.loading {
+    .image-button {
+      opacity: 0.5;
+    }
   }
 
   .image-button {
     object-fit: cover;
     width: 120px;
     height: 120px;
+
+    &:hover {
+      opacity: 0.5;
+    }
   }
 
   .tag-chooser {
@@ -224,18 +255,22 @@ const data = post.draft ?? post.published; // backwards compat
   });
 
   const imageButton = document.querySelector(".image-button");
-  const input = document.getElementById("image-input") as HTMLInputElement;
+  const imageUploadElement = document.getElementById(
+    "image-input",
+  ) as HTMLInputElement;
   imageButton?.addEventListener("click", async (e) => {
-    input.click();
+    imageUploadElement.click();
   });
-  input.addEventListener("change", async (e) => {
-    const file = input.files?.[0];
+  imageUploadElement.addEventListener("change", async (e) => {
+    const file = imageUploadElement.files?.[0];
     if (!file) {
       return;
     }
+    imageUploadElement.parentElement?.classList.add("loading");
     const formData = new FormData() as UploadFormData;
     formData.append("image", file);
     const result = await POST(`/api/${postId}/upload`, formData);
+    imageUploadElement.parentElement?.classList.remove("loading");
     if (!result.success) {
       return;
     }

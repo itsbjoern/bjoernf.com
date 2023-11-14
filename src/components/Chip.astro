@@ -28,7 +28,7 @@ const Wrapped = to ? "a" : "div";
   <Wrapped
     class:list={["container", clickable && "clickable"]}
     href={to ? to : undefined}
-    target={to ? "_blank" : undefined}
+    target={!to?.startsWith("/") ? "_blank" : undefined}
   >
     {icon ? <Icon icon={icon} /> : null}
     <span>{label}</span>
