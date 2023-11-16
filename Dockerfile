@@ -18,10 +18,12 @@ RUN bun run build
 FROM base AS release
 COPY --from=install /temp/prod/node_modules node_modules
 COPY --from=prerelease /usr/src/app/dist .
+COPY assets /usr/src/app/assets
 
 USER bun
 ENV HOST=0.0.0.0
 ENV PORT=80
+ENV FONTCONFIG_PATH /user/src/app/assets
 EXPOSE 80/tcp
 
 CMD ["bun", "run", "--bun", "server/entry.mjs"]

@@ -42,7 +42,6 @@ export const GET: APIRoute = async ({ request, url }) => {
     text: {
       text: `"${title}"`,
       font: "Inter",
-      fontfile: Inter,
       dpi: 500,
       width: 750,
       align: "center",
