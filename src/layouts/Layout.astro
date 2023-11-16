@@ -40,7 +40,11 @@ for (const post of posts) {
       name="og:description"
       content={description}
     />
-    <meta prefix="og: http://ogp.me/ns#" name="og:image" content={image} />
+    <meta
+      prefix="og: http://ogp.me/ns#"
+      name="og:image"
+      content={Astro.url + image}
+    />
     <meta prefix="og: http://ogp.me/ns#" name="og:type" content="website" />
     <meta
       name="description"
