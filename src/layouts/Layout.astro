@@ -30,32 +30,19 @@ for (const post of posts) {
 <html lang="en">
   <head>
     <meta charset="UTF-8" />
-    <meta
-      prefix="og: http://ogp.me/ns#"
-      name="og:title"
-      content={`${title} | Björn Friedrichs`}
-    />
-    <meta
-      prefix="og: http://ogp.me/ns#"
-      name="og:description"
-      content={description}
-    />
-    <meta
-      prefix="og: http://ogp.me/ns#"
-      name="og:image"
-      content={Astro.url.origin + image}
-    />
-    <meta prefix="og: http://ogp.me/ns#" name="og:type" content="website" />
+    <meta name="og:title" content={`${title} | Björn Friedrichs`} />
+    <meta name="og:description" content={description} />
+    <meta name="og:image" content={Astro.url.origin + image} />
+    <meta name="og:type" content="website" />
     <meta
       name="description"
       content={description ?? "Personal website and blog by Björn Friedrichs"}
     />
-    <meta prefix="og: http://ogp.me/ns#" name="og:url" content={Astro.url} />
-    <meta
-      prefix="og: http://ogp.me/ns#"
-      name="og:site_name"
-      content="Björn Friedrichs"
-    />
+    <meta name="og:url" content={Astro.url} />
+    <meta name="og:site_name" content="Björn Friedrichs" />
+    <meta name="twitter:card" content="summary_large_image" />
+    <meta name="twitter:site" content="@bjoernf_dev" />
+    <meta name="twitter:image" content={Astro.url.origin + image} />
     <link
       rel="alternate"
       type="application/rss+xml"
