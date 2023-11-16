@@ -1,5 +1,4 @@
 import type { APIRoute } from "astro";
-import Inter from "src/assets/Inter-Regular.ttf?url";
 import sharp from "sharp";
 
 export const GET: APIRoute = async ({ request, url }) => {
