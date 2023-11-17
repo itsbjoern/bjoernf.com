@@ -40,7 +40,7 @@ export const GET: APIRoute = async ({ request, url }) => {
   const sharpTitleImage = await sharp({
     text: {
       text: `"${title}"`,
-      font: "Inter",
+      font: "Roboto",
       dpi: 500,
       width: 750,
       align: "center",

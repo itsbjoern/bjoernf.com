@@ -1,6 +1,12 @@
 FROM oven/bun:1.0.11 as base
 WORKDIR /usr/src/app
 
+
+FROM base as fonts
+RUN apt-get update
+RUN apt-get -y install fontconfig fonts-roboto
+RUN fc-cache -fv
+
 FROM base AS install
 RUN mkdir -p /temp/prod
 COPY package.json bun.lockb /temp/prod/
@@ -18,12 +24,12 @@ RUN bun run build
 FROM base AS release
 COPY --from=install /temp/prod/node_modules node_modules
 COPY --from=prerelease /usr/src/app/dist .
-COPY assets /usr/src/app/assets
+COPY --from=fonts /usr/share/fonts /usr/share/fonts
+COPY --from=fonts /etc/fonts /etc/fonts
 
 USER bun
 ENV HOST=0.0.0.0
 ENV PORT=80
-ENV FONTCONFIG_PATH /user/src/app/assets
 EXPOSE 80/tcp
 
 CMD ["bun", "run", "--bun", "server/entry.mjs"]
