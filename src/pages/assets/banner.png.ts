@@ -70,7 +70,7 @@ export const GET: APIRoute = async ({ request, url }) => {
       text: {
         text: subtitle,
         font: "Roboto",
-        dpi: 150,
+        dpi: 250,
         width: 750,
         align: "left",
         rgba: true,
@@ -85,7 +85,7 @@ export const GET: APIRoute = async ({ request, url }) => {
     text: {
       text: '<span foreground="#ddd">Björn Friedrichs</span>',
       font: "Roboto",
-      dpi: 175,
+      dpi: 200,
       width: 750,
       align: "left",
       rgba: true,
@@ -128,7 +128,7 @@ export const GET: APIRoute = async ({ request, url }) => {
         ? [
             {
               input: subtitleBuffer,
-              top: Math.round(630 / 2 - titleMeta.height! - 20),
+              top: Math.round(630 / 2 - titleMeta.height! / 2 - 75),
               left: 400 + Math.round(800 / 2 - subtitleMeta!.width! / 2),
             },
           ]
