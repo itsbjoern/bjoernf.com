@@ -66,4 +66,9 @@
     border-top: 2px solid rgba(13, 13, 13, 0.1);
     margin: 1.5rem 0;
   }
+
+  a {
+    color: var(--tw-color-primary);
+    text-decoration: underline;
+  }
 }
