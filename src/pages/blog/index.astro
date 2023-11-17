@@ -6,15 +6,13 @@ import Layout from "@/layouts/Layout.astro";
 import type { Filter } from "mongodb";
 import type { Post } from "@/utils/models";
 import TextField from "@/components/TextField.astro";
+import Tag from "@/components/Tag.astro";
+import Chip from "@/components/Chip.astro";
 
 const query: Filter<Post> = { published: { $exists: true } };
-const search = Astro.url.searchParams.get("search");
-if (search) {
-  query.$or = [
-    { "published.title": { $regex: search, $options: "i" } },
-    { "published.content": { $regex: search, $options: "i" } },
-    { "published.tags": search },
-  ];
+const tag = Astro.url.searchParams.get("tag");
+if (tag) {
+  query["published.tags"] = tag;
 }
 
 const database = await getDb();
@@ -22,17 +20,32 @@ const posts = await database
   .posts()
   .find(query, { projection: { published: 1, createdAt: 1 } })
   .sort({ "published.publishedAt": -1 });
+
+const allPosts = await database
+  .posts()
+  .find({ published: { $exists: true } })
+  .toArray();
+const uniqueTags = new Set<string>();
+for (const post of allPosts) {
+  for (const tag of post.published?.tags ?? []) {
+    uniqueTags.add(tag);
+  }
+}
 ---
 
 <Layout title="Blog">
   <div class="flex flex-col">
-    <div class="flex justify-end">
-      <TextField
-        id="search-input"
-        label="Search"
-        value={search ?? undefined}
-        icon={SearchIcon}
-      />
+    <div class="flex justify-end gap-2">
+      {
+        Array.from(uniqueTags).map((tagName) => (
+          <Tag
+            reset={tag === tagName}
+            deletable={tag === tagName}
+            variant={tag === tagName ? "contained" : "outlined"}
+            name={tagName}
+          />
+        ))
+      }
     </div>
     <div class="flex flex-col">
       {posts.map((p) => <PostItem post={p} />)}

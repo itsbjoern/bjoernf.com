@@ -1,6 +1,6 @@
 ---
 import Icon from "./Icon.astro";
-import Delete from "@/images/icons/Delete.svg?raw";
+import Clear from "@/images/icons/Clear.svg?raw";
 
 interface Props {
   variant?: "contained" | "outlined" | "text";
@@ -32,7 +32,7 @@ const Wrapped = to ? "a" : "div";
   >
     {icon ? <Icon icon={icon} /> : null}
     <span>{label}</span>
-    {deletable ? <Icon icon={Delete} class="delete-icon" /> : null}
+    {deletable ? <Icon icon={Clear} class="delete-icon" /> : null}
   </Wrapped>
 </div>
 

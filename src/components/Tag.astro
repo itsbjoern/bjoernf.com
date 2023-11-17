@@ -4,16 +4,24 @@ import Chip from "./Chip.astro";
 interface Props {
   name: string;
   deletable?: boolean;
+  reset?: boolean;
   class?: string;
+  variant?: "contained" | "outlined";
 }
 
-const { name, class: className, deletable } = Astro.props;
+const {
+  name,
+  class: className,
+  deletable,
+  reset,
+  variant = "contained",
+} = Astro.props;
 ---
 
 <Chip
-  variant="contained"
-  to={deletable ? undefined : `/blog?search=${name}`}
-  deletable={deletable}
+  variant={variant}
+  to={deletable ? (reset ? "/blog" : undefined) : `/blog?tag=${name}`}
+  deletable={deletable || reset}
   clickable
   class:list={["-mt-1", "!text-xs", className, deletable && "deletable"]}
   label={name}
