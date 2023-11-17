@@ -6,13 +6,14 @@ import Icon from "../Icon.astro";
 interface Props {
   text?: string;
   href: string;
+  rel?: string;
 }
 
-const { text, href } = Astro.props;
+const { text, href, rel } = Astro.props;
 const isExternal = href.slice(0, 1) !== "/";
 ---
 
-<LinkRender external={isExternal} href={href}>
+<LinkRender external={isExternal} href={href} rel={rel}>
   {` ${text || href}`}
   {
     isExternal ? (

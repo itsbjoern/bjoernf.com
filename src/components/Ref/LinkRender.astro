@@ -2,9 +2,10 @@
 interface Props {
   external: boolean;
   href: string;
+  rel?: string;
 }
 
-const { href, external } = Astro.props;
+const { href, external, rel = "noreferrer" } = Astro.props;
 ---
 
 {
@@ -12,7 +13,7 @@ const { href, external } = Astro.props;
     <a
       class="inline text-primary underline decoration-primary hover:decoration-orange-200"
       href={href}
-      rel="noreferrer"
+      rel={rel}
       target="_blank"
     >
       <slot />

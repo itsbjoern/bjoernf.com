@@ -10,9 +10,11 @@ import Layout from "@/layouts/Layout.astro";
       <h3 class="text-xl font-bold">How it&apos;s made</h3>
     </span>
     <span>
-      This website is built using React and delivered using{" "}
-      <Ref text="aiohttp" href="https://docs.aiohttp.org/en/stable/" /> and
-      supported by MongoDB. Everything is dockerised and I use this handy
+      This website is built using <Ref
+        text="Astro"
+        href="https://astro.build/"
+      /> and supported by MongoDB. Everything is dockerised and I use this handy
+
       <Ref
         text="Let's Encrypt Companion"
         href="https://github.com/nginx-proxy/acme-companion"
@@ -30,11 +32,10 @@ import Layout from "@/layouts/Layout.astro";
       <h3 class="text-xl font-bold">Privacy / Tracking</h3>
     </span>
     <span>
-      To get information about the behavior of my visitors, I use{" "}
-      <Ref text="Ackee" href="https://ackee.electerious.com" />. This analytics
-      software gives me insight about my visitors only in general, but not about
-      individuals per se, as it does not track visitors and does not store any
-      personal identifiable information.{" "}
+      To get minimal information about my site statistics, I use{" "}
+      <Ref text="Ackee" href="https://ackee.electerious.com" />. I self host
+      this analytics package to gives me insight into the generated traffic
+      without storing any personal identifiable information.{" "}
       <Ref
         text="Go to their documentation"
         href="https://docs.ackee.electerious.com/#/docs/Anonymization"
