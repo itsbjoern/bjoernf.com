@@ -144,7 +144,7 @@ export const GET: APIRoute = async ({ request, url }) => {
 
   return new Response(image, {
     headers: {
-      "content-type": "image/webp",
+      "content-type": "image/png",
     },
   });
 };
