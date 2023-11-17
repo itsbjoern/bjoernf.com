@@ -48,8 +48,8 @@ export const invalidateCache = async (path: string) => {
       DistributionId: cfDist,
       InvalidationBatch: {
         Paths: {
-          Quantity: 3,
-          Items: ["/", "/rss*", path],
+          Quantity: 4,
+          Items: ["/", "/rss*", "/assets*", path],
         },
         CallerReference: "astro-dist",
       },

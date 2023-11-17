@@ -8,9 +8,10 @@ interface Props {
   title: string;
   description?: string;
   image?: string;
+  subtitle?: string;
 }
 
-const { title, description = "", image = Me.src } = Astro.props;
+const { title, description = "", image = Me.src, subtitle = "" } = Astro.props;
 
 const database = await getDb();
 const posts = await database
@@ -35,7 +36,9 @@ for (const post of posts) {
     <meta
       name="og:image"
       content={Astro.url.origin +
-        `/banner.webp?title=${encodeURIComponent(title)}&image=${image}`}
+        `/assets/banner.webp?title=${encodeURIComponent(
+          title,
+        )}&image=${image}&subtitle=${subtitle}`}
     />
     <meta name="og:type" content="website" />
     <meta

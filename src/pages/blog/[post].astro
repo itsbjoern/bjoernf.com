@@ -53,7 +53,12 @@ const { image, title, html, tags, summary, publishedAt } = post.published;
 const url = Astro.url.toString();
 ---
 
-<Layout title={title} description={summary} image={image}>
+<Layout
+  title={`"${title}"`}
+  description={summary}
+  image={image}
+  subtitle={`Published ${formatDate(publishedAt!)}`}
+>
   <div class="flex h-auto flex-col">
     <div
       class={`lg:sticky lg:top-4 lg:h-0 lg:w-52 lg:gap-12 lg:translate-x-64 lg:self-end mb-2`}
