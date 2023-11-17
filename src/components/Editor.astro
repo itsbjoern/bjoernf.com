@@ -70,6 +70,7 @@ const menuButtons = (Object.keys(menuIcons) as Array<Extensions>).map(
     import UnderlineExtension from "@tiptap/extension-underline";
     import TextAlignExtension from "@tiptap/extension-text-align";
     import ImageExtension from "@tiptap/extension-image";
+    import LinkExtension from "@tiptap/extension-link";
     import type { Extensions } from "@/pages/blog/types";
     import { POST } from "@/utils/api";
     import { debounce } from "@/utils/debounce";
@@ -88,6 +89,9 @@ const menuButtons = (Object.keys(menuIcons) as Array<Extensions>).map(
         }),
         ImageExtension.configure({
           inline: false,
+        }),
+        LinkExtension.configure({
+          protocols: ["http", "https", "mailto"],
         }),
       ],
       content: editorElement.dataset.html,
