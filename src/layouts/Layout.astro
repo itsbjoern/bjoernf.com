@@ -31,6 +31,18 @@ for (const post of posts) {
 <html lang="en">
   <head>
     <meta charset="UTF-8" />
+    <meta name="title" content={`${title} | Björn Friedrichs`} />
+    <meta name="description" content={description} />
+    <meta
+      name="image"
+      content={Astro.url.origin +
+        `/assets/banner.png?title=${encodeURIComponent(
+          title,
+        )}&image=${encodeURIComponent(image)}&subtitle=${encodeURIComponent(
+          subtitle,
+        )}`}
+    />
+
     <meta name="og:title" content={`${title} | Björn Friedrichs`} />
     <meta name="og:description" content={description} />
     <meta
@@ -38,22 +50,28 @@ for (const post of posts) {
       content={Astro.url.origin +
         `/assets/banner.png?title=${encodeURIComponent(
           title,
-        )}&image=${image}&subtitle=${subtitle}`}
+        )}&image=${encodeURIComponent(image)}&subtitle=${encodeURIComponent(
+          subtitle,
+        )}`}
     />
     <meta name="og:type" content="website" />
-    <meta
-      name="description"
-      content={description ?? "Personal website and blog by Björn Friedrichs"}
-    />
     <meta name="og:url" content={Astro.url} />
-    <meta name="og:site_name" content="Björn Friedrichs" />
+
     <meta name="twitter:card" content="summary_large_image" />
-    <meta name="twitter:site" content="@bjoernf_dev" />
+    <meta name="twitter:url" content={Astro.url} />
+    <meta name="twitter:title" content={`${title} | Björn Friedrichs`} />
+    <meta name="twitter:description" content={description} />
+    <meta name="twitter:creator" content="bjoernf_dev" />
     <meta
       name="twitter:image"
       content={Astro.url.origin +
-        `/banner.png?title=${encodeURIComponent(title)}&image=${image}`}
+        `/assets/banner.png?title=${encodeURIComponent(
+          title,
+        )}&image=${encodeURIComponent(image)}&subtitle=${encodeURIComponent(
+          subtitle,
+        )}`}
     />
+
     <link
       rel="alternate"
       type="application/rss+xml"
