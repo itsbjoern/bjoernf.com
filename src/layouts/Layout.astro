@@ -36,7 +36,7 @@ for (const post of posts) {
     <meta
       name="og:image"
       content={Astro.url.origin +
-        `/assets/banner.webp?title=${encodeURIComponent(
+        `/assets/banner.png?title=${encodeURIComponent(
           title,
         )}&image=${image}&subtitle=${subtitle}`}
     />
@@ -52,7 +52,7 @@ for (const post of posts) {
     <meta
       name="twitter:image"
       content={Astro.url.origin +
-        `/banner.webp?title=${encodeURIComponent(title)}&image=${image}`}
+        `/banner.png?title=${encodeURIComponent(title)}&image=${image}`}
     />
     <link
       rel="alternate"

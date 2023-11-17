@@ -60,7 +60,7 @@ export const GET: APIRoute = async ({ request, url }) => {
     },
   });
   const titleMeta = await sharpTitleImage.metadata();
-  const titleImage = await sharpTitleImage.webp().toBuffer();
+  const titleImage = await sharpTitleImage.png().toBuffer();
 
   const subtitle = params.get("subtitle");
   let subtitleBuffer = null;
@@ -78,7 +78,7 @@ export const GET: APIRoute = async ({ request, url }) => {
     });
 
     subtitleMeta = await subtitleImage.metadata();
-    subtitleBuffer = await subtitleImage.webp().toBuffer();
+    subtitleBuffer = await subtitleImage.png().toBuffer();
   }
 
   const cr = await sharp({
@@ -91,10 +91,10 @@ export const GET: APIRoute = async ({ request, url }) => {
       rgba: true,
     },
   })
-    .webp()
+    .png()
     .toBuffer();
 
-  const gradient = await sharp(Buffer.from(svg)).webp().toBuffer();
+  const gradient = await sharp(Buffer.from(svg)).png().toBuffer();
 
   const sidebar = await sharp({
     create: {
@@ -104,7 +104,7 @@ export const GET: APIRoute = async ({ request, url }) => {
       background: { r: 0, g: 0, b: 0 },
     },
   })
-    .webp()
+    .png()
     .toBuffer();
 
   const image = await sharp({
@@ -139,7 +139,7 @@ export const GET: APIRoute = async ({ request, url }) => {
         left: 50,
       },
     ])
-    .webp()
+    .png()
     .toBuffer();
 
   return new Response(image, {
