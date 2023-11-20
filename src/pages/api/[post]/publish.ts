@@ -41,7 +41,8 @@ export const POST = SecureEndpoint<PublishRequestBody, PublishReturnData>(
         ...hasPost.draft,
         summary,
         version: (hasPost.published?.version ?? 0) + 1,
-        publishedAt: new Date(),
+        updatedAt: new Date(),
+        publishedAt: hasPost.published?.publishedAt ?? new Date(),
       },
     };
 
