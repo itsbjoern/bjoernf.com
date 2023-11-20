@@ -43,15 +43,9 @@ const objectToGetParams = (object: Record<string, string | undefined>) => {
 };
 
 export const linkedinLink = (input: TemplateProps) => {
-  const templated = template({ type: "linkedin", ...input });
   return (
-    "https://linkedin.com/shareArticle" +
-    objectToGetParams({
-      url: input.url + "?source=linkedin",
-      mini: "true",
-      title: input.title,
-      summary: templated,
-    })
+    "https://www.linkedin.com/sharing/share-offsite/?url=" +
+    encodeURIComponent(input.url)
   );
 };
 
@@ -74,12 +68,12 @@ export const whatsappLink = (input: TemplateProps, mobile: boolean) => {
   );
 };
 
-export const twitterLink = (input: TemplateProps) => {
-  // const _body = template({ type: 'twitter', ...input });
+export const xComLink = (input: TemplateProps) => {
+  // const _body = template({ type: 'x.com', ...input });
   return (
-    "https://twitter.com/share" +
+    "https://x.com/share" +
     objectToGetParams({
-      url: input.url + "?source=twitter",
+      url: input.url + "?source=x.com",
       text: input.title,
       hashtags: input.tags?.length > 0 ? input.tags.join(",") : undefined,
       related: undefined,

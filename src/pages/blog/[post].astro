@@ -6,15 +6,10 @@ import ShareIcon from "@/components/ShareIcon.astro";
 
 import EmailIcon from "@/images/icons/share/EmailIcon.svg?raw";
 import LinkedinIcon from "@/images/icons/share/LinkedinIcon.svg?raw";
-import TwitterIcon from "@/images/icons/share/TwitterIcon.svg?raw";
+import XComIcon from "@/images/icons/share/XComIcon.svg?raw";
 import WhatsappIcon from "@/images/icons/share/WhatsappIcon.svg?raw";
 
-import {
-  emailLink,
-  linkedinLink,
-  whatsappLink,
-  twitterLink,
-} from "@/utils/share";
+import { emailLink, linkedinLink, whatsappLink, xComLink } from "@/utils/share";
 import { formatDate } from "@/utils/formatDate";
 
 import { ensureAuth } from "@/utils/auth";
@@ -79,8 +74,8 @@ const url = Astro.url.toString();
         />
         <ShareIcon
           size={45}
-          icon={TwitterIcon}
-          href={twitterLink({ title, url, tags })}
+          icon={XComIcon}
+          href={xComLink({ title, url, tags })}
         />
       </div>
     </div>
