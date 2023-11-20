@@ -72,4 +72,9 @@
     color: var(--tw-color-primary);
     text-decoration: underline;
   }
+
+  a:hover {
+    text-decoration-thickness: 1px;
+    text-underline-offset: 1px;
+  }
 }
