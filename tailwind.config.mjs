@@ -7,7 +7,7 @@ export default {
         default: '#f1f1f1',
         paper: '#f5f5f5',
         offset: '#778DA9',
-        primary: '#FF570A',
+        primary: '#316466',
         secondary: '#381D2A',
       },
       screens: {
