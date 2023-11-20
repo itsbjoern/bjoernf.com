@@ -34,7 +34,6 @@
     "tailwindcss": "^3.3.3"
   },
   "devDependencies": {
-    "@types/ackee-tracker": "^5.0.4",
     "@types/bcryptjs": "^2.4.5",
     "@types/jsonwebtoken": "^9.0.4",
     "@types/react": "^18.2.31",
