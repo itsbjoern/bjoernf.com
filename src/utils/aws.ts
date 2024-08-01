@@ -51,7 +51,7 @@ export const invalidateCache = async (path: string) => {
           Quantity: 4,
           Items: ["/", "/rss*", "/assets*", path],
         },
-        CallerReference: "astro-dist",
+        CallerReference: new Date().toISOString(),
       },
     }),
   );
