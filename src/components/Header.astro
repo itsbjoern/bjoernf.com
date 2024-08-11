@@ -16,7 +16,7 @@ import Button from "./Button.astro";
 const isLoggedIn = Astro.cookies.has("token");
 ---
 
-<div class="neo flex flex-col gap-4 rounded-b-xl bg-paper p-6">
+<div class="neo flex flex-col gap-4 rounded-b-md bg-paper p-6">
   <div class="flex items-center justify-between">
     <div class="flex flex-row items-center">
       <img
@@ -83,14 +83,14 @@ const isLoggedIn = Astro.cookies.has("token");
       <Chip
         clickable
         icon={GithubIcon}
-        to="https://github.com/BFriedrichs"
-        label="BFriedrichs"
+        to="https://github.com/itsbjoern"
+        label="itsbjoern"
       />
       <Chip
         clickable
         icon={XComIcon}
-        to="https://x.com/bjoernf_dev"
-        label="bjoernf_dev"
+        to="https://x.com/itsbjoern"
+        label="itsbjoern"
       />
     </div>
   </div>

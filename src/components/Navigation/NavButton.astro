@@ -10,7 +10,7 @@ interface Props {
 const { icon, label, to, selected } = Astro.props;
 ---
 
-<a class:list={["nav-action", selected && "selected"]} href={to}>
+<a class:list={["nav-action", "rounded-md", selected && "selected"]} href={to}>
   <Icon icon={icon} class="svg" />
   <span>{label}</span>
 </a>
@@ -29,7 +29,6 @@ const { icon, label, to, selected } = Astro.props;
     outline: 0;
     border: 0;
     margin: 0;
-    border-radius: 0;
     padding: 0;
     cursor: pointer;
     user-select: none;
