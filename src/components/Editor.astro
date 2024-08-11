@@ -71,6 +71,7 @@ const menuButtons = (Object.keys(menuIcons) as Array<Extensions>).map(
     import TextAlignExtension from "@tiptap/extension-text-align";
     import ImageExtension from "@tiptap/extension-image";
     import LinkExtension from "@tiptap/extension-link";
+    import ImageResize from "tiptap-extension-resize-image";
     import type { Extensions } from "@/pages/blog/types";
     import { POST } from "@/utils/api";
     import { debounce } from "@/utils/debounce";
@@ -83,6 +84,7 @@ const menuButtons = (Object.keys(menuIcons) as Array<Extensions>).map(
       element: editorElement,
       extensions: [
         StarterKit,
+        ImageResize,
         UnderlineExtension,
         TextAlignExtension.configure({
           types: ["heading", "paragraph"],

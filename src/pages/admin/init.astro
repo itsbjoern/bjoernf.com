@@ -6,9 +6,11 @@ const database = await getDb();
 const user = await database.users().findOne();
 
 if (!user) {
-  const password = await generatePasswordHash(process.env.MONGO_USER_PASSWORD!);
+  const password = await generatePasswordHash(
+    import.meta.env.MONGO_USER_PASSWORD!,
+  );
   await database.users().insertOne({
-    username: process.env.ADMIN_USERNAME!,
+    username: import.meta.env.ADMIN_USERNAME!,
     password,
     createdAt: new Date(),
   });
