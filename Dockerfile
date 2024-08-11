@@ -1,8 +1,8 @@
-FROM oven/bun:1.0.11 as base
+FROM oven/bun:1.0.11 AS base
 WORKDIR /usr/src/app
 
 
-FROM base as fonts
+FROM base AS fonts
 RUN apt-get update
 RUN apt-get -y install fontconfig fonts-roboto
 RUN fc-cache -fv
