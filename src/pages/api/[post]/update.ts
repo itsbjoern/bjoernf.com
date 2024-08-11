@@ -41,6 +41,9 @@ export const POST = SecureEndpoint<UpdateRequestBody, UpdateReturnData>(
       ...Object.fromEntries(
         Object.entries(data).map(([key, value]) => [`draft.${key}`, value]),
       ),
+      "draft.summary": data.text
+        ? data.text.split(".").slice(0, 3).join(".") + "."
+        : "",
     };
 
     const post = await database
