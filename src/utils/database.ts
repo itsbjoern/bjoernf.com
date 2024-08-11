@@ -7,7 +7,7 @@ class Database {
 
   async connect() {
     if (!this.connection) {
-      this.connection = MongoClient.connect(import.meta.env.MONGO_URL!, {
+      this.connection = MongoClient.connect(process.env.MONGO_URL!, {
         serverApi: {
           version: ServerApiVersion.v1,
           strict: true,
@@ -17,7 +17,7 @@ class Database {
     }
 
     const client = await this.connection;
-    this.db = client.db(import.meta.env.MONGO_DATABASE!);
+    this.db = client.db(process.env.MONGO_DATABASE!);
     return this;
   }
 

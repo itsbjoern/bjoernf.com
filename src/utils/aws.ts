@@ -11,8 +11,8 @@ const cfDist = "EP23KDGK9RC0N";
 const s3 = new S3Client({
   region,
   credentials: {
-    accessKeyId: import.meta.env.AWS_ACCESS_KEY!,
-    secretAccessKey: import.meta.env.AWS_SECRET_KEY!,
+    accessKeyId: process.env.AWS_ACCESS_KEY!,
+    secretAccessKey: process.env.AWS_SECRET_KEY!,
   },
 });
 
@@ -34,8 +34,8 @@ export const uploadFile = async (
 const cf = new CloudFront({
   region,
   credentials: {
-    accessKeyId: import.meta.env.AWS_ACCESS_KEY!,
-    secretAccessKey: import.meta.env.AWS_SECRET_KEY!,
+    accessKeyId: process.env.AWS_ACCESS_KEY!,
+    secretAccessKey: process.env.AWS_SECRET_KEY!,
   },
 });
 
