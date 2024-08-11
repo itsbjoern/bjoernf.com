@@ -41,11 +41,11 @@ export const POST = SecureEndpoint<UploadRequestBody, UploadReturnData>(
       const imageBuffer = await data.arrayBuffer();
       resized = await sharp(imageBuffer)
         .resize({
-          width: 300,
-          height: 300,
+          width: 500,
+          height: 500,
           fit: "inside",
         })
-        .jpeg({ quality: 80 })
+        .jpeg({ quality: 95 })
         .toBuffer();
     } catch {
       throw new APIError(400, "Unsupported image type");
