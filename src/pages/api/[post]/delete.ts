@@ -22,7 +22,11 @@ export const POST = SecureEndpoint<DeleteRequestBody, DeleteReturnData>(
 
     await database.posts().deleteOne({ _id: hasPost._id });
 
-    await invalidateCache(`/blog/${hasPost._id}`);
+    const paths = [`/blog/${hasPost._id}`];
+    if (hasPost.published?.slug) {
+      paths.push(`/blog/${hasPost.published.slug}`);
+    }
+    await invalidateCache(paths);
 
     return {
       postId: postId ?? "",

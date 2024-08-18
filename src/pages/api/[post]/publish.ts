@@ -57,7 +57,11 @@ export const POST = SecureEndpoint<PublishRequestBody, PublishReturnData>(
       .posts()
       .findOneAndUpdate({ _id: hasPost._id }, { $set: theUpdate });
 
-    await invalidateCache(`/blog/${hasPost._id}`);
+    const paths = [`/blog/${hasPost._id}`];
+    if (hasPost.published?.slug) {
+      paths.push(`/blog/${hasPost.published.slug}`);
+    }
+    await invalidateCache(paths);
 
     return {
       post: post!,

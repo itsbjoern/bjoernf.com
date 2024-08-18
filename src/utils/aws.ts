@@ -39,7 +39,7 @@ const cf = new CloudFront({
   },
 });
 
-export const invalidateCache = async (path: string) => {
+export const invalidateCache = async (paths: Array<string>) => {
   if (import.meta.env.DEV) {
     return;
   }
@@ -48,8 +48,8 @@ export const invalidateCache = async (path: string) => {
       DistributionId: cfDist,
       InvalidationBatch: {
         Paths: {
-          Quantity: 4,
-          Items: ["/", "/rss*", "/assets*", path],
+          Quantity: 4 + paths.length,
+          Items: ["/", "/rss*", "/assets*", "/blog", ...paths],
         },
         CallerReference: new Date().toISOString(),
       },
