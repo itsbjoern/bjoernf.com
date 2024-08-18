@@ -17,6 +17,7 @@ import Icon from "@/components/Icon.astro";
 import type { Extensions } from "@/pages/blog/types";
 
 import "@/content.css";
+import "@/highlight.css";
 
 interface Props {
   postId: string;
@@ -71,7 +72,10 @@ const menuButtons = (Object.keys(menuIcons) as Array<Extensions>).map(
     import TextAlignExtension from "@tiptap/extension-text-align";
     import ImageExtension from "@tiptap/extension-image";
     import LinkExtension from "@tiptap/extension-link";
+    import { CodeBlockLowlight } from "@tiptap/extension-code-block-lowlight";
     import ImageResize from "tiptap-extension-resize-image";
+    import { common, createLowlight } from "lowlight";
+
     import type { Extensions } from "@/pages/blog/types";
     import { POST } from "@/utils/api";
     import { debounce } from "@/utils/debounce";
@@ -79,6 +83,8 @@ const menuButtons = (Object.keys(menuIcons) as Array<Extensions>).map(
 
     const editorElement = document.getElementById("text-editor")!;
     const postId = editorElement.dataset.post!;
+
+    const lowlight = createLowlight(common);
 
     const editorClass = new Editor({
       element: editorElement,
@@ -94,6 +100,9 @@ const menuButtons = (Object.keys(menuIcons) as Array<Extensions>).map(
         }),
         LinkExtension.configure({
           protocols: ["http", "https", "mailto"],
+        }),
+        CodeBlockLowlight.configure({
+          lowlight,
         }),
       ],
       content: editorElement.dataset.html,
