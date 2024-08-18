@@ -24,6 +24,7 @@
     "ackee-tracker": "^5.1.0",
     "astro": "^3.3.2",
     "bcryptjs": "^2.4.3",
+    "hast-util-to-html": "^9.0.1",
     "jsonwebtoken": "^9.0.2",
     "lowlight": "^3.1.0",
     "mongodb": "^6.2.0",

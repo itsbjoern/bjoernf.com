@@ -75,6 +75,7 @@ const menuButtons = (Object.keys(menuIcons) as Array<Extensions>).map(
     import { CodeBlockLowlight } from "@tiptap/extension-code-block-lowlight";
     import ImageResize from "tiptap-extension-resize-image";
     import { common, createLowlight } from "lowlight";
+    import { toHtml } from "hast-util-to-html";
 
     import type { Extensions } from "@/pages/blog/types";
     import { POST } from "@/utils/api";
@@ -89,19 +90,41 @@ const menuButtons = (Object.keys(menuIcons) as Array<Extensions>).map(
     const editorClass = new Editor({
       element: editorElement,
       extensions: [
-        StarterKit,
-        ImageResize,
+        StarterKit.configure({
+          codeBlock: false,
+        }),
+        ImageResize.configure({
+          inline: false,
+        }),
         UnderlineExtension,
         TextAlignExtension.configure({
           types: ["heading", "paragraph"],
         }),
-        ImageExtension.configure({
-          inline: false,
-        }),
         LinkExtension.configure({
           protocols: ["http", "https", "mailto"],
         }),
-        CodeBlockLowlight.configure({
+        CodeBlockLowlight.extend({
+          renderHTML({ node, HTMLAttributes }) {
+            let gen = node.attrs.language
+              ? lowlight.highlight(node.attrs.language, node.textContent, {})
+              : lowlight.highlightAuto(node.textContent);
+
+            const pre = document.createElement("pre");
+            for (let key in HTMLAttributes) {
+              pre.setAttribute(key, HTMLAttributes[key]);
+            }
+            let code = document.createElement("code");
+            if (node.attrs.language) {
+              code.classList.add(
+                this.options.languageClassPrefix + node.attrs.language,
+              );
+            }
+            pre.appendChild(code);
+            code.innerHTML = toHtml(gen);
+
+            return pre;
+          },
+        }).configure({
           lowlight,
         }),
       ],
