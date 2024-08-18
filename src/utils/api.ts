@@ -4,6 +4,7 @@ import type { UploadEndpoint } from "@/pages/api/[post]/upload";
 import type { UpdateEndpoint } from "@/pages/api/[post]/update";
 import type { PublishEndpoint } from "@/pages/api/[post]/publish";
 import type { UnpublishEndpoint } from "@/pages/api/[post]/unpublish";
+import type { DeleteEndpoint } from "@/pages/api/[post]/delete";
 
 type RawEndpoints = {
   "/api/login": LoginEndpoint;
@@ -12,6 +13,7 @@ type RawEndpoints = {
   [key: `/api/${string}/update`]: UpdateEndpoint;
   [key: `/api/${string}/publish`]: PublishEndpoint;
   [key: `/api/${string}/unpublish`]: UnpublishEndpoint;
+  [key: `/api/${string}/delete`]: DeleteEndpoint;
 };
 
 type Endpoints = {

@@ -11,6 +11,7 @@ export type PostInner = {
   html: string;
   text: string;
   image?: string;
+  slug?: string;
   publishedAt?: Date;
   version?: number;
 };

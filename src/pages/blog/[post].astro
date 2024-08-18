@@ -32,8 +32,16 @@ try {
 
 const { post: postId } = Astro.params;
 
+let query = null;
+try {
+  // If not object id, then it's a slug
+  query = { _id: new ObjectId(postId) };
+} catch {
+  query = { "published.slug": postId };
+}
+
 const database = await getDb();
-const post = await database.posts().findOne({ _id: new ObjectId(postId) });
+const post = await database.posts().findOne(query);
 
 if (!post || !post?.published) {
   return new Response(null, {
@@ -84,7 +92,7 @@ const url = Astro.url.toString();
   {
     user ? (
       <div class="flex flex-1 justify-end">
-        <Button id="edit" variant="contained" to={`/admin/edit/${postId}`}>
+        <Button id="edit" variant="contained" to={`/admin/edit/${post._id}`}>
           Edit
         </Button>
       </div>

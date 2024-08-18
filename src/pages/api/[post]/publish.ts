@@ -34,12 +34,19 @@ export const POST = SecureEndpoint<PublishRequestBody, PublishReturnData>(
     }
 
     const summary = hasPost.draft.text.split(".").slice(0, 3).join(".") + ".";
+    const slug = hasPost.draft.title
+      .toLowerCase()
+      .replace(/[^a-z0-9]+/g, "-")
+      .replace(/-+/g, "-")
+      .replace(/^-/, "")
+      .replace(/-$/, "");
 
     const theUpdate = {
       updatedAt: new Date(),
       published: {
         ...hasPost.draft,
         summary,
+        slug: hasPost?.published?.slug ?? slug,
         version: (hasPost.published?.version ?? 0) + 1,
         updatedAt: new Date(),
         publishedAt: hasPost.published?.publishedAt ?? new Date(),
