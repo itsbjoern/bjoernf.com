@@ -12,6 +12,29 @@ interface Props {
 
 const { post } = Astro.props;
 const { image, title, html, tags, summary, publishedAt } = post;
+
+import { common, createLowlight } from "lowlight";
+import { toHtml } from "hast-util-to-html";
+const lowlight = createLowlight(common);
+
+const highlightedCode = html.replaceAll(/<pre>[\s\S]*?<\/pre>/g, (match) => {
+  const code = match.replace(/<pre>|<\/pre>/g, "");
+  const lang = code.match(/language-(\w+)/)?.[1];
+
+  const insideCode = code
+    .replace(/<code[^>]+>|<\/code>/g, "")
+    .replace(/&lt;/g, "<")
+    .replace(/&gt;/g, ">")
+    .replace(/&amp;/g, "&");
+  if (lang) {
+    const highlighted = lowlight.highlight(lang, insideCode);
+    return `<pre><code class="language-${lang}">${toHtml(
+      highlighted,
+    )}</code></pre>`;
+  }
+  const highlighted = lowlight.highlightAuto(insideCode);
+  return `<pre>${toHtml(highlighted)}</pre>`;
+});
 ---
 
 <div class="flex flex-col gap-5">
@@ -42,7 +65,7 @@ const { image, title, html, tags, summary, publishedAt } = post;
     </div>
   </div>
   <div class="post-content">
-    <Fragment set:html={html} />
+    <Fragment set:html={highlightedCode} />
   </div>
 </div>
 
