@@ -22,7 +22,7 @@ const highlightedCode = html.replaceAll(/<pre>[\s\S]*?<\/pre>/g, (match) => {
   const lang = code.match(/language-(\w+)/)?.[1];
 
   const insideCode = code
-    .replace(/<code[^>]+>|<\/code>/g, "")
+    .replace(/<code[^>]*>|<\/code>/g, "")
     .replace(/&lt;/g, "<")
     .replace(/&gt;/g, ">")
     .replace(/&amp;/g, "&");
@@ -33,7 +33,7 @@ const highlightedCode = html.replaceAll(/<pre>[\s\S]*?<\/pre>/g, (match) => {
     )}</code></pre>`;
   }
   const highlighted = lowlight.highlightAuto(insideCode);
-  return `<pre>${toHtml(highlighted)}</pre>`;
+  return `<pre><code>${toHtml(highlighted)}</code></pre>`;
 });
 ---
 
