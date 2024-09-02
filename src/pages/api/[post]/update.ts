@@ -54,7 +54,6 @@ export const POST = SecureEndpoint<UpdateRequestBody, UpdateReturnData>(
     if (hasPost.published?.slug) {
       paths.push(`/blog/${hasPost.published.slug}`);
     }
-    await invalidateCache(paths);
 
     return {
       post: post!,
