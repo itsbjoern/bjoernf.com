@@ -21,7 +21,6 @@
     "@tiptap/extension-underline": "^2.1.12",
     "@tiptap/pm": "^2.1.12",
     "@tiptap/starter-kit": "^2.1.12",
-    "ackee-tracker": "^5.1.0",
     "astro": "^3.3.2",
     "bcryptjs": "^2.4.3",
     "hast-util-to-html": "^9.0.1",
