@@ -5,7 +5,7 @@ import LogoutIcon from "@/images/icons/Logout.svg?raw";
 import AdminPanelSettingsIcon from "@/images/icons/AdminPanelSettings.svg?raw";
 import ArrowCircleUpIcon from "@/images/icons/ArrowCircleUp.svg?raw";
 import GithubIcon from "@/images/icons/GitHub.svg?raw";
-import XComIcon from "@/images/icons/XCom.svg?raw";
+import BlueskyIcon from "@/images/icons/Bluesky.svg?raw";
 
 import Divider from "./Divider.astro";
 import Chip from "./Chip.astro";
@@ -88,9 +88,9 @@ const isLoggedIn = Astro.cookies.has("token");
       />
       <Chip
         clickable
-        icon={XComIcon}
-        to="https://x.com/itsbjoern"
-        label="itsbjoern"
+        icon={BlueskyIcon}
+        to="https://bsky.app/profile/bjoernf.com"
+        label="@bjoernf.com"
       />
     </div>
   </div>

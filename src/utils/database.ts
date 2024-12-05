@@ -16,8 +16,23 @@ class Database {
       });
     }
 
-    const client = await this.connection;
-    this.db = client.db(process.env.MONGO_DATABASE!);
+    try {
+      const client = await this.connection;
+
+      client.on("close", () => {
+        this.connection = undefined;
+        this.db = undefined;
+      });
+
+      client.on("error", () => {
+        this.connection = undefined;
+        this.db = undefined;
+      });
+
+      this.db = client.db(process.env.MONGO_DATABASE!);
+    } catch (err) {
+      throw new Error("Could not connect to the database");
+    }
     return this;
   }
 
