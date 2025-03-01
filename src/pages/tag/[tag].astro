@@ -1,0 +1,76 @@
+---
+import { getCollection } from "astro:content";
+import PostItem from "@/components/PostItem.astro";
+import Layout from "@/layouts/Layout.astro";
+import ClickableTag from "@/components/Tag.astro";
+
+const posts = await getCollection("blog");
+
+const sortedPosts = posts.sort((a, b) => {
+  const aDate = new Date(a.data.createdAt);
+  const bDate = new Date(b.data.createdAt);
+  return bDate.getTime() - aDate.getTime();
+});
+
+const uniqueTags: Array<string> = [];
+for (const post of sortedPosts) {
+  for (const tag of post.data.tags ?? []) {
+    if (!uniqueTags.includes(tag)) {
+      uniqueTags.push(tag);
+    }
+  }
+}
+
+export async function getStaticPaths() {
+  const posts = await getCollection("blog");
+
+  const sortedPosts = posts.sort((a, b) => {
+    const aDate = new Date(a.data.createdAt);
+    const bDate = new Date(b.data.createdAt);
+    return bDate.getTime() - aDate.getTime();
+  });
+
+  const uniqueTags: Array<string> = [];
+  for (const post of sortedPosts) {
+    for (const tag of post.data.tags ?? []) {
+      if (!uniqueTags.includes(tag)) {
+        uniqueTags.push(tag);
+      }
+    }
+  }
+
+  return uniqueTags.map((tag) => {
+    const filteredPosts = posts.filter((p) => p.data.tags.includes(tag));
+
+    return {
+      params: { tag },
+      props: {
+        posts: filteredPosts,
+      },
+    };
+  });
+}
+
+const { tag } = Astro.params;
+const { posts: tagPosts } = Astro.props;
+---
+
+<Layout title="Blog">
+  <div class="flex flex-col">
+    <div class="flex justify-end gap-2 flex-wrap">
+      {
+        Array.from(uniqueTags).map((tagName) => (
+          <ClickableTag
+            reset={tag === tagName}
+            deletable={tag === tagName}
+            variant={tag === tagName ? "contained" : "outlined"}
+            name={tagName}
+          />
+        ))
+      }
+    </div>
+    <div class="flex flex-col">
+      {tagPosts.map((p) => <PostItem post={p} />)}
+    </div>
+  </div>
+</Layout>

@@ -1,0 +1,73 @@
+---
+title: What’s a story point anyway
+summary: "Recently I read an interesting post about story points in agile development titled „Story Point Revisited“ by Ron Jeffries. It made me think about how I feel about them and estimation processes for software development in general. A TL;DR recap"
+image: ./images/post-0009/story.jpg
+tags: [Development]
+slugs: [whats-a-story-point-anyway, 66b7da8eeec5f950c8ad1b13]
+createdAt: 2024-08-11T20:00:00
+published: true
+---
+
+import Ref from "@/components/Ref/Ref.astro";
+import { Image } from "astro:assets";
+import pointsImage from "./images/post-0009/new_points.jpg";
+
+Recently I read an interesting post about story points in agile development titled <Ref text="„Story Point Revisited“" href="https://ronjeffries.com/articles/019-01ff/story-points/Index.html" /> by Ron Jeffries. It made me think about how I feel about them and estimation processes for software development in general.
+
+**A TL;DR recap**
+
+In this article Jeffries critiques the use of story points as a misplaced proxy for just estimating time in the first place. According to him their original inception was driven by the fact that the „ideal“ time of implementation is often distorted by distractions and it led his team to the conclusion that the actual time of work needed often ended up being closer to three times of that ideal. By calling 3 days a „point“ they avoided confusion (what’s a „story day“?) and it was a reasonably straightforward solution when dealing with the problem of encoding difficulty, effort and complexity with the concept of time.
+
+If you are in any way involved with other developers you will have invariably have run into the crowd that absolutely deplores this kind of story point and anything vaguely connected to planning poker sessions. While I always generally accepted that some people have this position, I never quite understood it (or agreed with it for that matter). This post made me appreciate the potential issues with the system better and upon reflection it made me think of some of the key factors that in my opinion make or break story point estimations:
+
+**Do not measure time**
+
+I know, I know. This one seemingly everyone talks about, and in actuality no one does. But I am being serious when I say, before you think of time, think about how difficult a change seems, how many components it touches, how much infrastructure or underlying systems need to change. What is the impact for the user? What are the risks? Are there any wait times, blockers, other team members involved? Any ticket may have dozens of such considerations and any of them may move the time needed to implement by hours or days. How many of those? Most of the time no one really knows and in my opinion this is where story points really shine.
+
+If you think of every single one of those decisions as a sliding scale, e.g. 0-5, and all your team members feel roughly the same about where a task lands on that scale for these decisions, then all of these complexities sum up into one number. I don’t want you to think about this too literally, don’t start pulling out a calculator in your scrum meetings, but rather think about it in a metaphorical sense. I never consider time directly as a factor when I estimate a ticket, the points I estimate will just naturally scale with the complexity of a ticket because of all the encoded decisions, and thus it will take more or less time to complete.
+
+After all, the estimation process is extremely useful as any initial estimation reveals a real insight into every developers thought process which ultimately determines an items difficulty. If there is large discrepancies in estimated points for a ticket here it's a great opportunity to teach or learn about why a change may be more or less problematic than initially thought. In the future these gaps of estimation between team members will almost magically close by themselves, the team grows together and becomes way more "dialled-in" to all the potential factors a change might carry with it.
+
+There is a caveat to this, which is that it only works if quite literally time is not of the essence in terms of your development cycle. In particular I mean, the result of the work has to be more important than the time spent on it. It won’t work if your time worked is tracked against a paying client, instead of you developing a product for your own company where the feature or change is „just“ an inherent value add. If your project needs to be delivered by a certain time, or there is a particularly statistics driven culture around delivering workloads on time then this simply won’t work. If you need to measure time, measure time not story points.
+
+This leads into my next point:
+
+**No comparisons, EVER**
+
+Given my previous philosophy on how I think about story point estimates, I think this one will come at no shock. It simply does not make sense to compare items when they have their story points estimated for vastly different reasons.
+
+Two tickets might have vaguely similar points, but one might be a deeply complex change in a core system, while the other might require long wait times because of trial and error runs in our CI. One or the other may be done considerably faster or slower than the other for should-have-known and/or completely unforeseeable reasons.
+
+Additionally, these points we estimate and assign are invariably a compression over a range. In my opinion this range can by definition not be well defined, the same amount of points can mean very different things if they happen to be on opposite ends of the "acceptable" range for their point estimate. For example, currently we pretty much only estimate 1, 2, 3, 5, or 8 points - anything larger than 8 is practically too large to be considered one unit of work and will be split into smaller tickets. This correlates roughly with "no ticket should take longer than one or two days work". To somewhat break it down:
+
+    1 can be a one line fix or any very small change.
+
+    3 would be probably the most common medium workload that touches multiple files and vaguely changes or adds to a system without requiring a total deep dive.
+
+    8 would be a very large and substantial change, requiring multiple rounds of reviews and rigorous testing.
+
+Now how does it make sense if eight 1-point typo fixes can equal one such substantial change? That’s the neat thing, it doesn’t! The estimation merely suggests how much effort will be funneled into implementing that one change, as such it’s completely independent of any other ticket in your backlog. It’s an estimation for that one workload, and that one workload alone.
+
+You might think that this could not possibly work and that our amount of worked points has to fluctuate wildly. My counterpoint to that would be this graph of weekly points delivered over a period of 6 months, it represents how an average of how many points any single developer would have delivered per week, scaled against the available capacity in the team (to account for leave, hirings, etc.)
+
+<Image src={pointsImage} alt="Weekly points delivered" />
+
+While we do have variation, we keep a fairly consistent level of delivered work week to week. Importantly, we don‘t care about the actual week to week performance because - once again - we don’t compare. It can sometimes be useful to reflect on a particularly „good“ (or bad) week to investigate which tickets have caused such stark deviation. In turn that in itself can act as a great self-fuelling function to get a better feel as a team for what constitutes an easy or hard ticket, and perhaps even more importantly, why it does! It teaches us more about the work we are doing day to day.
+
+**The horror**
+
+With all that being said, this brings us to the seemingly biggest issue with story points that I luckily never had to experience myself. Even just the prospect fills me with dread and therefore I believe I understand some of the issues people have with a point based system.
+
+-> Abusing point estimates for cross-team reports and performance metrics.
+
+This one is a real head scratcher to me, as I had never even considered that there are project managers who may look at story points and then compare the amount of completed points across teams. The mere thought of this seems horrifying at best to me. I have always worked in small companies, the size of developer teams never exceeding the amount of people where you could comfortably have a meeting with everyone in the same room. Even then, the amount of times people have disagreed how hard a ticket would be for one reason or another, and how seemingly arbitrary these reasons sometimes are… I simply cannot fathom how anyone would attend such a meeting and feel like there is any merit in drawing useful comparisons from those metrics.
+
+Do not compare, please.
+
+**Conclusion**
+
+To wrap up, all of this only represents my personal perspective and I cannot assert that all I propose in this post is the only real way to use story point estimations. Software development usually is a highly dynamic process and I imagine that some teams have found ways to work around the exact issues I preach to avoid here. Nevertheless, everything I have learned about this process myself, and the opinions and comments I have read make me believe my conclusions about estimation are generally applicable.
+
+Finally, I truly do believe that utilising story points for agile development cycles can work, but you need a very cohesive team, that has enough agency to deliver work outside of strict deadlines. If accurately tracking or reporting on spent development time and/or increasing a sense of velocity based on completed estimates are important goals to you, I would suggest avoiding story point estimation altogether.
+
+For my current team and frankly, all the teams I have worked in so far, story point estimation never felt like a chore but rather a useful tool. However, I do appreciate the perspective this review has given me.

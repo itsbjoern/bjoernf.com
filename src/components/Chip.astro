@@ -32,7 +32,6 @@ const Wrapped = to ? "a" : "div";
   >
     {icon ? <Icon icon={icon} /> : null}
     <span>{label}</span>
-    {deletable ? <Icon icon={Clear} class="delete-icon" /> : null}
   </Wrapped>
 </div>
 
@@ -68,7 +67,7 @@ const Wrapped = to ? "a" : "div";
     outline: 0px;
     cursor: default;
     text-decoration: none;
-    padding: 3px 0;
+    padding: 4px 0 2px 0;
     vertical-align: middle;
     box-sizing: border-box;
   }

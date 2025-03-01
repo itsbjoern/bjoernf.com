@@ -5,7 +5,7 @@ interface Props {
   rel?: string;
 }
 
-const { href, external, rel = "noreferrer" } = Astro.props;
+const { href, external, rel = "noreferrer noopener" } = Astro.props;
 ---
 
 {

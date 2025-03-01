@@ -2,7 +2,6 @@
 import Footer from "@/components/Footer.astro";
 import Header from "@/components/Header.astro";
 import Navigation from "@/components/Navigation/Navigation.astro";
-import { getDb } from "@/utils/database";
 import Me from "@/images/me.jpg";
 interface Props {
   title: string;
@@ -11,20 +10,7 @@ interface Props {
   subtitle?: string;
 }
 
-const { title, description = "", image = Me.src, subtitle = "" } = Astro.props;
-
-const database = await getDb();
-const posts = await database
-  .posts()
-  .find({ "published.tags": { $exists: 1 } })
-  .toArray();
-
-const uniqueTags = new Set<string>();
-for (const post of posts) {
-  for (const tag of post.published?.tags ?? []) {
-    uniqueTags.add(tag);
-  }
-}
+const { title, description = "", image = Me.src } = Astro.props;
 ---
 
 <!doctype html>
@@ -33,27 +19,11 @@ for (const post of posts) {
     <meta charset="UTF-8" />
     <meta name="title" content={`${title} | Björn Friedrichs`} />
     <meta name="description" content={description} />
-    <meta
-      name="image"
-      content={Astro.url.origin +
-        `/assets/banner.png?title=${encodeURIComponent(
-          title,
-        )}&image=${encodeURIComponent(image)}&subtitle=${encodeURIComponent(
-          subtitle,
-        )}`}
-    />
+    <meta name="image" content={Astro.url.origin + image} />
 
     <meta name="og:title" content={`${title} | Björn Friedrichs`} />
     <meta name="og:description" content={description} />
-    <meta
-      name="og:image"
-      content={Astro.url.origin +
-        `/assets/banner.png?title=${encodeURIComponent(
-          title,
-        )}&image=${encodeURIComponent(image)}&subtitle=${encodeURIComponent(
-          subtitle,
-        )}`}
-    />
+    <meta name="og:image" content={Astro.url.origin + image} />
     <meta name="og:type" content="website" />
     <meta name="og:url" content={Astro.url} />
 
@@ -62,15 +32,7 @@ for (const post of posts) {
     <meta name="twitter:title" content={`${title} | Björn Friedrichs`} />
     <meta name="twitter:description" content={description} />
     <meta name="twitter:creator" content="bjoernf_dev" />
-    <meta
-      name="twitter:image"
-      content={Astro.url.origin +
-        `/assets/banner.png?title=${encodeURIComponent(
-          title,
-        )}&image=${encodeURIComponent(image)}&subtitle=${encodeURIComponent(
-          subtitle,
-        )}`}
-    />
+    <meta name="twitter:image" content={Astro.url.origin + image} />
 
     <script
       defer
@@ -84,16 +46,7 @@ for (const post of posts) {
       title="Björn Friedrichs' Blog"
       href="/rss.xml"
     />
-    {
-      Array.from(uniqueTags).map((tag) => (
-        <link
-          rel="alternate"
-          type="application/rss+xml"
-          title={`Björn Friedrichs' Blog | ${tag}`}
-          href={`/rss/${tag.toLowerCase()}.xml`}
-        />
-      ))
-    }
+    <link rel="sitemap" href="/sitemap-index.xml" />
     <meta name="viewport" content="width=device-width" />
     <link rel="icon" type="image/svg+xml" href="/favicon.svg" />
     <meta name="generator" content={Astro.generator} />

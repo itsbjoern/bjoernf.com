@@ -1,0 +1,34 @@
+---
+title: Puppeteer in GitHub Actions
+summary: "I couldn't find a straightforward way on how to accomplish launching headless puppeteer in GitHub Actions. This turned out to be surprisingly simple and does not require any third party actions or containers at all. It took me a while to find this bit "
+image: ./images/post-0008/ppt.jpg
+tags: [Development]
+slugs: [puppeteer-in-github-actions, 66abb336d47c9dc572139206]
+createdAt: 2024-08-01T20:00:00
+published: true
+---
+
+I couldn't find a straightforward way on how to accomplish launching headless puppeteer in GitHub Actions. This turned out to be surprisingly simple and does not require any third party actions or containers at all. It took me a while to find this bit of information though and therefore I'm just leaving it here too, perhaps it will be useful to someone (even me) in the future.
+
+The trick is to just point the executable path to the correct location in the action. You can install the puppeteer package as you normally would and all you need to do then is point `executablePath` to `usr/bin/google-chrome-stable`. Done.
+
+For reference, these are the full launch argument that which are currently working:
+
+```ts
+const browser = await puppeteer.launch({
+  headless: true,
+  defaultViewport: null,
+  args: [
+    "--ignore-certificate-errors",
+    "--no-sandbox",
+    "--disable-setuid-sandbox",
+    "--disable-accelerated-2d-canvas",
+    "--disable-gpu",
+  ],
+  executablePath: "/usr/bin/google-chrome-stable",
+});
+```
+
+It is quite possible that you won't need all of the arguments specified above for it to continue working. The current working puppeteer version in the project is `puppeteer": "22.14.0"`
+
+And that's all ...

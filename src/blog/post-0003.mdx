@@ -1,0 +1,54 @@
+---
+title: Resolving 404 issues with S3, CloudFront and SPAs
+summary: "Today I worked on an issue that led me down a rabbit hole to resolve an issue with AWS. We noticed that security headers were missing from some of our CloudFront responses. Weirdly, everything was fine at first glance."
+image: ""
+tags: [Development]
+slugs: [resolving-cloudfront-404s, 62e815f9cb04471f8f30f913]
+createdAt: 2022-08-01T20:00:00
+published: true
+---
+
+import Ref from "@/components/Ref/Ref.astro";
+
+Today I worked on an issue that led me down a rabbit hole to resolve an issue with AWS. We noticed that security headers were missing from some of our CloudFront responses. Weirdly, everything was fine at first glance. Navigating to the application at its base path would return all expected headers. The issue was reported specifically for our `/login` path and as it turned out, using this path as an entry point would indeed not send the correct headers.
+
+Without going into too much detail, the application in question is served using a single index file, where any path then gets resolved by the application itself via <Ref text="react-router" href="https://v5.reactrouter.com/" />. A classic setup for a React SPA. On the AWS side, the static files are located in a S3 bucket with `Static website hosting` enabled. This is used as an Origin domain in a CloudFront distribution. The headers get applied by a CloudFront Function in a Viewer Response.
+
+So far so good. The first issue I identified was that a page load on any path that was not the root (such as `/login`) would result in a `404` response. But importantly, the application would still load and render correctly. I initially assumed this was just a peculiar cache-miss problem on CloudFront's end but it turned out to be more complicated than that.
+
+After a lot of back and forth of checking configurations I found a lead in S3's `Static website hosting`. It turns out the index file was specified for both, the `Index document` but also the `Error document`. This meant that even if the path to a resource was specified incorrectly (in this case, any path was added to the request at all) the index file would always be served anyway.
+
+It also appears that CloudFront will always forward the original request URL (e.g. `/login`) directly to its Origin. In the case of S3, it will try to resolve the path as a file. Since we only host the index file and a static folder, the request fails with a `File Not Found` response. **Critically, in case of an Origin returning an error code CloudFront does not apply the Viewer Response function.**
+
+So how do you fix this? AWS does not have an easy way to deal with this. There is no in-built filtering functionality or any other way to create an automatic redirection to the correct resources. I found two solutions that did not work for me, and one that did.
+
+**Solution that does not work #1: Set up a custom error page in CloudFront**
+
+CloudFront distributions allow to set custom error pages based on responses received from their Origin. While this allows to remap the 404 error to a 200 status code, CloudFront will still not apply its Viewer Response function. Therefore, while the console network tab is happy, our fault is not fixed.
+
+**Solution that does not work #2: Setting the Default root object**
+
+As seen on StackOverflow, some people had success setting the Default root object in the Distributions General Settings (source) to their index file. However, this did not help at all in this case.
+
+**Solution that did work: Conditionally rewriting the path in the Viewer Request**
+
+Remember how CloudFront forwards every URL directly to its Origins. Using the Viewer Request function of a Distribution we can update the path to be rerouted to the root element /. This will cause S3 to respond with the index file. Note, we still serve static files from the same domain so we want to avoid rewriting all requests.
+
+For reference, this is the function we added. Please forgive the ugly code, it was a long day - I intend to clean it up tomorrow. I also despise whatever environment AWS is running these in as it would not accept my slightly more elegant regex.
+
+```ts
+function handler(event) {
+  var request = event.request;
+  var pathItems = request.uri.split("/");
+  var lastItem = pathItems[pathItems.length - 1];
+  // Rewrite any paths that do not end in a file (e.g. .html, .css or .js)
+  if (lastItem.indexOf(".") === -1) {
+    request.uri = "/";
+  }
+  return request;
+}
+```
+
+This finally resolved our issue, as S3 now returns the index file for every request that is not a static file request which then made CloudFront add the headers using it edge functions.
+
+In conclusion, if you run into an issue where on first page load your non-root paths do not load and you use S3 as an origin for your CloudFront Distribution, try to rewrite the request URL in your `Viewer Request` function to remove any unnecessary path before the request reaches S3.

@@ -20,9 +20,9 @@ const {
 
 <Chip
   variant={variant}
-  to={deletable ? (reset ? "/blog" : undefined) : `/blog?tag=${name}`}
+  to={deletable ? (reset ? "/blog" : undefined) : `/tag/${name}`}
   deletable={deletable || reset}
   clickable
-  class:list={["-mt-1", "!text-xs", className, deletable && "deletable"]}
+  class:list={["!text-xs", className, deletable && "deletable"]}
   label={name}
 />

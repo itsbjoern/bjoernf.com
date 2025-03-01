@@ -1,0 +1,95 @@
+---
+title: "Pdf Mini: Images with transparency"
+summary: "I have released a first version of my new project https://pdfblaze.com. It’s an ultrafast, convenient way to generate PDFs by using custom templates and dynamic values."
+image: ./images/post-0011/2.jpg
+tags: [Development, PDF]
+slugs: [tanstack-router-spa-co-located-in-astro, 66c1143c6ca36023f249f9ff]
+createdAt: 2024-11-19T20:00:00
+published: true
+---
+import Ref from "@/components/Ref/Ref.astro";
+import { Image } from "astro:assets";
+import firstImage from "./images/post-0011/1.jpg";
+import secondImage from "./images/post-0011/2.jpg";
+
+I have released a first version of my new project <Ref href="https://pdfblaze.com" />. It’s an ultrafast, convenient way to generate PDFs by using custom templates and dynamic values.
+
+As part of creating this application I had to learn a lot about the PDF and TrueType font specifications. Some of the information I needed was quite arduous to find, to say the least.. So, I want to make a mini series of blog posts where I intend to tackle one specific issue I had encountered in each post.
+
+Without further ado, let’s get into it.
+
+**Images with transparency in PDFs**
+
+The long and short of it: the main issue with transparency in images is that the PDF specification does not really consider the alpha channel part of the pixel data itself. Rather we need to separate the RGB pixel data from the alpha data and then overlay them using an `SMask`.
+
+To explain this in more detail the best I can do is show you an example of how to specify an image with such an alpha mask. A regular image will usually be described by an `XObject` dictionary something like this:
+
+```
+1 0 obj <<
+/Type /XObject
+/Subtype /Image
+/Width 3
+/Height 3
+/ColorSpace /DeviceRGB
+/BitsPerComponent 8
+/Filter [ /ASCIIHexDecode ]
+>>
+stream
+ff0000 00ff00 0000ff 0000ff ff0000 00ff00 ff0000 0000ff ff0000
+endstream
+```
+(note: I leave out some properties like `\Length` in these examples. While PDF viewers are usually able with recovering without them, I'd not recommend omitting them and stick to adding any fields the specification requires)
+
+This example shows rendering a simple 3x3 pixel image where we defined that every RGB value in the data stream has 8 bits of freedom, as indicated by the `DeviceRGB` colour space and 8 `BitsPerComponent`. This means that the trailing data stream of the object is simply the literal pixel values encoded as a hex string (depending on the filter but here `ASCIIHexDecode` means just hex). In this case we have 3x3 = 9 pixel values, the resulting colour matrix is encoded left-to-right top-to-bottom as follows:
+
+```
+red    green  blue
+blue   red    green
+red    blue   red
+```
+
+The resulting image when printed onto a PDF looks like this:
+
+<Image src={firstImage} alt="Image without transparency" width={200} />
+
+Note: I rendered the image larger than a 3x3 grid so the colours interpolate into each other during upscaling by default, but this wouldn't normally happen for regular images rendered at their actual size. In most case this would of course be a much larger image, usually encoded with a filter that offers way more compression.
+
+Now, if we want to add transparency to this image all we actually need to do is define a separate `XObject` as an `SMask` for our original image.
+
+This `SMask` should follow the same structure (i.e., the same height and width definitions) but since we are only defining an alpha mask we only need the `DeviceGray` colour space instead of `DeviceRGB`. This is because we only need a single byte per alpha value instead of 3. According to this, such an `XObject` would be defined like this:
+
+```
+2 0 obj
+<<
+/Type /XObject
+/Subtype /Image
+/Width 3
+/Height 3
+/ColorSpace /DeviceGray
+/BitsPerComponent 8
+/Filter [ /ASCIIHexDecode ]
+>>
+stream
+ff ff ff 66 66 66 00 00 00
+endstream
+endobj
+```
+
+And of course don't forget to amend the previous object to include the SMask
+```
+1 0 obj
+<<
+/Type /XObject
+/Subtype /Image
+/SMask 2 0 R
+[...]
+```
+
+The resulting image will have combined the mask and the pixels for this resulting image:
+
+
+<Image src={secondImage} alt="Image with transparency" width={200} />
+
+As you can see there isn't actually much to it, all you need to do is separate your RGB colour channel from the alpha channel and then define them separately in another XObject. However, if you (like me) have jumped into the full PDF specification you may know it's sometimes difficult to parse these details from it.
+
+And that is all for this post, enjoy your images with transparency!

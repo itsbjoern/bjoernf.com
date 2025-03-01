@@ -9,89 +9,11 @@ jobs:
   build-web:
     runs-on: ubuntu-latest
     steps:
-      - uses: actions/checkout@v3
+      - uses: actions/checkout@v4
 
-      - name: Set up Docker Buildx
-        id: buildx
-        uses: docker/setup-buildx-action@v2
+      - uses: oven-sh/setup-bun@v2
 
-      - name: Cache Docker layers
-        id: cache-layers
-        uses: actions/cache@v3
-        with:
-          path: /tmp/.buildx-cache
-          key: ${{ runner.os }}-buildx-${{ github.sha }}
-          restore-keys: |
-            ${{ runner.os }}-buildx-
-
-      - name: Create images folder
-        run: mkdir -p images
-
-      - name: Build and push
-        uses: docker/build-push-action@v2
-        with:
-          context: .
-          tags: bjoernf:latest
-          push: false
-          load: true
-          cache-from: type=local,src=/tmp/.buildx-cache
-          cache-to: type=local,dest=/tmp/.buildx-cache-new,mode=max
-          outputs: type=docker,dest=images/bjoernf.tar
-
-      - # Temp fix
-        # https://github.com/docker/build-push-action/issues/252
-        # https://github.com/moby/buildkit/issues/1896 name: Move cache
-        run: |
-          rm -rf /tmp/.buildx-cache
-          mv /tmp/.buildx-cache-new /tmp/.buildx-cache
-
-      - name: Install SSH key
-        uses: shimataro/ssh-key-action@v2
-        with:
-          key: ${{ secrets.SSH_KEY }}
-          known_hosts: "placeholder"
-
-      - name: Adding Known Hosts
-        run: ssh-keyscan -H ${{ secrets.SSH_HOST }} >> ~/.ssh/known_hosts
-
-      - name: Copy files
-        run: |
-          rsync -avz docker-compose.yaml ${{ secrets.SSH_USERNAME }}@${{ secrets.SSH_HOST }}:/home/${{ secrets.SSH_USERNAME }}/bjoernf.com/docker-compose.yaml
-          rsync -avz images/ ${{ secrets.SSH_USERNAME }}@${{ secrets.SSH_HOST }}:/home/${{ secrets.SSH_USERNAME }}/bjoernf.com/images
-
-      - name: Load images
-        uses: appleboy/ssh-action@master
-        with:
-          host: ${{ secrets.SSH_HOST }}
-          username: ${{ secrets.SSH_USERNAME }}
-          key: ${{ secrets.SSH_KEY }}
-          script: |
-            sudo docker load -i ~/bjoernf.com/images/bjoernf.tar
-
-      - name: Restart server
-        uses: appleboy/ssh-action@master
-        with:
-          host: ${{ secrets.SSH_HOST }}
-          username: ${{ secrets.SSH_USERNAME }}
-          key: ${{ secrets.SSH_KEY }}
-          script: |
-            cd ~/bjoernf.com
-            cat >release.yml <<EOL
-            services:
-              web:
-                environment:
-                  JWT_SECRET: ${{ secrets.JWT_SECRET }}
-                  MONGO_URL: ${{ secrets.MONGO_URL }}
-                  MONGO_DATABASE: ${{ secrets.MONGO_DATABASE }}
-                  ADMIN_USERNAME: ${{ secrets.ADMIN_USERNAME }}
-                  MONGO_USER_PASSWORD: ${{ secrets.MONGO_USER_PASSWORD }}
-                  AWS_ACCESS_KEY: ${{ secrets.AWS_ACCESS_KEY }}
-                  AWS_SECRET_KEY: ${{ secrets.AWS_SECRET_KEY }}
-            EOL
-
-            sudo docker-compose -f docker-compose.yaml -f release.yml down
-            sudo docker-compose -f docker-compose.yaml -f release.yml up -V -d
-            sudo docker system prune -f
+      - run: bun run build
 
       - name: Configure AWS credentials
         uses: aws-actions/configure-aws-credentials@v1
@@ -100,8 +22,11 @@ jobs:
           aws-secret-access-key: ${{ secrets.AWS_SECRET_KEY }}
           aws-region: eu-west-2
 
+      - name: Sync to S3
+        run: aws s3 sync ./dist s3://bjoernf.com --delete
+
       - name: Invalidate cache from CF
         run: |
           aws cloudfront create-invalidation \
             --distribution-id EP23KDGK9RC0N \
-            --paths "/*" "/assets/*" "/images/*" "/rss" "/rss*"
+            --paths "/" "/*"

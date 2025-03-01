@@ -1,0 +1,48 @@
+---
+title: Generating images with sharp in dockerised Bun
+summary: "Preface: as of writing this bun's latest released version is 1.0.12 and for sharp it is 0."
+image: ./images/post-0007/bun.jpg
+tags: [Development]
+slugs: [generating-images-with-sharp-in-dockerised-bun, 6557cd80b1117b8e80173021]
+createdAt: 2023-11-17T20:00:00
+published: true
+---
+
+import { Image } from "astro:assets";
+import Ref from "@/components/Ref/Ref.astro";
+import fbPreviewImage from "./images/post-0007/fb-preview.jpg";
+
+Preface: as of writing this bun's latest released version is `1.0.12` and for sharp it is `0.33.0-alpha.12`
+
+As can be seen by some of my previous posts on this blog, I love using this website itself to play around and familiarise myself with new tech. Before, I wrote about my own homebrewed SSR approach plus hydration. This was super fun to build, but wasn't the most stable or easiest to maintain. I have recently switched to Astro which is a more mature version of the same idea with many nice additions and quality of life features. It also does not require react but supports JSX-style templating, very neat.
+
+But because I can't help myself I decided to not go with an actual stable, regular node server and instead started tinkering with <Ref text="Bun" href="https://bun.sh/" />. In case you haven't heard, Bun is an incredible new runtime/dependency manager developed by the extremely talented team at Oven. However, while it is impressive, in it's current state it isn't entirely without flaws.
+
+Back to the matter at hand: I have been working on exposing a custom endpoint which dynamically generates a social card image based on the current route. To generate and compose these images I use the <Ref text="sharp" href="https://github.com/lovell/sharp" /> package. This is a well maintained image manipulation library with a very intuitive API. This works and looks great, and I thought it would be as simple as just pushing it to get it to work. Here is an example of what my <Ref text="previous post" href="/blog/making-exercise-convenient" /> looks like when, for example, pasting a link to Facebook:
+
+<Image src={fbPreviewImage} alt="Facebook preview image" />
+
+Unfortunately this wasn't quite as easy as just adding the image generation part. While in my development environment everything works fine, there are some issues when setting it up in a docker container (which I use to host this website). At the moment bun breaks post-install scripts of dependencies, which sharp unfortunately relies upon, at least in the current stable release version `0.32.x`. I found a <Ref text="GitHub issue" href="https://github.com/lovell/sharp/issues/3750#issuecomment-1751172728" /> which referenced an "alpha" version of sharp which removed the reliance on it. And in fact, with `sharp@0.33.0-alpha.9` this works (I tried upgrading to the current latest `-alpha.12` too but this also seemingly breaks).
+
+Once I had figured this out, I was sure it everything else would just fall into place... nope, no luck - apparently the Docker image `oven/bun:1.0.12` (which as of right now is **latest**) is broken when installing my dependencies. I don't know if this is the case for everyone or just for the particular set of dependencies in my repo, what I do know is that I had to revert to the previous version `oven/bun:1.0.11` to get it working again.
+
+I was very happy when my build finally succeeded, the container spun up and the image generation worked! Well, until I realised that the bun docker image ships without any fonts pre-installed. So what I got was a lovely selection of boxes: "☐☐☐☐☐☐☐☐☐☐☐", while this is almost entertaining enough to keep as-is, I decided to at least try and solve the issue first. Luckily, this wasn't too much of a problem, I now simply install fontconfig as part of my Docker build and then copy the fonts into my release image. This is required because sharp uses the resulting fontconfig file to resolve available fonts.
+
+```dockerfile
+FROM oven/bun:1.0.11 as base
+
+FROM base as fonts
+RUN apt-get update
+RUN apt-get -y install fontconfig fonts-roboto
+RUN fc-cache -fv
+
+[...]
+
+FROM base AS release
+COPY --from=fonts /usr/share/fonts /usr/share/fonts
+COPY --from=fonts /etc/fonts /etc/fonts
+
+[...]
+```
+
+Now my images finally render correctly, including text and everything. Probably these setup issues will be resolved soon (either in sharp and/or bun) but until then this is a helpful workaround.

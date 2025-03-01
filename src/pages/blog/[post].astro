@@ -1,6 +1,6 @@
 ---
-import { getDb } from "@/utils/database";
-import { ObjectId } from "mongodb";
+import { getCollection } from "astro:content";
+
 import Layout from "@/layouts/Layout.astro";
 import ShareIcon from "@/components/ShareIcon.astro";
 
@@ -12,53 +12,29 @@ import WhatsappIcon from "@/images/icons/share/WhatsappIcon.svg?raw";
 import { emailLink, linkedinLink, whatsappLink, xComLink } from "@/utils/share";
 import { formatDate } from "@/utils/formatDate";
 
-import { ensureAuth } from "@/utils/auth";
-import Button from "@/components/Button.astro";
 import PostView from "@/components/PostView.astro";
 
-// export const prerender = true;
-// export async function getStaticPaths() {
-//   const db = await getDb();
-//   const posts = await db.posts().find({}).sort({ createdAt: -1 }).toArray();
-//   return {
-//     paths: posts.map((p) => ({ params: { post: p._id.toString() } })),
-//   };
-// }
-
-let user = null;
-try {
-  user = await ensureAuth(Astro.cookies.get("token")?.value);
-} catch {}
-
-const { post: postId } = Astro.params;
-
-let query = null;
-try {
-  // If not object id, then it's a slug
-  query = { _id: new ObjectId(postId) };
-} catch {
-  query = { "published.slug": postId };
+export async function getStaticPaths() {
+  const posts = await getCollection("blog");
+  return posts.flatMap((post) =>
+    (post.data.slugs || []).map((slug) => ({
+      params: { post: slug },
+      props: { post },
+    })),
+  );
 }
 
-const database = await getDb();
-const post = await database.posts().findOne(query);
+const { post } = Astro.props;
 
-if (!post || !post?.published) {
-  return new Response(null, {
-    status: 404,
-    statusText: "Not found",
-  });
-}
-
-const { image, title, html, tags, summary, publishedAt } = post.published;
+const { image, title, tags, summary, createdAt } = post.data;
 const url = Astro.url.toString();
 ---
 
 <Layout
   title={`"${title}"`}
   description={summary}
-  image={image}
-  subtitle={`Published ${formatDate(publishedAt!)}`}
+  image={`/assets/blog/${post.data.slugs[0]}.png`}
+  subtitle={`Published ${formatDate(createdAt)}`}
 >
   <div class="flex h-auto flex-col">
     <div
@@ -88,14 +64,5 @@ const url = Astro.url.toString();
       </div>
     </div>
   </div>
-  <PostView post={post.published} />
-  {
-    user ? (
-      <div class="flex flex-1 justify-end">
-        <Button id="edit" variant="contained" to={`/admin/edit/${post._id}`}>
-          Edit
-        </Button>
-      </div>
-    ) : null
-  }
+  <PostView post={post} />
 </Layout>

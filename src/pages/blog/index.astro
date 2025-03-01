@@ -1,36 +1,27 @@
 ---
-import SearchIcon from "@/images/icons/Search.svg?raw";
-import { getDb } from "@/utils/database";
 import PostItem from "@/components/PostItem.astro";
 import Layout from "@/layouts/Layout.astro";
-import type { Filter } from "mongodb";
-import type { Post } from "@/utils/models";
-import TextField from "@/components/TextField.astro";
 import Tag from "@/components/Tag.astro";
-import Chip from "@/components/Chip.astro";
+import { getCollection } from "astro:content";
 
-const query: Filter<Post> = { published: { $exists: true } };
-const tag = Astro.url.searchParams.get("tag");
-if (tag) {
-  query["published.tags"] = tag;
-}
+const posts = await getCollection("blog");
 
-const database = await getDb();
-const posts = await database
-  .posts()
-  .find(query, { projection: { published: 1, createdAt: 1 } })
-  .sort({ "published.publishedAt": -1 });
+const sortedPosts = posts.sort((a, b) => {
+  const aDate = new Date(a.data.createdAt);
+  const bDate = new Date(b.data.createdAt);
+  return bDate.getTime() - aDate.getTime();
+});
 
-const allPosts = await database
-  .posts()
-  .find({ published: { $exists: true } })
-  .toArray();
-const uniqueTags = new Set<string>();
-for (const post of allPosts) {
-  for (const tag of post.published?.tags ?? []) {
-    uniqueTags.add(tag);
+const uniqueTags: Array<string> = [];
+for (const post of posts) {
+  for (const tag of post.data.tags ?? []) {
+    if (!uniqueTags.includes(tag)) {
+      uniqueTags.push(tag);
+    }
   }
 }
+
+const tag = "none";
 ---
 
 <Layout title="Blog">
@@ -48,7 +39,7 @@ for (const post of allPosts) {
       }
     </div>
     <div class="flex flex-col">
-      {posts.map((p) => <PostItem post={p} />)}
+      {sortedPosts.map((p) => <PostItem post={p} />)}
     </div>
   </div>
 </Layout>

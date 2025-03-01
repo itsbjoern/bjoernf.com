@@ -4,6 +4,7 @@
     "jsx": "react-jsx",
     "jsxImportSource": "react",
     "baseUrl": ".",
+    "allowJs": true,
     "types": ["bun-types"],
     "paths": {
       "@/*": ["src/*"]
