@@ -1,5 +1,4 @@
 import sharp from "sharp";
-import fs from "node:fs";
 
 const svg =
   '<svg width="1200" height="630" version="1.1" xmlns="http://www.w3.org/2000/svg">' +
@@ -17,6 +16,21 @@ type ImageProps = {
   title: string;
   subtitle?: string;
 };
+
+const clamp = (num: number, min: number, max: number) =>
+  Math.min(Math.max(num, min), max);
+
+const getCompositePosition = (
+  canvasWidth: number,
+  canvasHeight: number,
+  elementWidth: number,
+  elementHeight: number,
+  desiredX: number,
+  desiredY: number,
+) => ({
+  left: clamp(desiredX, 0, canvasWidth - elementWidth),
+  top: clamp(desiredY, 0, canvasHeight - elementHeight),
+});
 
 export const createImage = async ({ buffer, title, subtitle }: ImageProps) => {
   let coverImage;
@@ -99,10 +113,13 @@ export const createImage = async ({ buffer, title, subtitle }: ImageProps) => {
     .png()
     .toBuffer();
 
+  const CANVAS_WIDTH = 1200;
+  const CANVAS_HEIGHT = 630;
+
   const image = await sharp({
     create: {
-      width: 1200,
-      height: 630,
+      width: CANVAS_WIDTH,
+      height: CANVAS_HEIGHT,
       channels: 3,
       background: { r: 255, g: 255, b: 255 },
     },
@@ -110,25 +127,46 @@ export const createImage = async ({ buffer, title, subtitle }: ImageProps) => {
     .composite([
       { input: sidebar, left: 0, top: 0 },
       { input: gradient, left: 0, top: 0 },
-      { input: coverImage, left: 50, top: 50 },
+      {
+        input: coverImage,
+        ...getCompositePosition(CANVAS_WIDTH, CANVAS_HEIGHT, 300, 300, 50, 50),
+      },
       {
         input: titleImage,
-        left: 400 + Math.round(800 / 2 - titleMeta.width! / 2),
-        top: Math.round(630 / 2 - titleMeta.height! / 2),
+        ...getCompositePosition(
+          CANVAS_WIDTH,
+          CANVAS_HEIGHT,
+          titleMeta.width!,
+          titleMeta.height!,
+          400 + Math.round(800 / 2 - titleMeta.width! / 2),
+          Math.round(630 / 2 - titleMeta.height! / 2),
+        ),
       },
       ...(subtitleBuffer
         ? [
             {
               input: subtitleBuffer,
-              top: Math.round(630 / 2 - titleMeta.height! / 2 - 75),
-              left: 400 + Math.round(800 / 2 - subtitleMeta!.width! / 2),
+              ...getCompositePosition(
+                CANVAS_WIDTH,
+                CANVAS_HEIGHT,
+                subtitleMeta!.width!,
+                subtitleMeta!.height!,
+                400 + Math.round(800 / 2 - subtitleMeta!.width! / 2),
+                Math.round(630 / 2 - titleMeta.height! / 2 - 75),
+              ),
             },
           ]
         : []),
       {
         input: cr,
-        top: 630 - 50 - 30,
-        left: 50,
+        ...getCompositePosition(
+          CANVAS_WIDTH,
+          CANVAS_HEIGHT,
+          750, // width of cr text
+          30, // approximate height of cr text
+          50,
+          630 - 50 - 30,
+        ),
       },
     ])
     .png()

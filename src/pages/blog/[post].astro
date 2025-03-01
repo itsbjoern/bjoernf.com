@@ -26,7 +26,7 @@ export async function getStaticPaths() {
 
 const { post } = Astro.props;
 
-const { image, title, tags, summary, createdAt } = post.data;
+const { title, tags, summary, createdAt } = post.data;
 const url = Astro.url.toString();
 ---
 
