@@ -17,22 +17,10 @@ type ImageProps = {
   subtitle?: string;
 };
 
-const clamp = (num: number, min: number, max: number) =>
-  Math.min(Math.max(num, min), max);
-
-const getCompositePosition = (
-  canvasWidth: number,
-  canvasHeight: number,
-  elementWidth: number,
-  elementHeight: number,
-  desiredX: number,
-  desiredY: number,
-) => ({
-  left: clamp(desiredX, 0, canvasWidth - elementWidth),
-  top: clamp(desiredY, 0, canvasHeight - elementHeight),
-});
-
 export const createImage = async ({ buffer, title, subtitle }: ImageProps) => {
+  const IMAGE_HEIGHT = 630;
+  const IMAGE_WIDTH = 1200;
+
   let coverImage;
   if (buffer) {
     coverImage = await sharp(buffer)
@@ -55,7 +43,7 @@ export const createImage = async ({ buffer, title, subtitle }: ImageProps) => {
       .toBuffer();
   }
 
-  const sharpTitleImage = sharp({
+  let sharpTitleImage = sharp({
     text: {
       text: title,
       font: "Roboto",
@@ -66,7 +54,13 @@ export const createImage = async ({ buffer, title, subtitle }: ImageProps) => {
       rgba: true,
     },
   });
-  const titleMeta = await sharpTitleImage.metadata();
+  let titleMeta = await sharpTitleImage.metadata();
+  if (titleMeta.height! > IMAGE_HEIGHT / 2) {
+    sharpTitleImage = sharpTitleImage.resize({
+      height: IMAGE_HEIGHT / 2,
+    });
+    titleMeta = await sharpTitleImage.metadata();
+  }
   const titleImage = await sharpTitleImage.png().toBuffer();
 
   let subtitleBuffer = null;
@@ -105,7 +99,7 @@ export const createImage = async ({ buffer, title, subtitle }: ImageProps) => {
   const sidebar = await sharp({
     create: {
       width: 400,
-      height: 630,
+      height: IMAGE_HEIGHT,
       channels: 3,
       background: { r: 0, g: 0, b: 0 },
     },
@@ -113,13 +107,10 @@ export const createImage = async ({ buffer, title, subtitle }: ImageProps) => {
     .png()
     .toBuffer();
 
-  const CANVAS_WIDTH = 1200;
-  const CANVAS_HEIGHT = 630;
-
   const image = await sharp({
     create: {
-      width: CANVAS_WIDTH,
-      height: CANVAS_HEIGHT,
+      width: IMAGE_WIDTH,
+      height: IMAGE_HEIGHT,
       channels: 3,
       background: { r: 255, g: 255, b: 255 },
     },
@@ -127,46 +118,25 @@ export const createImage = async ({ buffer, title, subtitle }: ImageProps) => {
     .composite([
       { input: sidebar, left: 0, top: 0 },
       { input: gradient, left: 0, top: 0 },
-      {
-        input: coverImage,
-        ...getCompositePosition(CANVAS_WIDTH, CANVAS_HEIGHT, 300, 300, 50, 50),
-      },
+      { input: coverImage, left: 50, top: 50 },
       {
         input: titleImage,
-        ...getCompositePosition(
-          CANVAS_WIDTH,
-          CANVAS_HEIGHT,
-          titleMeta.width!,
-          titleMeta.height!,
-          400 + Math.round(800 / 2 - titleMeta.width! / 2),
-          Math.round(630 / 2 - titleMeta.height! / 2),
-        ),
+        left: 400 + Math.round(800 / 2 - titleMeta.width! / 2),
+        top: Math.round(IMAGE_HEIGHT / 2 - titleMeta.height! / 2),
       },
       ...(subtitleBuffer
         ? [
             {
               input: subtitleBuffer,
-              ...getCompositePosition(
-                CANVAS_WIDTH,
-                CANVAS_HEIGHT,
-                subtitleMeta!.width!,
-                subtitleMeta!.height!,
-                400 + Math.round(800 / 2 - subtitleMeta!.width! / 2),
-                Math.round(630 / 2 - titleMeta.height! / 2 - 75),
-              ),
+              top: Math.round(IMAGE_HEIGHT / 2 - titleMeta.height! / 2 - 75),
+              left: 400 + Math.round(800 / 2 - subtitleMeta!.width! / 2),
             },
           ]
         : []),
       {
         input: cr,
-        ...getCompositePosition(
-          CANVAS_WIDTH,
-          CANVAS_HEIGHT,
-          750, // width of cr text
-          30, // approximate height of cr text
-          50,
-          630 - 50 - 30,
-        ),
+        top: IMAGE_HEIGHT - 50 - 30,
+        left: 50,
       },
     ])
     .png()
