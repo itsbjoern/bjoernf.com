@@ -11,7 +11,6 @@ import Divider from "./Divider.astro";
 import Chip from "./Chip.astro";
 import Navigation from "./Navigation/Navigation.astro";
 import Icon from "./Icon.astro";
-import Button from "./Button.astro";
 
 const isLoggedIn = Astro.cookies.has("token");
 ---
@@ -29,26 +28,12 @@ const isLoggedIn = Astro.cookies.has("token");
       <div class="ml-4 flex flex-col justify-evenly">
         <div class="modal-container">
           <h2 id="title" class="text-2xl font-bold">Björn Friedrichs</h2>
-          <span class="modal">
-            <div class="flex justify-between items-center">
-              <div>
-                Instead of <span class="strike">Bjorn</span>,<br />
-                 try "Byeaurn"
-              </div>
-              <br />
-              <div>
-                <Button icon={PlayIcon} id="audio-button" variant="contained">
-                  Listen
-                </Button>
-                <audio id="name-audio">
-                  <source src="/name.mp3" type="audio/mpeg" />
-                   Your browser does not support the audio element.
-                </audio>
-              </div>
-            </div>
-          </span>
+          <audio id="name-audio">
+            <source src="/name.mp3" type="audio/mpeg" />
+             Your browser does not support the audio element.
+          </audio>
         </div>
-        <div class="flex flex-row items-center gap-1">
+        <div class="flex flex-row items-center gap-1 cursor-pointer">
           <Icon icon={ArrowCircleUpIcon} />
           <span id="subtitle">That&apos;s me</span>
         </div>
@@ -101,7 +86,7 @@ const isLoggedIn = Astro.cookies.has("token");
   const phoneticString = "Bjøːrn Fʁiː.dʁɪçs";
 
   const subtitleString = "That's me";
-  const phoneticSubtitleString = "Hover this";
+  const phoneticSubtitleString = "How do I say that?";
 
   const nameElement = document.getElementById("title")!;
   const subtitleElement = document.getElementById("subtitle")!;
@@ -126,58 +111,13 @@ const isLoggedIn = Astro.cookies.has("token");
 
   setTimeout(updateName, 4000);
 
-  const audioButton = document.getElementById("audio-button")!;
   const nameAudio = document.getElementById("name-audio")! as HTMLAudioElement;
-  audioButton.addEventListener("click", () => {
+  subtitleElement.addEventListener("click", () => {
     nameAudio.play();
   });
 </script>
 
 <style>
-  .modal-container {
-    position: relative;
-  }
-
-  .modal-container .modal {
-    position: absolute;
-    top: calc(100% + 10px);
-    left: 0;
-    display: none;
-
-    color: #fff;
-    width: 290px;
-
-    padding: 12px 16px;
-    border-radius: 8px;
-    background-color: #333;
-    box-shadow:
-      2px 0 5px 1px rgba(0, 0, 0, 0.05),
-      0px 2px 3px 0px rgb(0, 0, 0, 0.25);
-  }
-
-  .modal-container .modal::before {
-    content: "";
-    position: absolute;
-    left: 0;
-    top: -20px;
-    height: 20px;
-    width: 100%;
-  }
-
-  .modal-container .modal::after {
-    content: "";
-    position: absolute;
-    top: -20px;
-    left: 30px;
-    transform: translateX(-50%);
-    border: 10px solid transparent;
-    border-bottom-color: #333;
-  }
-
-  .modal-container:hover .modal {
-    display: block;
-  }
-
   .glitch {
     animation:
       stutter 400ms cubic-bezier(0.46, 0.29, 0, 1.24) 1 400ms,
