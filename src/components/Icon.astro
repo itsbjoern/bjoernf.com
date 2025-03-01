@@ -7,19 +7,18 @@ interface Props {
 const { icon, class: _class, ...rest } = Astro.props;
 ---
 
-<svg class:list={[_class]} {...rest}>
-  <Fragment set:html={icon} />
-</svg>
-
 <style>
   svg {
     user-select: none;
-    width: 1em;
-    height: 1em;
-    font-size: 1.4em;
+    width: 0.8em;
+    height: 0.8em;
+    font-size: 1em;
     display: inline-block;
     fill: currentColor;
     flex-shrink: 0;
     transition: none;
   }
 </style>
+<svg class:list={[_class]} {...rest}>
+  <Fragment set:html={icon} />
+</svg>

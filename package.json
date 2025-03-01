@@ -9,8 +9,8 @@
     "astro": "astro"
   },
   "dependencies": {
-    "@astrojs/node": "^6.0.3",
-    "@astrojs/tailwind": "^5.0.2",
+    "@astrojs/node": "9.1.2",
+    "@astrojs/tailwind": "6.0.0",
     "@aws-sdk/client-cloudfront": "^3.438.0",
     "@aws-sdk/client-s3": "^3.438.0",
     "@tiptap/core": "^2.1.12",
@@ -21,7 +21,7 @@
     "@tiptap/extension-underline": "^2.1.12",
     "@tiptap/pm": "^2.1.12",
     "@tiptap/starter-kit": "^2.1.12",
-    "astro": "^3.3.2",
+    "astro": "5.4.1",
     "bcryptjs": "^2.4.3",
     "hast-util-to-html": "^9.0.1",
     "jsonwebtoken": "^9.0.2",
