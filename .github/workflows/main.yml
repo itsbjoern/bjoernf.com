@@ -13,7 +13,7 @@ jobs:
 
       - uses: oven-sh/setup-bun@v2
 
-      - run: bun run build
+      - run: bun run --bun build
 
       - name: Configure AWS credentials
         uses: aws-actions/configure-aws-credentials@v1
