@@ -6,7 +6,6 @@ interface Props {
   variant?: "contained" | "outlined" | "text";
   label: string;
   clickable?: boolean;
-  deletable?: boolean;
   icon?: string;
   to?: string;
   class?: string;
@@ -14,7 +13,6 @@ interface Props {
 
 const {
   variant = "text",
-  deletable,
   clickable,
   icon,
   label,
@@ -51,6 +49,7 @@ const Wrapped = to ? "a" : "div";
 
   .contained {
     background-color: rgba(0, 0, 0, 0.04);
+    border: 1px solid rgba(0, 0, 0, 0.04);
   }
 
   .container {
@@ -80,20 +79,18 @@ const Wrapped = to ? "a" : "div";
     white-space: nowrap;
   }
 
-  .container svg:not(.delete-icon) {
+  .container svg {
     color: #616161;
+    margin-top: -2px;
     margin-left: 4px;
     margin-right: -6px;
+
+    width: 1em;
+    height: 1em;
   }
 
   .container .contained {
     padding: 0;
-  }
-
-  .delete-icon {
-    color: #616161;
-    margin-right: 4px;
-    margin-left: -6px;
   }
 
   .clickable:hover {

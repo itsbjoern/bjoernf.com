@@ -21,7 +21,6 @@ const {
 <Chip
   variant={variant}
   to={deletable ? (reset ? "/blog" : undefined) : `/tag/${name}`}
-  deletable={deletable || reset}
   clickable
   class:list={["!text-xs", className, deletable && "deletable"]}
   label={name}

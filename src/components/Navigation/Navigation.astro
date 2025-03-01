@@ -8,7 +8,7 @@ interface Props {
   mobile?: boolean;
 }
 
-const paths = ["/", "/blog", "/projects"];
+const paths = ["/", "/blog", "/projects", "/tag"];
 const currentPath = Astro.url.pathname;
 const currentMainSegment = currentPath.split("/")[1];
 const menuIndex = paths.indexOf(`/${currentMainSegment}`);
@@ -31,7 +31,7 @@ const { mobile = false } = Astro.props;
   <NavButton
     label="Blog"
     icon={ReceiptIcon}
-    selected={menuIndex === 1}
+    selected={menuIndex === 1 || menuIndex === 3}
     to={paths[1]}
   />
   <NavButton
