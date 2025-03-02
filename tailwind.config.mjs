@@ -4,11 +4,9 @@ export default {
 	theme: {
     extend: {
       colors: {
-        default: '#f1f1f1',
+        default: '#e9e9e9',
         paper: '#f5f5f5',
-        offset: '#778DA9',
-        primary: '#316466',
-        secondary: '#381D2A',
+        primary: '#2a2a2a',
       },
       screens: {
         smo: { max: '639px' },

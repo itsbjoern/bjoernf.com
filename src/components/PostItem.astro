@@ -12,14 +12,14 @@ const { post } = Astro.props;
 const { title, summary, tags, image, slugs, published, createdAt } = post.data;
 ---
 
-<div class="mb-2 flex flex-col">
+<div class="neo-container mb-2 flex flex-col relative">
   <div
     class="flex flex-row justify-start smo:mt-5 smo:flex-col-reverse smo:pb-2"
   >
-    <div class="z-[5] flex flex-row overflow-hidden">
+    <div class="z-[5] flex flex-row">
       <div class="z-[5] flex flex-row pt-4 pr-5 pb-0 pl-6">
         <div
-          class="neo z-[5] flex flex-row gap-4 rounded-t-md bg-paper pt-2 pr-2 pb-0 pl-3 items-center"
+          class="neo clipped z-[5] flex flex-row gap-4 rounded-t-md bg-paper pt-2 pr-2 pb-0 pl-3 items-center"
         >
           <a class="flex flex-row gap-2" href={`/blog/${slugs[0]}`}>
             <div class="flex flex-row">
@@ -29,14 +29,18 @@ const { title, summary, tags, image, slugs, published, createdAt } = post.data;
             </div>
           </a>
           <div class="flex flex-row justify-end gap-2">
-            {tags ? tags.map((tag) => <Tag name={tag} />) : null}
+            {
+              tags
+                ? tags.map((tag) => <Tag name={tag} variant="outlined" />)
+                : null
+            }
           </div>
         </div>
       </div>
     </div>
   </div>
   <a
-    class="neo relative flex min-h-[100px] flex-1 overflow-hidden rounded-md bg-paper smo:pr-2"
+    class="neo relative flex min-h-[100px] flex-1 rounded-md bg-paper smo:pr-2"
     href={`/blog/${slugs[0]}`}
   >
     <div class="flex flex-row gap-2 pr-3 pb-2 pl-2 pt-2">

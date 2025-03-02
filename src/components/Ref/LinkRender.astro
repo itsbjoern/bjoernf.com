@@ -11,7 +11,7 @@ const { href, external, rel = "noreferrer noopener" } = Astro.props;
 {
   external ? (
     <a
-      class="inline text-primary underline decoration-primary hover:decoration-1 underline-offset-1"
+      class="neo-text inline text-primary underline decoration-primary hover:decoration-1 underline-offset-1"
       href={href}
       rel={rel}
       target="_blank"
@@ -20,7 +20,7 @@ const { href, external, rel = "noreferrer noopener" } = Astro.props;
     </a>
   ) : (
     <a
-      class="text-primary underline decoration-primary hover:decoration-1 underline-offset-1"
+      class="neo-text text-primary underline decoration-primary hover:decoration-1 underline-offset-1"
       href={href}
     >
       <slot />
