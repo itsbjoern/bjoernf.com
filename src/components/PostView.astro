@@ -33,7 +33,7 @@ const { title, createdAt, tags, image } = post.data;
           tags && tags.length ? (
             <div class="flex flex-row gap-2">
               {tags.map((t) => (
-                <Tag name={t} class="mt-1" />
+                <Tag name={t} class="mt-1" variant="outlined" />
               ))}
             </div>
           ) : null
