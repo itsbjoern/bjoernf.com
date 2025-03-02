@@ -1,8 +1,9 @@
 ---
 import GameLayout from "@/layouts/Game.astro";
 import { Game } from "./Game.tsx";
+import titleImg from "./conn.png";
 ---
 
-<GameLayout title="Wiki-sort Game">
+<GameLayout title="Wikipedia Connections" image={titleImg.src}>
   <Game client:only />
 </GameLayout>
