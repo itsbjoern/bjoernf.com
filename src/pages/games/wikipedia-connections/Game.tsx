@@ -18,6 +18,13 @@ interface Selection {
   [key: number]: number | null;
 }
 
+interface Toast {
+  id?: number;
+  message: string;
+  color?: string;
+  duration?: number;
+}
+
 function mulberry32(a: number) {
   return function () {
     let t = (a += 0x6d2b79f5);
@@ -55,10 +62,10 @@ export const Game = () => {
 
   const [highlighted, setHighlighted] = useState<Selection>({});
   const [previousChoices, setPreviousChoices] = useState<Selection[]>([]);
-  const [correctGuesses, setCorrectGuesses] = useState<Selection>({});
   const [showWinScreen, setShowWinScreen] = useState(false);
   const [showRulesModal, setShowRulesModal] = useState(false);
   const [popupContent, setPopupContent] = useState<Link | null>(null);
+  const [toasts, setToasts] = useState<Toast[]>([]);
 
   const gameLink = nestedLinks[
     dayDate as keyof typeof nestedLinks
@@ -122,6 +129,23 @@ export const Game = () => {
     return [rows, lastItem[choice]];
   }, [nestedLinks]);
 
+  const correctGuesses = previousChoices.reduce((acc, choices) => {
+    Object.entries(choices).forEach(([rowIndex, colIndex]) => {
+      const row = parseInt(rowIndex, 10);
+      if (colIndex === null) {
+        acc[row] = null;
+      } else if (rows[row][colIndex].index === lastItem?.index) {
+        acc[row] = colIndex;
+      }
+    });
+    return acc;
+  }, {});
+
+  const canSubmit =
+    Object.values(highlighted).filter(
+      (val) => val !== undefined && val !== null,
+    ).length === rows.length;
+
   const hasWon =
     Object.values(correctGuesses).filter(
       (val) => val !== undefined && val !== null,
@@ -131,19 +155,47 @@ export const Game = () => {
     const savedState = loadState();
     if (savedState && savedState.dayDate === dayDate) {
       setPreviousChoices(savedState.previousChoices);
-      setCorrectGuesses(savedState.correctGuesses);
       setShowWinScreen(savedState.hasWon);
-      setHighlighted(savedState.correctGuesses);
+
+      // @ts-ignore
+      const correct = savedState.previousChoices.reduce((acc, choices) => {
+        Object.entries(choices).forEach(([rowIndex, colIndex]) => {
+          const row = parseInt(rowIndex, 10);
+          if (colIndex === null) {
+            acc[row] = null;
+            // @ts-ignore
+          } else if (rows[row][colIndex].index === lastItem?.index) {
+            acc[row] = colIndex;
+          }
+        });
+        return acc;
+      }, {});
+
+      setHighlighted(correct);
     } else {
       setHighlighted({});
-      setCorrectGuesses({});
       setPreviousChoices([]);
       setShowWinScreen(false);
     }
   }, []);
 
   const handleLinkClick = (rowIndex: number, colIndex: number) => {
-    if (correctGuesses[rowIndex] && correctGuesses[rowIndex] !== -1) return;
+    if (
+      correctGuesses[rowIndex] !== undefined &&
+      correctGuesses[rowIndex] !== null
+    ) {
+      return;
+    }
+
+    const incorrectGuess = previousChoices.some(
+      (choice) =>
+        choice[rowIndex] === colIndex &&
+        rows[rowIndex][choice[rowIndex]].index !== lastItem?.index,
+    );
+    console.log(incorrectGuess);
+    if (incorrectGuess) {
+      return;
+    }
 
     setHighlighted((prev) => ({
       ...prev,
@@ -151,18 +203,22 @@ export const Game = () => {
     }));
   };
 
-  const handleSubmit = () => {
-    const currentSelection = Object.entries(highlighted).map(
-      ([rowIndex, colIndex]) => [parseInt(rowIndex), colIndex],
-    );
+  const addToast = (toast: Toast) => {
+    const id = Date.now();
+    setToasts((prev) => [...prev, { id, ...toast }]);
+    setTimeout(() => {
+      setToasts((prev) => prev.filter((toast) => toast.id !== id));
+    }, toast.duration || 3000);
+  };
 
+  const handleSubmit = () => {
     let didWin = true;
-    const newCorrectGuesses: Selection = { ...correctGuesses };
-    currentSelection.forEach(([rowIndex, colIndex]) => {
-      if (rows[rowIndex][colIndex].index === choice) {
-        newCorrectGuesses[rowIndex] = colIndex;
+    let correctGuesses: Selection = {};
+    Object.entries(highlighted).forEach(([rowIndex, colIndex]) => {
+      let row = parseInt(rowIndex, 10);
+      if (rows[row][colIndex].index === lastItem!.index) {
+        correctGuesses[row] = colIndex;
       } else {
-        newCorrectGuesses[rowIndex] = null;
         didWin = false;
       }
     });
@@ -174,18 +230,25 @@ export const Game = () => {
         spread: 70,
         origin: { y: 0.6 },
       });
+    } else {
+      if (Object.keys(correctGuesses).length === rows.length - 1) {
+        addToast({
+          message: "Almost there, try again!",
+          color: "bg-red-400",
+        });
+      } else {
+        addToast({ message: "Not quite, try again!", color: "bg-red-400" });
+      }
     }
 
     saveState({
       dayDate,
-      previousChoices: [...previousChoices, newCorrectGuesses],
-      correctGuesses: newCorrectGuesses,
+      previousChoices: [...previousChoices, highlighted],
       hasWon: didWin,
     });
 
-    setCorrectGuesses(newCorrectGuesses);
-    setHighlighted(newCorrectGuesses);
-    setPreviousChoices((prev) => [...prev, newCorrectGuesses]);
+    setHighlighted(correctGuesses);
+    setPreviousChoices((prev) => [...prev, highlighted]);
   };
 
   const handleQuestionMarkClick = (link: Link) => {
@@ -194,7 +257,9 @@ export const Game = () => {
 
   return (
     <div className="p-4 bg-gray-100 rounded-lg shadow-lg width-full relative">
-      <h1 className="text-3xl font-bold mb-6 ">Wiki Connections</h1>
+      <h1 className="text-3xl font-bold ">Wiki Connections</h1>
+      <p>Daily Wikipedia connections, can you beat it?</p>
+      <div className="border-b border-gray-300 my-4" />
       <div className="absolute top-4 right-4 flex gap-2">
         {hasWon ? (
           <button
@@ -259,32 +324,45 @@ export const Game = () => {
                         <b>{links[correctGuesses[rowIndex]].title}</b>
                       </div>
                     ) : (
-                      links.map((link, colIndex) => (
-                        <div
-                          key={colIndex}
-                          className={`p-2 flex flex-1 items-center justify-center text-center rounded-lg cursor-pointer transition-colors duration-200 relative ${
-                            correctGuesses[rowIndex] === colIndex
-                              ? "bg-green-400"
-                              : hasWon
-                              ? colorMap[link.index as keyof typeof colorMap]
-                              : highlighted[rowIndex] === colIndex
-                              ? "bg-blue-200"
-                              : "bg-gray-200 hover:bg-gray-300"
-                          }`}
-                          onClick={() => handleLinkClick(rowIndex, colIndex)}
-                        >
-                          <b>{link.title}</b>
-                          <button
-                            className="absolute -top-2 -right-2 w-6 h-6 bg-gray-200 rounded-full transition-colors hover:bg-gray-300"
-                            onClick={(e) => {
-                              e.stopPropagation();
-                              handleQuestionMarkClick(link);
-                            }}
+                      links.map((link, colIndex) => {
+                        const incorrectGuess = previousChoices.some(
+                          (choice) =>
+                            choice[rowIndex] === colIndex &&
+                            rows[rowIndex][choice[rowIndex]].index !==
+                              lastItem?.index,
+                        );
+
+                        return (
+                          <div
+                            key={colIndex}
+                            className={`p-2 flex flex-1 items-center justify-center text-center rounded-lg cursor-pointer transition-colors duration-200 relative ${
+                              correctGuesses[rowIndex] === colIndex &&
+                              !showWinScreen
+                                ? "bg-green-400"
+                                : hasWon && !showWinScreen
+                                ? colorMap[link.index as keyof typeof colorMap]
+                                : incorrectGuess && !showWinScreen
+                                ? "bg-red-300"
+                                : highlighted[rowIndex] === colIndex &&
+                                  !showWinScreen
+                                ? "bg-blue-200"
+                                : "bg-gray-200 hover:bg-gray-300"
+                            }`}
+                            onClick={() => handleLinkClick(rowIndex, colIndex)}
                           >
-                            ?
-                          </button>
-                        </div>
-                      ))
+                            <b>{link.title}</b>
+                            <button
+                              className="absolute -top-2 -right-2 w-6 h-6 bg-gray-200 rounded-full transition-colors hover:bg-gray-300"
+                              onClick={(e) => {
+                                e.stopPropagation();
+                                handleQuestionMarkClick(link);
+                              }}
+                            >
+                              ?
+                            </button>
+                          </div>
+                        );
+                      })
                     )}
                   </div>
                   {rowIndex < rows.length - 1 ? (
@@ -334,19 +412,12 @@ export const Game = () => {
             </div>
             <button
               className={`mt-4 p-2 bg-green-500 text-white rounded-lg shadow-md  ${
-                hasWon ||
-                Object.values(highlighted).filter(
-                  (val) => val !== undefined && val !== null,
-                ).length < rows.length
+                hasWon || !canSubmit
                   ? "opacity-50"
                   : "hover:bg-green-600 transition-colors duration-200 cursor-pointer"
               }`}
               onClick={handleSubmit}
-              disabled={
-                Object.values(highlighted).filter(
-                  (val) => val !== undefined && val !== null,
-                ).length < rows.length || hasWon
-              }
+              disabled={!canSubmit || hasWon}
             >
               Check
             </button>
@@ -386,7 +457,7 @@ export const Game = () => {
             <div className="p-6 bg-white rounded-lg shadow-lg">
               <h2 className="text-3xl font-bold text-center">You won!</h2>
               <p className="text-center">
-                You solved the game in {previousChoices.length} attempts!
+                You beat the game in {previousChoices.length} attempts!
               </p>
               <div className="border-b border-gray-300 my-4" />
               <div className="flex flex-col gap-2">
@@ -397,12 +468,10 @@ export const Game = () => {
                       <div
                         key={rowIndex}
                         className={`flex flex-1 h-8 rounded-lg ${
-                          colIndex === undefined || colIndex === null
-                            ? "bg-red-300"
-                            : colIndex ===
-                              correctGuesses[rowIndex as unknown as number]
+                          colIndex ===
+                          correctGuesses[rowIndex as unknown as number]
                             ? "bg-green-300"
-                            : "bg-blue-200"
+                            : "bg-red-300"
                         }`}
                       />
                     ))}
@@ -411,6 +480,35 @@ export const Game = () => {
               </div>
               <div className="border-b border-gray-300 my-4" />
               <div className="flex gap-4 justify-center">
+                <button
+                  className="p-2 bg-blue-500 text-white rounded-lg shadow-md hover:bg-blue-600 transition-colors duration-200 cursor-pointer"
+                  onClick={() => {
+                    let text = `I beat the daily Wikipedia Connections in ${previousChoices.length} attempts!\n\n`;
+                    previousChoices.forEach((choices, i) => {
+                      let row = "";
+                      Object.entries(choices).forEach(
+                        ([rowIndex, colIndex]) => {
+                          if (
+                            colIndex ===
+                            correctGuesses[rowIndex as unknown as number]
+                          ) {
+                            row += "🟩";
+                          } else {
+                            row += "🟥";
+                          }
+                        },
+                      );
+                      text += row + "\n";
+                    });
+                    text += "\n";
+                    text +=
+                      "Play it yourself at https://bjoernf.com/games/wikipedia-connections";
+                    navigator.clipboard.writeText(text);
+                    addToast({ message: "Copied to clipboard!" });
+                  }}
+                >
+                  Copy to clipboard
+                </button>
                 <button
                   className="p-2 bg-blue-500 text-white rounded-lg shadow-md hover:bg-blue-600 transition-colors duration-200 cursor-pointer"
                   onClick={() => {
@@ -508,6 +606,18 @@ export const Game = () => {
           </div>
         </>
       )}
+      <div className="fixed inset-x-2 md:inset-x-1/3 top-10 flex flex-col gap-2 pointer-events-none">
+        {toasts.map((toast) => (
+          <div
+            key={toast.id}
+            className={`p-2 ${
+              toast.color || "bg-gray-800"
+            } text-white rounded-lg shadow-md transition-all`}
+          >
+            {toast.message}
+          </div>
+        ))}
+      </div>
     </div>
   );
 };
