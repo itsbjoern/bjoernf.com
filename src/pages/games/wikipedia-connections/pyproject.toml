@@ -1,5 +1,6 @@
 [tool.poetry]
-name = "wiki-sort"
+name = "wikipedia-connections"
+package-mode = false
 version = "0.1.0"
 description = ""
 authors = ["Björn Friedrichs <mail@bjoernf.com>"]

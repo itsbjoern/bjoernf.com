@@ -16,7 +16,7 @@ jobs:
 
       - name: Install the project dependencies
         working-directory: src/pages/games/wikipedia-connections
-        run: poetry install
+        run: poetry install --no-root
 
       - working-directory: src/pages/games/wikipedia-connections
         run: python today.py
