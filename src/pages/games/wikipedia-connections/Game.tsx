@@ -133,6 +133,7 @@ export const Game = () => {
       setPreviousChoices(savedState.previousChoices);
       setCorrectGuesses(savedState.correctGuesses);
       setShowWinScreen(savedState.hasWon);
+      setHighlighted(savedState.correctGuesses);
     } else {
       setHighlighted({});
       setCorrectGuesses({});
@@ -426,26 +427,29 @@ export const Game = () => {
       {showRulesModal ? (
         <>
           <div className="fixed inset-0 bg-black bg-opacity-50" />
-          <div className="fixed inset-x-2 md:inset-x-1/3 top-10 flex items-center justify-center">
+          <div className="fixed inset-x-2 md:inset-x-1/3 top-2 md:top-10 flex items-center justify-center">
             <div className="p-6 bg-white rounded-lg shadow-lg">
               <h2 className="text-3xl font-bold text-center">How to Play</h2>
-              <p className="mt-4 text-center">
-                Every day you will be shown a random page of a Wikipedia entry.
-                For each page, it gives you a list of pages that it links to.
-                Then it shows the page that the last page links to, and that one
-                links to another page, and so on.
-              </p>
-              <p className="mt-4 text-center">
-                Your goal is to navigate from the start page to the end page by
-                correctly identifying the links between the pages that lead you
-                to the correct ending page. You can use the questionmark to
-                learn more about a page. To not spoil the game for yourself,
-                don't use the Wikipedia link unless you absolutely have to.
-              </p>
-              <p className="mt-4 text-center">
-                When you have made a selection for all links, press the "Check"
-                button to see if you have made the correct choices.
-              </p>
+              <div className="flex flex-col max-h-[50vh] md:max-h-[70vh] overflow-auto">
+                <p className="mt-4 text-center">
+                  Every day you will be shown a random page of a Wikipedia
+                  entry. For each page, it gives you a list of pages that it
+                  links to. Then it shows the page that the last page links to,
+                  and that one links to another page, and so on.
+                </p>
+                <p className="mt-4 text-center">
+                  Your goal is to navigate from the start page to the end page
+                  by correctly identifying the links between the pages that lead
+                  you to the correct ending page. You can use the questionmark
+                  to learn more about a page. To not spoil the game for
+                  yourself, don't use the Wikipedia link unless you absolutely
+                  have to.
+                </p>
+                <p className="mt-4 text-center">
+                  When you have made a selection for all links, press the
+                  "Check" button to see if you have made the correct choices.
+                </p>
+              </div>
               <div className="border-b border-gray-300 my-4" />
               <div className="flex gap-4 justify-center">
                 <button
@@ -464,19 +468,23 @@ export const Game = () => {
       {popupContent && (
         <>
           <div className="fixed inset-0 bg-black bg-opacity-50" />
-          <div className="fixed inset-x-2 md:inset-x-1/3 top-10 flex items-center justify-center">
+          <div className="fixed inset-x-2 md:inset-x-1/3 top-2 md:top-10 flex items-center justify-center">
             <div className="p-6 bg-white rounded-lg shadow-lg">
-              {popupContent.image ? (
-                <img
-                  src={popupContent.image}
-                  alt={popupContent.title}
-                  className="w-32 h-32 mx-auto rounded-lg object-cover"
-                />
-              ) : null}
-              <h2 className="text-2xl font-bold text-center">
-                {popupContent.title}
-              </h2>
-              <p className="mt-4 text-center">{popupContent.summary}</p>
+              <div className="flex flex-row md:flex-col gap-4 items-center">
+                {popupContent.image ? (
+                  <img
+                    src={popupContent.image}
+                    alt={popupContent.title}
+                    className="w-16 h-16 md:w-32 md:h-32 md:mx-auto rounded-lg object-cover"
+                  />
+                ) : null}
+                <h2 className="text-2xl font-bold md:text-center">
+                  {popupContent.title}
+                </h2>
+              </div>
+              <p className="mt-4 text-center max-h-[30vh] md:max-h-[70vh] overflow-auto">
+                {popupContent.summary}
+              </p>
               <a
                 href={popupContent.url}
                 target="_blank"
