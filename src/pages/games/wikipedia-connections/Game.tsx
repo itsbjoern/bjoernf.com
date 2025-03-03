@@ -482,10 +482,10 @@ export const Game = ({
                     text +=
                       "Play it yourself at https://bjoernf.com/games/wikipedia-connections";
                     navigator.clipboard.writeText(text);
-                    addToast({ message: "Copied to clipboard!" });
+                    addToast({ message: "Copied result to clipboard!" });
                   }}
                 >
-                  Copy to clipboard
+                  Share result
                 </button>
                 <button
                   className="p-2 bg-blue-500 text-white rounded-lg shadow-md hover:bg-blue-600 transition-colors duration-200 cursor-pointer"
