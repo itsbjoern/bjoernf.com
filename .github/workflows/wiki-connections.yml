@@ -19,7 +19,7 @@ jobs:
         run: poetry install --no-root
 
       - working-directory: src/pages/games/wikipedia-connections
-        run: python today.py
+        run: poetry run python today.py
 
       - name: Configure AWS credentials
         uses: aws-actions/configure-aws-credentials@v1
