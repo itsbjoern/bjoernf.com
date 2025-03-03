@@ -25,7 +25,8 @@ jobs:
           aws-region: eu-west-2
 
       - name: Sync to S3
-        run: aws s3 sync ./dist s3://bjoernf.com --exclude='wikipedia-game.json' --delete
+        working-directory: dist
+        run: aws s3 sync . s3://bjoernf.com --exclude='wikipedia-game.json' --delete
 
       - name: Invalidate cache from CF
         run: |
