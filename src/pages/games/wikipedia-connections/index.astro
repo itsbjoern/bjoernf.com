@@ -1,9 +1,9 @@
 ---
 import GameLayout from "@/layouts/Game.astro";
-import { Game } from "./Game.tsx";
+import { Loader } from "./Loader.tsx";
 import titleImg from "./conn.png";
 ---
 
 <GameLayout title="Wikipedia Connections" image={titleImg.src}>
-  <Game client:only />
+  <Loader client:only />
 </GameLayout>

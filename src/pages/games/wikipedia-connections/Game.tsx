@@ -1,5 +1,4 @@
 import { useState, useEffect, useMemo } from "react";
-import nestedLinks from "./data/combined.json";
 // @ts-ignore
 import confetti from "canvas-confetti";
 
@@ -7,6 +6,7 @@ interface Link {
   text: string;
   choice?: number;
   url: string;
+  date: string;
   title: string;
   image?: string;
   summary: string;
@@ -34,13 +34,13 @@ function mulberry32(a: number) {
   };
 }
 
-const loadState = () => {
-  const state = localStorage.getItem("wikiSortGameState");
+const loadState = (gameType: string) => {
+  const state = localStorage.getItem(`wikiSortGameState-${gameType}`);
   return state ? JSON.parse(state) : null;
 };
 
-const saveState = (state: any) => {
-  localStorage.setItem("wikiSortGameState", JSON.stringify(state));
+const saveState = (gameType: string, state: any) => {
+  localStorage.setItem(`wikiSortGameState-${gameType}`, JSON.stringify(state));
 };
 
 const colorMap = {
@@ -50,16 +50,13 @@ const colorMap = {
   3: "bg-orange-100",
 };
 
-export const Game = () => {
-  const dayDate = useMemo(() => {
-    const today = new Date();
-    const zeroPad = (num: number) => (num < 10 ? `0${num}` : num);
-
-    return `${today.getFullYear()}-${zeroPad(today.getMonth() + 1)}-${zeroPad(
-      today.getDate(),
-    )}`;
-  }, []);
-
+export const Game = ({
+  gameType,
+  gameLink,
+}: {
+  gameType: string;
+  gameLink: Link;
+}) => {
   const [highlighted, setHighlighted] = useState<Selection>({});
   const [previousChoices, setPreviousChoices] = useState<Selection[]>([]);
   const [showWinScreen, setShowWinScreen] = useState(false);
@@ -67,14 +64,9 @@ export const Game = () => {
   const [popupContent, setPopupContent] = useState<Link | null>(null);
   const [toasts, setToasts] = useState<Toast[]>([]);
 
-  const gameLink = nestedLinks[
-    dayDate as keyof typeof nestedLinks
-  ] as unknown as Link;
-
   const getRand = useMemo(() => {
-    const today = new Date();
-    const randValue = today.getFullYear() + today.getMonth() + today.getDate();
-    return mulberry32(randValue);
+    const parts = gameLink.date.split("-").map((part) => parseInt(part, 10));
+    return mulberry32(parts.reduce((acc, part) => acc + part, 0));
   }, []);
 
   const shuffleArray = (array: any[]) => {
@@ -85,19 +77,12 @@ export const Game = () => {
   };
 
   const choice = useMemo(
-    () =>
-      gameLink
-        ? gameLink.choice || Math.floor(getRand() * gameLink.links.length)
-        : 0,
+    () => Math.floor(getRand() * gameLink.links.length),
     [gameLink, getRand],
   );
 
   const [rows, lastItem] = useMemo(() => {
     const rows: Link[][] = [];
-
-    if (!gameLink) {
-      return [[], null];
-    }
 
     gameLink.links.forEach((link, i) => {
       if (!rows[i]) {
@@ -127,7 +112,7 @@ export const Game = () => {
     });
 
     return [rows, lastItem[choice]];
-  }, [nestedLinks]);
+  }, [gameLink]);
 
   const correctGuesses = previousChoices.reduce((acc, choices) => {
     Object.entries(choices).forEach(([rowIndex, colIndex]) => {
@@ -152,8 +137,8 @@ export const Game = () => {
     ).length === rows.length;
 
   useEffect(() => {
-    const savedState = loadState();
-    if (savedState && savedState.dayDate === dayDate) {
+    const savedState = loadState(gameType);
+    if (savedState && savedState.dayDate === gameLink.date) {
       setPreviousChoices(savedState.previousChoices);
       setShowWinScreen(savedState.hasWon);
 
@@ -177,7 +162,7 @@ export const Game = () => {
       setPreviousChoices([]);
       setShowWinScreen(false);
     }
-  }, []);
+  }, [gameType, gameLink]);
 
   const handleLinkClick = (rowIndex: number, colIndex: number) => {
     if (
@@ -192,7 +177,6 @@ export const Game = () => {
         choice[rowIndex] === colIndex &&
         rows[rowIndex][choice[rowIndex]].index !== lastItem?.index,
     );
-    console.log(incorrectGuess);
     if (incorrectGuess) {
       return;
     }
@@ -241,8 +225,8 @@ export const Game = () => {
       }
     }
 
-    saveState({
-      dayDate,
+    saveState(gameType, {
+      dayDate: gameLink.date,
       previousChoices: [...previousChoices, highlighted],
       hasWon: didWin,
     });
@@ -276,154 +260,149 @@ export const Game = () => {
           How to play
         </button>
       </div>
-      {!gameLink ? (
-        <div className="p-4 bg-white rounded-lg text-center">
-          <p>No game today, sorry!</p>
+      <div className="flex flex-col gap-4">
+        <div className="p-3 gap-4 items-center bg-blue-500 text-white rounded-lg relative flex">
+          {gameLink!.image ? (
+            <img
+              src={gameLink!.image}
+              alt={gameLink!.title}
+              className="flex-0 w-16 h-16 mx-auto rounded-lg object-cover"
+            />
+          ) : null}
+          <div className="flex-1 -mt-1">
+            <span className="text-xs">Starting at</span>
+            <p>
+              <strong>{gameLink!.title}</strong>
+            </p>
+          </div>
+          <button
+            className="absolute -top-2 -right-2 w-6 h-6 bg-blue-500 rounded-full transition-colors hover:bg-blue-400"
+            onClick={(e) => {
+              e.stopPropagation();
+              handleQuestionMarkClick(gameLink!);
+            }}
+          >
+            ?
+          </button>
         </div>
-      ) : (
-        <div className="flex flex-col gap-4">
+
+        <>
+          <div className="flex flex-col bg-white p-4 gap-4 md:gap-2 rounded-lg">
+            {rows.map((links, rowIndex) => (
+              <>
+                <div
+                  className="flex gap-1 md:gap-4 flex-col md:flex-row"
+                  key={rowIndex}
+                >
+                  {!hasWon &&
+                  correctGuesses[rowIndex] !== undefined &&
+                  correctGuesses[rowIndex] !== null ? (
+                    <div
+                      className={`p-2 flex flex-1 items-center justify-center text-center rounded-lg transition-all duration-200 bg-green-400`}
+                    >
+                      <b>{links[correctGuesses[rowIndex]].title}</b>
+                    </div>
+                  ) : (
+                    links.map((link, colIndex) => {
+                      const incorrectGuess = previousChoices.some(
+                        (choice) =>
+                          choice[rowIndex] === colIndex &&
+                          rows[rowIndex][choice[rowIndex]].index !==
+                            lastItem?.index,
+                      );
+
+                      return (
+                        <div
+                          key={colIndex}
+                          className={`p-2 flex flex-1 items-center justify-center text-center rounded-lg cursor-pointer transition-colors duration-200 relative ${
+                            correctGuesses[rowIndex] === colIndex &&
+                            !showWinScreen
+                              ? "bg-green-400"
+                              : hasWon && !showWinScreen
+                              ? colorMap[link.index as keyof typeof colorMap]
+                              : incorrectGuess && !showWinScreen
+                              ? "bg-red-300"
+                              : highlighted[rowIndex] === colIndex &&
+                                !showWinScreen
+                              ? "bg-blue-200"
+                              : "bg-gray-200 hover:bg-gray-300"
+                          }`}
+                          onClick={() => handleLinkClick(rowIndex, colIndex)}
+                        >
+                          <b>{link.title}</b>
+                          <button
+                            className="absolute -top-2 -right-2 w-6 h-6 bg-gray-200 rounded-full transition-colors hover:bg-gray-300"
+                            onClick={(e) => {
+                              e.stopPropagation();
+                              handleQuestionMarkClick(link);
+                            }}
+                          >
+                            ?
+                          </button>
+                        </div>
+                      );
+                    })
+                  )}
+                </div>
+                {rowIndex < rows.length - 1 ? (
+                  <div className="flex justify-center">
+                    <svg
+                      xmlns="http://www.w3.org/2000/svg"
+                      className="h-6 w-6 text-gray-500"
+                      fill="none"
+                      viewBox="0 0 24 24"
+                      stroke="currentColor"
+                    >
+                      <path
+                        strokeLinecap="round"
+                        strokeLinejoin="round"
+                        strokeWidth={2}
+                        d="M19 14l-7 7m0 0l-7-7m7 7V3"
+                      />
+                    </svg>
+                  </div>
+                ) : null}
+              </>
+            ))}
+          </div>
           <div className="p-3 gap-4 items-center bg-blue-500 text-white rounded-lg relative flex">
-            {gameLink!.image ? (
+            {lastItem!.image ? (
               <img
-                src={gameLink!.image}
-                alt={gameLink!.title}
+                src={lastItem!.image}
+                alt={lastItem!.title}
                 className="flex-0 w-16 h-16 mx-auto rounded-lg object-cover"
               />
             ) : null}
             <div className="flex-1 -mt-1">
-              <span className="text-xs">Starting at</span>
+              <span className="text-xs">To</span>
               <p>
-                <strong>{gameLink!.title}</strong>
+                <strong>{lastItem!.title}</strong>
               </p>
             </div>
             <button
               className="absolute -top-2 -right-2 w-6 h-6 bg-blue-500 rounded-full transition-colors hover:bg-blue-400"
               onClick={(e) => {
                 e.stopPropagation();
-                handleQuestionMarkClick(gameLink!);
+                handleQuestionMarkClick(lastItem!);
               }}
             >
               ?
             </button>
           </div>
+          <button
+            className={`mt-4 p-2 bg-green-500 text-white rounded-lg shadow-md  ${
+              hasWon || !canSubmit
+                ? "opacity-50"
+                : "hover:bg-green-600 transition-colors duration-200 cursor-pointer"
+            }`}
+            onClick={handleSubmit}
+            disabled={!canSubmit || hasWon}
+          >
+            Check
+          </button>
+        </>
 
-          <>
-            <div className="flex flex-col bg-white p-4 gap-4 md:gap-2 rounded-lg">
-              {rows.map((links, rowIndex) => (
-                <>
-                  <div
-                    className="flex gap-1 md:gap-4 flex-col md:flex-row"
-                    key={rowIndex}
-                  >
-                    {!hasWon &&
-                    correctGuesses[rowIndex] !== undefined &&
-                    correctGuesses[rowIndex] !== null ? (
-                      <div
-                        className={`p-2 flex flex-1 items-center justify-center text-center rounded-lg transition-all duration-200 bg-green-400`}
-                      >
-                        <b>{links[correctGuesses[rowIndex]].title}</b>
-                      </div>
-                    ) : (
-                      links.map((link, colIndex) => {
-                        const incorrectGuess = previousChoices.some(
-                          (choice) =>
-                            choice[rowIndex] === colIndex &&
-                            rows[rowIndex][choice[rowIndex]].index !==
-                              lastItem?.index,
-                        );
-
-                        return (
-                          <div
-                            key={colIndex}
-                            className={`p-2 flex flex-1 items-center justify-center text-center rounded-lg cursor-pointer transition-colors duration-200 relative ${
-                              correctGuesses[rowIndex] === colIndex &&
-                              !showWinScreen
-                                ? "bg-green-400"
-                                : hasWon && !showWinScreen
-                                ? colorMap[link.index as keyof typeof colorMap]
-                                : incorrectGuess && !showWinScreen
-                                ? "bg-red-300"
-                                : highlighted[rowIndex] === colIndex &&
-                                  !showWinScreen
-                                ? "bg-blue-200"
-                                : "bg-gray-200 hover:bg-gray-300"
-                            }`}
-                            onClick={() => handleLinkClick(rowIndex, colIndex)}
-                          >
-                            <b>{link.title}</b>
-                            <button
-                              className="absolute -top-2 -right-2 w-6 h-6 bg-gray-200 rounded-full transition-colors hover:bg-gray-300"
-                              onClick={(e) => {
-                                e.stopPropagation();
-                                handleQuestionMarkClick(link);
-                              }}
-                            >
-                              ?
-                            </button>
-                          </div>
-                        );
-                      })
-                    )}
-                  </div>
-                  {rowIndex < rows.length - 1 ? (
-                    <div className="flex justify-center">
-                      <svg
-                        xmlns="http://www.w3.org/2000/svg"
-                        className="h-6 w-6 text-gray-500"
-                        fill="none"
-                        viewBox="0 0 24 24"
-                        stroke="currentColor"
-                      >
-                        <path
-                          strokeLinecap="round"
-                          strokeLinejoin="round"
-                          strokeWidth={2}
-                          d="M19 14l-7 7m0 0l-7-7m7 7V3"
-                        />
-                      </svg>
-                    </div>
-                  ) : null}
-                </>
-              ))}
-            </div>
-            <div className="p-3 gap-4 items-center bg-blue-500 text-white rounded-lg relative flex">
-              {lastItem!.image ? (
-                <img
-                  src={lastItem!.image}
-                  alt={lastItem!.title}
-                  className="flex-0 w-16 h-16 mx-auto rounded-lg object-cover"
-                />
-              ) : null}
-              <div className="flex-1 -mt-1">
-                <span className="text-xs">To</span>
-                <p>
-                  <strong>{lastItem!.title}</strong>
-                </p>
-              </div>
-              <button
-                className="absolute -top-2 -right-2 w-6 h-6 bg-blue-500 rounded-full transition-colors hover:bg-blue-400"
-                onClick={(e) => {
-                  e.stopPropagation();
-                  handleQuestionMarkClick(lastItem!);
-                }}
-              >
-                ?
-              </button>
-            </div>
-            <button
-              className={`mt-4 p-2 bg-green-500 text-white rounded-lg shadow-md  ${
-                hasWon || !canSubmit
-                  ? "opacity-50"
-                  : "hover:bg-green-600 transition-colors duration-200 cursor-pointer"
-              }`}
-              onClick={handleSubmit}
-              disabled={!canSubmit || hasWon}
-            >
-              Check
-            </button>
-          </>
-
-          {/* <div className="mt-4">
+        {/* <div className="mt-4">
           <h2 className="text-xl font-bold">Previous guesses</h2>
           <div className="flex flex-col gap-6 bg-white rounded-lg p-4">
             {previousChoices.map((choices, i) => (
@@ -445,8 +424,7 @@ export const Game = () => {
             ))}
           </div>
         </div> */}
-        </div>
-      )}
+      </div>
       {showWinScreen ? (
         <>
           <div className="fixed inset-0 bg-black bg-opacity-50" />

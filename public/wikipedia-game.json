@@ -1,0 +1,224 @@
+{
+  "regular": {
+    "date": "2025-03-03",
+    "text": "Samsung Galaxy S7",
+    "url": "https://en.wikipedia.org/wiki/Samsung_Galaxy_S7",
+    "title": "Samsung Galaxy S7",
+    "summary": "\nThe Samsung Galaxy S7, Samsung Galaxy S7 Edge and Samsung Galaxy S7 Active are Android-based smartphones manufactured, released and marketed by Samsung Electronics. The S7 series serves as the successor to the Galaxy S6, S6 Edge, S6 Edge+ and S6 Active released in 2015. The S7 and S7 Edge were officially unveiled on 21 February 2016 during a Samsung press conference at Mobile World Congress, with a European and North American release on 11 March 2016. The S7 Active was unveiled on 4 June 2016, and released on AT&T in the United States on 10 June 2016.",
+    "image": "https://upload.wikimedia.org/wikipedia/commons/thumb/0/03/Samsung_Galaxy_S7_and_S7_Edge.png/320px-Samsung_Galaxy_S7_and_S7_Edge.png",
+    "links": [
+      {
+        "text": "Android Jelly Bean",
+        "url": "https://en.wikipedia.org./Android_Jelly_Bean",
+        "title": "Android Jelly Bean",
+        "summary": "Android Jelly Bean is the codename given to the tenth version of the Android mobile operating system developed by Google, spanning three major point releases. Among the devices that launched with Android 4.1 to 4.3 are the Nexus 7 (2012), Nexus 4, Nexus 10, Nexus 7 (2013), and Hyundai Play X.",
+        "image": "https://upload.wikimedia.org/wikipedia/commons/thumb/a/af/Android_4.2_on_the_Nexus_4.png/320px-Android_4.2_on_the_Nexus_4.png",
+        "links": [
+          {
+            "text": "Nexus 4",
+            "url": "https://en.wikipedia.org./Nexus_4",
+            "title": "Nexus 4",
+            "summary": "The Nexus 4 is an Android smartphone co-developed by Google and LG Electronics. It is the fourth smartphone in the Google Nexus product family, unveiled on October 29, 2012, and released on November 13, 2012, and succeeded the Samsung-manufactured Galaxy Nexus. As with other Nexus devices, the Nexus 4 was sold unlocked through Google Play, but was also retailed by wireless carriers.",
+            "image": "https://upload.wikimedia.org/wikipedia/commons/thumb/7/7d/Nexus_4.png/320px-Nexus_4.png",
+            "links": [
+              {
+                "text": "Google",
+                "url": "https://en.wikipedia.org./Google",
+                "title": "Google",
+                "summary": "Google LLC is an American multinational corporation and technology company focusing on online advertising, search engine technology, cloud computing, computer software, quantum computing, e-commerce, consumer electronics, and artificial intelligence (AI). It has been referred to as \"the most powerful company in the world\" by the BBC and is one of the world's most valuable brands due to its market dominance, data collection, and technological advantages in the field of AI. Alongside Amazon, Apple, Meta, and Microsoft, Google's parent company, Alphabet Inc. is one of the five Big Tech companies.",
+                "image": "https://upload.wikimedia.org/wikipedia/commons/thumb/3/32/Googleplex_HQ_%28cropped%29.jpg/320px-Googleplex_HQ_%28cropped%29.jpg",
+                "links": [
+                  {
+                    "text": "Server farm",
+                    "url": "https://en.wikipedia.org./Server_farm",
+                    "title": "Server farm",
+                    "summary": "A server farm or server cluster is a collection of computer servers, usually maintained by an organization to supply server functionality far beyond the capability of a single machine. They often consist of thousands of computers which require a large amount of power to run and to keep cool. At the optimum performance level, a server farm has enormous financial and environmental costs.\nThey often include backup servers that can take over the functions of primary servers that may fail. Server farms are typically collocated with the network switches and/or routers that enable communication between different parts of the cluster and the cluster's users. Server \"farmers\" typically mount computers, routers, power supplies and related electronics on 19-inch racks in a server room or data center.",
+                    "image": "https://upload.wikimedia.org/wikipedia/commons/thumb/d/d4/Wikimedia-servers-Sept04.jpg/320px-Wikimedia-servers-Sept04.jpg",
+                    "links": [
+                      {
+                        "text": "Computational fluid dynamics",
+                        "url": "https://en.wikipedia.org./Computational_fluid_dynamics",
+                        "title": "Computational fluid dynamics",
+                        "summary": "Computational fluid dynamics (CFD) is a branch of fluid mechanics that uses numerical analysis and data structures to analyze and solve problems that involve fluid flows. Computers are used to perform the calculations required to simulate the free-stream flow of the fluid, and the interaction of the fluid with surfaces defined by boundary conditions. With high-speed supercomputers, better solutions can be achieved, and are often required to solve the largest and most complex problems. Ongoing research yields software that improves the accuracy and speed of complex simulation scenarios such as transonic or turbulent flows. Initial validation of such software is typically performed using experimental apparatus such as wind tunnels. In addition, previously performed analytical or empirical analysis of a particular problem can be used for comparison. A final validation is often performed using full-scale testing, such as flight tests.",
+                        "image": "https://upload.wikimedia.org/wikipedia/commons/thumb/5/54/Rayleigh-Taylor_instability.jpg/320px-Rayleigh-Taylor_instability.jpg",
+                        "links": [
+                          {
+                            "text": "Wind tunnel",
+                            "url": "https://en.wikipedia.org./Wind_tunnel",
+                            "title": "Wind tunnel",
+                            "summary": "A wind tunnel is \"an apparatus for producing a controlled stream of air for conducting aerodynamic experiments\". The experiment is conducted in the test section of the wind tunnel and a complete tunnel configuration includes air ducting to and from the test section and a device for keeping the air in motion, such as a fan. Wind tunnel uses include assessing the effects of air on an aircraft in flight or a ground vehicle moving on land, and measuring the effect of wind on buildings and bridges. Wind tunnel test sections range in size from less than a foot across, to over 100 feet (30\u00a0m), and with air speeds from a light breeze to hypersonic.",
+                            "image": "https://upload.wikimedia.org/wikipedia/commons/thumb/9/9c/8-Foot_Transonic_Pressure_Tunnel_%289443013405%29.jpg/320px-8-Foot_Transonic_Pressure_Tunnel_%289443013405%29.jpg",
+                            "links": []
+                          }
+                        ]
+                      }
+                    ]
+                  }
+                ]
+              }
+            ]
+          }
+        ]
+      },
+      {
+        "text": "MicroSD",
+        "url": "https://en.wikipedia.org./MicroSD",
+        "title": "MicroSD",
+        "summary": "Secure Digital, officially abbreviated as SD, is a proprietary, non-volatile, flash memory card format the SD Association (SDA) developed for use in portable devices.",
+        "image": "https://upload.wikimedia.org/wikipedia/commons/thumb/6/67/SD_Cards.svg/320px-SD_Cards.svg.png",
+        "links": [
+          {
+            "text": "Open-source software",
+            "url": "https://en.wikipedia.org./Open-source_software",
+            "title": "Open-source software",
+            "summary": "Open-source software (OSS) is computer software that is released under a license in which the copyright holder grants users the rights to use, study, change, and distribute the software and its source code to anyone and for any purpose. Open-source software may be developed in a collaborative, public manner. Open-source software is a prominent example of open collaboration, meaning any capable user is able to participate online in development, making the number of possible contributors indefinite. The ability to examine the code facilitates public trust in the software.",
+            "image": "https://upload.wikimedia.org/wikipedia/commons/thumb/2/20/Manjaro_Linux_desktop_20210604.png/320px-Manjaro_Linux_desktop_20210604.png",
+            "links": [
+              {
+                "text": "National security",
+                "url": "https://en.wikipedia.org./National_security",
+                "title": "National security",
+                "summary": "National security, or national defence, is the security and defence of a sovereign state, including its citizens, economy, and institutions, which is regarded as a duty of government. Originally conceived as protection against military attack, national security is widely understood to include also non-military dimensions, such as the security from terrorism, minimization of crime, economic security, energy security, environmental security, food security, and cyber-security. Similarly, national security risks include, in addition to the actions of other states, action by violent non-state actors, by narcotic cartels, organized crime, by multinational corporations, and also the effects of natural disasters.",
+                "image": "",
+                "links": [
+                  {
+                    "text": "Government",
+                    "url": "https://en.wikipedia.org./Government",
+                    "title": "Government",
+                    "summary": "A government is the system or group of people governing an organized community, generally a state.",
+                    "image": "https://upload.wikimedia.org/wikipedia/commons/thumb/0/04/Forms_of_government.svg/320px-Forms_of_government.svg.png",
+                    "links": [
+                      {
+                        "text": "Executive (government)",
+                        "url": "https://en.wikipedia.org./Executive_(government)",
+                        "title": "Executive (government)",
+                        "summary": "The executive branch is the part of government which executes or enforces the law.",
+                        "image": "",
+                        "links": [
+                          {
+                            "text": "Presidential system",
+                            "url": "https://en.wikipedia.org./Presidential_system",
+                            "title": "Presidential system",
+                            "summary": "A presidential, strong-president, or single-executive system is a form of government in which a head of government heads an executive branch that derives its authority and legitimacy from a source that is separate from the legislative branch. The system was popularized by its inclusion in the Constitution of the United States.",
+                            "image": "https://upload.wikimedia.org/wikipedia/commons/thumb/0/04/Forms_of_government.svg/320px-Forms_of_government.svg.png",
+                            "links": []
+                          }
+                        ]
+                      }
+                    ]
+                  }
+                ]
+              }
+            ]
+          }
+        ]
+      },
+      {
+        "text": "Image sensor",
+        "url": "https://en.wikipedia.org./Image_sensor",
+        "title": "Image sensor",
+        "summary": "An image sensor or imager is a sensor that detects and conveys information used to form an image. It does so by converting the variable attenuation of light waves into signals, small bursts of current that convey the information. The waves can be light or other electromagnetic radiation. Image sensors are used in electronic imaging devices of both analog and digital types, which include digital cameras, camera modules, camera phones, optical mouse devices, medical imaging equipment, night vision equipment such as thermal imaging devices, radar, sonar, and others. As technology changes, electronic and digital imaging tends to replace chemical and analog imaging.",
+        "image": "",
+        "links": [
+          {
+            "text": "Noise (electronics)",
+            "url": "https://en.wikipedia.org./Noise_(electronics)",
+            "title": "Noise (electronics)",
+            "summary": "In electronics, noise is an unwanted disturbance in an electrical signal.",
+            "image": "https://upload.wikimedia.org/wikipedia/commons/thumb/7/72/Pink.noise.png/320px-Pink.noise.png",
+            "links": [
+              {
+                "text": "Quantum noise",
+                "url": "https://en.wikipedia.org./Quantum_noise",
+                "title": "Quantum noise",
+                "summary": "Quantum noise is noise arising from the indeterminate state of matter in accordance with fundamental principles of quantum mechanics, specifically the uncertainty principle and via zero-point energy fluctuations. Quantum noise is due to the apparently discrete nature of the small quantum constituents such as electrons, as well as the discrete nature of quantum effects, such as photocurrents.",
+                "image": "",
+                "links": [
+                  {
+                    "text": "Gravitational wave",
+                    "url": "https://en.wikipedia.org./Gravitational_wave",
+                    "title": "Gravitational wave",
+                    "summary": "Gravitational waves are transient displacements in a gravitational field\u2014generated by the relative motion of gravitating masses\u2014that radiate outward from their source at the speed of light. They were proposed by Oliver Heaviside in 1893 and then later by Henri Poincar\u00e9 in 1905 as the gravitational equivalent of electromagnetic waves. In 1916, Albert Einstein demonstrated that gravitational waves result from his general theory of relativity as ripples in spacetime.",
+                    "image": "https://upload.wikimedia.org/wikipedia/commons/thumb/8/85/Warped_Space_and_Time_Around_Colliding_Black_Holes_%28Courtesy_Caltech-MIT-LIGO_Laboratory%2C_produced_by_SXS_project%29.webm/320px--Warped_Space_and_Time_Around_Colliding_Black_Holes_%28Courtesy_Caltech-MIT-LIGO_Laboratory%2C_produced_by_SXS_project%29.webm.jpg",
+                    "links": [
+                      {
+                        "text": "Visible light",
+                        "url": "https://en.wikipedia.org./Visible_light",
+                        "title": "Visible light",
+                        "summary": "Light, visible light, or visible radiation is electromagnetic radiation that can be perceived by the human eye. Visible light spans the visible spectrum and is usually defined as having wavelengths in the range of 400\u2013700 nanometres (nm), corresponding to frequencies of 750\u2013420 terahertz. The visible band sits adjacent to the infrared and the ultraviolet, called collectively optical radiation.",
+                        "image": "https://upload.wikimedia.org/wikipedia/commons/thumb/f/fa/Prism_flat_rainbow_%28cropped%29.jpg/320px-Prism_flat_rainbow_%28cropped%29.jpg",
+                        "links": [
+                          {
+                            "text": "Photon",
+                            "url": "https://en.wikipedia.org./Photon",
+                            "title": "Photon",
+                            "summary": "A photon is an elementary particle that is a quantum of the electromagnetic field, including electromagnetic radiation such as light and radio waves, and the force carrier for the electromagnetic force. Photons are massless particles that can move no faster than the speed of light measured in vacuum. The photon belongs to the class of boson particles.",
+                            "image": "",
+                            "links": []
+                          }
+                        ]
+                      }
+                    ]
+                  }
+                ]
+              }
+            ]
+          }
+        ]
+      },
+      {
+        "text": "Exynos",
+        "url": "https://en.wikipedia.org./Exynos",
+        "title": "Exynos",
+        "summary": "The Samsung Exynos, formerly Hummingbird (Korean:\u00a0\uc5d1\uc2dc\ub178\uc2a4), is a series of Arm-based system-on-chips developed by Samsung Electronics' System LSI division and manufactured by Samsung Foundry. It is a continuation of Samsung's earlier S3C, S5L and S5P line of SoCs.",
+        "image": "https://upload.wikimedia.org/wikipedia/commons/thumb/c/cc/Samsung-Exynos-4412-Quad_SoC_used_in_I9300.jpg/320px-Samsung-Exynos-4412-Quad_SoC_used_in_I9300.jpg",
+        "links": [
+          {
+            "text": "32 nanometer",
+            "url": "https://en.wikipedia.org./32_nanometer",
+            "title": "32 nanometer",
+            "summary": "The \"32 nm\" node is the step following the \"45 nm\" process in CMOS (MOSFET) semiconductor device fabrication. \"32-nanometre\" refers to the average half-pitch of a memory cell at this technology level.",
+            "image": "",
+            "links": [
+              {
+                "text": "22 nm process",
+                "url": "https://en.wikipedia.org./22_nm_process",
+                "title": "22 nm process",
+                "summary": "The \"22 nm\" node is the process step following 32 nm in CMOS MOSFET semiconductor device fabrication. The typical half-pitch for a memory cell using the process is around 22\u00a0nm. It was first demonstrated by semiconductor companies for use in RAM in 2008. In 2010, Toshiba began shipping 24\u00a0nm flash memory chips, and Samsung Electronics began mass-producing 20\u00a0nm flash memory chips. The first consumer-level CPU deliveries using a 22\u00a0nm process started in April 2012 with the Intel Ivy Bridge processors.",
+                "image": "",
+                "links": [
+                  {
+                    "text": "Moore's law",
+                    "url": "https://en.wikipedia.org./Moore's_law",
+                    "title": "Moore's law",
+                    "summary": "Moore's law is the observation that the number of transistors in an integrated circuit (IC) doubles about every two years. Moore's law is an observation and projection of a historical trend. Rather than a law of physics, it is an empirical relationship. It is an experience-curve law, a type of law quantifying efficiency gains from experience in production.",
+                    "image": "https://upload.wikimedia.org/wikipedia/commons/thumb/0/00/Moore%27s_Law_Transistor_Count_1970-2020.png/320px-Moore%27s_Law_Transistor_Count_1970-2020.png",
+                    "links": [
+                      {
+                        "text": "List of semiconductor materials",
+                        "url": "https://en.wikipedia.org./List_of_semiconductor_materials#Compound_semiconductors",
+                        "title": "List of semiconductor materials",
+                        "summary": "\nSemiconductor materials are nominally small band gap insulators. The defining property of a semiconductor material is that it can be compromised by doping it with impurities that alter its electronic properties in a controllable way. \nBecause of their application in the computer and photovoltaic industry\u2014in devices such as transistors, lasers, and solar cells\u2014the search for new semiconductor materials and the improvement of existing materials is an important field of study in materials science.",
+                        "image": "",
+                        "links": [
+                          {
+                            "text": "Hydrogen",
+                            "url": "https://en.wikipedia.org./Hydrogen",
+                            "title": "Hydrogen",
+                            "summary": "Hydrogen is a chemical element; it has symbol H and atomic number 1. It is the lightest element and, at standard conditions, is a gas of diatomic molecules with the formula H2, sometimes called dihydrogen, hydrogen gas, molecular hydrogen, or simply hydrogen. It is colorless, odorless, non-toxic, and highly combustible. Constituting about 75% of all normal matter, hydrogen is the most abundant chemical element in the universe. Stars, including the Sun, mainly consist of hydrogen in a plasma state, while on Earth, hydrogen is found in water, organic compounds, as the gas H2 (dihydrogen), and in other molecular forms. The most common isotope of hydrogen (protium, 1H) consists of one proton, one electron, and no neutrons.",
+                            "image": "https://upload.wikimedia.org/wikipedia/commons/thumb/8/83/Hydrogen_discharge_tube.jpg/320px-Hydrogen_discharge_tube.jpg",
+                            "links": []
+                          }
+                        ]
+                      }
+                    ]
+                  }
+                ]
+              }
+            ]
+          }
+        ]
+      }
+    ]
+  }
+}

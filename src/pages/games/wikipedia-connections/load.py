@@ -9,7 +9,7 @@ from threading import Thread
 
 BREADTH = 4
 DEPTH = 6
-NUM_THREADS = 7
+NUM_THREADS = 1
 
 random_article_link = "https://en.wikipedia.org/api/rest_v1/page/random/summary"
 user_agent = "https://bjoernf.com/games/wiki-sort (mail@bjoernf.com)"
@@ -72,6 +72,40 @@ def get_article_summary(title):
         return {}
 
 
+def get_title_words(title):
+    clean_title = "".join(c for c in title if c.isalnum() or c.isspace()).lower()
+    title_words = clean_title.split(" ")
+
+    # Allow for some common words
+    final_title_words = []
+    for word in title_words:
+        if word in ["the", "of", "and", "in", "on", "a", "an"]:
+            continue
+        if word in ["is", "was", "are", "were", "be", "been", "being"]:
+            continue
+        if word in ["to", "from", "by", "with", "as", "at", "for", "or", "not"]:
+            continue
+        if word in ["this", "that", "these", "those"]:
+            continue
+        if word in ["it", "its", "it's", "they", "their", "them"]:
+            continue
+        if word in ["he", "his", "him", "she", "her", "hers"]:
+            continue
+        if word in ["i", "me", "my", "mine", "you", "your", "yours"]:
+            continue
+        if word in ["we", "us", "our", "ours"]:
+            continue
+        if word in ["all", "any", "some", "none", "more", "most", "much", "many"]:
+            continue
+        if word in ["about", "into", "over", "under", "through", "around"]:
+            continue
+        if word in ["up", "down", "left", "right", "back", "front"]:
+            continue
+        final_title_words.append(word)
+
+    return final_title_words
+
+
 def fetch_links_recursive(title, current_depth, pick_size, urls, title_words):
     links = get_article_links(title)
     # Only the first level uses pick_size, subsequent levels use 1
@@ -90,14 +124,17 @@ def fetch_links_recursive(title, current_depth, pick_size, urls, title_words):
             if link["url"] in urls:
                 can_break = False
                 break
-            link_words = link["title"].split(" ")
+
+            link_words = get_title_words(link["title"])
             if any(word in title_words for word in link_words):
                 can_break = False
 
         if can_break:
             for link in random_links:
                 urls.append(link["url"])
-                title_words.extend(link["title"].split(" "))
+
+                link_words = get_title_words(link["title"])
+                title_words.extend(link_words)
             break
 
         i += 1
@@ -124,7 +161,9 @@ def fetch_links_recursive(title, current_depth, pick_size, urls, title_words):
                 if i > 3:
                     print(f"Failed to fetch nested links for: {link['title']}")
                     urls.remove(link["url"])
-                    for word in link["title"].split(" "):
+
+                    link_words = get_title_words(link["title"])
+                    for word in link_words:
                         title_words.remove(word)
 
                     return fetch_links_recursive(
@@ -145,21 +184,21 @@ def fetch_links_recursive(title, current_depth, pick_size, urls, title_words):
     return result
 
 
-def create_random_article_links(day_offset):
+def create_random_article_links():
     random_article = get_random_article()
     if not random_article:
-        return create_random_article_links(day_offset)
+        return create_random_article_links()
 
     title = random_article["title"]
     url = random_article["content_urls"]["desktop"]["page"]
     summary = random_article.get("extract", "")
     image = random_article.get("thumbnail", {}).get("source", "")
 
-    title_words = title.split(" ")
+    title_words = get_title_words(title)
     urls = [url]
     nested_links = fetch_links_recursive(title, 1, BREADTH, urls, title_words)
     while not nested_links:
-        return create_random_article_links(day_offset)
+        return create_random_article_links()
 
     result = {
         "text": title,
@@ -169,15 +208,18 @@ def create_random_article_links(day_offset):
         "image": image,
         "links": nested_links,
     }
-    today = datetime.now()
-    for_day = today + timedelta(days=day_offset)
-    day_str = for_day.strftime("%Y-%m-%d")
-    with open(f"data/links-{day_str}.json", "w+") as f:
-        json.dump(result, f, indent=2)
+
+    return result
 
 
 def worker(day_offset):
-    create_random_article_links(day_offset)
+    result = create_random_article_links(day_offset)
+    today = datetime.now()
+    for_day = today + timedelta(days=day_offset)
+    day_str = for_day.strftime("%Y-%m-%d")
+
+    with open(f"data/links-{day_str}.json", "w+") as f:
+        json.dump(result, f, indent=2)
 
 
 if __name__ == "__main__":
