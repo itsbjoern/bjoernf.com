@@ -2,6 +2,8 @@ name: Recreate Wikipedia Connections
 
 on:
   workflow_dispatch:
+  schedule:
+    - cron: "5 0 * * *"
 
 jobs:
   create_game:
@@ -30,4 +32,4 @@ jobs:
 
       - name: Sync to S3
         working-directory: src/pages/games/wikipedia-connections
-        run: aws s3 sync ./wikipedia-game.json s3://bjoernf.com/wikipedia-game.json
+        run: aws s3 sync . s3://bjoernf.com --exclude='*' --include='wikipedia-game.json'
