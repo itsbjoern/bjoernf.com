@@ -7,7 +7,12 @@ export const Loader = () => {
   const [gameLink, setGameLink] = useState();
   useEffect(() => {
     let fetching = true;
-    fetch(gameFileUrl)
+
+    const today = new Date();
+    const date = today.toISOString().split("T")[0];
+    const url = gameFileUrl + "?date=" + date;
+
+    fetch(url)
       .then((res) => {
         return res.json().then((data) => {
           if (fetching) {
