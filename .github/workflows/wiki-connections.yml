@@ -1,4 +1,4 @@
-name: CI
+name: Recreate Wikipedia Connections
 
 on:
   workflow_dispatch:
@@ -15,6 +15,7 @@ jobs:
         uses: abatilo/actions-poetry@v3
 
       - name: Install the project dependencies
+        working-directory: src/pages/games/wikipedia-connections
         run: poetry install
 
       - working-directory: src/pages/games/wikipedia-connections
