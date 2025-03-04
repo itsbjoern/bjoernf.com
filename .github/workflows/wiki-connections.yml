@@ -32,4 +32,4 @@ jobs:
 
       - name: Sync to S3
         working-directory: src/pages/games/wikipedia-connections
-        run: aws s3 sync . s3://bjoernf.com --exclude='*' --include='wikipedia-game.json'
+        run: aws s3 sync . s3://bjoernf.com/dynamic --exclude='*' --include='wikipedia-game.json'

@@ -1,5 +1,5 @@
 import { useState, useEffect } from "react";
-import gameFileUrl from "/wikipedia-game.json?url";
+import gameFileUrl from "/dynamic/wikipedia-game.json?url";
 
 import { Game } from "./Game";
 
