@@ -13,5 +13,8 @@ export default defineConfig({
   output: "static",
   build: {
     assets: "static",
+  },
+  vite: {
+    "assetsInclude": ["**/*.xml"]
   }
 });

@@ -1,0 +1,70 @@
+---
+title: "Building my own (virtual) bookshelf"
+summary: "The Kindle is great it presents me with one small but annoying issue. Unlike with collecting real, physical books you never get the satisfaction of seeing your collection grow."
+image: ./books.png
+tags: [Development]
+slugs: [virtual-bookshelf]
+createdAt: 2025-03-09T20:00:00
+published: true
+---
+import Ref from "@/components/Ref/Ref.astro";
+import { Image } from "astro:assets";
+import baseXml from "@/pages/fun/bookshelf/list.xml?raw";
+import VirtualBookshelf from "@/pages/fun/bookshelf/frame.astro";
+import goodreadsRss from "./goodreads_rss.png";
+import editable from "./editable.png";
+
+
+A couple of years ago I made a snap decision to buy a Kindle and it is now the main reason for me getting back into reading regularly. I think it is a fantastic device that lets me read any book I want, be it at home with the light turned off or on the go. I genuinely cannot recommend it enough.
+
+All that praise out of the way, while the Kindle is great it presents me with one small but annoying issue. Unlike with collecting real, physical books you never get the satisfaction of seeing your collection grow. All your books are solely contained on your small electronic screen. To offset this a little bit I already like logging books I have read (or plan to read) on <Ref text="Goodreads" href="https://www.goodreads.com/" />. For that purpose, I think it is a great platform and it lets me keep track of what I have read and what I want to read next. Comparatively though that is really not the same as having a physical bookshelf.
+
+For a while now I had this idea that it would be cool to somehow pass this list of books into a 3D renderer to at least get some visual sense of what my collection would look like. Recently I finally sat down and actually considered what I would like this to look like.
+
+My goals were:
+1. A 3D representation of the books I had read
+2. Ideally it should just be able to load a list of books from a JSON/XML file
+3. It should be interactive, so I can click on a book and get more information about it
+4. I wanted it to be embeddable so that other people may be able to also use it in the future.
+
+Upon starting the investigation for this project I was immediately disheartened when I saw that Goodreads does <Ref text="not offer a public API (anymore)" href="https://help.goodreads.com/s/article/Does-Goodreads-support-the-use-of-APIs" />. I browsed their website for a bit and considered scraping for a while, but I really did want this project to be mostly standalone, without regular needs to configure a scraping service. I noticed that, almost hidden on the bottom of the page, every list actually has an RSS feed.
+<Image src={goodreadsRss} alt="Goodreads RSS feed" width="150" />
+
+This was perfect, the RSS feed not only included all the necessary data such as titles and links, it also has links to nice thumbnails of the book covers. That meant I was able to just parse the list of books from that RSS feed without any need for scraping or otherwise.
+
+---
+
+To render the bookshelf and books themselves I am using <Ref text="Three.js" href="https://threejs.org/" />. Using Three.js allowed me to relatively quickly iterate on a simple 3D scene that served me well. It also comes with some nice drag and zoom controls out of the box.
+
+So below you can see the result: A virtual bookshelf filled with the books I have read since I started using Goodreads. You can move the scene via drag and zoom in and out with the mouse wheel. Holding shift or control while dragging will also move the whole scene to get a better view. Hovering over a book shows a bit of extra information in the sidebar, and by clicking it you get a little highlight on the current book.
+<div style="height: 500px">
+<VirtualBookshelf input={baseXml} />
+</div>
+
+You can find a full-screen version here <Ref text="here" href="/fun/bookshelf" />.
+
+There are also a few tweaks that can be configured within the canvas itself, such as the number of books per shelf, the count of dividers, or the initial angle when viewing the scene.
+
+These tweaks are also configurable via the URL, so when embedding it yourself (see below) you can pass in your own parameters to adjust the scene to your liking.
+* `booksPerShelf` - The amount of books per shelf
+* `dividerEvery` - How many books should be separated by a divider
+* `horiRotation` - The initial horizontal rotation of the scene (in degrees)
+* `vertRotation` - The initial vertical rotation of the scene (in degrees)
+* `onlyRead` - Only show books that have been marked read, 1 for true, 0 for false  (default: 1)
+* `url` - The URL to the RSS feed (default: the one from my Goodreads)
+
+<Image src={editable} alt="Editable version" />
+
+<Ref text="You can check out the editable version here" href="/fun/bookshelf?edit" />
+
+Overall, I am quite happy with the result. It was a fun little project that I could finish in a few days and it was nice to see the books I have read in a different light. I hope you enjoy it too.
+
+
+---
+P.S: The site is set up so that you can embed it as an iframe with your set of books. To do so you will have to host your own Goodreads `.xml` because the iframe will have to fetch the data. Goodreads does obviously not allow wildcard CORS requests, so you will need to host (or forward) the file yourself and configure a CORS origin for my site `Access-Control-Allow-Origin: "bjoernf.com"`. The iframe will then load and parse your own list.
+
+An example embed would be:
+```html
+<iframe src="https://bjoernf.com/fun/bookshelf?url=https://your-own-xml-url.com" width="100%" height="500px"></iframe>
+```
+

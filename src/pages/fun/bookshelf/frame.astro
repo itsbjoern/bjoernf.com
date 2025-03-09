@@ -1,0 +1,745 @@
+---
+type Props = {
+  input?: string;
+};
+
+const { input } = Astro.props;
+---
+
+<div id="hiddenData" data-input={input} style="display: none;"></div>
+<div
+  id="editControls"
+  style="display: none; position: absolute; right: 0; top: 0; margin-top: 10px; z-index: 10;"
+>
+  <div>
+    <label for="fov">Field of view</label>
+    <br />
+    <input type="range" id="fov" min="1" max="179" value="40" />
+  </div>
+  <div>
+    <label for="booksPerShelf">Books per shelf</label>
+    <br />
+    <input type="range" id="booksPerShelf" min="1" max="50" value="8" />
+  </div>
+  <div>
+    <label for="dividerEvery">Divider every</label>
+    <br />
+    <input type="range" id="dividerEvery" min="1" max="10" value="4" />
+  </div>
+  <div>
+    <label for="horiRotation">Horizontal rotation</label>
+    <br />
+    <input type="range" id="horiRotation" min="-180" max="180" value="50" />
+  </div>
+  <div>
+    <label for="vertRotation">Vertical rotation</label>
+    <br />
+    <input type="range" id="vertRotation" min="-180" max="180" value="130" />
+  </div>
+  <div>
+    <label for="onlyRead">Only Read</label>
+    <br />
+    <input type="range" id="onlyRead" min="0" max="1" value="1" />
+  </div>
+</div>
+<div id="bookshelf" style="width: 100%; height: 100%; position: relative;">
+  <div
+    id="info"
+    style="display: none; position: absolute; top: 0; left: 0; z-index: 10; width: 50%; max-width: 40vw; height: 100%; padding: 10px; background-color: rgba(255, 255, 255, 0.8); font-size: 1rem; overflow: auto;"
+  >
+  </div>
+</div>
+
+<script>
+  import * as THREE from "three";
+  import { OrbitControls } from "three/examples/jsm/controls/OrbitControls";
+  import { createBookGeometry } from "./book";
+  import { createRectangleWithRoundedEdges } from "./helpers";
+
+  const showEditControls = window.location.search.includes("edit");
+  const editControls = document.getElementById("editControls")!;
+  if (showEditControls) {
+    editControls.style.display = "block";
+  }
+
+  const parseNested = (item) => {
+    const data = {};
+    Array.from(item.children).forEach((child) => {
+      if (child.children.length > 0) {
+        data[child.tagName] = parseNested(child);
+      } else {
+        data[child.tagName] = child.textContent;
+      }
+    });
+    return data;
+  };
+
+  // const parseXML = async (url) => {
+  //   const response = await fetch(url);
+  //   const text = await response.text();
+  //   const parser = new DOMParser();
+  //   const xmlDoc = parser.parseFromString(text, "application/xml");
+  //   const items = xmlDoc.getElementsByTagName("item");
+  //   return Array.from(items).map(parseNested);
+  // };
+
+  const searchParams = new URLSearchParams(window.location.search);
+  let allExclude = searchParams.getAll("exclude") || [];
+
+  const hiddenInput = document.getElementById("hiddenData")!;
+  const xmlInput = hiddenInput.getAttribute("data-input");
+
+  let xml = xmlInput || "";
+  const url = searchParams.get("url");
+  if (url) {
+    const response = await fetch(url);
+    xml = await response.text();
+  }
+
+  const parseXML = async (xml) => {
+    const parser = new DOMParser();
+    const xmlDoc = parser.parseFromString(xml, "application/xml");
+    const items = xmlDoc.getElementsByTagName("item");
+    return Array.from(items).map(parseNested);
+  };
+  let books = await parseXML(xml);
+
+  const getConfig = () => {
+    const config = {
+      fov: 40,
+      booksPerShelf: 8,
+      dividerEvery: 4,
+      horiRotation: 50,
+      vertRotation: 150,
+      onlyRead: 1,
+    };
+    (Object.keys(config) as Array<keyof typeof config>).forEach((key) => {
+      if (searchParams.has(key)) {
+        config[key] = parseInt(searchParams.get(key)!);
+      }
+    });
+
+    return config;
+  };
+
+  const updateInfo = (book) => {
+    const infoDiv = document.getElementById("info")!;
+    if (!book) {
+      infoDiv.innerHTML = "";
+      infoDiv.style.display = "none";
+      return;
+    }
+    infoDiv.style.display = "block";
+
+    const isHidden = allExclude.includes(book.book_id);
+
+    infoDiv.innerHTML = `
+      ${
+        showEditControls
+          ? `<button type="button" id="toggleExclude"
+            class="${
+              isHidden
+                ? "bg-green-500 hover:bg-green-700"
+                : "bg-red-500 hover:bg-red-700"
+            }  text-white font-bold py-1 px-3 rounded"
+          >${isHidden ? "Show" : "Do not show"}</button>`
+          : ""
+      }
+      <h1 class="text-2xl/7">${book.title}</h1>
+      <p><strong>Author:</strong> ${book.author_name}</p>
+      <p><strong>Published:</strong> ${book.book_published}</p>
+      <p><strong>Average Rating:</strong> ${book.average_rating}</p>
+      <a href="https://www.goodreads.com/book/show/${
+        book.book_id
+      }" rel="noopener noreferrer" target="_blank">View on goodreads.com</a>
+      <h2 class="text-lg mt-2">Description</h2>
+      <p>${book.book_description.replaceAll(/<\/?[bui]>/g, "")}</p>
+    `;
+    if (showEditControls) {
+      const onToggleExclude = (e) => {
+        if (allExclude.includes(book.book_id)) {
+          searchParams.delete("exclude");
+          allExclude = allExclude.filter((guid) => guid !== book.book_id);
+          searchParams.set("exclude", allExclude.join(","));
+        } else {
+          searchParams.append("exclude", book.book_id);
+          allExclude.push(book.book_id);
+        }
+        window.history.pushState(
+          null,
+          "",
+          `${window.location.pathname}?${searchParams.toString()}`,
+        );
+        updateInfo(book);
+      };
+
+      const toggleExclude = document.getElementById("toggleExclude")!;
+      toggleExclude.addEventListener("click", onToggleExclude);
+    }
+  };
+
+  const createBookshelf = (container, books) => {
+    const config = getConfig();
+
+    if (config.onlyRead) {
+      books = books.filter((book) => book.user_shelves !== "to-read");
+    }
+    if (!showEditControls && allExclude.length > 0) {
+      books = books.filter((book) => !allExclude.includes(book.book_id));
+    }
+
+    const scene = new THREE.Scene();
+    const camera = new THREE.PerspectiveCamera(
+      config.fov,
+      container.clientWidth / container.clientHeight,
+      0.1,
+      1000,
+    );
+    const renderer = new THREE.WebGLRenderer({ antialias: true });
+    renderer.setClearColor(0xffffff);
+    renderer.setPixelRatio(window.devicePixelRatio);
+    renderer.setSize(container.clientWidth, container.clientHeight);
+    renderer.shadowMap.enabled = true;
+    renderer.shadowMap.type = THREE.PCFSoftShadowMap;
+
+    container.appendChild(renderer.domElement);
+
+    const controls = new OrbitControls(camera, renderer.domElement);
+    controls.enableDamping = true;
+    controls.dampingFactor = 0.25;
+    controls.screenSpacePanning = true;
+    controls.maxPolarAngle = Math.PI / 2 + 0.25;
+    controls.minPolarAngle = 0;
+    controls.maxAzimuthAngle = Math.PI / 2 - 0.3;
+    controls.minAzimuthAngle = -Math.PI / 2 + 0.3;
+    controls.maxDistance = 100;
+    controls.minDistance = 40;
+    controls._panLeft(15, controls.object.matrix);
+    controls.update();
+
+    const loader = new THREE.TextureLoader();
+    const raycaster = new THREE.Raycaster();
+    const mouse = new THREE.Vector2(-100, -100);
+
+    const bookHeight = 10;
+    const bookWidth = 7;
+    const bookDepth = 2;
+    const bookBaseColor = 0x8b4513;
+
+    while (
+      config.dividerEvery < config.booksPerShelf &&
+      config.booksPerShelf % config.dividerEvery <= 4
+    ) {
+      if (config.booksPerShelf % config.dividerEvery === 0) {
+        break;
+      }
+      config.dividerEvery++;
+    }
+
+    const horizontalDistanceBetweenBooks = 0.3;
+    const verticalDistanceBetweenBooks = 1.75;
+
+    const dividerWidth = 1;
+    const dividerDistance = dividerWidth + horizontalDistanceBetweenBooks;
+    const dividerColor = 0xdd8833;
+
+    const shelfCount = Math.ceil(books.length / config.booksPerShelf);
+    const shelfColor = 0xee9922;
+
+    const frameWidth = 2;
+    const frameDepth = bookWidth + 5;
+    const frameColor = 0xee9922;
+
+    const allBooksWidth =
+      config.booksPerShelf * bookDepth +
+      dividerDistance *
+        (Math.ceil(config.booksPerShelf / config.dividerEvery) - 1) +
+      (config.booksPerShelf - 1) * horizontalDistanceBetweenBooks;
+
+    const allBooksHeight =
+      shelfCount * bookHeight +
+      (shelfCount - 0.5) * verticalDistanceBetweenBooks;
+
+    // const helperAllBooksGeometry = new THREE.BoxGeometry(
+    //   allBooksWidth,
+    //   allBooksHeight,
+    //   bookWidth,
+    // );
+    // const helperAllBooksMaterial = new THREE.MeshBasicMaterial({
+    //   color: 0x00ff00,
+    //   transparent: true,
+    //   opacity: 0.5,
+    // });
+    // const helperAllBooksMesh = new THREE.Mesh(
+    //   helperAllBooksGeometry,
+    //   helperAllBooksMaterial,
+    // );
+    // helperAllBooksMesh.position.set(0, 0, 0);
+    // scene.add(helperAllBooksMesh);
+
+    const shelfHeight = 1;
+    const shelfWidth = allBooksWidth + frameWidth * 1.2;
+
+    const bookcaseWidth = allBooksWidth + 20 + frameWidth * 2;
+    const bookcaseHeight = allBooksHeight + 20 + frameWidth * 2;
+
+    const offsetFov = camera.fov * (Math.PI / 180);
+    const zOffset = Math.max(
+      bookcaseWidth / (2 * Math.tan(offsetFov / 2)),
+      bookcaseHeight / (2 * Math.tan(offsetFov / 2)),
+    );
+
+    camera.position.set(
+      zOffset * (config.horiRotation / 180),
+      -zOffset * (config.vertRotation / 180),
+      zOffset,
+    );
+    camera.lookAt(0, 0, 0);
+
+    scene.add(new THREE.AmbientLight(0x404040, 0.9));
+
+    const ambient = new THREE.DirectionalLight(0xffffff, 0.5);
+    ambient.position.set(40, 40, 50);
+    ambient.target.position.set(0, 0, 0);
+    ambient.castShadow = true;
+    ambient.shadow.camera.near = 0.1;
+    ambient.shadow.camera.far = 500;
+    ambient.shadow.camera.left = -50;
+    ambient.shadow.camera.right = 50;
+    ambient.shadow.camera.top = 50;
+    ambient.shadow.camera.bottom = -50;
+    ambient.shadow.mapSize.width = 1024;
+    ambient.shadow.mapSize.height = 1024;
+    scene.add(ambient);
+    // scene.add(new THREE.DirectionalLightHelper(ambient, 5));
+    // scene.add(new THREE.CameraHelper(ambient.shadow.camera));
+
+    const light = new THREE.DirectionalLight(0xffffff, 4);
+    light.position.set(-50, 100, 50);
+    light.target.position.set(0, 0, 0);
+    light.castShadow = true;
+    light.shadow.bias = 0.0001;
+    light.shadow.camera.near = 0.1;
+    light.shadow.camera.far = 500;
+    light.shadow.camera.left = -50;
+    light.shadow.camera.right = 50;
+    light.shadow.camera.top = 50;
+    light.shadow.camera.bottom = -50;
+    light.shadow.mapSize.width = 2048;
+    light.shadow.mapSize.height = 2048;
+    scene.add(light);
+    // scene.add(new THREE.DirectionalLightHelper(light, 5));
+    // scene.add(new THREE.CameraHelper(light.shadow.camera));
+
+    const spotLight = new THREE.SpotLight(0xffffff, 5);
+    spotLight.position.set(-5, 25, 50);
+    spotLight.target.position.set(0, 0, 0);
+    spotLight.penumbra = 0.15;
+    spotLight.angle = 0.13;
+    spotLight.decay = 0.15;
+    spotLight.distance = 500;
+    spotLight.castShadow = true;
+
+    spotLight.shadow.camera.near = 5;
+    spotLight.shadow.camera.far = 4000;
+    spotLight.shadow.camera.fov = 30;
+    spotLight.shadow.mapSize.width = 1024;
+    spotLight.shadow.mapSize.height = 1024;
+    spotLight.visible = false;
+    scene.add(spotLight);
+    // const spotLightHelper = new THREE.SpotLightHelper(spotLight);
+    // scene.add(spotLightHelper);
+
+    // Create shelves
+    for (let i = 0; i < shelfCount; i++) {
+      const shelfGeometry = createRectangleWithRoundedEdges(
+        shelfWidth + frameWidth / 2, // + frameWidth / 2 to extrude into the frame
+        shelfHeight,
+        bookWidth + 4,
+        0.2,
+      );
+      const shelfMaterial = new THREE.MeshStandardMaterial({
+        color: shelfColor,
+      });
+      const shelfMesh = new THREE.Mesh(shelfGeometry, shelfMaterial);
+      shelfMesh.position.set(
+        0,
+        i * (bookHeight + verticalDistanceBetweenBooks) - allBooksHeight / 2,
+        0,
+      );
+      shelfMesh.castShadow = true;
+      shelfMesh.receiveShadow = true;
+      scene.add(shelfMesh);
+    }
+
+    // Create dividers
+    for (
+      let i = 1;
+      i < Math.ceil(config.booksPerShelf / config.dividerEvery);
+      i++
+    ) {
+      const dividerGeometry = createRectangleWithRoundedEdges(
+        dividerWidth,
+        allBooksHeight + shelfHeight / 2, // + shelfHeight / 2 to extrude into the frame
+        bookWidth + 2.5,
+        0.2,
+      );
+      const dividerMaterial = new THREE.MeshStandardMaterial({
+        color: dividerColor,
+      });
+      const dividerMesh = new THREE.Mesh(dividerGeometry, dividerMaterial);
+      dividerMesh.position.set(
+        i * config.dividerEvery * (bookDepth + horizontalDistanceBetweenBooks) -
+          allBooksWidth / 2 +
+          i * dividerDistance -
+          dividerDistance +
+          dividerWidth / 2,
+        0,
+        0,
+      );
+      dividerMesh.castShadow = true;
+      dividerMesh.receiveShadow = true;
+      scene.add(dividerMesh);
+    }
+
+    // const test = new THREE.BoxGeometry(5, 5, 5);
+    // const gm = new THREE.MeshStandardMaterial({ color: 0xff0000 });
+    // const mm = new THREE.Mesh(test, gm);
+    // mm.position.set(0, 0, 0);
+    // scene.add(mm);
+
+    const topGeometry = createRectangleWithRoundedEdges(
+      shelfWidth + frameWidth + 1,
+      frameWidth,
+      frameDepth + 1,
+      0.2,
+    );
+    const topMaterial = new THREE.MeshStandardMaterial({ color: frameColor });
+    const topMesh = new THREE.Mesh(topGeometry, topMaterial);
+    topMesh.position.set(0, allBooksHeight / 2 + frameWidth / 2, 0);
+    topMesh.castShadow = true;
+    topMesh.receiveShadow = true;
+    scene.add(topMesh);
+
+    const sideOverhang = 4;
+    const leftGeometry = createRectangleWithRoundedEdges(
+      frameWidth,
+      allBooksHeight + sideOverhang + frameWidth / 2, // + frameWidth / 2 to extrude into the frame
+      frameDepth,
+      0.2,
+    );
+    const leftMaterial = new THREE.MeshStandardMaterial({ color: frameColor });
+    const leftMesh = new THREE.Mesh(leftGeometry, leftMaterial);
+    leftMesh.position.set(
+      -shelfWidth / 2,
+      -sideOverhang / 2 + verticalDistanceBetweenBooks - frameWidth / 2,
+      0,
+    );
+    leftMesh.castShadow = true;
+    leftMesh.receiveShadow = true;
+    scene.add(leftMesh);
+
+    const rightGeometry = createRectangleWithRoundedEdges(
+      frameWidth,
+      allBooksHeight + sideOverhang + frameWidth / 2, // + frameWidth / 2 to extrude into the frame
+      frameDepth,
+      0.2,
+    );
+    const rightMaterial = new THREE.MeshStandardMaterial({ color: frameColor });
+    const rightMesh = new THREE.Mesh(rightGeometry, rightMaterial);
+    rightMesh.position.set(
+      shelfWidth / 2,
+      -sideOverhang / 2 + verticalDistanceBetweenBooks - frameWidth / 2,
+      0,
+    );
+    rightMesh.castShadow = true;
+    rightMesh.receiveShadow = true;
+    scene.add(rightMesh);
+
+    type Mesh = any;
+
+    const bookMeshes: Mesh[] = [];
+    const intersectMeshes: Mesh[] = [];
+
+    books.forEach((book, index: number) => {
+      const bookMesh = createBookGeometry(book, loader);
+
+      bookMesh.position.x =
+        (index % config.booksPerShelf) *
+          (bookDepth + horizontalDistanceBetweenBooks) +
+        (index % config.booksPerShelf > 0
+          ? Math.floor((index % config.booksPerShelf) / config.dividerEvery) *
+            dividerDistance
+          : 0) -
+        allBooksWidth / 2 +
+        bookDepth / 2 +
+        horizontalDistanceBetweenBooks * (Math.random() - 0.5);
+      bookMesh.position.y =
+        Math.floor(index / config.booksPerShelf) *
+          (bookHeight + verticalDistanceBetweenBooks) -
+        allBooksHeight / 2 +
+        bookHeight / 2 +
+        shelfHeight / 2;
+      bookMesh.rotation.y = 0;
+      bookMesh.castShadow = true;
+      bookMesh.receiveShadow = true;
+
+      const clone = bookMesh.clone();
+      clone.castShadow = false;
+      clone.receiveShadow = false;
+      clone.visible = false;
+      scene.add(clone);
+      intersectMeshes.push(clone);
+
+      bookMesh.userData = {
+        clone: clone,
+        status: "isIn",
+        outAnim: null,
+        outTime: new Date(),
+        originalPosition: bookMesh.position.clone(),
+        targetPosition: bookMesh.position.clone(),
+        originalRotation: bookMesh.rotation.clone(),
+        targetRotation: bookMesh.rotation.clone(),
+        bookData: book,
+      };
+      scene.add(bookMesh);
+
+      bookMeshes.push(bookMesh);
+      intersectMeshes.push(bookMesh);
+    });
+
+    const onMouseMove = (event) => {
+      const rect = container.getBoundingClientRect();
+      mouse.x = ((event.clientX - rect.x) / container.clientWidth) * 2 - 1;
+      mouse.y = -((event.clientY - rect.y) / container.clientHeight) * 2 + 1;
+    };
+
+    container.addEventListener("mousemove", onMouseMove, false);
+
+    let running = true;
+    let pulledOutBook: Mesh = null;
+    let toSelectBook: Mesh = null;
+    let currentlySelectedBook: Mesh = null;
+    const turnDelay = 300;
+
+    let lockedPosition = camera.position.clone();
+    let lockedRotation = camera.rotation.clone();
+
+    const onMouseUp = (event) => {
+      console.log(event, event.target, renderer.domElement);
+      if (event.target !== renderer.domElement) {
+        return;
+      }
+      const selectBook = toSelectBook;
+      toSelectBook = null;
+      if (lockedPosition.distanceTo(camera.position) > 0.1) {
+        return;
+      }
+      if (
+        Math.abs(lockedRotation.x - camera.rotation.x) > 0.1 ||
+        Math.abs(lockedRotation.y - camera.rotation.y) > 0.1 ||
+        Math.abs(lockedRotation.z - camera.rotation.z) > 0.1
+      ) {
+        return;
+      }
+      if (currentlySelectedBook) {
+        currentlySelectedBook = null;
+        toSelectBook = null;
+        light.visible = true;
+        spotLight.visible = false;
+
+        return;
+      }
+
+      if (selectBook) {
+        currentlySelectedBook = pulledOutBook;
+
+        light.visible = false;
+        spotLight.visible = true;
+        spotLight.target = currentlySelectedBook;
+      }
+    };
+
+    const onMouseDown = (event) => {
+      lockedPosition = camera.position.clone();
+      lockedRotation = camera.rotation.clone();
+      if (pulledOutBook) {
+        raycaster.setFromCamera(mouse, camera);
+        const intersects = raycaster.intersectObjects([pulledOutBook]);
+        if (intersects.length > 0) {
+          if (currentlySelectedBook) {
+          } else {
+            toSelectBook = pulledOutBook;
+          }
+        }
+      }
+    };
+
+    container.addEventListener("mousedown", onMouseDown, false);
+    container.addEventListener("mouseup", onMouseUp, false);
+
+    const updateBookMesh = (intersects, bookMesh: Mesh) => {
+      if (intersects.length === 0) {
+        updateInfo(null);
+      }
+      if (
+        intersects.length > 0 &&
+        (intersects[0].object === bookMesh ||
+          intersects[0].object.parent === bookMesh ||
+          intersects[0].object.parent === bookMesh.userData.clone)
+      ) {
+        if (bookMesh.userData.status === "isAnimatingIn") {
+          return;
+        }
+        bookMesh.userData.status = "isAnimatingOut";
+        if (pulledOutBook && pulledOutBook !== bookMesh) {
+          bookMesh.userData.targetPosition.z =
+            bookMesh.userData.originalPosition.z + 2;
+        }
+        bookMesh.userData.outTime = new Date();
+        updateInfo(bookMesh.userData.bookData);
+
+        if (pulledOutBook && pulledOutBook !== bookMesh) {
+          return;
+        }
+        pulledOutBook = bookMesh;
+
+        bookMesh.userData.outAnim = setTimeout(() => {
+          bookMesh.userData.status = "isOut";
+          bookMesh.userData.targetPosition.x =
+            bookMesh.userData.originalPosition.x - 1;
+
+          bookMesh.userData.targetPosition.z =
+            bookMesh.userData.originalPosition.z + bookWidth / 2 + 4;
+
+          bookMesh.userData.targetRotation.y = -Math.PI / 2;
+        }, turnDelay);
+      } else {
+        if (
+          bookMesh.userData.status === "isIn" ||
+          bookMesh.userData.status === "isAnimatingIn" ||
+          bookMesh.userData.outTime.getTime() + turnDelay > new Date().getTime()
+        ) {
+          return;
+        }
+        bookMesh.userData.status = "isAnimatingIn";
+        bookMesh.userData.targetRotation.copy(
+          bookMesh.userData.originalRotation,
+        );
+        bookMesh.userData.targetPosition.x =
+          bookMesh.userData.originalPosition.x;
+
+        if (bookMesh.userData.outAnim) {
+          clearTimeout(bookMesh.userData.outAnim);
+          bookMesh.userData.outAnim = null;
+        }
+        if (pulledOutBook === bookMesh) {
+          pulledOutBook = null;
+        }
+
+        setTimeout(() => {
+          bookMesh.userData.targetPosition.z =
+            bookMesh.userData.originalPosition.z;
+          setTimeout(() => {
+            bookMesh.userData.status = "isIn";
+          }, turnDelay);
+        }, turnDelay);
+      }
+    };
+
+    const animate = () => {
+      if (running) {
+        requestAnimationFrame(animate);
+      }
+
+      raycaster.setFromCamera(mouse, camera);
+      if (currentlySelectedBook) {
+        const intersects = raycaster.intersectObjects([currentlySelectedBook]);
+
+        if (intersects.length > 0) {
+          currentlySelectedBook.userData.targetPosition.z =
+            currentlySelectedBook.userData.originalPosition.z +
+            bookWidth / 2 +
+            5;
+        } else {
+          currentlySelectedBook.userData.targetPosition.z =
+            currentlySelectedBook.userData.originalPosition.z +
+            bookWidth / 2 +
+            4;
+        }
+      }
+
+      const intersects = raycaster.intersectObjects(intersectMeshes);
+      for (const bookMesh of bookMeshes) {
+        if (!currentlySelectedBook) {
+          updateBookMesh(intersects, bookMesh);
+        }
+        if (showEditControls) {
+          if (allExclude.includes(bookMesh.userData.bookData.book_id)) {
+            if (!bookMesh.userData.hiddenIndicatorMesh) {
+              const box = new THREE.BoxHelper(
+                bookMesh.userData.clone,
+                0xff0000,
+              );
+              scene.add(box);
+              bookMesh.userData.hiddenIndicatorMesh = box;
+            }
+          } else {
+            if (bookMesh.userData.hiddenIndicatorMesh) {
+              scene.remove(bookMesh.userData.hiddenIndicatorMesh);
+              bookMesh.userData.hiddenIndicatorMesh = null;
+            }
+          }
+        }
+        bookMesh.position.lerp(bookMesh.userData.targetPosition, 0.2);
+        bookMesh.rotation.y +=
+          (bookMesh.userData.targetRotation.y - bookMesh.rotation.y) * 0.15;
+      }
+
+      controls.update();
+      renderer.render(scene, camera);
+    };
+
+    animate();
+
+    return () => {
+      running = false;
+      container.removeEventListener("mousemove", onMouseMove);
+      container.removeEventListener("click", onMouseUp);
+      container.removeChild(renderer.domElement);
+    };
+  };
+
+  let stopDrawing = createBookshelf(
+    document.getElementById("bookshelf"),
+    books,
+  );
+
+  let sliderTimeout: ReturnType<typeof setTimeout>;
+  const initConfig = getConfig();
+  (Object.keys(initConfig) as Array<keyof typeof initConfig>).forEach((id) => {
+    const slider = document.getElementById(id) as HTMLInputElement | null;
+    if (!slider) {
+      return;
+    }
+    slider.value = initConfig[id].toString();
+    slider.addEventListener("input", () => {
+      searchParams.set(id, slider.value);
+      window.history.pushState(
+        null,
+        "",
+        `${window.location.pathname}?${searchParams.toString()}`,
+      );
+      if (sliderTimeout) {
+        clearTimeout(sliderTimeout);
+      }
+      sliderTimeout = setTimeout(() => {
+        stopDrawing();
+        stopDrawing = createBookshelf(
+          document.getElementById("bookshelf"),
+          books,
+        );
+      }, 100);
+    });
+  });
+</script>

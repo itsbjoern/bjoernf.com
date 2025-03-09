@@ -1,0 +1,23 @@
+---
+import VirtualBookshelf from "./frame.astro";
+import xml from "./list.xml?raw";
+---
+
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>3D Bookshelf</title>
+  </head>
+  <body><VirtualBookshelf input={xml} /></body>
+
+  <style>
+    html,
+    body {
+      margin: 0;
+      padding: 0;
+      overflow: hidden;
+      height: 100%;
+    }
+  </style>
+</html>
