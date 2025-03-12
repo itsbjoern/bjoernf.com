@@ -51,6 +51,9 @@ const colorMap = {
 };
 
 const formatTime = (startTime: number, cmp?: number) => {
+  if (!startTime) {
+    return "--:--";
+  }
   const time = Math.floor(((cmp || Date.now()) - startTime) / 1000);
   const minutes = Math.floor(time / 60);
   const seconds = time % 60;
