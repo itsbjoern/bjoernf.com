@@ -50,6 +50,15 @@ const colorMap = {
   3: "bg-orange-100",
 };
 
+const formatTime = (startTime: number, cmp?: number) => {
+  const time = Math.floor(((cmp || Date.now()) - startTime) / 1000);
+  const minutes = Math.floor(time / 60);
+  const seconds = time % 60;
+  return `${minutes.toString().padStart(2, "0")}:${seconds
+    .toString()
+    .padStart(2, "0")}`;
+};
+
 export const Game = ({
   gameType,
   gameLink,
@@ -63,6 +72,10 @@ export const Game = ({
   const [showRulesModal, setShowRulesModal] = useState(false);
   const [popupContent, setPopupContent] = useState<Link | null>(null);
   const [toasts, setToasts] = useState<Toast[]>([]);
+  const [startTime, setStartTime] = useState(Date.now());
+  const [winTime, setWinTime] = useState(null);
+
+  const [timerString, setTimerString] = useState("00:00");
 
   const getRand = useMemo(() => {
     const parts = gameLink.date.split("-").map((part) => parseInt(part, 10));
@@ -137,10 +150,25 @@ export const Game = ({
     ).length === rows.length;
 
   useEffect(() => {
+    if (hasWon) {
+      return;
+    }
+    let interval = setInterval(() => {
+      setTimerString(formatTime(startTime));
+    }, 1000);
+
+    return () => clearInterval(interval);
+  }, [startTime, hasWon]);
+
+  useEffect(() => {
     const savedState = loadState(gameType);
     if (savedState && savedState.dayDate === gameLink.date) {
       setPreviousChoices(savedState.previousChoices);
       setShowWinScreen(savedState.hasWon);
+
+      setStartTime(savedState.startTime);
+      setWinTime(savedState.winTime);
+      setTimerString(formatTime(savedState.startTime, savedState.winTime));
 
       // @ts-ignore
       const correct = savedState.previousChoices.reduce((acc, choices) => {
@@ -229,6 +257,8 @@ export const Game = ({
       dayDate: gameLink.date,
       previousChoices: [...previousChoices, highlighted],
       hasWon: didWin,
+      startTime,
+      winTime: didWin ? Date.now() : null,
     });
 
     setHighlighted(correctGuesses);
@@ -243,7 +273,7 @@ export const Game = ({
     <div className="p-4 bg-gray-100 rounded-lg shadow-lg width-full relative">
       <h1 className="text-3xl font-bold ">Wiki Connections</h1>
       <p>Daily Wikipedia connections, can you beat it?</p>
-      <div className="border-b border-gray-300 my-4" />
+      <div className="border-b border-gray-300 mt-4 mb-2" />
       <div className="absolute top-4 right-4 flex gap-2">
         {hasWon ? (
           <button
@@ -260,7 +290,20 @@ export const Game = ({
           How to play
         </button>
       </div>
+      <div className="mb-2">Elapsed time: {timerString}</div>
+
       <div className="flex flex-col gap-4">
+        <button
+          className={`p-2 bg-green-500 text-white rounded-lg shadow-md  ${
+            hasWon || !canSubmit
+              ? "opacity-50"
+              : "hover:bg-green-600 transition-colors duration-200 cursor-pointer"
+          }`}
+          onClick={handleSubmit}
+          disabled={!canSubmit || hasWon}
+        >
+          Check selection
+        </button>
         <div className="p-3 gap-4 items-center bg-blue-500 text-white rounded-lg relative flex">
           {gameLink!.image ? (
             <img
@@ -398,7 +441,7 @@ export const Game = ({
             onClick={handleSubmit}
             disabled={!canSubmit || hasWon}
           >
-            Check
+            Check selection
           </button>
         </>
 
@@ -438,6 +481,8 @@ export const Game = ({
                 You beat the game in {previousChoices.length} attempts!
               </p>
               <div className="border-b border-gray-300 my-4" />
+              Time: {timerString}
+              <div className="border-b border-gray-300 my-4" />
               <div className="flex flex-col gap-2">
                 Your attempts were:
                 {previousChoices.map((choices, i) => (
@@ -461,7 +506,7 @@ export const Game = ({
                 <button
                   className="p-2 bg-blue-500 text-white rounded-lg shadow-md hover:bg-blue-600 transition-colors duration-200 cursor-pointer"
                   onClick={() => {
-                    let text = `I beat the daily Wikipedia Connections in ${previousChoices.length} attempts!\n\n`;
+                    let text = `I beat the daily Wikipedia Connections in ${previousChoices.length} attempts! Time: ${timerString}\n\n`;
                     previousChoices.forEach((choices, i) => {
                       let row = "";
                       Object.entries(choices).forEach(
