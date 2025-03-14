@@ -2,6 +2,7 @@ import { useState, useEffect } from "react";
 import gameFileUrl from "/dynamic/wikipedia-game.json?url";
 
 import { Game } from "./Game";
+import { ToastProvider } from "./Toasts";
 
 export const Loader = () => {
   const [gameLink, setGameLink] = useState();
@@ -29,5 +30,9 @@ export const Loader = () => {
     return <div>Loading...</div>;
   }
 
-  return <Game gameType="regular" gameLink={gameLink} />;
+  return (
+    <ToastProvider>
+      <Game gameType="regular" gameLink={gameLink} />
+    </ToastProvider>
+  );
 };
