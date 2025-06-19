@@ -15,10 +15,10 @@ interface Props {
 const { post } = Astro.props;
 const { Content } = await render(post);
 
-const { title, createdAt, tags, image } = post.data;
+const { title, createdAt, tags, image, summary } = post.data;
 ---
 
-<div class="flex flex-col gap-5">
+<div class="flex flex-col gap-5 smo:px-2">
   <div class="flex flex-row items-center gap-5 smo:flex-col">
     {
       image ? (
@@ -28,12 +28,12 @@ const { title, createdAt, tags, image } = post.data;
       ) : null
     }
     <div class="flex flex-1 flex-col justify-center gap-2">
-      <div class="flex flex-row flex-wrap justify-between gap-2">
+      <div class="flex flex-row flex-wrap justify-between items-center gap-2">
         {
           tags && tags.length ? (
             <div class="flex flex-row gap-2">
               {tags.map((t) => (
-                <Tag name={t} class="mt-1" variant="outlined" />
+                <Tag name={t} variant="outlined" />
               ))}
             </div>
           ) : null

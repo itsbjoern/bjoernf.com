@@ -31,7 +31,7 @@ const url = Astro.url.toString();
 ---
 
 <Layout
-  title={`"${title}"`}
+  title={title}
   description={summary}
   image={`/assets/blog/${post.data.slugs[0]}.png`}
   subtitle={`Published ${formatDate(createdAt)}`}

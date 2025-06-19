@@ -1,0 +1,16 @@
+---
+interface Props {
+  id: string;
+}
+
+const { id } = Astro.props;
+---
+
+<div
+  class={`tab-pane tab-pane-${id} hidden`}
+  data-tab-id={id}
+  role="tabpanel"
+  tabindex="0"
+>
+  <slot />
+</div>

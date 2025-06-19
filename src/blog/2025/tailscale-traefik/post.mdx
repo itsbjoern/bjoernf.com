@@ -1,0 +1,247 @@
+---
+title: "Multiple services in Tailscale with Traefik + Docker"
+summary: "Ensuring proper routing of multiple services in Tailscale using Traefik and Docker wasn't quite as straightforward as I expected. The following setup is a pretty solid workaround to Tailscales subdomain restriction."
+image: ./title.png
+tags: [Development]
+slugs: [tailscale-traefik]
+createdAt: 2025-06-19T20:00:00
+published: true
+---
+import Ref from "@/components/Ref/Ref.astro";
+import Tabs from "@/components/Tabs/Tabs.astro";
+import TabButton from "@/components/Tabs/TabButton.astro";
+import TabPane from "@/components/Tabs/TabPane.astro";
+
+**Preamble**
+
+I finally went through the process of upgrading my home server from a Raspberry Pi to a more powerful machine. This was mainly motivated by me wanting to use <Ref text="Immich" href="https://immich.app/" /> but my Raspberry Pi 4 was not powerful enough to run it alongside the other services (such as <Ref text="Vaultwarden" href="https://github.com/dani-garcia/vaultwarden" /> and <Ref text="Home Assistant" href="https://www.home-assistant.io/" />).
+
+I had already been using Tailscale to access my Vaultwarden and Home Assistant instances, but I had just been running them on different ports on the same machine, Vaultwarden in particular also required a <Ref text="Caddy" href="https://caddyserver.com/" /> reverse proxy to handle the TLS certificates. As part of this upgrade I aimed to make my setup a bit neater and instead of routing everything through different ports, I wanted to use subdomains for each service.
+
+<Ref text="Traefik" href="https://traefik.io/" /> was not strictly necessary as a choice for this, as Caddy should be able to handle this as well, but I was curious about it and wanted to try it out. It also seemed to have good integration with <Ref text="Docker" href="https://www.docker.com/" /> and Tailscale built in.
+
+I ended up upgrading to a <Ref text="Beelink S12" href="https://www.bee-link.com/products/beelink-mini-s12-pro-n100" /> as I wanted something small and quiet, but powerful enough to run multiple services. It didn't need to be a complete powerhouse, but I just didn't want to have to worry about it for a bit at least. And the price was just right to not break the bank. I ended up ditching the default Windows install and just went with <Ref text="Ubuntu Server" href="https://ubuntu.com/download/server" /> as this is what I was most comfortable with.
+
+---
+
+**The nitty gritty**
+
+In theory the setup is quite simple, install Tailscale, Traefik and Docker, then configure Traefik to route requests to the correct Docker containers based on the subdomain. Then use the built-in <Ref text="Tailscale resolver" href="https://doc.traefik.io/traefik/https/tailscale/" /> in Traefik to handle the certificates for me automagically.
+
+In practice however this is not quite as simple. I assume most people who have used Tailscale are aware of this but Tailscale does not support multiple subdomains per device. This means assigning uniquely routable subdomains to each service is not possible. One option would be to use a single subdomain and then route requests based on the path, but while this is more recently possible <Ref text="with Vaultwarden" href="https://github.com/dani-garcia/vaultwarden/wiki/Using-an-alternate-base-dir" /> it is not possible <Ref text="with Home Assistant" href="https://github.com/home-assistant/core/issues/21113" />. It also apparently can cause all kinds of issues with WebSockets and other parts of the services that expect them to be on their own subdomain.
+
+Instead after some searching around and reading through the Traefik documentation I realised I could just route DNS requests to subdomains of my choosing to my Tailscale network, then sign those subdomains using <Ref text="Let's Encrypt" href="https://letsencrypt.org/" />. I will be using AWS Route53 for this, but this video shows how it can be achieve with Cloudflare as well: <Ref href="https://www.youtube.com/watch?v=Vt4PDUXB_fg" />.
+
+I will redact my actual setup in this example, let's just assume:
+1. Your tailnet is `tail-net.ts.net`
+2. Your Tailscale device is `device.tail-net.ts.net`
+3. You have a domain `example.com` that you own and can configure DNS for.
+
+The first step is to set up your desired DNS subdomains in your DNS provider to point at your tailnet device address. To allow all services to be forwarded to Tailscale I set up a wildcard CNAME record for `*.athome.example.com` pointing to `device.tail-net.ts.net`. This way any subdomain request will be routed to the Tailscale device. Any subdomain works here, I just chose the namespace `athome` to free up the other subdomains for other purposes.
+
+Then Traefik can be configured to handle the requests for these subdomains and route them to the correct Docker containers based on the subdomain. The configuration is quite straightforward, you just need to set up the entry points, providers and the certificates resolvers.
+
+<Tabs>
+  <Fragment slot="tab-buttons">
+    <TabButton id="traefik">Traefik - Config</TabButton>
+    <TabButton id="traefik-compose">Traefik - Docker Compose</TabButton>
+    <TabButton id="route53-iam">Route53 IAM Policy</TabButton>
+  </Fragment>
+  <Fragment slot="tab-panes">
+    <TabPane id="traefik">
+
+      ```yaml
+      # traefik.yml
+
+      entryPoints:
+        http:
+          address: ":80"
+
+      https:
+        address: ":443"
+
+      providers:
+        docker:
+          endpoint: "unix:///var/run/docker.sock"
+          exposedByDefault: false
+
+      certificatesResolvers:
+        myresolver:
+          acme:
+            storage: "/letsencrypt/acme.json"
+            email: email@example.com
+            dnsChallenge:
+              provider: "route53"
+              resolvers:
+                - "8.8.8.8"
+      ```
+      <br />
+
+      The Traefik configuration is quite standard, a couple things to note:
+      - `resolvers` are set to use Google's DNS servers, this is required to properly resolve the DNS challenges while having configured the CNAME redirect.
+      - `provider` is set to `route53`, this is the AWS Route53 DNS provider. You can use any <Ref text="supported DNS provider" href="https://doc.traefik.io/traefik/https/acme/#providers" /> here, but I chose Route53 as I already use it for my domain.
+      - Using the `docker` provider to automatically route Docker containers that are started within the Traefik network.
+
+    </TabPane>
+    <TabPane id="traefik-compose">
+      ```yaml
+      # docker-compose.yml
+
+      services:
+        traefik:
+          image: traefik:latest
+          restart: unless-stopped
+          container_name: traefik
+          ports:
+            - 80:80
+            - 443:443
+            - 8080:8080
+          volumes:
+            - /etc/localtime:/etc/localtime:ro
+            - ./traefik.yml:/etc/traefik/traefik.yml:ro
+            - /var/run/docker.sock:/var/run/docker.sock:ro
+            - /var/run/tailscale/tailscaled.sock:/var/run/tailscale/tailscaled.sock:ro
+            - ./letsencrypt:/letsencrypt
+          networks:
+            - traefik
+          environment:
+            - "AWS_ACCESS_KEY_ID=XXXX"
+            - "AWS_SECRET_ACCESS_KEY=XXXX"
+            - "AWS_HOSTED_ZONE_ID=XXXX"
+            - "AWS_REGION=XXXX"
+            - "LEGO_DISABLE_CNAME_SUPPORT=true"
+
+      networks:
+        traefik:
+          external: true
+      ```
+      <br />
+      The Docker Compose configuration is also quite standard, a couple things to note:
+      - The AWS specific credentials (`AWS_ACCESS_KEY_ID`, `AWS_SECRET_ACCESS_KEY`, `AWS_HOSTED_ZONE_ID`, `AWS_REGION`) only need to be supplied if you are using Route53
+      - The `LEGO_DISABLE_CNAME_SUPPORT` environment variable is set to `true`. **THIS IS VERY IMPORTANT!** Basically, because we are forwarding all subdomains to the Tailscale device, by default Traefik (or rather it's dependency LEGO) will start following the CNAME records to set up the certificates. However, this will cause it to follow the CNAME to the Tailscale device and then try to set up the certificate there, which will fail as your tailnet address is not routable from the public internet.
+      - I use an external Docker network called `traefik` to allow Traefik to communicate with the other containers. You can create this network with the following command: `docker network create traefik`
+
+    </TabPane>
+    <TabPane id="route53-iam">
+      **This policy is only relevant if you are using AWS Route53 as your DNS provider.**
+
+      It allows Traefik to manage the DNS records for the subdomains you want to use. You will need to create an IAM user with this policy and provide the credentials in the Docker Compose file.
+
+      Make sure to replace `<YOUR_HOSTED_ZONE_ID>` with your actual Route53 hosted zone ID.
+      ```json
+      {
+          "Version": "2012-10-17",
+          "Statement": [
+              {
+                  "Sid": "VisualEditor0",
+                  "Effect": "Allow",
+                  "Action": [
+                      "route53:GetChange",
+                      "route53:ListHostedZonesByName"
+                  ],
+                  "Resource": "*"
+              },
+              {
+                  "Sid": "VisualEditor1",
+                  "Effect": "Allow",
+                  "Action": [
+                      "route53:ChangeResourceRecordSets",
+                      "route53:ListResourceRecordSets"
+                  ],
+                  "Resource": "arn:aws:route53:::hostedzone/<YOUR_HOSTED_ZONE_ID>"
+              }
+          ]
+      }
+      ```
+    </TabPane>
+  </Fragment>
+</Tabs>
+
+With this configuration in place, Traefik will automatically handle the DNS challenges for the subdomains you have set up in your DNS provider. It will request certificates from Let's Encrypt and store them in the `/letsencrypt/acme.json` file. This file should be mounted as a volume in the Traefik container to persist the certificates across restarts, otherwise you may have issues with Let's Encrypt rate limits.
+
+Below are example Docker Compose files that I use on my instances. Personally, I prefer to disable Traefik's automatic service detection by setting `exposedByDefault: false`, which means I need to explicitly add `traefik.enable=true` to the labels of any service I want to expose.
+
+Since Traefik can route traffic to containers within its network, it's not necessary to expose service ports to the host machine. However, if a service runs on a port other than `:80`, you must specify the port in the Traefik labels, as Traefik cannot detect it automatically. For example, Home Assistant runs on port `8123` by default, so you need to add the label `traefik.http.services.homeassistant.loadbalancer.server.port=8123` (see the full config below).
+
+<Tabs>
+  <Fragment slot="tab-buttons">
+    <TabButton id="vaultwarden">Vaultwarden</TabButton>
+    <TabButton id="homeassistant">Home Assistant</TabButton>
+  </Fragment>
+  <Fragment slot="tab-panes">
+    <TabPane id="vaultwarden">
+      Setting up a service is straightforward:
+      1. Configure a rule for the domain you want to use for Vaultwarden, e.g. `vaultwarden.athome.example.com`.
+      2. Set the TLS resolver to the one you configured in Traefik, e.g. `myresolver`.
+      3. Set the `DOMAIN` environment variable in Vaultwarden to match the domain in your Traefik rule.
+
+      ```yaml
+      # docker-compose.yml
+
+      services:
+        vaultwarden:
+          image: vaultwarden/server:latest
+          restart: always
+          container_name: vaultwarden
+          volumes:
+            - ./vw-data:/data
+          environment:
+            - DOMAIN=https://vaultwarden.athome.example.com
+            - ADMIN_TOKEN=XXXXXXXX
+            - WEBSOCKET_ENABLED=true
+            - INVITATIONS_ALLOWED=false
+            - SIGNUPS_ALLOWED=false # Set to true if resetting
+          labels:
+            - "traefik.enable=true"
+            - "traefik.http.routers.vaultwarden.rule=Host(`vaultwarden.athome.example.com`)"
+            - "traefik.http.routers.vaultwarden.tls.certresolver=myresolver"
+          networks:
+            - traefik
+
+      networks:
+        traefik:
+          external: true
+      ```
+
+    </TabPane>
+    <TabPane id="homeassistant">
+      ```yaml
+      # docker-compose.yml
+
+      services:
+        homeassistant:
+          container_name: homeassistant
+          image: "ghcr.io/home-assistant/home-assistant:stable"
+          volumes:
+            - ./ha-data/config:/config # Retain home assistant config
+            - /etc/localtime:/etc/localtime:ro
+          restart: unless-stopped
+          privileged: true
+          networks:
+            - traefik
+          labels:
+            - "traefik.enable=true"
+            - "traefik.http.routers.homeassistant.rule=Host(`homeassistant.athome.example.com`)"
+            - "traefik.http.routers.homeassistant.tls.certresolver=myresolver"
+            - "traefik.http.services.homeassistant.loadbalancer.server.port=8123"
+
+
+      networks:
+        traefik:
+          external: true
+    ```
+
+    </TabPane>
+  </Fragment>
+</Tabs>
+
+Once the services are ready and started, Traefik will automatically pick up any changes using the docker provider. You can now visit your services using the subdomains you configured, e.g. `https://vaultwarden.athome.example.com` and `https://homeassistant.athome.example.com`. Just as a hint, it can take a few minutes sometimes for the DNS challenge to complete and for the certificates to be issued, so don't panic if it doesn't work immediately.
+
+---
+
+**Conclusion**
+
+This setup now allows me to finally separate my personal services into their own subdomains. I wish it was easier to achieve using *just* Tailscale but I am fine with the relatively small compromise of having to route the requests through a DNS provider.
+
+Maybe this helps someone else who is trying to achieve a similar setup. If you have any questions or suggestions, feel free to reach out to me on <Ref text="Mastodon" href="https://fosstodon.org/@itsbjoern" /> or <Ref text="Bluesky" href="https://bsky.app/profile/bjoernf" />.
+

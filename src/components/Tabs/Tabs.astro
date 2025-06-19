@@ -1,0 +1,75 @@
+---
+
+---
+
+<div class="tabs w-full mx-auto">
+  <div
+    class="flex border-b border-gray-200 bg-white rounded-t-lg px-1 py-1 gap-1 overflow-auto"
+    role="tablist"
+  >
+    <slot name="tab-buttons" />
+  </div>
+  <div class="bg-white rounded-b-lg shadow p-4">
+    <slot name="tab-panes" />
+  </div>
+</div>
+
+<script>
+  const allTabs = document.querySelectorAll(".tabs");
+
+  allTabs.forEach((tab) => {
+    const buttons = tab.querySelectorAll(".tab-button");
+    const panes = tab.querySelectorAll(".tab-pane");
+
+    // Set first tab and pane as visible/selected on load
+    if (buttons.length && panes.length) {
+      buttons.forEach((btn, i) => {
+        if (i === 0) {
+          btn.classList.remove("text-gray-600");
+          btn.classList.add("text-blue-600", "border-b-2", "border-blue-600");
+          btn.setAttribute("aria-selected", "true");
+          btn.setAttribute("tabindex", "0");
+        }
+      });
+      panes.forEach((pane, i) => {
+        if (i === 0) {
+          pane.classList.remove("hidden");
+        }
+      });
+    }
+
+    buttons.forEach((button, idx) => {
+      button.addEventListener("click", () => {
+        const id = button.getAttribute("data-tab-id");
+
+        buttons.forEach((btn, i) => {
+          if (btn === button) {
+            btn.classList.remove("text-gray-600");
+            btn.classList.add("text-blue-600", "border-b-2", "border-blue-600");
+            btn.setAttribute("aria-selected", "true");
+            btn.setAttribute("tabindex", "0");
+          } else {
+            btn.classList.remove(
+              "text-blue-600",
+              "border-b-2",
+              "border-blue-600",
+            );
+            btn.classList.add("text-gray-600");
+            btn.setAttribute("aria-selected", "false");
+            btn.setAttribute("tabindex", "-1");
+          }
+        });
+
+        panes.forEach((pane) => {
+          if (pane.getAttribute("data-tab-id") === id) {
+            pane.classList.remove("hidden");
+            pane.classList.add("block");
+          } else {
+            pane.classList.remove("block");
+            pane.classList.add("hidden");
+          }
+        });
+      });
+    });
+  });
+</script>
