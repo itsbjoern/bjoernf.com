@@ -34,10 +34,13 @@ Instead after some searching around and reading through the Traefik documentatio
 
 I will redact my actual setup in this example, let's just assume:
 1. Your tailnet is `tail-net.ts.net`
-2. Your Tailscale device is `device.tail-net.ts.net`
+2. Your internal Tailscale device IP is `100.XXX.YYY.ZZZ`
 3. You have a domain `example.com` that you own and can configure DNS for.
 
-The first step is to set up your desired DNS subdomains in your DNS provider to point at your tailnet device address. To allow all services to be forwarded to Tailscale I set up a wildcard CNAME record for `*.athome.example.com` pointing to `device.tail-net.ts.net`. This way any subdomain request will be routed to the Tailscale device. Any subdomain works here, I just chose the namespace `athome` to free up the other subdomains for other purposes.
+The first step is to set up your desired DNS subdomains in your DNS provider to point at your tailnet device address. To allow all services to be forwarded to Tailscale I set up a wildcard A record for `*.athome.example.com` pointing to `100.XXX.YYY.ZZZ`. This way any subdomain request will be routed to the Tailscale device. Any subdomain works here, I just chose the namespace `athome` to free up the other subdomains for other purposes.
+
+**EDIT:** This section previously referred to using a CNAME record to point the subdomains to the Tailscale device instead of it's IP. However, it turns out there is an <Ref text="issue with routing on Windows and Android devices" href="https://github.com/tailscale/tailscale/issues/7650" /> when doing so. Therefore, this is amended to using an A record now.
+
 
 Then Traefik can be configured to handle the requests for these subdomains and route them to the correct Docker containers based on the subdomain. The configuration is quite straightforward, you just need to set up the entry points, providers and the certificates resolvers.
 
@@ -118,7 +121,7 @@ Then Traefik can be configured to handle the requests for these subdomains and r
       <br />
       The Docker Compose configuration is also quite standard, a couple things to note:
       - The AWS specific credentials (`AWS_ACCESS_KEY_ID`, `AWS_SECRET_ACCESS_KEY`, `AWS_HOSTED_ZONE_ID`, `AWS_REGION`) only need to be supplied if you are using Route53
-      - The `LEGO_DISABLE_CNAME_SUPPORT` environment variable is set to `true`. **THIS IS VERY IMPORTANT!** Basically, because we are forwarding all subdomains to the Tailscale device, by default Traefik (or rather it's dependency LEGO) will start following the CNAME records to set up the certificates. However, this will cause it to follow the CNAME to the Tailscale device and then try to set up the certificate there, which will fail as your tailnet address is not routable from the public internet.
+      - <s>The `LEGO_DISABLE_CNAME_SUPPORT` environment variable is set to `true`. Basically, because we are forwarding all subdomains to the Tailscale device, by default Traefik (or rather it's dependency LEGO) will start following the CNAME records to set up the certificates. However, this will cause it to follow the CNAME to the Tailscale device and then try to set up the certificate there, which will fail as your tailnet address is not routable from the public internet.</s> This is no longer necessary when using an A instead of a CNAME record for the subdomains.
       - I use an external Docker network called `traefik` to allow Traefik to communicate with the other containers. You can create this network with the following command: `docker network create traefik`
 
     </TabPane>
