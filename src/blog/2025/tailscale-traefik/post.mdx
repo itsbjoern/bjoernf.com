@@ -164,7 +164,7 @@ With this configuration in place, Traefik will automatically handle the DNS chal
 
 Below are example Docker Compose files that I use on my instances. Personally, I prefer to disable Traefik's automatic service detection by setting `exposedByDefault: false`, which means I need to explicitly add `traefik.enable=true` to the labels of any service I want to expose.
 
-Since Traefik can route traffic to containers within its network, it's not necessary to expose service ports to the host machine. However, if a service runs on a port other than `:80`, you must specify the port in the Traefik labels, as Traefik cannot detect it automatically. For example, Home Assistant runs on port `8123` by default, so you need to add the label `traefik.http.services.homeassistant.loadbalancer.server.port=8123` (see the full config below).
+Since Traefik can route traffic to containers within its network, it's not necessary to expose service ports to the host machine. However, if a service runs on a port other than `:80`, you must specify the port in the Traefik labels, as Traefik cannot detect it automatically. For example, Home Assistant runs on port `8123` by default, so you need to add the label `traefik.http.services.homeassistant.loadbalancer.server.port=8123` (see the full config below). If you bind multiple networks to a service – e.g, if you have other services in the same compose file that you don't want to expose to the Traefik network – you can use the `traefik.docker.network` label to specify which network Traefik should use to route traffic to the service. So, in my case I would add `traefik.docker.network=traefik` to every service that I specify more than one network for.
 
 <Tabs>
   <Fragment slot="tab-buttons">
