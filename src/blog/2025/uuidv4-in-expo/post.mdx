@@ -1,0 +1,38 @@
+---
+title: "Using UUID v4 in Expo (native + web)"
+summary: "A workable UUID v4 generator for Expo apps that works on both native and web platforms."
+image: ./title.png
+tags: [Development]
+slugs: [uuid-v4-expo]
+createdAt: 2025-07-25T20:00:00
+published: true
+---
+import Ref from "@/components/Ref/Ref.astro";
+
+Today I ran into a problem with generating v4 UUIDs in an Expo app. The `uuid` package is a popular choice for generating UUIDs, but it doesn't work out of the box in Expo apps because it relies on Node.js's `crypto` module. Specifically the `getRandomValues` function, which is not available in the Expo environment.
+
+There seem to be workaround such as the <Ref text="react-native-uuid" href="https://www.npmjs.com/package/react-native-uuid" /> package which <Ref text="re-implements the random number generator" href="https://github.com/eugenehp/react-native-uuid/blob/master/src/rng.ts" /> using `Math.random()` which I'm not a huge fan of.
+
+There's also <Ref text="react-native-get-random-values" href="https://www.npmjs.com/package/react-native-get-random-values" /> which is a polyfill for the `crypto.getRandomValues` function, but it has not been updated in months (years) and users seem to have multiple issues with it. I didn't want to outsource a core functionality to a potentially flakey dependency (which in fairness it may not be, but I didn't want to deal with the headache if it was).
+
+Instead I decided to rely on the `expo-crypto` package which is a part of the Expo SDK and provides a reliable way to generate random values. `uuid`'s `v4` generation implementation allows you to pass in a custom random number generator, so we can use `expo-crypto`'s `getRandomValues` function to generate the random bytes needed for the UUID.
+
+It may have been possible to somehow polyfill the `crypto.getRandomValues` function in a way that would work with the `uuid` package, but I didn't want to spend time on that. Especially not because from prior experience I know how much of a pain it is when Expo, metro or something else in the process changes down the line. Instead, I opted for a straightforward solution that simply re-exports it's own `v4` function.
+
+It's a simple and elegant solution that works on both native and web platforms. Here's how you can implement it in your Expo app, just remember to import `v4` from your own file instead of the `uuid` package directly:
+
+```ts
+// uuid.ts
+
+import { getRandomValues } from "expo-crypto"
+import { v4 as uuidv4 } from "uuid"
+
+export const v4 = () => {
+  const random = new Uint8Array(16)
+  getRandomValues(random)
+
+  return uuidv4({
+    random,
+  })
+}
+```
