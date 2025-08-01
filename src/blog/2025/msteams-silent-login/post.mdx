@@ -1,0 +1,310 @@
+---
+title: "Microsoft Teams silent login flow in 2025"
+summary: "Implementing a silent login flow for Microsoft Teams using the Teams SDK and Microsoft Graph API. Load user information without requiring an additional login prompt."
+image: ./title.png
+tags: [Development]
+slugs: [ms-teams-silent-login]
+createdAt: 2025-08-01T17:00:00
+published: true
+---
+import { Image } from "astro:assets";
+import Ref from "@/components/Ref/Ref.astro";
+import Tabs from "@/components/Tabs/Tabs.astro";
+import TabButton from "@/components/Tabs/TabButton.astro";
+import TabPane from "@/components/Tabs/TabPane.astro";
+import appIdImage from "./app_id.png";
+
+This post outlines the implementation of a silent login flow for Microsoft Teams. At SimplyDo we had previously implemented a solution for this and it worked, after some changes from Microsoft there is now a slightly more elegant solution available.
+
+_Sidenote: in all fairnesss, most of our prior issues stemmed from the proactive messages required by Teams applications, but this is also much more straightforward nowadays. If you're interested in (or struggling with) implementing proactive notifications feel free to send me a message on one of my socials._
+
+You can find our process for the previous solution in our <Ref text="team blog post" href="https://devblog.simplydo.co.uk/posts/2023-11-22-silent_auth/" />. You will find that the process is actually still extremely similar, especially in regards to Steps 1 & 2. However, since then Microsoft has made some changes to their recommended Teams packages, so this updated approach should be more in line with the setup you can expect when creating a new Teams app in 2025.
+
+Either way, the following should guide you through an example of how to implement a silent login flow in Microsoft Teams using the Teams SDK and the Microsoft Graph API. The example will cover both the frontend and backend parts of the flow.
+
+**The MS Teams frontend**
+
+The flow begins in the Teams environment itself. What we are looking for is a way to utilise the users authentication context of Teams itself to silently authenticate the user in our app.
+
+For this we use the following versions of the Teams SDK, as of writing these are the latest versions available.
+```ts
+  "@microsoft/teams-js": "^2.36.0",
+  "@microsoft/teamsfx": "^4.0.0",
+  "@microsoft/teamsfx-react": "^4.0.2",
+```
+
+Technically only `@microsoft/teams-js` is required for this, but I assume most people will look at this in context of a React app. However, as you can see in their code the teamsfx packages actually just a wrapper around an authentication request around to make the ssoToken available, so this should always be available as long as `app.initialize()` has been called.
+References: <Ref text="Wrapping the internal call" href="https://github.com/OfficeDev/microsoft-365-agents-toolkit/blob/29b60835ab3a9c6ca0d1e57e2a910650437ceb21/packages/sdk/src/credential/teamsUserCredential.browser.ts#L277C33-L277C44" /> and <Ref text="calling the underlying authentication" href="https://github.com/OfficeDev/microsoft-365-agents-toolkit/blob/29b60835ab3a9c6ca0d1e57e2a910650437ceb21/packages/sdk/src/credential/teamsUserCredential.browser.ts#L329" />
+
+If you open a Teams app in the Desktop or web client you will have the `useTeamsUserCredential` hook available to you. This hook will allow you to access the Teams user credentials and initiate the login flow. Crucially, you have access to the `ssoToken` which is the auth token that validates the user in Teams. This token is what we will use to authenticate the user in our app.
+
+The setup should look something like this:
+```ts
+import { useTeamsUserCredential } from "@microsoft/teamsfx-react"
+
+const Component = () => {
+  const teamsCredentials = useTeamsUserCredential({
+    initiateLoginEndpoint: import.meta.env.VITE_START_LOGIN_PAGE_URL,
+    clientId: import.meta.env.VITE_CLIENT_ID,
+  })
+  const [currentUser, setCurrentUser] = useState(null)
+  const [userLoginStatus, setUserLoginStatus] = useState("loading")
+
+  const { loading, teamsUserCredential } = teamsCredentials
+  if (loading) {
+    return <div>Loading...</div>
+  }
+
+  useEffect(() => {
+    if (userLoginStatus !== "loading") {
+      return
+    }
+    setUserLoginStatus("initialising")
+
+    // If we already have a token, we can skip the login flow
+    const apiToken = localStorage.getItem("token")
+    if (apiToken) {
+      api.registerToken(apiToken)
+      const user = api.getUser()
+      setCurrentUser(user)
+
+      setUserLoginStatus("loggedIn")
+      return
+    }
+
+    const initialiseLogin = async () => {
+      // Ensure the ssoToken is available
+      const userInfo = await teamsUserCredential?.getUserInfo()
+      if (!userInfo) {
+        setUserLoginStatus("loginFailed")
+        return
+      }
+
+      // Read the silent id token from the TeamsFx context
+      const ssoToken = teamsUserCredential?.ssoToken?.token
+      const response = await api.loginWithTeams({ ssoToken })
+
+      api.registerToken(response.token)
+      localStorage.setItem("token", response.token)
+      setCurrentUser(response.user)
+
+      setUserLoginStatus("loggedIn")
+    }
+    initialiseLogin()
+  }, [teamsUserCredential])
+}
+```
+Here we first call the `.getUserInfo()` method to ensure that the user is logged in and we have access to the `ssoToken`. This token is then passed to our backend API to authenticate the user. Once the request succeeds we can use this information set a session token in our api which allows us to further communicate with our backend without having to re-authenticate through the `ssoToken` in the future.
+
+**The backend**
+
+In the backend we will verify the `ssoToken` and use it to authenticate the user. Before we do so we need to check what our audience for the token is. This can be done by checking the `aud` claim in the token. You should never parse this directly from the token, but it will be stable across requests. If you are not deployed yet you can also check your Azure AD app registration to see what the audience is set to.
+
+The following image shows where you would find the App audience in the App registration.  Let's assume it's set to `api://<your-app-id>` for now.
+<Image src={appIdImage} alt="Example of App ID in Azure" />
+
+Now that we know the audience, we can verify the token and extract the user information from it. The token is signed by Microsoft and we can verify it using the public keys provided by Microsoft.
+
+Please be aware that in this example we will request user information from the Microsoft Graph API using the `https://graph.microsoft.com/.default` scope. This scope grants access to any delegated permissions configured for the application, but fails if there isn't any. You will need to ensure that the app registration has the necessary permissions granted to resolve the fields of the following Graph API call. The configured permissions can be found in the app registration under "API permissions".
+
+In these examples I will use a few dummy functions to illustrate how you could use the data in this flow, but you will need to implement your own logic to handle the user data and authentication flow in your app.
+<Tabs>
+  <Fragment slot="tab-buttons">
+    <TabButton id="python">Python</TabButton>
+    <TabButton id="ts">TypeScript</TabButton>
+  </Fragment>
+  <Fragment slot="tab-panes">
+    <TabPane id="python">
+      For Python we use the `requests` and `pyjwt` libraries to verify the token.
+      The `msal` library is used to acquire an access token on behalf of the user if the user is not found in our database.
+
+      ```python
+        import os
+        import requests
+        import jwt
+        from msal import ConfidentialClientApplication
+
+        # Microsoft maintains a rotating set of public keys to verify the JWT signature.
+        # Reference:
+        # https://learn.microsoft.com/en-us/entra/identity-platform/access-tokens#validate-the-signature
+        config_response = requests.get(
+            "https://login.microsoftonline.com/common/v2.0/.well-known/openid-configuration",
+            timeout=5,
+        )
+        config_data = config_response.json()
+        jwks_url = config_data.get("jwks_uri")
+
+        jwks_response = requests.get(jwks_url, timeout=5)
+        public_keys = {
+            key["kid"]: jwt.algorithms.RSAAlgorithm.from_jwk(json.dumps(key))
+            for key in jwks_response.json().get("keys", [])
+        }
+
+        # The api handler as invoked by api.loginWithTeams on the frontend
+        def login_from_teams_token(data):
+            teams_token = data["ssoToken"]
+            token_headers = jwt.get_unverified_header(teams_token)
+            public_key = public_keys[token_headers["kid"]]
+
+            decoded_token = jwt.decode(
+                teams_token,
+                key=public_key,
+                algorithms=["RS256"],
+                audience="api://<your-app-id>",
+            )
+
+            tid = decoded_token["tid"]
+
+            # The oid is the users unique identifier in Azure AD
+            # This can be None or empty in certain scenarios, so handle it accordingly
+            oid = decoded_token.get("oid")
+            if oid:
+                # Find the user and return it, otherwise we have to provision a new user
+                user = get_user_by_oid(oid)
+                if user:
+                    return {
+                      "token": create_api_token(user),
+                      "user": user,
+                    }
+
+            # MICROSOFT_APP_ID and MICROSOFT_APP_SECRET are the app registration credentials
+            msal_client = ConfidentialClientApplication(
+                client_id=os.environ["MICROSOFT_APP_ID"],
+                client_credential=os.environ["MICROSOFT_APP_SECRET"],
+                authority=f"https://login.microsoftonline.com/{tid}",
+            )
+
+            access_data = msal_client.acquire_token_on_behalf_of(
+                user_assertion=teams_token,
+                scopes=["https://graph.microsoft.com/.default"],
+            )
+
+            if "access_token" not in access_data:
+                raise Exception("Failed to acquire access token")
+
+            # Example of how the token can be used to create a new user
+            resp = requests.get(
+                f"https://graph.microsoft.com/v1.0/me?$select=id,givenName,mail",
+                headers={
+                    "Authorization": f"Bearer {access_data['access_token']}"
+                },
+            )
+            user_data = resp.json()
+            user = create_user(
+                oid=oid,
+                email=user_data.get("mail"),
+                first_name=user_data.get("givenName"),
+            )
+
+            return {
+              "token": create_api_token(user),
+              "user": user,
+            }
+      ```
+    </TabPane>
+    <TabPane id="ts">
+       _Disclaimer: I chucked the Python example into AI to generate a TypeScript version. It may not be perfect (or working for that matter), but it should give you an idea._
+
+      ```ts
+        import axios from "axios";
+        import jwt, { JwtHeader, JwtPayload } from "jsonwebtoken";
+        import jwkToPem from "jwk-to-pem";
+        import { ConfidentialClientApplication } from "@azure/msal-node";
+
+        const configUrl = "https://login.microsoftonline.com/common/v2.0/.well-known/openid-configuration";
+
+        let publicKeys: Record<string, string> = {};
+
+        async function fetchPublicKeys(): Promise<void> {
+          const configResponse = await axios.get(configUrl, { timeout: 5000 });
+          const jwksUri = configResponse.data.jwks_uri;
+
+          const jwksResponse = await axios.get(jwksUri, { timeout: 5000 });
+          const keys = jwksResponse.data.keys || [];
+
+          publicKeys = keys.reduce((acc: Record<string, string>, key: any) => {
+            acc[key.kid] = jwkToPem(key);
+            return acc;
+          }, {});
+        }
+
+        interface TeamsLoginData {
+          ssoToken: string;
+        }
+
+        // The api handler as invoked by api.loginWithTeams on the frontend
+        export async function loginFromTeamsToken(data: TeamsLoginData): Promise<any> {
+          const teamsToken = data.ssoToken;
+
+          if (!Object.keys(publicKeys).length) {
+            await fetchPublicKeys();
+          }
+
+          const tokenHeaders = jwt.decode(teamsToken, { complete: true })?.header as JwtHeader;
+          const kid = tokenHeaders?.kid;
+
+          if (!kid || !publicKeys[kid]) {
+            throw new Error("Invalid token: Key ID not found");
+          }
+
+          const publicKey = publicKeys[kid];
+
+          const decodedToken = jwt.verify(teamsToken, publicKey, {
+            algorithms: ["RS256"],
+            audience: "api://<your-app-id>",
+          }) as JwtPayload;
+
+          const tid = decodedToken["tid"];
+          const oid = decodedToken["oid"];
+
+
+          // The oid is the users unique identifier in Azure AD
+          // This can be null or empty in certain scenarios, so handle it accordingly
+          if (oid) {
+            const user = await getUserByOid(oid);
+            if (user) {
+              return { user, token: createApiToken(user)};
+            }
+          }
+
+          // MICROSOFT_APP_ID and MICROSOFT_APP_SECRET are the app registration credentials
+          const msalClient = new ConfidentialClientApplication({
+            auth: {
+              clientId: process.env.MICROSOFT_APP_ID!,
+              clientSecret: process.env.MICROSOFT_APP_SECRET!,
+              authority: `https://login.microsoftonline.com/${tid}`,
+            },
+          });
+
+          const result = await msalClient.acquireTokenOnBehalfOf({
+            oboAssertion: teamsToken,
+            scopes: ["https://graph.microsoft.com/.default"],
+          });
+
+          if (!result || !result.accessToken) {
+            throw new Error("Failed to acquire access token");
+          }
+
+          // Example of how the token can be used to create a new user
+          const graphResponse = await axios.get("https://graph.microsoft.com/v1.0/me?$select=id,givenName,mail", {
+            headers: {
+              Authorization: `Bearer ${result.accessToken}`,
+            },
+          });
+
+          const userData = graphResponse.data;
+
+          const user = await createUser({
+            oid,
+            email: userData.mail,
+            first_name: userData.givenName,
+          });
+
+          return { user, token: createApiToken(user)};
+        }
+        ```
+    </TabPane>
+  </Fragment>
+</Tabs>
+
+Nothing here is terribly complicated, but it does require some understanding of how the Teams SDK works and how to verify the JWT tokens. The key takeaway is that you can use the Teams user credentials to silently authenticate the user in your app without requiring them to log in again.
