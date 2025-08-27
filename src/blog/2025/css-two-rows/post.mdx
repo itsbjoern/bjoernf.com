@@ -7,7 +7,7 @@ slugs: [flexible-row-length-css]
 createdAt: 2025-08-27T21:36:00
 published: true
 ---
-import { Example } from "./example"
+import Example from "./example.astro"
 
 I ran into this annoying CSS problem that neither AI nor the internet seemed to be able to produce a sensible solution for. I don't think it's a hard problem nor but it did take me a little while to wrap my head around it. I'm now just documenting the issue for prosperity.
 
@@ -66,12 +66,12 @@ In the following example the content is editable, give it a go and see how it be
 ---
 
 Additionally, if the width of the lower row is constrained, it will also work nicely:
-<Example editable content="Content that is much longer and will break because the container is restricted in width" contentStyle={{ width: 200 }} />
+<Example editable content="Content that is much longer and will break because the container is restricted in width" contentStyle={{ width: "200px" }} />
 
 ---
 
 As mentioned before, if the width-controlling row is animated, it will also animate the truncation of the other row:
-<Example contentStyle={{ width: 200, backgroundColor: "#a7b1ff" }} contentId="animatedContent" />
+<Example contentStyle={{ width: "200px", backgroundColor: "#a7b1ff" }} contentId="animatedContent" />
 <br />
 <button className="bg-gray-500 hover:bg-gray-700 text-white font-bold py-2 px-4 rounded" id="animatedButton">Toggle width</button>
 <script>{`
