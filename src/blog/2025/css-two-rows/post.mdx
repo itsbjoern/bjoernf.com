@@ -1,0 +1,94 @@
+---
+title: "Multi-row, dynamically truncated text width with ellipsis in pure CSS"
+summary: "Creating a two-row layout with text where both rows have a variable length (or width). One of the rows should dictate the width of the container, while the other row truncates to that size with ellipses."
+image: ./title.png
+tags: [Development]
+slugs: [flexible-row-length-css]
+createdAt: 2025-08-27T21:36:00
+published: true
+---
+import { Example } from "./example"
+
+I ran into this annoying CSS problem that neither AI nor the internet seemed to be able to produce a sensible solution for. I don't think it's a hard problem nor but it did take me a little while to wrap my head around it. I'm now just documenting the issue for prosperity.
+
+The basic issue boils down to wanting a two-row layout with text where both rows have a variable length (or width). In the layout one of the rows should dictate the width of the container, while the other row truncates to it's size with ellipses.
+
+**TL;DR:**
+
+* Title: An overly long but truncated title
+* Content: Any length content
+
+Example:
+<Example />
+
+Code:
+```tsx
+ <div
+  style={{
+    display: "inline-flex",
+    flexDirection: "column",
+  }}
+>
+  <div style={{ display: "flex" }}>
+    <div
+      style={{
+        width: 0,
+        flexGrow: 1,
+        overflow: "hidden",
+        textOverflow: "ellipsis",
+        whiteSpace: "nowrap",
+      }}
+    >
+      A long but truncated title
+    </div>
+  </div>
+  <div>
+    Any length content
+  </div>
+</div>
+```
+
+**Explanation**
+
+The important components of this setup are:
+
+1. Using `inline-flex` on the outer container to make it shrink to fit the content of the row that controls the size. This means that whichever row is controlling the size will determine the overall width of the container and thus truncate the other row.
+2. Wrapping the truncated view in a `flex` container that the truncated text can grow into. This will allow the text to take up the available space without exceeding the container's width.
+3. Setting the truncated text to `width: 0` and `flex-grow: 1` to make it grow to the size of the interim flex container, but it can never exceed further than the overall container.
+
+It creates a rather elegant solution where there is no need to calculate any sizes, and it's adaptable to any content size. It also automatically animates rather nicely if the width-controlling row has a transition.
+
+**The playground**
+
+In the following example the content is editable, give it a go and see how it behaves:
+<Example content="Edit me" editable />
+
+---
+
+Additionally, if the width of the lower row is constrained, it will also work nicely:
+<Example editable content="Content that is much longer and will break because the container is restricted in width" contentStyle={{ width: 200 }} />
+
+---
+
+As mentioned before, if the width-controlling row is animated, it will also animate the truncation of the other row:
+<Example contentStyle={{ width: 200, backgroundColor: "#a7b1ff" }} contentId="animatedContent" />
+<br />
+<button className="bg-gray-500 hover:bg-gray-700 text-white font-bold py-2 px-4 rounded" id="animatedButton">Toggle width</button>
+<script>{`
+  const content = document.getElementById("animatedContent");
+  const button = document.getElementById("animatedButton");
+  button.addEventListener("click", function() {
+    content.style.width = content.style.width === "200px" ? "400px" : "200px";
+  });
+`}</script>
+
+---
+
+Lastly, it also works great if you have multiple components of varying widths that need to sitting next to each other in one row (this was my use case)
+
+<div style={{ display: "flex", gap: "16px" }}>
+<Example content="First title" />
+<Example content="Second title" />
+<Example content="Third title" />
+<Example content="Fourth title" />
+</div>
