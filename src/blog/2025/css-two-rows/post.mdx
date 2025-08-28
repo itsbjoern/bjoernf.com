@@ -71,14 +71,14 @@ Additionally, if the width of the lower row is constrained, it will also work ni
 ---
 
 As mentioned before, if the width-controlling row is animated, it will also animate the truncation of the other row:
-<Example contentStyle={{ width: "200px", backgroundColor: "#a7b1ff" }} contentId="animatedContent" />
+<Example contentStyle={{ width: "100px", backgroundColor: "#a7b1ff" }} contentId="animatedContent" />
 <br />
 <button className="bg-gray-500 hover:bg-gray-700 text-white font-bold py-2 px-4 rounded" id="animatedButton">Toggle width</button>
 <script>{`
   const content = document.getElementById("animatedContent");
   const button = document.getElementById("animatedButton");
   button.addEventListener("click", function() {
-    content.style.width = content.style.width === "200px" ? "400px" : "200px";
+    content.style.width = content.style.width === "100px" ? "300px" : "100px";
   });
 `}</script>
 
