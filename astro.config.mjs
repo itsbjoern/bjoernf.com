@@ -15,6 +15,12 @@ export default defineConfig({
     assets: "static",
   },
   vite: {
-    "assetsInclude": ["**/*.xml"]
+    "assetsInclude": ["**/*.xml"],
+    optimizeDeps: {
+      exclude: ['@ffmpeg/ffmpeg', '@ffmpeg/util', 'gif.js']
+    },
+    worker: {
+      format: 'es'
+    }
   }
 });

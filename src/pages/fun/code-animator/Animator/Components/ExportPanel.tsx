@@ -6,7 +6,7 @@ import { computeDiff } from "../diffEngine";
 import { exportGIF, exportMP4, downloadBlob } from "../exportEngine";
 
 export const ExportPanel = () => {
-  const { beforeSnippet, afterSnippet, config, highlighter } = useAnimator();
+  const { snippets, config, highlighter } = useAnimator();
   const { setExporting, setProgress, setCurrentFormat, setError, ffmpegLoaded, resetExport } =
     useExport();
   const { addToast } = useToast();
@@ -22,8 +22,8 @@ export const ExportPanel = () => {
   const [showSettings, setShowSettings] = useState(false);
 
   const handleExport = async (format: "gif" | "mp4") => {
-    if (!beforeSnippet || !afterSnippet || !highlighter) {
-      addToast({ message: "Please enter code in both editors first", color: "bg-red-500" });
+    if (snippets.length < 2 || !highlighter) {
+      addToast({ message: "Please enter code in at least 2 stages first", color: "bg-red-500" });
       return;
     }
 
@@ -37,6 +37,10 @@ export const ExportPanel = () => {
       const canvas = document.createElement("canvas");
       canvas.width = settings.width;
       canvas.height = settings.height;
+
+      // For now, export the first transition (we can enhance this later to export all)
+      const beforeSnippet = snippets[0];
+      const afterSnippet = snippets[1];
 
       // Compute diff
       const diffOps = computeDiff(beforeSnippet.code, afterSnippet.code);
@@ -153,7 +157,7 @@ export const ExportPanel = () => {
       <div className="flex gap-4">
         <button
           onClick={() => handleExport("gif")}
-          disabled={!beforeSnippet || !afterSnippet}
+          disabled={snippets.length < 2}
           className="flex-1 px-6 py-3 bg-blue-600 text-white rounded font-medium hover:bg-blue-700 disabled:bg-gray-300 disabled:cursor-not-allowed"
         >
           Export as GIF
@@ -161,16 +165,16 @@ export const ExportPanel = () => {
 
         <button
           onClick={() => handleExport("mp4")}
-          disabled={!beforeSnippet || !afterSnippet}
+          disabled={snippets.length < 2}
           className="flex-1 px-6 py-3 bg-green-600 text-white rounded font-medium hover:bg-green-700 disabled:bg-gray-300 disabled:cursor-not-allowed"
         >
           Export as MP4
-          {!ffmpegLoaded && <span className="text-xs block">~30MB download</span>}
+          {!ffmpegLoaded && <span className="text-xs block">~31MB initial load</span>}
         </button>
       </div>
 
       <p className="text-sm text-gray-600 mt-4">
-        Exports are processed entirely in your browser. No data is sent to any server.
+        Exports the first transition (Stage 1 → 2). Exports are processed entirely in your browser. No data is sent to any server.
       </p>
     </div>
   );

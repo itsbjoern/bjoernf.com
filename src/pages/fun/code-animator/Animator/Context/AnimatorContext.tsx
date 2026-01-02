@@ -24,8 +24,8 @@ export type DiffOperation = EnhancedDiffOperation;
 
 type AnimatorState = {
   // Snippet management
-  beforeSnippet: CodeSnippet | null;
-  afterSnippet: CodeSnippet | null;
+  snippets: CodeSnippet[];
+  language: string;
   history: CodeSnippet[];
   maxHistory: number;
 
@@ -38,20 +38,27 @@ type AnimatorState = {
   diffResult: DiffOperation[] | null;
 
   // UI state
-  activeView: "editor" | "diff" | "preview";
+  activeView: "editor" | "preview";
 
   // Shiki instance
   highlighter: Highlighter | null;
 };
 
 type AnimatorActions = {
-  setBeforeSnippet: (snippet: CodeSnippet) => void;
-  setAfterSnippet: (snippet: CodeSnippet) => void;
-  updateSnippet: (which: "before" | "after", code: string, language: string) => void;
+  // Snippet management
+  addSnippet: () => void;
+  removeSnippet: (index: number) => void;
+  updateSnippetCode: (index: number, code: string) => void;
+  moveSnippetUp: (index: number) => void;
+  moveSnippetDown: (index: number) => void;
+  setLanguage: (language: string) => void;
+
+  // History management
   loadFromHistory: (snippetId: string, which: "before" | "after") => void;
   deleteFromHistory: (snippetId: string) => void;
   clearHistory: () => void;
   addToHistory: (snippet: CodeSnippet) => void;
+  saveSessionToHistory: () => void;
 
   updateConfig: (config: Partial<AnimationConfig>) => void;
 
@@ -60,7 +67,7 @@ type AnimatorActions = {
   reset: () => void;
   seek: (time: number) => void;
 
-  setActiveView: (view: "editor" | "diff" | "preview") => void;
+  setActiveView: (view: "editor" | "preview") => void;
 
   setDiffResult: (result: DiffOperation[] | null) => void;
   setHighlighter: (highlighter: Highlighter) => void;
@@ -79,15 +86,18 @@ const DEFAULT_CONFIG: AnimationConfig = {
 const AnimatorContext = createContext<(AnimatorState & AnimatorActions) | null>(null);
 
 export const AnimatorProvider = ({ children }: { children: ReactNode }) => {
-  const [beforeSnippet, setBeforeSnippetState] = useState<CodeSnippet | null>(null);
-  const [afterSnippet, setAfterSnippetState] = useState<CodeSnippet | null>(null);
+  const [snippets, setSnippets] = useState<CodeSnippet[]>([
+    { id: generateId(), code: "", language: "javascript", timestamp: Date.now() },
+    { id: generateId(), code: "", language: "javascript", timestamp: Date.now() },
+  ]);
+  const [language, setLanguageState] = useState<string>("javascript");
   const [history, setHistory] = useState<CodeSnippet[]>([]);
   const [maxHistory] = useState(10);
   const [config, setConfigState] = useState<AnimationConfig>(DEFAULT_CONFIG);
   const [isPlaying, setIsPlaying] = useState(false);
   const [currentTime, setCurrentTime] = useState(0);
   const [diffResult, setDiffResult] = useState<DiffOperation[] | null>(null);
-  const [activeView, setActiveView] = useState<"editor" | "diff" | "preview">("editor");
+  const [activeView, setActiveView] = useState<"editor" | "preview">("editor");
   const [highlighter, setHighlighter] = useState<Highlighter | null>(null);
 
   // Load saved state on mount
@@ -103,55 +113,76 @@ export const AnimatorProvider = ({ children }: { children: ReactNode }) => {
     }
 
     const savedSession = loadSession();
-    if (savedSession) {
-      setBeforeSnippetState(savedSession.beforeSnippet);
-      setAfterSnippetState(savedSession.afterSnippet);
+    if (savedSession && savedSession.snippets.length > 0) {
+      setSnippets(savedSession.snippets);
+      setLanguageState(savedSession.language);
     }
   }, []);
 
-  // Save session whenever snippets change
+  // Save session whenever snippets or language change
   useEffect(() => {
     saveSession({
-      beforeSnippet,
-      afterSnippet,
+      snippets,
+      language,
       timestamp: Date.now(),
     });
-  }, [beforeSnippet, afterSnippet]);
+  }, [snippets, language]);
 
   // Save config whenever it changes
   useEffect(() => {
     saveConfig(config);
   }, [config]);
 
-  const setBeforeSnippet = useCallback((snippet: CodeSnippet) => {
-    setBeforeSnippetState(snippet);
-    setCurrentTime(0);
-    setIsPlaying(false);
+  // Snippet management
+  const addSnippet = useCallback(() => {
+    setSnippets((prev) => [
+      ...prev,
+      { id: generateId(), code: "", language, timestamp: Date.now() },
+    ]);
+  }, [language]);
+
+  const removeSnippet = useCallback((index: number) => {
+    setSnippets((prev) => {
+      if (prev.length <= 2) return prev; // Keep at least 2 snippets
+      return prev.filter((_, i) => i !== index);
+    });
   }, []);
 
-  const setAfterSnippet = useCallback((snippet: CodeSnippet) => {
-    setAfterSnippetState(snippet);
+  const updateSnippetCode = useCallback((index: number, code: string) => {
+    setSnippets((prev) =>
+      prev.map((snippet, i) =>
+        i === index ? { ...snippet, code, language, timestamp: Date.now() } : snippet
+      )
+    );
     setCurrentTime(0);
     setIsPlaying(false);
+  }, [language]);
+
+  const moveSnippetUp = useCallback((index: number) => {
+    if (index === 0) return;
+    setSnippets((prev) => {
+      const newSnippets = [...prev];
+      [newSnippets[index - 1], newSnippets[index]] = [newSnippets[index], newSnippets[index - 1]];
+      return newSnippets;
+    });
   }, []);
 
-  const updateSnippet = useCallback(
-    (which: "before" | "after", code: string, language: string) => {
-      const snippet: CodeSnippet = {
-        id: generateId(),
-        code,
-        language,
-        timestamp: Date.now(),
-      };
+  const moveSnippetDown = useCallback((index: number) => {
+    setSnippets((prev) => {
+      if (index === prev.length - 1) return prev;
+      const newSnippets = [...prev];
+      [newSnippets[index], newSnippets[index + 1]] = [newSnippets[index + 1], newSnippets[index]];
+      return newSnippets;
+    });
+  }, []);
 
-      if (which === "before") {
-        setBeforeSnippet(snippet);
-      } else {
-        setAfterSnippet(snippet);
-      }
-    },
-    [setBeforeSnippet, setAfterSnippet]
-  );
+  const setLanguage = useCallback((newLanguage: string) => {
+    setLanguageState(newLanguage);
+    // Update all snippets to use the new language
+    setSnippets((prev) =>
+      prev.map((snippet) => ({ ...snippet, language: newLanguage }))
+    );
+  }, []);
 
   const addToHistory = useCallback(
     (snippet: CodeSnippet) => {
@@ -164,18 +195,40 @@ export const AnimatorProvider = ({ children }: { children: ReactNode }) => {
     [maxHistory]
   );
 
+  const saveSessionToHistory = useCallback(() => {
+    if (snippets.length === 0) return;
+
+    const name = prompt("Enter a name for this animation session:");
+    if (!name) return;
+
+    // Create a single snippet representing the entire session
+    const sessionSnippet: CodeSnippet = {
+      id: generateId(),
+      code: snippets.map((s, i) => `// Stage ${i + 1}\n${s.code}`).join("\n\n"),
+      language,
+      timestamp: Date.now(),
+      metadata: { name, description: `${snippets.length} stages` },
+    };
+
+    addToHistory(sessionSnippet);
+  }, [snippets, language]);
+
   const loadFromHistory = useCallback(
     (snippetId: string, which: "before" | "after") => {
       const snippet = history.find((s) => s.id === snippetId);
       if (snippet) {
-        if (which === "before") {
-          setBeforeSnippet(snippet);
-        } else {
-          setAfterSnippet(snippet);
-        }
+        // Legacy support - convert to new format
+        setSnippets((prev) => {
+          const newSnippets = [...prev];
+          const index = which === "before" ? 0 : 1;
+          if (newSnippets[index]) {
+            newSnippets[index] = snippet;
+          }
+          return newSnippets;
+        });
       }
     },
-    [history, setBeforeSnippet, setAfterSnippet]
+    [history]
   );
 
   const deleteFromHistory = useCallback((snippetId: string) => {
@@ -214,8 +267,8 @@ export const AnimatorProvider = ({ children }: { children: ReactNode }) => {
 
   const value = {
     // State
-    beforeSnippet,
-    afterSnippet,
+    snippets,
+    language,
     history,
     maxHistory,
     config,
@@ -225,13 +278,17 @@ export const AnimatorProvider = ({ children }: { children: ReactNode }) => {
     activeView,
     highlighter,
     // Actions
-    setBeforeSnippet,
-    setAfterSnippet,
-    updateSnippet,
+    addSnippet,
+    removeSnippet,
+    updateSnippetCode,
+    moveSnippetUp,
+    moveSnippetDown,
+    setLanguage,
     loadFromHistory,
     deleteFromHistory,
     clearHistory,
     addToHistory,
+    saveSessionToHistory,
     updateConfig,
     play,
     pause,

@@ -25,8 +25,8 @@ export type HistoryStorage = {
 };
 
 export type SessionStorage = {
-  beforeSnippet: CodeSnippet | null;
-  afterSnippet: CodeSnippet | null;
+  snippets: CodeSnippet[];
+  language: string;
   timestamp: number;
 };
 

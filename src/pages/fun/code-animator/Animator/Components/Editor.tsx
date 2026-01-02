@@ -2,7 +2,7 @@ import { useCallback, useEffect, useMemo, useRef, useState } from "react";
 import { useAnimator } from "../Context/AnimatorContext";
 
 type EditorProps = {
-  which: "before" | "after";
+  index: number;
   className?: string;
 };
 
@@ -21,13 +21,19 @@ const SUPPORTED_LANGUAGES = [
   { value: "markdown", label: "Markdown" },
 ];
 
-export const Editor = ({ which, className = "" }: EditorProps) => {
-  const { beforeSnippet, afterSnippet, updateSnippet, highlighter, addToHistory } =
-    useAnimator();
+export const Editor = ({ index, className = "" }: EditorProps) => {
+  const {
+    snippets,
+    language,
+    updateSnippetCode,
+    removeSnippet,
+    moveSnippetUp,
+    moveSnippetDown,
+    highlighter,
+  } = useAnimator();
 
-  const snippet = which === "before" ? beforeSnippet : afterSnippet;
+  const snippet = snippets[index];
   const [code, setCode] = useState(snippet?.code || "");
-  const [language, setLanguage] = useState(snippet?.language || "javascript");
   const [highlightedHtml, setHighlightedHtml] = useState("");
   const textareaRef = useRef<HTMLTextAreaElement>(null);
 
@@ -35,7 +41,6 @@ export const Editor = ({ which, className = "" }: EditorProps) => {
   useEffect(() => {
     if (snippet) {
       setCode(snippet.code);
-      setLanguage(snippet.language);
     }
   }, [snippet]);
 
@@ -66,36 +71,17 @@ export const Editor = ({ which, className = "" }: EditorProps) => {
   // Debounced update to context
   useEffect(() => {
     const timer = setTimeout(() => {
-      if (code !== snippet?.code || language !== snippet?.language) {
-        updateSnippet(which, code, language);
+      if (code !== snippet?.code) {
+        updateSnippetCode(index, code);
       }
     }, 300);
 
     return () => clearTimeout(timer);
-  }, [code, language, which, snippet, updateSnippet]);
+  }, [code, index, snippet, updateSnippetCode]);
 
   const handleCodeChange = useCallback((e: React.ChangeEvent<HTMLTextAreaElement>) => {
     setCode(e.target.value);
   }, []);
-
-  const handleLanguageChange = useCallback(
-    (e: React.ChangeEvent<HTMLSelectElement>) => {
-      setLanguage(e.target.value);
-    },
-    []
-  );
-
-  const handleSaveToHistory = useCallback(() => {
-    if (snippet) {
-      const name = prompt("Enter a name for this snippet:");
-      if (name) {
-        addToHistory({
-          ...snippet,
-          metadata: { ...snippet.metadata, name },
-        });
-      }
-    }
-  }, [snippet, addToHistory]);
 
   const lineCount = code.split("\n").length;
   const lineNumbers = useMemo(
@@ -103,31 +89,39 @@ export const Editor = ({ which, className = "" }: EditorProps) => {
     [lineCount]
   );
 
+  const canMoveUp = index > 0;
+  const canMoveDown = index < snippets.length - 1;
+  const canDelete = snippets.length > 2;
+
   return (
     <div className={`flex flex-col ${className}`}>
       {/* Header */}
       <div className="flex justify-between items-center mb-2">
-        <h3 className="font-semibold text-lg">
-          {which === "before" ? "Before" : "After"}
-        </h3>
+        <h3 className="font-semibold text-lg">Stage {index + 1}</h3>
         <div className="flex gap-2">
-          <select
-            value={language}
-            onChange={handleLanguageChange}
-            className="px-3 py-1 border border-gray-300 rounded bg-white text-sm"
-          >
-            {SUPPORTED_LANGUAGES.map((lang) => (
-              <option key={lang.value} value={lang.value}>
-                {lang.label}
-              </option>
-            ))}
-          </select>
           <button
-            onClick={handleSaveToHistory}
-            className="px-3 py-1 bg-primary text-white rounded text-sm hover:opacity-80"
-            disabled={!code}
+            onClick={() => moveSnippetUp(index)}
+            disabled={!canMoveUp}
+            className="px-3 py-1 border border-gray-300 rounded text-sm hover:bg-gray-50 disabled:opacity-40 disabled:cursor-not-allowed"
+            title="Move Up"
           >
-            Save to History
+            ↑
+          </button>
+          <button
+            onClick={() => moveSnippetDown(index)}
+            disabled={!canMoveDown}
+            className="px-3 py-1 border border-gray-300 rounded text-sm hover:bg-gray-50 disabled:opacity-40 disabled:cursor-not-allowed"
+            title="Move Down"
+          >
+            ↓
+          </button>
+          <button
+            onClick={() => removeSnippet(index)}
+            disabled={!canDelete}
+            className="px-3 py-1 border border-red-300 text-red-600 rounded text-sm hover:bg-red-50 disabled:opacity-40 disabled:cursor-not-allowed"
+            title="Remove Stage"
+          >
+            ✕
           </button>
         </div>
       </div>
@@ -162,7 +156,7 @@ export const Editor = ({ which, className = "" }: EditorProps) => {
               value={code}
               onChange={handleCodeChange}
               className="w-full h-[400px] p-3 font-mono text-sm leading-6 bg-transparent text-white resize-none outline-none"
-              placeholder={`Enter ${which === "before" ? "initial" : "final"} code here...`}
+              placeholder={`Enter code for stage ${index + 1}...`}
               spellCheck={false}
               style={{
                 color: highlightedHtml ? "transparent" : "#fff",

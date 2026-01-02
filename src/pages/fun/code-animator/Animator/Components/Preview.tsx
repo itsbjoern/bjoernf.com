@@ -4,15 +4,16 @@ import { computeFrameStates } from "../animationEngine";
 import { computeDiff } from "../diffEngine";
 
 export const Preview = () => {
-  const { beforeSnippet, afterSnippet, config, highlighter } = useAnimator();
+  const { snippets, config, highlighter } = useAnimator();
   const canvasRef = useRef<HTMLCanvasElement>(null);
   const [currentTime, setCurrentTime] = useState(0);
+  const [isPaused, setIsPaused] = useState(false);
   const animationRef = useRef<number>();
   const lastFrameTimeRef = useRef<number>(0);
 
   // Auto-play animation loop
   useEffect(() => {
-    if (!beforeSnippet || !afterSnippet || !highlighter || !canvasRef.current) {
+    if (snippets.length < 2 || !highlighter || !canvasRef.current) {
       return;
     }
 
@@ -20,30 +21,81 @@ export const Preview = () => {
     const ctx = canvas.getContext("2d");
     if (!ctx) return;
 
-    // Compute diff
-    const diffOps = computeDiff(beforeSnippet.code, afterSnippet.code);
-    if (diffOps.length === 0) return;
+    // Calculate total duration and prepare transitions
+    const staticDuration = config.duration; // Time to show each static screen
+    const transitionDuration = config.duration * 0.5; // Time for transition animation
+    const cycleDuration = staticDuration + transitionDuration; // Time for one screen + transition
+    const totalDuration = snippets.length * staticDuration + (snippets.length - 1) * transitionDuration;
+
+    // Compute diffs for all transitions
+    const transitions = snippets.slice(0, -1).map((snippet, i) => ({
+      from: snippet,
+      to: snippets[i + 1],
+      diffOps: computeDiff(snippet.code, snippets[i + 1].code),
+    }));
 
     let startTime = performance.now();
-    let animationTime = 0;
+    let pausedTime = 0;
 
     const animate = (timestamp: number) => {
-      const elapsed = timestamp - startTime;
-
-      // Loop animation
-      animationTime = elapsed % (config.duration * 2); // Duration * 2 for back-and-forth
-      let progress: number;
-
-      if (animationTime < config.duration) {
-        // Forward animation (0 to 1)
-        progress = animationTime / config.duration;
-      } else {
-        // Backward animation (1 to 0)
-        progress = 1 - ((animationTime - config.duration) / config.duration);
+      if (isPaused) {
+        pausedTime = timestamp - startTime;
+        animationRef.current = requestAnimationFrame(animate);
+        return;
       }
 
-      // Compute frame states
-      const frameStates = computeFrameStates(diffOps, progress, config);
+      const elapsed = timestamp - startTime - pausedTime;
+      const animationTime = elapsed % totalDuration;
+
+      // Determine current state: which screen we're on and whether we're static or transitioning
+      let currentScreenIndex = 0;
+      let isTransitioning = false;
+      let progress = 0;
+      let staticProgress = 0; // Progress during static display (for progress bar)
+
+      let accumulatedTime = 0;
+      for (let i = 0; i < snippets.length; i++) {
+        // Static display phase
+        if (animationTime < accumulatedTime + staticDuration) {
+          currentScreenIndex = i;
+          isTransitioning = false;
+          const timeInStatic = animationTime - accumulatedTime;
+          staticProgress = timeInStatic / staticDuration;
+          progress = 0; // No transition progress during static
+          break;
+        }
+        accumulatedTime += staticDuration;
+
+        // Transition phase (if not the last screen)
+        if (i < snippets.length - 1) {
+          if (animationTime < accumulatedTime + transitionDuration) {
+            currentScreenIndex = i;
+            isTransitioning = true;
+            const timeInTransition = animationTime - accumulatedTime;
+            progress = timeInTransition / transitionDuration;
+            staticProgress = 1; // Progress bar stays full during transition
+            break;
+          }
+          accumulatedTime += transitionDuration;
+        }
+      }
+
+      let frameStates;
+
+      if (isTransitioning) {
+        // Show transition animation
+        const currentTransition = transitions[currentScreenIndex];
+        if (!currentTransition || currentTransition.diffOps.length === 0) {
+          animationRef.current = requestAnimationFrame(animate);
+          return;
+        }
+        frameStates = computeFrameStates(currentTransition.diffOps, progress, config);
+      } else {
+        // Show static screen
+        const snippet = snippets[currentScreenIndex];
+        const staticDiff = computeDiff(snippet.code, snippet.code);
+        frameStates = computeFrameStates(staticDiff, 0, config);
+      }
 
       // Clear canvas
       ctx.fillStyle = config.backgroundColor;
@@ -52,8 +104,10 @@ export const Preview = () => {
       // Set up text rendering
       ctx.font = `${config.fontSize}px monospace`;
       ctx.textBaseline = "top";
+      ctx.textAlign = "left";
 
-      const padding = 20;
+      const paddingX = 20;
+      const paddingTopY = 30; // Extra padding at top for progress bar
       const lineHeight = config.fontSize * config.lineHeight;
 
       // Render each line with segments
@@ -71,7 +125,7 @@ export const Preview = () => {
 
           // Render the segment
           ctx.fillStyle = segment.color || "#e6edf3";
-          ctx.fillText(segment.text, padding + segment.x, padding + segment.y);
+          ctx.fillText(segment.text, paddingX + segment.x, paddingTopY + segment.y);
         }
       }
 
@@ -79,23 +133,33 @@ export const Preview = () => {
       ctx.filter = "none";
       ctx.globalAlpha = 1;
 
-      // Progress bar at the bottom
+      // Segmented progress bars at the top - one segment per screen
       const progressBarHeight = 4;
-      const progressBarY = canvas.height - progressBarHeight - 10;
-      const progressBarWidth = canvas.width - padding * 2;
+      const progressBarY = 10;
+      const progressBarWidth = canvas.width - paddingX * 2;
+      const segmentGap = 4;
+      const numScreens = snippets.length;
+      const segmentWidth = (progressBarWidth - (numScreens - 1) * segmentGap) / numScreens;
 
-      // Background
-      ctx.fillStyle = "#30363d";
-      ctx.fillRect(padding, progressBarY, progressBarWidth, progressBarHeight);
+      // Draw all segments
+      for (let i = 0; i < numScreens; i++) {
+        const segmentX = paddingX + i * (segmentWidth + segmentGap);
 
-      // Progress
-      ctx.fillStyle = "#58a6ff";
-      ctx.fillRect(
-        padding,
-        progressBarY,
-        progressBarWidth * (animationTime < config.duration ? progress : 1 - progress),
-        progressBarHeight
-      );
+        // Background
+        ctx.fillStyle = "#30363d";
+        ctx.fillRect(segmentX, progressBarY, segmentWidth, progressBarHeight);
+
+        // Determine fill for this segment
+        if (i < currentScreenIndex) {
+          // Completed segment (past screens)
+          ctx.fillStyle = "#58a6ff";
+          ctx.fillRect(segmentX, progressBarY, segmentWidth, progressBarHeight);
+        } else if (i === currentScreenIndex) {
+          // Current segment - show static progress (paused during transition)
+          ctx.fillStyle = "#58a6ff";
+          ctx.fillRect(segmentX, progressBarY, segmentWidth * staticProgress, progressBarHeight);
+        }
+      }
 
       animationRef.current = requestAnimationFrame(animate);
     };
@@ -107,7 +171,7 @@ export const Preview = () => {
         cancelAnimationFrame(animationRef.current);
       }
     };
-  }, [beforeSnippet, afterSnippet, config, highlighter]);
+  }, [snippets, config, highlighter, isPaused]);
 
   // Resize canvas to fit container
   useEffect(() => {
@@ -126,10 +190,14 @@ export const Preview = () => {
     return () => window.removeEventListener("resize", handleResize);
   }, []);
 
-  if (!beforeSnippet || !afterSnippet) {
+  const staticDuration = config.duration;
+  const transitionDuration = config.duration * 0.5;
+  const totalDuration = snippets.length * staticDuration + (snippets.length - 1) * transitionDuration;
+
+  if (snippets.length < 2) {
     return (
       <div className="text-center py-20 text-gray-600">
-        Enter code in both editors to see the animation preview
+        Add at least 2 code stages to see the animation preview
       </div>
     );
   }
@@ -138,8 +206,16 @@ export const Preview = () => {
     <div className="space-y-4">
       <div className="flex justify-between items-center">
         <h3 className="font-semibold text-lg">Animation Preview</h3>
-        <div className="text-sm text-gray-600">
-          Auto-playing • {config.duration}ms duration
+        <div className="flex items-center gap-4">
+          <button
+            onClick={() => setIsPaused(!isPaused)}
+            className="px-4 py-2 border border-gray-300 rounded hover:bg-gray-50 font-medium"
+          >
+            {isPaused ? "▶ Play" : "⏸ Pause"}
+          </button>
+          <div className="text-sm text-gray-600">
+            {snippets.length} stages • {staticDuration}ms display • {transitionDuration}ms transition • {totalDuration}ms total
+          </div>
         </div>
       </div>
 
@@ -148,7 +224,7 @@ export const Preview = () => {
       </div>
 
       <div className="text-sm text-gray-600 text-center">
-        Animation loops continuously between before and after states
+        Each stage displays for {staticDuration}ms before transitioning to the next
       </div>
     </div>
   );

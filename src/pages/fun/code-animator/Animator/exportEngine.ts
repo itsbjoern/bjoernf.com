@@ -1,4 +1,3 @@
-import GIF from "gif.js";
 import { FFmpeg } from "@ffmpeg/ffmpeg";
 import { fetchFile, toBlobURL } from "@ffmpeg/util";
 import type { ExportSettings } from "./Context/ExportContext";
@@ -9,6 +8,74 @@ import { computeFrameStates } from "./animationEngine";
 
 export type ProgressCallback = (progress: number) => void;
 
+const renderFrame = (
+  ctx: CanvasRenderingContext2D,
+  frameStates: ReturnType<typeof computeFrameStates>,
+  config: AnimationConfig,
+  settings: ExportSettings,
+  currentScreenIndex: number,
+  numScreens: number,
+  staticProgress: number
+) => {
+  // Clear canvas
+  ctx.fillStyle = config.backgroundColor;
+  ctx.fillRect(0, 0, settings.width, settings.height);
+
+  // Render frame
+  ctx.font = `${config.fontSize}px monospace`;
+  ctx.textBaseline = "top";
+  ctx.textAlign = "left";
+
+  const paddingX = 20;
+  const paddingTopY = 30;
+
+  // Render each line with segments
+  for (const frame of frameStates) {
+    for (const segment of frame.segments) {
+      ctx.globalAlpha = segment.opacity;
+
+      // Apply blur filter
+      if (segment.blur > 0) {
+        ctx.filter = `blur(${segment.blur}px)`;
+      } else {
+        ctx.filter = "none";
+      }
+
+      // Render the segment
+      ctx.fillStyle = segment.color || "#e6edf3";
+      ctx.fillText(segment.text, paddingX + segment.x, paddingTopY + segment.y);
+    }
+  }
+
+  // Reset filters and alpha
+  ctx.filter = "none";
+  ctx.globalAlpha = 1;
+
+  // Draw progress bar at the top
+  const progressBarHeight = 4;
+  const progressBarY = 10;
+  const progressBarWidth = settings.width - paddingX * 2;
+  const segmentGap = 4;
+  const segmentWidth = (progressBarWidth - (numScreens - 1) * segmentGap) / numScreens;
+
+  for (let i = 0; i < numScreens; i++) {
+    const segmentX = paddingX + i * (segmentWidth + segmentGap);
+
+    // Background
+    ctx.fillStyle = "#30363d";
+    ctx.fillRect(segmentX, progressBarY, segmentWidth, progressBarHeight);
+
+    // Fill
+    if (i < currentScreenIndex) {
+      ctx.fillStyle = "#58a6ff";
+      ctx.fillRect(segmentX, progressBarY, segmentWidth, progressBarHeight);
+    } else if (i === currentScreenIndex) {
+      ctx.fillStyle = "#58a6ff";
+      ctx.fillRect(segmentX, progressBarY, segmentWidth * staticProgress, progressBarHeight);
+    }
+  }
+};
+
 export const exportGIF = async (
   canvas: HTMLCanvasElement,
   diffOps: DiffOperation[],
@@ -17,16 +84,19 @@ export const exportGIF = async (
   settings: ExportSettings,
   onProgress: ProgressCallback
 ): Promise<Blob> => {
+  // Dynamic import for gif.js to handle CommonJS module
+  const GIFModule = await import("gif.js");
+  const GIF = (GIFModule as any).default || GIFModule;
+
   return new Promise((resolve, reject) => {
     const gif = new GIF({
       workers: 2,
       quality: 11 - settings.quality, // GIF.js uses 1 (best) to 10 (worst)
       width: settings.width,
       height: settings.height,
-      workerScript: "/node_modules/gif.js/dist/gif.worker.js",
+      // Let gif.js auto-detect the worker script location
     });
 
-    const totalFrames = Math.ceil((config.duration / 1000) * settings.fps);
     const tempCanvas = document.createElement("canvas");
     tempCanvas.width = settings.width;
     tempCanvas.height = settings.height;
@@ -37,28 +107,16 @@ export const exportGIF = async (
       return;
     }
 
+    // This is a simplified export - just export first transition for now
+    // TODO: Update to handle all transitions with static/transition phases
+    const totalFrames = Math.ceil((config.duration / 1000) * settings.fps);
+
     // Generate frames
     for (let i = 0; i < totalFrames; i++) {
       const progress = i / totalFrames;
       const frameStates = computeFrameStates(diffOps, progress, config);
 
-      // Clear canvas
-      ctx.fillStyle = config.backgroundColor;
-      ctx.fillRect(0, 0, tempCanvas.width, tempCanvas.height);
-
-      // Render frame
-      ctx.font = `${config.fontSize}px monospace`;
-      ctx.textBaseline = "top";
-
-      const padding = 20;
-
-      for (const frame of frameStates) {
-        ctx.globalAlpha = frame.opacity;
-        ctx.fillStyle = frame.color || "#e6edf3";
-        ctx.fillText(frame.content, padding, padding + frame.y);
-      }
-
-      ctx.globalAlpha = 1;
+      renderFrame(ctx, frameStates, config, settings, 0, 2, progress);
 
       // Add frame to GIF
       gif.addFrame(ctx, { copy: true, delay: (1000 / settings.fps) });
@@ -95,11 +153,12 @@ export const loadFFmpeg = async (onProgress: ProgressCallback): Promise<FFmpeg> 
     onProgress(progress * 100);
   });
 
-  // Load FFmpeg
-  const baseURL = "https://unpkg.com/@ffmpeg/core@0.12.6/dist/umd";
+  // Load FFmpeg from local files (single-threaded version)
+  const baseURL = "/ffmpeg";
   await ffmpeg.load({
     coreURL: await toBlobURL(`${baseURL}/ffmpeg-core.js`, "text/javascript"),
     wasmURL: await toBlobURL(`${baseURL}/ffmpeg-core.wasm`, "application/wasm"),
+    // Single-threaded version doesn't require a worker
   });
 
   ffmpegInstance = ffmpeg;
@@ -131,23 +190,7 @@ export const exportMP4 = async (
     const progress = i / totalFrames;
     const frameStates = computeFrameStates(diffOps, progress, config);
 
-    // Clear canvas
-    ctx.fillStyle = config.backgroundColor;
-    ctx.fillRect(0, 0, tempCanvas.width, tempCanvas.height);
-
-    // Render frame
-    ctx.font = `${config.fontSize}px monospace`;
-    ctx.textBaseline = "top";
-
-    const padding = 20;
-
-    for (const frame of frameStates) {
-      ctx.globalAlpha = frame.opacity;
-      ctx.fillStyle = frame.color || "#e6edf3";
-      ctx.fillText(frame.content, padding, padding + frame.y);
-    }
-
-    ctx.globalAlpha = 1;
+    renderFrame(ctx, frameStates, config, settings, 0, 2, progress);
 
     // Convert canvas to blob
     const blob = await new Promise<Blob>((resolve) => {

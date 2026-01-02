@@ -81,8 +81,16 @@ export const computeDiff = (before: string, after: string): EnhancedDiffOperatio
       const newLine = changes[i + 1].value;
 
       // Split into individual lines and create modify operations
-      const oldLines = oldLine.split("\n").filter((l) => l.length > 0 || oldLine.endsWith("\n"));
-      const newLines = newLine.split("\n").filter((l) => l.length > 0 || newLine.endsWith("\n"));
+      const oldLines = oldLine.split("\n");
+      const newLines = newLine.split("\n");
+
+      // Remove trailing empty line only if it's from a trailing newline
+      if (oldLines.length > 0 && oldLines[oldLines.length - 1] === "" && oldLine.endsWith("\n")) {
+        oldLines.pop();
+      }
+      if (newLines.length > 0 && newLines[newLines.length - 1] === "" && newLine.endsWith("\n")) {
+        newLines.pop();
+      }
 
       const maxLines = Math.max(oldLines.length, newLines.length);
 
@@ -121,7 +129,11 @@ export const computeDiff = (before: string, after: string): EnhancedDiffOperatio
       i += 2; // Skip both changes
     } else if (change.added) {
       // Pure insertion
-      const lines = change.value.split("\n").filter((l) => l.length > 0 || change.value.endsWith("\n"));
+      const lines = change.value.split("\n");
+      // Remove trailing empty line only if it's from a trailing newline
+      if (lines.length > 0 && lines[lines.length - 1] === "" && change.value.endsWith("\n")) {
+        lines.pop();
+      }
       for (const line of lines) {
         operations.push({
           type: "insert",
@@ -132,7 +144,11 @@ export const computeDiff = (before: string, after: string): EnhancedDiffOperatio
       i++;
     } else if (change.removed) {
       // Pure deletion
-      const lines = change.value.split("\n").filter((l) => l.length > 0 || change.value.endsWith("\n"));
+      const lines = change.value.split("\n");
+      // Remove trailing empty line only if it's from a trailing newline
+      if (lines.length > 0 && lines[lines.length - 1] === "" && change.value.endsWith("\n")) {
+        lines.pop();
+      }
       for (const line of lines) {
         operations.push({
           type: "delete",
@@ -143,7 +159,11 @@ export const computeDiff = (before: string, after: string): EnhancedDiffOperatio
       i++;
     } else {
       // Unchanged
-      const lines = change.value.split("\n").filter((l) => l.length > 0 || change.value.endsWith("\n"));
+      const lines = change.value.split("\n");
+      // Remove trailing empty line only if it's from a trailing newline
+      if (lines.length > 0 && lines[lines.length - 1] === "" && change.value.endsWith("\n")) {
+        lines.pop();
+      }
       for (const line of lines) {
         operations.push({
           type: "unchanged",
