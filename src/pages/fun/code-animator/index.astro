@@ -1,0 +1,11 @@
+---
+import GameLayout from "@/layouts/Game.astro";
+import { Loader } from "./Animator/Loader.tsx";
+---
+
+<GameLayout
+  title="Code Animator"
+  description="Create smooth animations between code snippets with syntax highlighting. Export as GIF or MP4."
+>
+  <Loader client:only />
+</GameLayout>
