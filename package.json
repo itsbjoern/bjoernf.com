@@ -33,6 +33,7 @@
   },
   "devDependencies": {
     "@types/diff": "^8.0.0",
+    "@types/gif.js": "^0.2.5",
     "bun-types": "^1.0.7",
     "prettier": "^3.0.3",
     "prettier-plugin-astro": "^0.12.0"
