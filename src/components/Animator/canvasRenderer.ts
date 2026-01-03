@@ -65,36 +65,89 @@ export const renderFrameToCanvas = (
     ctx.textAlign = "left";
   }
 
-  // Render each line with segments
+  // First pass: Render merged backgrounds for each line
+  for (const frame of frameStates) {
+    // Group consecutive segments with the same background color
+    type BackgroundGroup = {
+      backgroundColor: string;
+      startX: number;
+      endX: number;
+      y: number;
+      opacity: number;
+    };
+
+    const backgroundGroups: BackgroundGroup[] = [];
+    let currentGroup: BackgroundGroup | null = null;
+
+    for (const segment of frame.segments) {
+      if (segment.backgroundColor) {
+        const charWidth = fontSize * 0.6;
+        const segmentStartX = segment.x;
+        const segmentEndX = segment.x + segment.text.length * charWidth;
+
+        if (
+          currentGroup &&
+          currentGroup.backgroundColor === segment.backgroundColor &&
+          currentGroup.y === segment.y &&
+          Math.abs(currentGroup.endX - segmentStartX) < 1 // Allow small gaps
+        ) {
+          // Extend current group
+          currentGroup.endX = segmentEndX;
+          currentGroup.opacity = Math.max(currentGroup.opacity, segment.opacity);
+        } else {
+          // Start new group
+          if (currentGroup) {
+            backgroundGroups.push(currentGroup);
+          }
+          currentGroup = {
+            backgroundColor: segment.backgroundColor,
+            startX: segmentStartX,
+            endX: segmentEndX,
+            y: segment.y,
+            opacity: segment.opacity,
+          };
+        }
+      } else if (currentGroup) {
+        // No background for this segment, save current group
+        backgroundGroups.push(currentGroup);
+        currentGroup = null;
+      }
+    }
+
+    // Don't forget the last group
+    if (currentGroup) {
+      backgroundGroups.push(currentGroup);
+    }
+
+    // Render merged background groups
+    ctx.filter = "none";
+    const pxWidthPad = 4;
+    const pxHeightPad = 1;
+    const bgHeight = fontSize * lineHeight;
+
+    for (const group of backgroundGroups) {
+      ctx.globalAlpha = group.opacity;
+      ctx.fillStyle = group.backgroundColor;
+
+      const bgY = paddingTopY + group.y - fontSize * 0.25;
+      const bgWidth = group.endX - group.startX;
+
+      ctx.beginPath();
+      ctx.roundRect(
+        paddingX + group.startX - pxWidthPad,
+        bgY - pxHeightPad,
+        bgWidth + pxWidthPad * 2,
+        bgHeight + pxHeightPad * 2,
+        4
+      );
+      ctx.fill();
+    }
+  }
+
+  // Second pass: Render text for each line
   for (const frame of frameStates) {
     for (const segment of frame.segments) {
       ctx.globalAlpha = segment.opacity;
-
-      // Render background if present (before text, no blur)
-      if (segment.backgroundColor) {
-
-        // Calculate background dimensions
-        const charWidth = fontSize * 0.6; // Approximate monospace width
-        const bgWidth = segment.text.length * charWidth;
-        const bgHeight = fontSize * lineHeight;
-        const bgY = paddingTopY + segment.y - fontSize * 0.25; // Slight vertical adjustment
-
-        const pxWidthPad = 4;
-        const pxHeightPad = 1;
-
-        ctx.beginPath();
-
-        ctx.filter = "none";
-        ctx.fillStyle = segment.backgroundColor;
-        ctx.roundRect(
-          paddingX + segment.x - pxWidthPad,
-          bgY - pxHeightPad,
-          bgWidth + pxWidthPad * 2,
-          bgHeight + pxHeightPad * 2,
-          4
-        );
-        ctx.fill();
-      }
 
       // Apply blur filter for text
       if (segment.blur > 0) {
