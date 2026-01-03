@@ -28,16 +28,18 @@ export const exportGIF = async (
 
     const gif = new GIF({
       workers: 2,
-      quality: 11 - settings.quality, // GIF.js uses 1 (best) to 10 (worst)
+      quality: 11 - settings.quality,
       width,
       height,
-      // Let gif.js auto-detect the worker script location
+      workerScript: "/gif.worker.js",
     });
 
     const tempCanvas = document.createElement("canvas");
     tempCanvas.width = width;
     tempCanvas.height = height;
-    const ctx = tempCanvas.getContext("2d");
+    const ctx = tempCanvas.getContext("2d", {
+      willReadFrequently: true,
+    });
 
     if (!ctx) {
       reject(new Error("Failed to get canvas context"));
@@ -48,8 +50,11 @@ export const exportGIF = async (
     const timeline = calculateTimeline(config.duration, snippets.length);
     const totalFrames = Math.ceil((timeline.totalDuration / 1000) * settings.fps);
 
+    // Calculate max line count for line numbers
+    const maxLineCount = Math.max(...snippets.map((s) => s.code.split("\n").length));
+
     // Create render config
-    const renderConfig = createRenderConfig(width, height, config, settings.padding);
+    const renderConfig = createRenderConfig(width, height, config, settings.padding, maxLineCount);
 
     // Generate frames
     for (let i = 0; i < totalFrames; i++) {
@@ -79,10 +84,16 @@ export const exportGIF = async (
     }
 
     gif.on("progress", (p: number) => {
+      console.log(p)
       onProgress({ percentage: 50 + p * 50, message: "Encoding GIF..." }); // Second 50% is encoding
     });
 
+    gif.on("abort", () => {
+      reject(new Error("GIF encoding aborted"));
+    });
+
     gif.on("finished", (blob: Blob) => {
+      console.log("GIF encoding finished");
       resolve(blob);
     });
 
@@ -139,14 +150,19 @@ export const exportMP4 = async (
   const tempCanvas = document.createElement("canvas");
   tempCanvas.width = width;
   tempCanvas.height = height;
-  const ctx = tempCanvas.getContext("2d");
+  const ctx = tempCanvas.getContext("2d", {
+    willReadFrequently: true,
+  });
 
   if (!ctx) {
     throw new Error("Failed to get canvas context");
   }
 
+  // Calculate max line count for line numbers
+  const maxLineCount = Math.max(...snippets.map((s) => s.code.split("\n").length));
+
   // Create render config
-  const renderConfig = createRenderConfig(width, height, config, settings.padding);
+  const renderConfig = createRenderConfig(width, height, config, settings.padding, maxLineCount);
 
   // Generate and write frames
   for (let i = 0; i < totalFrames; i++) {
@@ -160,11 +176,11 @@ export const exportMP4 = async (
     if (phase.isTransitioning) {
       // Transition from current screen to next
       const diffOps = computeDiff(snippets[phase.currentScreenIndex].code, snippets[phase.currentScreenIndex + 1].code, highlighter, language, "github-dark");
-      frameStates = computeFrameStates(diffOps, phase.progress, config, highlighter, language, "github-dark");
+      frameStates = computeFrameStates(diffOps, phase.progress, config);
     } else {
       // Static display of current screen
       const diffOps = computeDiff(snippets[phase.currentScreenIndex].code, snippets[phase.currentScreenIndex].code, highlighter, language, "github-dark");
-      frameStates = computeFrameStates(diffOps, 1, config, highlighter, language, "github-dark");
+      frameStates = computeFrameStates(diffOps, 1, config);
     }
 
     renderFrameToCanvas(ctx, frameStates, renderConfig, phase.currentScreenIndex, snippets.length, phase.staticProgress);

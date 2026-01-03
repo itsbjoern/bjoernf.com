@@ -23,6 +23,9 @@ export const renderFrameToCanvas = (
     progressBarY,
     progressBarHeight,
     segmentGap,
+    showLineNumbers,
+    lineNumberGutterWidth,
+    lineNumberColor,
   } = renderConfig;
 
   // Clear canvas
@@ -35,6 +38,32 @@ export const renderFrameToCanvas = (
   ctx.textAlign = "left";
 
   const lineHeight = 1.5; // Line height multiplier
+
+  // Render line numbers first (if enabled)
+  if (showLineNumbers && lineNumberGutterWidth > 0) {
+    ctx.fillStyle = lineNumberColor;
+    ctx.textAlign = "right";
+    ctx.globalAlpha = 1;
+    ctx.filter = "none";
+
+    for (const frame of frameStates) {
+      // Only render line number if the line is visible (opacity > 0)
+      const hasVisibleSegments = frame.segments.some((s) => s.opacity > 0);
+      if (hasVisibleSegments) {
+        const lineNumberX = paddingX - 10; // Right-align with some spacing
+        const lineNumberY = paddingTopY + frame.y;
+
+        // Use the maximum opacity of segments for the line number
+        const maxOpacity = Math.max(...frame.segments.map((s) => s.opacity));
+        ctx.globalAlpha = maxOpacity;
+
+        ctx.fillText(frame.lineNumber.toString(), lineNumberX, lineNumberY);
+      }
+    }
+
+    // Reset text alignment for code rendering
+    ctx.textAlign = "left";
+  }
 
   // Render each line with segments
   for (const frame of frameStates) {

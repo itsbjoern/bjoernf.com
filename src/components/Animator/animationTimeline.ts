@@ -35,6 +35,9 @@ export type RenderConfig = {
   progressBarY: number;
   progressBarHeight: number;
   segmentGap: number;
+  showLineNumbers: boolean;
+  lineNumberGutterWidth: number;
+  lineNumberColor: string;
 };
 
 /**
@@ -141,7 +144,13 @@ export const calculateCanvasSize = (
   const progressBarY = 10;
   const progressBarSpacing = progressBarY + progressBarHeight + 10; // Top space for progress bar
 
-  const width = maxLineLength * charWidth + 2 * padding;
+  // Line number gutter width (if enabled)
+  const lineNumberDigits = Math.max(2, maxLineCount.toString().length);
+  const lineNumberGutterWidth = config.showLineNumbers
+    ? (lineNumberDigits + 1) * charWidth + 10 // digits + spacing
+    : 0;
+
+  const width = maxLineLength * charWidth + 2 * padding + lineNumberGutterWidth;
   const height = maxLineCount * lineHeight + 2 * padding + progressBarSpacing;
 
   return { width, height };
@@ -154,17 +163,28 @@ export const createRenderConfig = (
   width: number,
   height: number,
   config: AnimationConfig,
-  padding: number
+  padding: number,
+  maxLineCount: number = 0
 ): RenderConfig => {
+  // Calculate line number gutter width
+  const charWidth = config.fontSize * 0.6;
+  const lineNumberDigits = Math.max(2, maxLineCount.toString().length);
+  const lineNumberGutterWidth = config.showLineNumbers
+    ? (lineNumberDigits + 1) * charWidth + 10
+    : 0;
+
   return {
     width,
     height,
     backgroundColor: config.backgroundColor,
     fontSize: config.fontSize,
-    paddingX: padding,
+    paddingX: padding + lineNumberGutterWidth, // Code starts after gutter
     paddingTopY: padding + 20, // Extra space for progress bar
     progressBarY: 10,
     progressBarHeight: 4,
     segmentGap: 4,
+    showLineNumbers: config.showLineNumbers,
+    lineNumberGutterWidth,
+    lineNumberColor: "#6e7681", // GitHub-style muted gray
   };
 };

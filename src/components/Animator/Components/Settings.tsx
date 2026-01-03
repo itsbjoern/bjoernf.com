@@ -31,6 +31,7 @@ export const Settings = () => {
       backgroundColor: "#0d1117",
       fontSize: 14,
       lineHeight: 1.5,
+      showLineNumbers: true,
     };
     setLocalConfig(defaultConfig);
     updateConfig(defaultConfig);
@@ -199,6 +200,23 @@ export const Settings = () => {
           </div>
         </div>
       </div>
+
+
+      {/* Line Numbers */}
+      <div className="mt-6">
+        <label className="flex items-center gap-2 cursor-pointer">
+          <input
+            type="checkbox"
+            checked={localConfig.showLineNumbers}
+            onChange={(e) =>
+              setLocalConfig({ ...localConfig, showLineNumbers: e.target.checked })
+            }
+            className="w-4 h-4"
+          />
+          <span className="text-sm font-medium">Show Line Numbers</span>
+        </label>
+      </div>
+
 
       {/* Actions */}
       <div className="flex gap-3 mt-8">

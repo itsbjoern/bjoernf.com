@@ -31,8 +31,11 @@ export const Preview = () => {
       diffOps: computeDiff(snippet.code, snippets[i + 1].code, highlighter, language, "github-dark"),
     }));
 
+    // Calculate max line count for line numbers
+    const maxLineCount = Math.max(...snippets.map((s) => s.code.split("\n").length));
+
     // Create render config with default padding for preview
-    const renderConfig = createRenderConfig(canvas.width, canvas.height, config, 20);
+    const renderConfig = createRenderConfig(canvas.width, canvas.height, config, 20, maxLineCount);
 
     let startTime = performance.now();
     let pausedTime = 0;

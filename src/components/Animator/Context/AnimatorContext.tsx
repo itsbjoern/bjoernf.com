@@ -78,9 +78,10 @@ const DEFAULT_CONFIG: AnimationConfig = {
   fps: 60,
   easing: "ease-in-out",
   theme: "github-dark",
-  backgroundColor: "#0d1117",
+  backgroundColor: "#1d2025",
   fontSize: 16,
   lineHeight: 1.5,
+  showLineNumbers: true,
 };
 
 const AnimatorContext = createContext<(AnimatorState & AnimatorActions) | null>(null);

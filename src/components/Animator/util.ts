@@ -17,6 +17,7 @@ export type AnimationConfig = {
   backgroundColor: string;
   fontSize: number;
   lineHeight: number;
+  showLineNumbers: boolean; // Show line numbers in gutter
 };
 
 export type HistoryStorage = {

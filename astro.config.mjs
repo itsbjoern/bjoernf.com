@@ -17,7 +17,7 @@ export default defineConfig({
   vite: {
     "assetsInclude": ["**/*.xml"],
     optimizeDeps: {
-      exclude: ['@ffmpeg/ffmpeg', '@ffmpeg/util', 'gif.js']
+      exclude: ['@ffmpeg/ffmpeg', '@ffmpeg/util']
     },
     worker: {
       format: 'es'
