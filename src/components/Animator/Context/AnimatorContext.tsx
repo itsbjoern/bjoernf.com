@@ -81,6 +81,9 @@ const DEFAULT_CONFIG: AnimationConfig = {
   fontSize: 16,
   lineHeight: 1.4,
   showLineNumbers: true,
+  insertColor: "rgba(81, 207, 102, 0.15)",
+  deleteColor: "rgba(255, 107, 107, 0.15)",
+  modifyColor: "rgba(255, 212, 59, 0.2)",
 };
 
 const AnimatorContext = createContext<(AnimatorState & AnimatorActions) | null>(null);

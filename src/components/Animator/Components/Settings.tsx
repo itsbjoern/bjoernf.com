@@ -38,6 +38,9 @@ export const Settings = () => {
       fontSize: 14,
       lineHeight: 1.5,
       showLineNumbers: true,
+      insertColor: "rgba(81, 207, 102, 0.1)",
+      deleteColor: "rgba(255, 107, 107, 0.1)",
+      modifyColor: "rgba(255, 212, 59, 0.1)",
     };
     setLocalConfig(defaultConfig);
     updateConfig(defaultConfig);
@@ -116,7 +119,7 @@ export const Settings = () => {
         </div>
 
         {/* Easing */}
-        <div>
+        {/* <div>
           <label className="block text-sm font-medium mb-2">Easing Function</label>
           <select
             value={localConfig.easing}
@@ -134,7 +137,7 @@ export const Settings = () => {
               </option>
             ))}
           </select>
-        </div>
+        </div> */}
 
         {/* Font Size */}
         <div>
@@ -201,6 +204,66 @@ export const Settings = () => {
               onChange={(e) =>
                 setLocalConfig({ ...localConfig, backgroundColor: e.target.value })
               }
+              className="flex-1 px-3 py-2 border border-gray-300 rounded font-mono text-sm"
+            />
+          </div>
+        </div>
+
+        {/* Insert Color */}
+        <div>
+          <label className="block text-sm font-medium mb-2">Insert Highlight Color</label>
+          <div className="flex gap-2">
+            <div
+              style={{ backgroundColor: localConfig.insertColor }}
+              className="h-10 w-20 border border-gray-300 rounded"
+            />
+            <input
+              type="text"
+              value={localConfig.insertColor}
+              onChange={(e) =>
+                setLocalConfig({ ...localConfig, insertColor: e.target.value })
+              }
+              placeholder="rgba(81, 207, 102, 0.15)"
+              className="flex-1 px-3 py-2 border border-gray-300 rounded font-mono text-sm"
+            />
+          </div>
+        </div>
+
+        {/* Delete Color */}
+        <div>
+          <label className="block text-sm font-medium mb-2">Delete Highlight Color</label>
+          <div className="flex gap-2">
+            <div
+              style={{ backgroundColor: localConfig.deleteColor }}
+              className="h-10 w-20 border border-gray-300 rounded"
+            />
+            <input
+              type="text"
+              value={localConfig.deleteColor}
+              onChange={(e) =>
+                setLocalConfig({ ...localConfig, deleteColor: e.target.value })
+              }
+              placeholder="rgba(255, 107, 107, 0.15)"
+              className="flex-1 px-3 py-2 border border-gray-300 rounded font-mono text-sm"
+            />
+          </div>
+        </div>
+
+        {/* Modify Color */}
+        <div>
+          <label className="block text-sm font-medium mb-2">Modify Highlight Color</label>
+          <div className="flex gap-2">
+            <div
+              style={{ backgroundColor: localConfig.modifyColor }}
+              className="h-10 w-20 border border-gray-300 rounded"
+            />
+            <input
+              type="text"
+              value={localConfig.modifyColor}
+              onChange={(e) =>
+                setLocalConfig({ ...localConfig, modifyColor: e.target.value })
+              }
+              placeholder="rgba(255, 212, 59, 0.2)"
               className="flex-1 px-3 py-2 border border-gray-300 rounded font-mono text-sm"
             />
           </div>

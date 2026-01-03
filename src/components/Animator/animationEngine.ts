@@ -22,13 +22,6 @@ export type FrameState = {
 
 export type EasingFunction = (t: number) => number;
 
-// Diff background colors (subtle, semi-transparent)
-const DIFF_BG_COLORS = {
-  delete: "rgba(255, 107, 107, 0.15)",   // Very light red
-  insert: "rgba(81, 207, 102, 0.15)",    // Very light green
-  modify: "rgba(255, 212, 59, 0.2)",     // Very light yellow
-};
-
 // Default text color when no syntax highlighting is available
 const DEFAULT_TEXT_COLOR = "#e6edf3";
 
@@ -39,6 +32,13 @@ export const easings: Record<string, EasingFunction> = {
   "ease-out": (t: number) => t * (2 - t),
   "ease-in-out": (t: number) => (t < 0.5 ? 2 * t * t : -1 + (4 - 2 * t) * t),
 };
+
+// Helper to get diff background colors from config
+const getDiffColors = (config: AnimationConfig) => ({
+  delete: config.deleteColor,
+  insert: config.insertColor,
+  modify: config.modifyColor,
+});
 
 export const applyEasing = (
   t: number,
@@ -161,6 +161,9 @@ export const computeFrameStates = (
   // Fade out backgrounds over 0.15 progress units (e.g., 1.0 to 1.15) - 15% of static display
   const backgroundFade = Math.min(Math.max(progress - 1, 0) / 0.15, 1);
 
+  // Get diff background colors from config
+  const diffColors = getDiffColors(config);
+
   const lineHeight = config.fontSize * config.lineHeight;
   const frames: FrameState[] = [];
 
@@ -212,7 +215,7 @@ export const computeFrameStates = (
           frameState.y,
           1 - easedProgress, // fade out
           easedProgress * 5, // blur up to 5px
-          DIFF_BG_COLORS.delete, // subtle red background
+          diffColors.delete,
           config.fontSize,
           backgroundFade
         );
@@ -235,7 +238,7 @@ export const computeFrameStates = (
           frameState.y,
           easedProgress, // fade in
           (1 - easedProgress) * 5, // blur reduces as it appears
-          DIFF_BG_COLORS.insert, // subtle green background
+          diffColors.insert,
           config.fontSize,
           backgroundFade
         );
@@ -318,7 +321,7 @@ export const computeFrameStates = (
                 opacity: 1 - blurProgress,
                 blur: blurProgress * 8,
                 color: segment.color || DEFAULT_TEXT_COLOR,
-                backgroundColor: fadeBackgroundColor(DIFF_BG_COLORS.modify, backgroundFade), // subtle yellow background
+                backgroundColor: fadeBackgroundColor(diffColors.modify, backgroundFade),
                 fontStyle: segment.fontStyle,
               });
             }
@@ -336,7 +339,7 @@ export const computeFrameStates = (
                 opacity: blurProgress,
                 blur: (1 - blurProgress) * 8,
                 color: segment.color || DEFAULT_TEXT_COLOR,
-                backgroundColor: fadeBackgroundColor(DIFF_BG_COLORS.modify, backgroundFade), // subtle yellow background
+                backgroundColor: fadeBackgroundColor(diffColors.modify, backgroundFade), // subtle yellow background
                 fontStyle: segment.fontStyle,
               });
             }

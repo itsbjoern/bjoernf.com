@@ -14,6 +14,10 @@ export type AnimationConfig = {
   fontSize: number;
   lineHeight: number;
   showLineNumbers: boolean; // Show line numbers in gutter
+  // Diff highlight colors
+  insertColor: string;
+  deleteColor: string;
+  modifyColor: string;
 };
 
 export type SessionStorage = {
