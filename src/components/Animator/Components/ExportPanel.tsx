@@ -124,6 +124,7 @@ export const ExportPanel = () => {
         <button
           onClick={() => handleExport("gif")}
           disabled={snippets.length < 2}
+          data-umami-event="code-animator-export-gif"
           className="flex-1 px-6 py-3 bg-blue-600 text-white rounded font-medium hover:bg-blue-700 disabled:bg-gray-300 disabled:cursor-not-allowed"
         >
           Export as GIF
@@ -132,6 +133,7 @@ export const ExportPanel = () => {
         <button
           onClick={() => handleExport("mp4")}
           disabled={snippets.length < 2}
+          data-umami-event="code-animator-export-mp4"
           className="flex-1 px-6 py-3 bg-green-600 text-white rounded font-medium hover:bg-green-700 disabled:bg-gray-300 disabled:cursor-not-allowed"
         >
           Export as MP4
