@@ -128,8 +128,8 @@ export const loadFFmpeg = async (onProgress: ProgressCallback): Promise<FFmpeg> 
   });
 
   ffmpeg.on("progress", ({ progress }) => {
-    console.log(progress)
-    onProgress({ percentage: progress * 100, message: "Loading video encoder (this may take a moment)..." });
+    // Simulate slightly faster loading
+    onProgress({ percentage: Math.min(progress * 140, 100), message: "Loading video encoder (this may take a moment)..." });
   });
 
   // Load FFmpeg from unpkg CDN
@@ -221,7 +221,9 @@ export const exportMP4 = async (
     const frameFileName = `frame${i.toString().padStart(5, "0")}.png`;
     await ffmpeg.writeFile(frameFileName, await fetchFile(blob));
 
-    onProgress({ percentage: (i / totalFrames) * 80, message: "Generating frames..." }); // First 80% is frame generation
+    if (i % 10 === 0) {
+      onProgress({ percentage: (i / totalFrames) * 100, message: "Generating frames..." });
+    }
   }
 
   // Encode video

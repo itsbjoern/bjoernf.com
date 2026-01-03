@@ -1,4 +1,4 @@
-import { diffLines, diffChars, type Change } from "diff";
+import { diffLines, type Change } from "diff";
 import type { DiffOperation } from "./Context/AnimatorContext";
 import { tokenizeLine, tokenizeCode, type ShikiToken } from "./shikiTokenizer";
 
@@ -8,6 +8,54 @@ export type CharSegment = {
   startX: number; // Starting X position in the line
   color?: string;        // Syntax highlight color from Shiki
   fontStyle?: string;    // Font styling (italic, bold, etc.)
+};
+
+/**
+ * Simple LCS-based token diffing algorithm
+ * Returns indices of tokens that are common between old and new arrays
+ */
+const findLCS = (
+  oldTokens: ShikiToken[],
+  newTokens: ShikiToken[]
+): { oldIndices: number[]; newIndices: number[] } => {
+  const m = oldTokens.length;
+  const n = newTokens.length;
+
+  // Build LCS matrix
+  const lcs: number[][] = Array(m + 1)
+    .fill(0)
+    .map(() => Array(n + 1).fill(0));
+
+  for (let i = 1; i <= m; i++) {
+    for (let j = 1; j <= n; j++) {
+      if (oldTokens[i - 1].text === newTokens[j - 1].text) {
+        lcs[i][j] = lcs[i - 1][j - 1] + 1;
+      } else {
+        lcs[i][j] = Math.max(lcs[i - 1][j], lcs[i][j - 1]);
+      }
+    }
+  }
+
+  // Backtrack to find the actual sequence
+  const oldIndices: number[] = [];
+  const newIndices: number[] = [];
+  let i = m;
+  let j = n;
+
+  while (i > 0 && j > 0) {
+    if (oldTokens[i - 1].text === newTokens[j - 1].text) {
+      oldIndices.unshift(i - 1);
+      newIndices.unshift(j - 1);
+      i--;
+      j--;
+    } else if (lcs[i - 1][j] > lcs[i][j - 1]) {
+      i--;
+    } else {
+      j--;
+    }
+  }
+
+  return { oldIndices, newIndices };
 };
 
 export type EnhancedDiffOperation =
@@ -24,129 +72,157 @@ export type EnhancedDiffOperation =
   };
 
 /**
- * Apply Shiki token colors to character segments
- * Maps syntax highlighting colors from Shiki tokens to diff segments
- * Splits segments by token boundaries to ensure correct coloring
+ * Compute token-level diff between two lines
+ * Each token (keyword, identifier, operator, etc.) is treated as an atomic unit
  */
-const applyTokenColors = (
-  segments: CharSegment[],
-  tokens: ShikiToken[]
-): CharSegment[] => {
-  if (!tokens || tokens.length === 0) {
-    return segments;
-  }
-
-  // Build a map of character position to color/fontStyle
-  const colorMap: { color: string; fontStyle?: string }[] = [];
-
-  for (const token of tokens) {
-    for (let i = 0; i < token.text.length; i++) {
-      colorMap[token.startIndex + i] = {
-        color: token.color,
-        fontStyle: token.fontStyle,
-      };
-    }
-  }
-
-  // Apply colors to segments, splitting by token boundaries
-  const result: CharSegment[] = [];
-  let currentPos = 0;
-
-  for (const segment of segments) {
-    let remainingText = segment.text;
-    let segmentOffset = 0;
-
-    // Split this segment by token color boundaries
-    while (remainingText.length > 0) {
-      const charPos = currentPos + segmentOffset;
-      const currentColor = colorMap[charPos];
-
-      // Find how many consecutive characters have the same color
-      let sameColorLength = 1;
-      for (let i = 1; i < remainingText.length; i++) {
-        const nextColor = colorMap[charPos + i];
-        if (nextColor?.color !== currentColor?.color ||
-          nextColor?.fontStyle !== currentColor?.fontStyle) {
-          break;
-        }
-        sameColorLength++;
-      }
-
-      // Create a sub-segment with consistent color
-      const subText = remainingText.substring(0, sameColorLength);
-      result.push({
-        ...segment,
-        text: subText,
-        startX: segment.startX + segmentOffset,
-        color: currentColor?.color,
-        fontStyle: currentColor?.fontStyle,
-      });
-
-      remainingText = remainingText.substring(sameColorLength);
-      segmentOffset += sameColorLength;
-    }
-
-    currentPos += segment.text.length;
-  }
-
-  return result;
-};
-
-const computeCharacterDiff = (
-  oldLine: string,
-  newLine: string,
-  oldTokens?: ShikiToken[],
-  newTokens?: ShikiToken[]
+const computeTokenDiff = (
+  oldTokens: ShikiToken[],
+  newTokens: ShikiToken[]
 ): {
   oldSegments: CharSegment[];
   newSegments: CharSegment[];
 } => {
-  const changes = diffChars(oldLine, newLine);
+  // Handle empty cases
+  if (oldTokens.length === 0 && newTokens.length === 0) {
+    return { oldSegments: [], newSegments: [] };
+  }
+
+  if (oldTokens.length === 0) {
+    // All tokens are added
+    let x = 0;
+    const segments: CharSegment[] = newTokens.map(token => {
+      const segment: CharSegment = {
+        text: token.text,
+        type: "added",
+        startX: x,
+        color: token.color,
+        fontStyle: token.fontStyle,
+      };
+      x += token.text.length;
+      return segment;
+    });
+    return { oldSegments: [], newSegments: segments };
+  }
+
+  if (newTokens.length === 0) {
+    // All tokens are removed
+    let x = 0;
+    const segments: CharSegment[] = oldTokens.map(token => {
+      const segment: CharSegment = {
+        text: token.text,
+        type: "removed",
+        startX: x,
+        color: token.color,
+        fontStyle: token.fontStyle,
+      };
+      x += token.text.length;
+      return segment;
+    });
+    return { oldSegments: segments, newSegments: [] };
+  }
+
+  // Find common tokens using LCS
+  const { oldIndices, newIndices } = findLCS(oldTokens, newTokens);
+
   const oldSegments: CharSegment[] = [];
   const newSegments: CharSegment[] = [];
 
   let oldX = 0;
   let newX = 0;
+  let oldIdx = 0;
+  let newIdx = 0;
+  let lcsIdx = 0;
 
-  for (const change of changes) {
-    if (change.removed) {
+  // Process all tokens
+  while (oldIdx < oldTokens.length || newIdx < newTokens.length) {
+    // Check if current tokens are in the LCS (unchanged)
+    if (
+      lcsIdx < oldIndices.length &&
+      oldIdx === oldIndices[lcsIdx] &&
+      newIdx === newIndices[lcsIdx]
+    ) {
+      // Unchanged token - use color from new token for consistency
+      const token = newTokens[newIdx];
       oldSegments.push({
-        text: change.value,
+        text: token.text,
+        type: "unchanged",
+        startX: oldX,
+        color: token.color,
+        fontStyle: token.fontStyle,
+      });
+      newSegments.push({
+        text: token.text,
+        type: "unchanged",
+        startX: newX,
+        color: token.color,
+        fontStyle: token.fontStyle,
+      });
+      oldX += token.text.length;
+      newX += token.text.length;
+      oldIdx++;
+      newIdx++;
+      lcsIdx++;
+    } else if (
+      lcsIdx < oldIndices.length &&
+      oldIdx < oldIndices[lcsIdx] &&
+      (newIdx >= newIndices[lcsIdx] || lcsIdx >= newIndices.length || newIdx < newIndices[lcsIdx])
+    ) {
+      // Token removed from old
+      const token = oldTokens[oldIdx];
+      oldSegments.push({
+        text: token.text,
         type: "removed",
         startX: oldX,
+        color: token.color,
+        fontStyle: token.fontStyle,
       });
-      oldX += change.value.length;
-    } else if (change.added) {
+      oldX += token.text.length;
+      oldIdx++;
+    } else if (
+      lcsIdx < newIndices.length &&
+      newIdx < newIndices[lcsIdx]
+    ) {
+      // Token added to new
+      const token = newTokens[newIdx];
       newSegments.push({
-        text: change.value,
+        text: token.text,
         type: "added",
         startX: newX,
+        color: token.color,
+        fontStyle: token.fontStyle,
       });
-      newX += change.value.length;
+      newX += token.text.length;
+      newIdx++;
     } else {
-      // Unchanged segment
-      oldSegments.push({
-        text: change.value,
-        type: "unchanged",
-        startX: oldX,
-      });
-      newSegments.push({
-        text: change.value,
-        type: "unchanged",
-        startX: newX,
-      });
-      oldX += change.value.length;
-      newX += change.value.length;
+      // Beyond LCS - process remaining tokens
+      if (oldIdx < oldTokens.length) {
+        const token = oldTokens[oldIdx];
+        oldSegments.push({
+          text: token.text,
+          type: "removed",
+          startX: oldX,
+          color: token.color,
+          fontStyle: token.fontStyle,
+        });
+        oldX += token.text.length;
+        oldIdx++;
+      }
+      if (newIdx < newTokens.length) {
+        const token = newTokens[newIdx];
+        newSegments.push({
+          text: token.text,
+          type: "added",
+          startX: newX,
+          color: token.color,
+          fontStyle: token.fontStyle,
+        });
+        newX += token.text.length;
+        newIdx++;
+      }
     }
   }
 
-  // Apply Shiki token colors to segments
-  // For unchanged segments: use NEW tokens for both old and new to ensure consistent splitting
-  // This ensures the "after" colors are always shown during transitions
-  const coloredOldSegments = oldTokens ? applyTokenColors(oldSegments, oldTokens) : oldSegments;
-  const coloredNewSegments = newTokens ? applyTokenColors(newSegments, newTokens) : newSegments;
-
-  return { oldSegments: coloredOldSegments, newSegments: coloredNewSegments };
+  return { oldSegments, newSegments };
 };
 
 export const computeDiff = (
@@ -191,14 +267,12 @@ export const computeDiff = (
 
       for (let j = 0; j < maxLines; j++) {
         if (j < oldLines.length && j < newLines.length) {
-          // Both lines exist - modify with character-level diff
+          // Both lines exist - modify with token-level diff
           // Use pre-computed tokens from full context tokenization
-          const oldTokens = beforeTokensByLine?.[beforeLineOffset + j];
-          const newTokens = afterTokensByLine?.[afterLineOffset + j];
+          const oldTokens = beforeTokensByLine?.[beforeLineOffset + j] || [];
+          const newTokens = afterTokensByLine?.[afterLineOffset + j] || [];
 
-          const { oldSegments, newSegments } = computeCharacterDiff(
-            oldLines[j],
-            newLines[j],
+          const { oldSegments, newSegments } = computeTokenDiff(
             oldTokens,
             newTokens
           );
