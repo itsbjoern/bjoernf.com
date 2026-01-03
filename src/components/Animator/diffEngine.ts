@@ -72,8 +72,107 @@ export type EnhancedDiffOperation =
   };
 
 /**
- * Compute token-level diff between two lines
- * Each token (keyword, identifier, operator, etc.) is treated as an atomic unit
+ * Check if two strings have significant overlap (one is a substring or they share a common prefix/suffix)
+ */
+const hasSignificantOverlap = (str1: string, str2: string): boolean => {
+  if (str1.length < 3 || str2.length < 3) return false;
+
+  // Check if one is a substring of the other
+  if (str1.includes(str2) || str2.includes(str1)) return true;
+
+  // Check for common prefix (at least 3 characters)
+  let prefixLen = 0;
+  const minLen = Math.min(str1.length, str2.length);
+  for (let i = 0; i < minLen; i++) {
+    if (str1[i] === str2[i]) prefixLen++;
+    else break;
+  }
+  if (prefixLen >= 3) return true;
+
+  // Check for common suffix (at least 3 characters)
+  let suffixLen = 0;
+  for (let i = 1; i <= minLen; i++) {
+    if (str1[str1.length - i] === str2[str2.length - i]) suffixLen++;
+    else break;
+  }
+  if (suffixLen >= 3) return true;
+
+  return false;
+};
+
+/**
+ * Character-level diff within a token (for partial string changes)
+ */
+const diffWithinToken = (
+  oldToken: ShikiToken,
+  newToken: ShikiToken,
+  oldStartX: number,
+  newStartX: number
+): { oldSegments: CharSegment[]; newSegments: CharSegment[] } => {
+  const oldSegments: CharSegment[] = [];
+  const newSegments: CharSegment[] = [];
+
+  let oldIdx = 0;
+  let newIdx = 0;
+  let oldX = oldStartX;
+  let newX = newStartX;
+
+  // Simple character-by-character comparison
+  while (oldIdx < oldToken.text.length || newIdx < newToken.text.length) {
+    if (oldIdx < oldToken.text.length && newIdx < newToken.text.length &&
+        oldToken.text[oldIdx] === newToken.text[newIdx]) {
+      // Character unchanged
+      oldSegments.push({
+        text: oldToken.text[oldIdx],
+        type: "unchanged",
+        startX: oldX,
+        color: newToken.color,
+        fontStyle: newToken.fontStyle,
+      });
+      newSegments.push({
+        text: newToken.text[newIdx],
+        type: "unchanged",
+        startX: newX,
+        color: newToken.color,
+        fontStyle: newToken.fontStyle,
+      });
+      oldX++;
+      newX++;
+      oldIdx++;
+      newIdx++;
+    } else if (oldIdx < oldToken.text.length &&
+               (newIdx >= newToken.text.length || oldToken.text[oldIdx] !== newToken.text[newIdx])) {
+      // Character removed
+      oldSegments.push({
+        text: oldToken.text[oldIdx],
+        type: "removed",
+        startX: oldX,
+        color: oldToken.color,
+        fontStyle: oldToken.fontStyle,
+      });
+      oldX++;
+      oldIdx++;
+    } else if (newIdx < newToken.text.length) {
+      // Character added
+      newSegments.push({
+        text: newToken.text[newIdx],
+        type: "added",
+        startX: newX,
+        color: newToken.color,
+        fontStyle: newToken.fontStyle,
+      });
+      newX++;
+      newIdx++;
+    }
+  }
+
+  return { oldSegments, newSegments };
+};
+
+/**
+ * Compute hybrid token/character-level diff between two lines
+ * Uses token-level diffing for most code, but falls back to character-level
+ * for tokens that partially match (e.g., string edits)
  */
 const computeTokenDiff = (
   oldTokens: ShikiToken[],
@@ -162,40 +261,29 @@ const computeTokenDiff = (
       oldIdx++;
       newIdx++;
       lcsIdx++;
-    } else if (
-      lcsIdx < oldIndices.length &&
-      oldIdx < oldIndices[lcsIdx] &&
-      (newIdx >= newIndices[lcsIdx] || lcsIdx >= newIndices.length || newIdx < newIndices[lcsIdx])
-    ) {
-      // Token removed from old
-      const token = oldTokens[oldIdx];
-      oldSegments.push({
-        text: token.text,
-        type: "removed",
-        startX: oldX,
-        color: token.color,
-        fontStyle: token.fontStyle,
-      });
-      oldX += token.text.length;
-      oldIdx++;
-    } else if (
-      lcsIdx < newIndices.length &&
-      newIdx < newIndices[lcsIdx]
-    ) {
-      // Token added to new
-      const token = newTokens[newIdx];
-      newSegments.push({
-        text: token.text,
-        type: "added",
-        startX: newX,
-        color: token.color,
-        fontStyle: token.fontStyle,
-      });
-      newX += token.text.length;
-      newIdx++;
     } else {
-      // Beyond LCS - process remaining tokens
-      if (oldIdx < oldTokens.length) {
+      // Tokens don't match - check if we should do character-level diff
+      const oldToken = oldIdx < oldTokens.length ? oldTokens[oldIdx] : null;
+      const newToken = newIdx < newTokens.length ? newTokens[newIdx] : null;
+
+      // If both tokens exist and have significant overlap, use character-level diff
+      if (oldToken && newToken &&
+          oldToken.color === newToken.color &&
+          hasSignificantOverlap(oldToken.text, newToken.text)) {
+        const { oldSegments: charOldSegs, newSegments: charNewSegs } =
+          diffWithinToken(oldToken, newToken, oldX, newX);
+        oldSegments.push(...charOldSegs);
+        newSegments.push(...charNewSegs);
+        oldX += oldToken.text.length;
+        newX += newToken.text.length;
+        oldIdx++;
+        newIdx++;
+      } else if (
+        lcsIdx < oldIndices.length &&
+        oldIdx < oldIndices[lcsIdx] &&
+        (newIdx >= newIndices[lcsIdx] || lcsIdx >= newIndices.length || newIdx < newIndices[lcsIdx])
+      ) {
+        // Token removed from old
         const token = oldTokens[oldIdx];
         oldSegments.push({
           text: token.text,
@@ -206,8 +294,11 @@ const computeTokenDiff = (
         });
         oldX += token.text.length;
         oldIdx++;
-      }
-      if (newIdx < newTokens.length) {
+      } else if (
+        lcsIdx < newIndices.length &&
+        newIdx < newIndices[lcsIdx]
+      ) {
+        // Token added to new
         const token = newTokens[newIdx];
         newSegments.push({
           text: token.text,
@@ -218,6 +309,32 @@ const computeTokenDiff = (
         });
         newX += token.text.length;
         newIdx++;
+      } else {
+        // Beyond LCS - process remaining tokens
+        if (oldIdx < oldTokens.length) {
+          const token = oldTokens[oldIdx];
+          oldSegments.push({
+            text: token.text,
+            type: "removed",
+            startX: oldX,
+            color: token.color,
+            fontStyle: token.fontStyle,
+          });
+          oldX += token.text.length;
+          oldIdx++;
+        }
+        if (newIdx < newTokens.length) {
+          const token = newTokens[newIdx];
+          newSegments.push({
+            text: token.text,
+            type: "added",
+            startX: newX,
+            color: token.color,
+            fontStyle: token.fontStyle,
+          });
+          newX += token.text.length;
+          newIdx++;
+        }
       }
     }
   }
