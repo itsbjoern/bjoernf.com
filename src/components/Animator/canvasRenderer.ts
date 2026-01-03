@@ -62,13 +62,19 @@ export const renderFrameToCanvas = (
 
     // Render line numbers for ALL lines from 0 to max to maintain continuity
     // Note: frameState lineNumbers are 0-indexed, but we display them as 1-indexed
+    const lineHeightPx = fontSize * lineHeight;
     for (let lineNum = 0; lineNum <= maxLineNumber; lineNum++) {
-      const y = linePositions.get(lineNum);
-      if (y !== undefined) {
-        const lineNumberX = paddingX - 10;
-        const lineNumberY = paddingTopY + y;
-        ctx.fillText((lineNum + 1).toString(), lineNumberX, lineNumberY);
+      // Get y position from map, or calculate it if line was filtered out (opacity = 0)
+      let y = linePositions.get(lineNum);
+      if (y === undefined) {
+        // Calculate position based on line number and line height
+        // This ensures continuous line numbers even when lines are deleted/hidden
+        y = lineNum * lineHeightPx;
       }
+
+      const lineNumberX = paddingX - 10;
+      const lineNumberY = paddingTopY + y;
+      ctx.fillText((lineNum + 1).toString(), lineNumberX, lineNumberY);
     }
 
     // Reset text alignment for code rendering
