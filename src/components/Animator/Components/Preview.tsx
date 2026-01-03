@@ -38,11 +38,14 @@ export const Preview = () => {
     let pausedTime = 0;
 
     const animate = (timestamp: number) => {
+
       if (isPaused) {
         pausedTime = timestamp - startTime;
         animationRef.current = requestAnimationFrame(animate);
         return;
       }
+      renderConfig.width = canvas.width;
+      renderConfig.height = canvas.height;
 
       const elapsed = timestamp - startTime - pausedTime;
       const animationTime = elapsed % timeline.totalDuration;
