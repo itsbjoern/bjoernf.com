@@ -15,13 +15,13 @@ export type EnhancedDiffOperation =
   | { type: "delete"; line: string; lineNumber: number; tokens?: ShikiToken[] }
   | { type: "insert"; line: string; lineNumber: number; tokens?: ShikiToken[] }
   | {
-      type: "modify";
-      oldLine: string;
-      newLine: string;
-      lineNumber: number;
-      oldSegments: CharSegment[];
-      newSegments: CharSegment[];
-    };
+    type: "modify";
+    oldLine: string;
+    newLine: string;
+    lineNumber: number;
+    oldSegments: CharSegment[];
+    newSegments: CharSegment[];
+  };
 
 /**
  * Apply Shiki token colors to character segments
@@ -66,7 +66,7 @@ const applyTokenColors = (
       for (let i = 1; i < remainingText.length; i++) {
         const nextColor = colorMap[charPos + i];
         if (nextColor?.color !== currentColor?.color ||
-            nextColor?.fontStyle !== currentColor?.fontStyle) {
+          nextColor?.fontStyle !== currentColor?.fontStyle) {
           break;
         }
         sameColorLength++;
@@ -87,54 +87,6 @@ const applyTokenColors = (
     }
 
     currentPos += segment.text.length;
-  }
-
-  return result;
-};
-
-/**
- * Apply token colors to old segments, using NEW tokens for unchanged segments
- * This ensures unchanged text uses "after" colors during transitions
- */
-const applyTokenColorsWithAfterForUnchanged = (
-  segments: CharSegment[],
-  oldTokens: ShikiToken[] | undefined,
-  newTokens: ShikiToken[] | undefined,
-  oldLine: string,
-  newLine: string
-): CharSegment[] => {
-  if (!oldTokens && !newTokens) {
-    return segments;
-  }
-
-  const result: CharSegment[] = [];
-
-  for (const segment of segments) {
-    if (segment.type === "unchanged" && newTokens) {
-      // For unchanged segments, use NEW tokens to get "after" colors
-      // We need to find where this text appears in the new line
-      const textInNewLine = newLine.substring(segment.startX, segment.startX + segment.text.length);
-
-      if (textInNewLine === segment.text) {
-        // Apply colors from new tokens using the same position
-        const singleSegment = [segment];
-        const colored = applyTokenColors(singleSegment, newTokens);
-        result.push(...colored);
-      } else {
-        // Text doesn't match position in new line, fall back to old tokens
-        const singleSegment = [segment];
-        const colored = oldTokens ? applyTokenColors(singleSegment, oldTokens) : singleSegment;
-        result.push(...colored);
-      }
-    } else if (segment.type === "removed" && oldTokens) {
-      // For removed segments, use old tokens
-      const singleSegment = [segment];
-      const colored = applyTokenColors(singleSegment, oldTokens);
-      result.push(...colored);
-    } else {
-      // No tokens available, keep as is
-      result.push(segment);
-    }
   }
 
   return result;
@@ -191,7 +143,7 @@ const computeCharacterDiff = (
   // Apply Shiki token colors to segments
   // For unchanged segments: use NEW tokens for both old and new to ensure consistent splitting
   // This ensures the "after" colors are always shown during transitions
-  const coloredOldSegments = applyTokenColorsWithAfterForUnchanged(oldSegments, oldTokens, newTokens, oldLine, newLine);
+  const coloredOldSegments = oldTokens ? applyTokenColors(oldSegments, oldTokens) : oldSegments;
   const coloredNewSegments = newTokens ? applyTokenColors(newSegments, newTokens) : newSegments;
 
   return { oldSegments: coloredOldSegments, newSegments: coloredNewSegments };
