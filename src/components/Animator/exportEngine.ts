@@ -70,9 +70,17 @@ export const exportGIF = async (
         const diffOps = computeDiff(snippets[phase.currentScreenIndex].code, snippets[phase.currentScreenIndex + 1].code, highlighter, language, "github-dark");
         frameStates = computeFrameStates(diffOps, phase.progress, config);
       } else {
-        // Static display of current screen
-        const diffOps = computeDiff(snippets[phase.currentScreenIndex].code, snippets[phase.currentScreenIndex].code, highlighter, language, "github-dark");
-        frameStates = computeFrameStates(diffOps, 1, config);
+        // Static display with background fade-out
+        if (phase.currentScreenIndex > 0) {
+          // Use transition to current screen with progress > 1 to fade backgrounds
+          const diffOps = computeDiff(snippets[phase.currentScreenIndex - 1].code, snippets[phase.currentScreenIndex].code, highlighter, language, "github-dark");
+          const extendedProgress = 1 + Math.min(phase.staticProgress, 0.15);
+          frameStates = computeFrameStates(diffOps, extendedProgress, config);
+        } else {
+          // First screen - show as-is
+          const diffOps = computeDiff(snippets[phase.currentScreenIndex].code, snippets[phase.currentScreenIndex].code, highlighter, language, "github-dark");
+          frameStates = computeFrameStates(diffOps, 1, config);
+        }
       }
 
       renderFrameToCanvas(ctx, frameStates, renderConfig, phase.currentScreenIndex, snippets.length, phase.staticProgress);
@@ -178,9 +186,17 @@ export const exportMP4 = async (
       const diffOps = computeDiff(snippets[phase.currentScreenIndex].code, snippets[phase.currentScreenIndex + 1].code, highlighter, language, "github-dark");
       frameStates = computeFrameStates(diffOps, phase.progress, config);
     } else {
-      // Static display of current screen
-      const diffOps = computeDiff(snippets[phase.currentScreenIndex].code, snippets[phase.currentScreenIndex].code, highlighter, language, "github-dark");
-      frameStates = computeFrameStates(diffOps, 1, config);
+      // Static display with background fade-out
+      if (phase.currentScreenIndex > 0) {
+        // Use transition to current screen with progress > 1 to fade backgrounds
+        const diffOps = computeDiff(snippets[phase.currentScreenIndex - 1].code, snippets[phase.currentScreenIndex].code, highlighter, language, "github-dark");
+        const extendedProgress = 1 + Math.min(phase.staticProgress, 0.15);
+        frameStates = computeFrameStates(diffOps, extendedProgress, config);
+      } else {
+        // First screen - show as-is
+        const diffOps = computeDiff(snippets[phase.currentScreenIndex].code, snippets[phase.currentScreenIndex].code, highlighter, language, "github-dark");
+        frameStates = computeFrameStates(diffOps, 1, config);
+      }
     }
 
     renderFrameToCanvas(ctx, frameStates, renderConfig, phase.currentScreenIndex, snippets.length, phase.staticProgress);

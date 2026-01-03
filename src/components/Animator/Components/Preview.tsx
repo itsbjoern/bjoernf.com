@@ -67,10 +67,22 @@ export const Preview = () => {
         }
         frameStates = computeFrameStates(currentTransition.diffOps, phase.progress, config);
       } else {
-        // Show static screen
-        const snippet = snippets[phase.currentScreenIndex];
-        const staticDiff = computeDiff(snippet.code, snippet.code, highlighter, language, "github-dark");
-        frameStates = computeFrameStates(staticDiff, 0, config);
+        // Show static screen with background fade-out
+        // Use transition to current screen with progress > 1 to fade backgrounds
+        const transitionIndex = phase.currentScreenIndex > 0 ? phase.currentScreenIndex - 1 : 0;
+        const currentTransition = transitions[transitionIndex];
+
+        if (currentTransition && currentTransition.diffOps.length > 0 && phase.currentScreenIndex > 0) {
+          // Progress > 1 triggers background fade-out in animation engine
+          // Fade backgrounds over first 15% of static display (caps at 0.15)
+          const extendedProgress = 1 + Math.min(phase.staticProgress, 0.15);
+          frameStates = computeFrameStates(currentTransition.diffOps, extendedProgress, config);
+        } else {
+          // First screen or no transition - show as-is
+          const snippet = snippets[phase.currentScreenIndex];
+          const staticDiff = computeDiff(snippet.code, snippet.code, highlighter, language, "github-dark");
+          frameStates = computeFrameStates(staticDiff, 1, config);
+        }
       }
 
       // Render to canvas
@@ -135,10 +147,6 @@ export const Preview = () => {
 
       <div className="border border-gray-300 rounded overflow-hidden bg-[#0d1117]">
         <canvas ref={canvasRef} className="w-full" />
-      </div>
-
-      <div className="text-sm text-gray-600 text-center">
-        Each stage displays for {timeline.staticDuration}ms before transitioning to the next
       </div>
     </div>
   );

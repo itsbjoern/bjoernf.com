@@ -74,6 +74,22 @@ const computeSegmentPositions = (
 };
 
 /**
+ * Fades out the alpha channel of an rgba color
+ */
+const fadeBackgroundColor = (color: string | undefined, fadeAmount: number): string | undefined => {
+  if (!color || fadeAmount >= 1) return undefined;
+
+  // Parse rgba color and reduce alpha
+  const match = color.match(/rgba?\((\d+),\s*(\d+),\s*(\d+),?\s*([\d.]+)?\)/);
+  if (match) {
+    const [, r, g, b, a] = match;
+    const alpha = parseFloat(a || '1') * (1 - fadeAmount);
+    return `rgba(${r}, ${g}, ${b}, ${alpha})`;
+  }
+  return color;
+};
+
+/**
  * Create segments for a simple line (unchanged, delete, or insert)
  * with syntax highlighting applied from pre-computed tokens
  */
@@ -84,8 +100,11 @@ const createSegmentsFromTokens = (
   opacity: number,
   blur: number,
   backgroundColor: string | undefined,
-  fontSize: number
+  fontSize: number,
+  backgroundFade: number = 0
 ): SegmentFrameState[] => {
+  const fadedBackground = fadeBackgroundColor(backgroundColor, backgroundFade);
+
   // If no tokens provided, return single segment with default color
   if (!tokens || tokens.length === 0) {
     return [{
@@ -95,7 +114,7 @@ const createSegmentsFromTokens = (
       opacity,
       blur,
       color: DEFAULT_TEXT_COLOR,
-      backgroundColor,
+      backgroundColor: fadedBackground,
     }];
   }
 
@@ -111,7 +130,7 @@ const createSegmentsFromTokens = (
         opacity,
         blur,
         color: token.color,
-        backgroundColor,
+        backgroundColor: fadedBackground,
         fontStyle: token.fontStyle,
       });
       x += measureTextWidth(token.text, fontSize);
@@ -125,7 +144,7 @@ const createSegmentsFromTokens = (
     opacity,
     blur,
     color: DEFAULT_TEXT_COLOR,
-    backgroundColor,
+    backgroundColor: fadedBackground,
   }];
 };
 
@@ -134,7 +153,14 @@ export const computeFrameStates = (
   progress: number,
   config: AnimationConfig
 ): FrameState[] => {
-  const easedProgress = applyEasing(progress, config.easing);
+  // Clamp progress for easing to [0, 1], but allow values > 1 for background fade-out
+  const clampedProgress = Math.min(progress, 1);
+  const easedProgress = applyEasing(clampedProgress, config.easing);
+
+  // Calculate background fade when progress > 1 (post-transition static phase)
+  // Fade out backgrounds over 0.15 progress units (e.g., 1.0 to 1.15) - 15% of static display
+  const backgroundFade = Math.min(Math.max(progress - 1, 0) / 0.15, 1);
+
   const lineHeight = config.fontSize * config.lineHeight;
   const frames: FrameState[] = [];
 
@@ -163,7 +189,8 @@ export const computeFrameStates = (
           1, // opacity
           0, // blur
           undefined, // no background for unchanged lines
-          config.fontSize
+          config.fontSize,
+          backgroundFade
         );
         frameState.segments.push(...segments);
 
@@ -186,7 +213,8 @@ export const computeFrameStates = (
           1 - easedProgress, // fade out
           easedProgress * 5, // blur up to 5px
           DIFF_BG_COLORS.delete, // subtle red background
-          config.fontSize
+          config.fontSize,
+          backgroundFade
         );
         frameState.segments.push(...segments);
 
@@ -208,7 +236,8 @@ export const computeFrameStates = (
           easedProgress, // fade in
           (1 - easedProgress) * 5, // blur reduces as it appears
           DIFF_BG_COLORS.insert, // subtle green background
-          config.fontSize
+          config.fontSize,
+          backgroundFade
         );
         frameState.segments.push(...segments);
 
@@ -289,7 +318,7 @@ export const computeFrameStates = (
                 opacity: 1 - blurProgress,
                 blur: blurProgress * 8,
                 color: segment.color || DEFAULT_TEXT_COLOR,
-                backgroundColor: DIFF_BG_COLORS.modify, // subtle yellow background
+                backgroundColor: fadeBackgroundColor(DIFF_BG_COLORS.modify, backgroundFade), // subtle yellow background
                 fontStyle: segment.fontStyle,
               });
             }
@@ -307,7 +336,7 @@ export const computeFrameStates = (
                 opacity: blurProgress,
                 blur: (1 - blurProgress) * 8,
                 color: segment.color || DEFAULT_TEXT_COLOR,
-                backgroundColor: DIFF_BG_COLORS.modify, // subtle yellow background
+                backgroundColor: fadeBackgroundColor(DIFF_BG_COLORS.modify, backgroundFade), // subtle yellow background
                 fontStyle: segment.fontStyle,
               });
             }

@@ -43,21 +43,31 @@ export const renderFrameToCanvas = (
   if (showLineNumbers && lineNumberGutterWidth > 0) {
     ctx.fillStyle = lineNumberColor;
     ctx.textAlign = "right";
-    ctx.globalAlpha = 1;
     ctx.filter = "none";
+    ctx.globalAlpha = 1.0;
 
+    // Find the maximum line number across all frames
+    const maxLineNumber = Math.max(
+      0,
+      ...frameStates.map((frame) => frame.lineNumber)
+    );
+
+    // Create a map of line numbers to their y positions
+    const linePositions = new Map<number, number>();
     for (const frame of frameStates) {
-      // Only render line number if the line is visible (opacity > 0)
-      const hasVisibleSegments = frame.segments.some((s) => s.opacity > 0);
-      if (hasVisibleSegments) {
-        const lineNumberX = paddingX - 10; // Right-align with some spacing
-        const lineNumberY = paddingTopY + frame.y;
+      if (!linePositions.has(frame.lineNumber)) {
+        linePositions.set(frame.lineNumber, frame.y);
+      }
+    }
 
-        // Use the maximum opacity of segments for the line number
-        const maxOpacity = Math.max(...frame.segments.map((s) => s.opacity));
-        ctx.globalAlpha = maxOpacity;
-
-        ctx.fillText(frame.lineNumber.toString(), lineNumberX, lineNumberY);
+    // Render line numbers for ALL lines from 0 to max to maintain continuity
+    // Note: frameState lineNumbers are 0-indexed, but we display them as 1-indexed
+    for (let lineNum = 0; lineNum <= maxLineNumber; lineNum++) {
+      const y = linePositions.get(lineNum);
+      if (y !== undefined) {
+        const lineNumberX = paddingX - 10;
+        const lineNumberY = paddingTopY + y;
+        ctx.fillText((lineNum + 1).toString(), lineNumberX, lineNumberY);
       }
     }
 
