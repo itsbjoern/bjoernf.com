@@ -22,7 +22,7 @@ export const Preview = () => {
     if (!ctx) return;
 
     // Calculate timeline
-    const timeline = calculateTimeline(config.duration, snippets.length);
+    const timeline = calculateTimeline(config.staticDuration, config.transitionDuration, snippets.length);
 
     // Compute diffs for all transitions
     const transitions = snippets.slice(0, -1).map((snippet, i) => ({
@@ -47,8 +47,11 @@ export const Preview = () => {
         animationRef.current = requestAnimationFrame(animate);
         return;
       }
-      renderConfig.width = canvas.width;
-      renderConfig.height = canvas.height;
+      // Use display dimensions (logical pixels), not physical canvas dimensions
+      // since we've scaled the context by devicePixelRatio
+      const dpr = window.devicePixelRatio || 2;
+      renderConfig.width = canvas.width / dpr;
+      renderConfig.height = canvas.height / dpr;
 
       const elapsed = timestamp - startTime - pausedTime;
       const animationTime = elapsed % timeline.totalDuration;
@@ -100,14 +103,29 @@ export const Preview = () => {
     };
   }, [snippets, config, highlighter, isPaused]);
 
-  // Resize canvas to fit container
+  // Resize canvas to fit container with high-DPI support
   useEffect(() => {
     const handleResize = () => {
       if (canvasRef.current) {
         const container = canvasRef.current.parentElement;
         if (container) {
-          canvasRef.current.width = container.clientWidth;
-          canvasRef.current.height = 600;
+          const dpr = window.devicePixelRatio || 2; // Use device pixel ratio, default to 2x for better quality
+          const displayWidth = container.clientWidth;
+          const displayHeight = 600;
+
+          // Set canvas internal size (actual rendering resolution)
+          canvasRef.current.width = displayWidth * dpr;
+          canvasRef.current.height = displayHeight * dpr;
+
+          // Set canvas display size (CSS size)
+          canvasRef.current.style.width = `${displayWidth}px`;
+          canvasRef.current.style.height = `${displayHeight}px`;
+
+          // Scale context to match
+          const ctx = canvasRef.current.getContext("2d");
+          if (ctx) {
+            ctx.scale(dpr, dpr);
+          }
         }
       }
     };
@@ -118,12 +136,12 @@ export const Preview = () => {
   }, []);
 
   // Calculate timeline for display in UI
-  const timeline = calculateTimeline(config.duration, snippets.length);
+  const timeline = calculateTimeline(config.staticDuration, config.transitionDuration, snippets.length);
 
   if (snippets.length < 2) {
     return (
       <div className="text-center py-20 text-gray-600">
-        Add at least 2 code stages to see the animation preview
+        Add at least 2 code snippets to see the animation preview
       </div>
     );
   }
@@ -140,7 +158,7 @@ export const Preview = () => {
             {isPaused ? "▶ Play" : "⏸ Pause"}
           </button>
           <div className="text-sm text-gray-600">
-            {snippets.length} stages • {timeline.totalDuration}ms total
+            {snippets.length} snippets • {timeline.totalDuration}ms total
           </div>
         </div>
       </div>

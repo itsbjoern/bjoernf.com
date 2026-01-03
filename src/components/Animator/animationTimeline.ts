@@ -44,11 +44,10 @@ export type RenderConfig = {
  * Calculate animation timeline from config and number of snippets
  */
 export const calculateTimeline = (
-  duration: number,
+  staticDuration: number,
+  transitionDuration: number,
   numScreens: number
 ): AnimationTimeline => {
-  const staticDuration = duration * 0.4;
-  const transitionDuration = duration * 0.6;
   const cycleDuration = staticDuration + transitionDuration;
   const totalDuration = numScreens * staticDuration + (numScreens - 1) * transitionDuration;
 
@@ -150,8 +149,13 @@ export const calculateCanvasSize = (
     ? (lineNumberDigits + 1) * charWidth + 10 // digits + spacing
     : 0;
 
-  const width = maxLineLength * charWidth + 2 * padding + lineNumberGutterWidth;
-  const height = maxLineCount * lineHeight + 2 * padding + progressBarSpacing;
+  // Calculate dimensions and round up to integers
+  let width = Math.ceil(maxLineLength * charWidth + 2 * padding + lineNumberGutterWidth);
+  let height = Math.ceil(maxLineCount * lineHeight + 2 * padding + progressBarSpacing);
+
+  // Ensure dimensions are divisible by 2 (required by video encoders)
+  if (width % 2 !== 0) width += 1;
+  if (height % 2 !== 0) height += 1;
 
   return { width, height };
 };

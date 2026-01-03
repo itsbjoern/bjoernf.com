@@ -1,6 +1,7 @@
 import { useState } from "react";
 import { useAnimator } from "../Context/AnimatorContext";
 import type { AnimationConfig } from "../util";
+import { useToast } from "../Toasts";
 
 const THEMES = [
   { value: "github-dark", label: "GitHub Dark" },
@@ -17,15 +18,20 @@ const EASING_OPTIONS = [
 export const Settings = () => {
   const { config, updateConfig } = useAnimator();
   const [localConfig, setLocalConfig] = useState<AnimationConfig>(config);
+  const { addToast } = useToast();
 
   const handleSave = () => {
     updateConfig(localConfig);
+    addToast({
+      message: "Settings updated",
+      color: "bg-green-500",
+    });
   };
 
   const handleReset = () => {
     const defaultConfig: AnimationConfig = {
-      duration: 2000,
-      fps: 60,
+      staticDuration: 1000,
+      transitionDuration: 1500,
       easing: "ease-in-out",
       theme: "github-dark",
       backgroundColor: "#0d1117",
@@ -42,47 +48,47 @@ export const Settings = () => {
       <h3 className="text-xl font-bold mb-6">Animation Settings</h3>
 
       <div className="space-y-6">
-        {/* Duration */}
+        {/* Static Duration */}
         <div>
           <label className="block text-sm font-medium mb-2">
-            Animation Duration: {localConfig.duration}ms
+            Static Display Duration: {localConfig.staticDuration}ms
           </label>
           <input
             type="range"
-            min="500"
-            max="5000"
+            min="200"
+            max="3000"
             step="100"
-            value={localConfig.duration}
+            value={localConfig.staticDuration}
             onChange={(e) =>
-              setLocalConfig({ ...localConfig, duration: parseInt(e.target.value) })
+              setLocalConfig({ ...localConfig, staticDuration: parseInt(e.target.value) })
             }
             className="w-full"
           />
           <div className="flex justify-between text-xs text-gray-600 mt-1">
-            <span>0.5s</span>
-            <span>5s</span>
+            <span>0.2s</span>
+            <span>3s</span>
           </div>
         </div>
 
-        {/* FPS */}
+        {/* Transition Duration */}
         <div>
           <label className="block text-sm font-medium mb-2">
-            Frame Rate: {localConfig.fps} FPS
+            Transition Duration: {localConfig.transitionDuration}ms
           </label>
           <input
             type="range"
-            min="15"
-            max="60"
-            step="5"
-            value={localConfig.fps}
+            min="200"
+            max="3000"
+            step="100"
+            value={localConfig.transitionDuration}
             onChange={(e) =>
-              setLocalConfig({ ...localConfig, fps: parseInt(e.target.value) })
+              setLocalConfig({ ...localConfig, transitionDuration: parseInt(e.target.value) })
             }
             className="w-full"
           />
           <div className="flex justify-between text-xs text-gray-600 mt-1">
-            <span>15 FPS</span>
-            <span>60 FPS</span>
+            <span>0.2s</span>
+            <span>3s</span>
           </div>
         </div>
 

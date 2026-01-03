@@ -19,7 +19,7 @@ export const ExportPanel = () => {
 
   const handleExport = async (format: "gif" | "mp4") => {
     if (snippets.length < 2 || !highlighter) {
-      addToast({ message: "Please enter code in at least 2 stages first", color: "bg-red-500" });
+      addToast({ message: "Please enter code in at least 2 snippets first", color: "bg-red-500" });
       return;
     }
 
@@ -140,7 +140,7 @@ export const ExportPanel = () => {
       </div>
 
       <p className="text-sm text-gray-600 mt-4">
-        Exports all transitions between stages. Exports are processed entirely in your browser. No data is sent to any server. MP4 export requires FFmpeg (~31MB) loaded from unpkg.com.
+        Exports all transitions between snippets. Exports are processed entirely in your browser. No data is sent to any server. MP4 export requires FFmpeg (~31MB) loaded from unpkg.com.
       </p>
     </div>
   );

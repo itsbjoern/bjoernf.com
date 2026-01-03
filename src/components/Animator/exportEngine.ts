@@ -26,17 +26,19 @@ export const exportGIF = async (
     // Calculate canvas size based on content
     const { width, height } = calculateCanvasSize(snippets, config, settings.padding);
 
+    // Use 2x resolution for better quality
+    const scale = 2;
     const gif = new GIF({
       workers: 2,
       quality: 11 - settings.quality,
-      width,
-      height,
+      width: width * scale,
+      height: height * scale,
       workerScript: "/gif.worker.js",
     });
 
     const tempCanvas = document.createElement("canvas");
-    tempCanvas.width = width;
-    tempCanvas.height = height;
+    tempCanvas.width = width * scale;
+    tempCanvas.height = height * scale;
     const ctx = tempCanvas.getContext("2d", {
       willReadFrequently: true,
     });
@@ -46,14 +48,17 @@ export const exportGIF = async (
       return;
     }
 
+    // Scale context for high-DPI rendering
+    ctx.scale(scale, scale);
+
     // Calculate timeline
-    const timeline = calculateTimeline(config.duration, snippets.length);
+    const timeline = calculateTimeline(config.staticDuration, config.transitionDuration, snippets.length);
     const totalFrames = Math.ceil((timeline.totalDuration / 1000) * settings.fps);
 
     // Calculate max line count for line numbers
     const maxLineCount = Math.max(...snippets.map((s) => s.code.split("\n").length));
 
-    // Create render config
+    // Create render config (use logical dimensions, context is already scaled)
     const renderConfig = createRenderConfig(width, height, config, settings.padding, maxLineCount);
 
     // Generate frames
@@ -148,16 +153,19 @@ export const exportMP4 = async (
 ): Promise<Blob> => {
   const ffmpeg = await loadFFmpeg(onProgress);
 
-  // Calculate canvas size based on content
+  // Calculate canvas size based on content (always even integers)
   const { width, height } = calculateCanvasSize(snippets, config, settings.padding);
 
+  // Use 2x resolution for better quality
+  const scale = 2;
+
   // Calculate timeline
-  const timeline = calculateTimeline(config.duration, snippets.length);
+  const timeline = calculateTimeline(config.staticDuration, config.transitionDuration, snippets.length);
   const totalFrames = Math.ceil((timeline.totalDuration / 1000) * settings.fps);
 
   const tempCanvas = document.createElement("canvas");
-  tempCanvas.width = width;
-  tempCanvas.height = height;
+  tempCanvas.width = width * scale;
+  tempCanvas.height = height * scale;
   const ctx = tempCanvas.getContext("2d", {
     willReadFrequently: true,
   });
@@ -166,10 +174,13 @@ export const exportMP4 = async (
     throw new Error("Failed to get canvas context");
   }
 
+  // Scale context for high-DPI rendering
+  ctx.scale(scale, scale);
+
   // Calculate max line count for line numbers
   const maxLineCount = Math.max(...snippets.map((s) => s.code.split("\n").length));
 
-  // Create render config
+  // Create render config (use logical dimensions, context is already scaled)
   const renderConfig = createRenderConfig(width, height, config, settings.padding, maxLineCount);
 
   // Generate and write frames

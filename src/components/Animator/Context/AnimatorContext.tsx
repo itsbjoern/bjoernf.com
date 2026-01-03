@@ -17,6 +17,8 @@ import {
   saveConfig,
   loadSession,
   saveSession,
+  type SessionStorage,
+  type HistoryStorage,
 } from "../util";
 import type { EnhancedDiffOperation } from "../diffEngine";
 
@@ -26,8 +28,7 @@ type AnimatorState = {
   // Snippet management
   snippets: CodeSnippet[];
   language: string;
-  history: CodeSnippet[];
-  maxHistory: number;
+  history: HistoryStorage;
 
   // Animation state
   config: AnimationConfig;
@@ -54,18 +55,16 @@ type AnimatorActions = {
   setLanguage: (language: string) => void;
 
   // History management
-  loadFromHistory: (snippetId: string, which: "before" | "after") => void;
-  deleteFromHistory: (snippetId: string) => void;
+  loadFromHistory: (sessionId: string) => void;
+  deleteFromHistory: (sessionId: string) => void;
   clearHistory: () => void;
-  addToHistory: (snippet: CodeSnippet) => void;
+  addToHistory: (session: SessionStorage) => void;
   saveSessionToHistory: () => void;
 
   updateConfig: (config: Partial<AnimationConfig>) => void;
 
   play: () => void;
   pause: () => void;
-  reset: () => void;
-  seek: (time: number) => void;
 
   setActiveView: (view: "editor" | "preview" | "settings" | "export") => void;
 
@@ -74,13 +73,13 @@ type AnimatorActions = {
 };
 
 const DEFAULT_CONFIG: AnimationConfig = {
-  duration: 2500,
-  fps: 60,
+  staticDuration: 900,
+  transitionDuration: 1800,
   easing: "ease-in-out",
   theme: "github-dark",
   backgroundColor: "#1d2025",
   fontSize: 16,
-  lineHeight: 1.5,
+  lineHeight: 1.4,
   showLineNumbers: true,
 };
 
@@ -92,8 +91,7 @@ export const AnimatorProvider = ({ children }: { children: ReactNode }) => {
     { id: generateId(), code: "", language: "javascript", timestamp: Date.now() },
   ]);
   const [language, setLanguageState] = useState<string>("javascript");
-  const [history, setHistory] = useState<CodeSnippet[]>([]);
-  const [maxHistory] = useState(10);
+  const [history, setHistory] = useState<HistoryStorage>({ sessions: [] });
   const [config, setConfigState] = useState<AnimationConfig>(DEFAULT_CONFIG);
   const [isPlaying, setIsPlaying] = useState(false);
   const [currentTime, setCurrentTime] = useState(0);
@@ -105,7 +103,7 @@ export const AnimatorProvider = ({ children }: { children: ReactNode }) => {
   useEffect(() => {
     const savedHistory = loadHistory();
     if (savedHistory) {
-      setHistory(savedHistory.snippets.slice(0, savedHistory.maxHistory));
+      setHistory({ sessions: savedHistory.sessions.slice(0, 10) });
     }
 
     const savedConfig = loadConfig();
@@ -123,9 +121,11 @@ export const AnimatorProvider = ({ children }: { children: ReactNode }) => {
   // Save session whenever snippets or language change
   useEffect(() => {
     saveSession({
+      id: generateId(),
       snippets,
       language,
       timestamp: Date.now(),
+      metadata: { name: "autosave" },
     });
   }, [snippets, language]);
 
@@ -186,14 +186,14 @@ export const AnimatorProvider = ({ children }: { children: ReactNode }) => {
   }, []);
 
   const addToHistory = useCallback(
-    (snippet: CodeSnippet) => {
+    (session: SessionStorage) => {
       setHistory((prev) => {
-        const newHistory = [snippet, ...prev].slice(0, maxHistory);
-        saveHistory({ snippets: newHistory, maxHistory });
-        return newHistory;
+        const newHistory = [...prev.sessions, session].slice(-10); // Keep only latest 10
+        saveHistory({ sessions: newHistory });
+        return { sessions: newHistory };
       });
     },
-    [maxHistory]
+    []
   );
 
   const saveSessionToHistory = useCallback(() => {
@@ -202,31 +202,23 @@ export const AnimatorProvider = ({ children }: { children: ReactNode }) => {
     const name = prompt("Enter a name for this animation session:");
     if (!name) return;
 
-    // Create a single snippet representing the entire session
-    const sessionSnippet: CodeSnippet = {
+    const session: SessionStorage = {
       id: generateId(),
-      code: snippets.map((s, i) => `// Stage ${i + 1}\n${s.code}`).join("\n\n"),
+      snippets,
       language,
       timestamp: Date.now(),
-      metadata: { name, description: `${snippets.length} stages` },
+      metadata: { name }
     };
 
-    addToHistory(sessionSnippet);
+    addToHistory(session);
   }, [snippets, language]);
 
   const loadFromHistory = useCallback(
-    (snippetId: string, which: "before" | "after") => {
-      const snippet = history.find((s) => s.id === snippetId);
-      if (snippet) {
-        // Legacy support - convert to new format
-        setSnippets((prev) => {
-          const newSnippets = [...prev];
-          const index = which === "before" ? 0 : 1;
-          if (newSnippets[index]) {
-            newSnippets[index] = snippet;
-          }
-          return newSnippets;
-        });
+    (sessionId: string) => {
+      const session = history.sessions.find((s) => s.id === sessionId);
+      if (session) {
+        setSnippets(session.snippets);
+        setLanguageState(session.language);
       }
     },
     [history]
@@ -234,15 +226,15 @@ export const AnimatorProvider = ({ children }: { children: ReactNode }) => {
 
   const deleteFromHistory = useCallback((snippetId: string) => {
     setHistory((prev) => {
-      const newHistory = prev.filter((s) => s.id !== snippetId);
-      saveHistory({ snippets: newHistory, maxHistory: 10 });
-      return newHistory;
+      const newHistory = prev.sessions.filter((s) => s.id !== snippetId);
+      saveHistory({ sessions: newHistory });
+      return { sessions: newHistory };
     });
   }, []);
 
   const clearHistory = useCallback(() => {
-    setHistory([]);
-    saveHistory({ snippets: [], maxHistory: 10 });
+    setHistory({ sessions: [] });
+    saveHistory({ sessions: [] });
   }, []);
 
   const updateConfig = useCallback((newConfig: Partial<AnimationConfig>) => {
@@ -257,21 +249,11 @@ export const AnimatorProvider = ({ children }: { children: ReactNode }) => {
     setIsPlaying(false);
   }, []);
 
-  const reset = useCallback(() => {
-    setCurrentTime(0);
-    setIsPlaying(false);
-  }, []);
-
-  const seek = useCallback((time: number) => {
-    setCurrentTime(Math.max(0, Math.min(time, config.duration)));
-  }, [config.duration]);
-
   const value = {
     // State
     snippets,
     language,
     history,
-    maxHistory,
     config,
     isPlaying,
     currentTime,
@@ -293,8 +275,6 @@ export const AnimatorProvider = ({ children }: { children: ReactNode }) => {
     updateConfig,
     play,
     pause,
-    reset,
-    seek,
     setActiveView,
     setDiffResult,
     setHighlighter,

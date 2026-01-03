@@ -3,15 +3,11 @@ export type CodeSnippet = {
   code: string;
   language: string;
   timestamp: number;
-  metadata?: {
-    name?: string;
-    description?: string;
-  };
 };
 
 export type AnimationConfig = {
-  duration: number; // ms
-  fps: number;
+  staticDuration: number; // ms - time each screen displays
+  transitionDuration: number; // ms - time for transition between screens
   easing: "linear" | "ease-in" | "ease-out" | "ease-in-out";
   theme: string; // Shiki theme
   backgroundColor: string;
@@ -20,15 +16,16 @@ export type AnimationConfig = {
   showLineNumbers: boolean; // Show line numbers in gutter
 };
 
-export type HistoryStorage = {
-  snippets: CodeSnippet[];
-  maxHistory: number;
-};
-
 export type SessionStorage = {
+  id: string;
   snippets: CodeSnippet[];
   language: string;
   timestamp: number;
+  metadata: { name: string }
+};
+
+export type HistoryStorage = {
+  sessions: SessionStorage[];
 };
 
 const HISTORY_KEY = "code-animator-history";

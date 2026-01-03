@@ -83,7 +83,7 @@ export const Editor = ({ index, className = "" }: EditorProps) => {
     <div className={`flex flex-col ${className}`}>
       {/* Header */}
       <div className="flex justify-between items-center mb-2">
-        <h3 className="font-semibold text-lg">Stage {index + 1}</h3>
+        <h3 className="font-semibold text-lg">Snippet {index + 1}</h3>
         <div className="flex gap-2">
           <button
             onClick={() => moveSnippetUp(index)}
@@ -105,7 +105,7 @@ export const Editor = ({ index, className = "" }: EditorProps) => {
             onClick={() => removeSnippet(index)}
             disabled={!canDelete}
             className="px-3 py-1 border border-red-300 text-red-600 rounded text-sm hover:bg-red-50 disabled:opacity-40 disabled:cursor-not-allowed"
-            title="Remove Stage"
+            title="Remove Snippet"
           >
             ✕
           </button>
@@ -142,7 +142,7 @@ export const Editor = ({ index, className = "" }: EditorProps) => {
               value={code}
               onChange={handleCodeChange}
               className="w-full h-[400px] p-3 font-mono text-sm leading-6 bg-transparent text-white resize-none outline-none"
-              placeholder={`Enter code for stage ${index + 1}...`}
+              placeholder={`Enter code for snippet ${index + 1}...`}
               spellCheck={false}
               style={{
                 color: highlightedHtml ? "transparent" : "#fff",

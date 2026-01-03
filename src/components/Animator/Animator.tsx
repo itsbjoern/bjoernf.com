@@ -33,7 +33,7 @@ export const Animator = () => {
             <div>
               <h1 className="text-3xl font-bold mb-2">Code Animator</h1>
               <p className="text-gray-600">
-                Create smooth animations between multiple code stages with syntax highlighting
+                Create smooth animations between multiple code snippets with syntax highlighting
               </p>
             </div>
           </div>
@@ -92,7 +92,7 @@ export const Animator = () => {
                     value={language}
                     onChange={(e) => setLanguage(e.target.value)}
                     className="px-3 py-2 border border-gray-300 rounded bg-white text-sm"
-                    title="Language (applies to all stages)"
+                    title="Language (applies to all snippets)"
                   >
                     {SUPPORTED_LANGUAGES.map((lang) => (
                       <option key={lang.value} value={lang.value}>
@@ -112,7 +112,7 @@ export const Animator = () => {
                   onClick={addSnippet}
                   className="px-4 py-2 bg-primary text-white rounded hover:opacity-80"
                 >
-                  + Add Stage
+                  + Add Snippet
                 </button>
                 <button
                   onClick={saveSessionToHistory}
@@ -120,6 +120,12 @@ export const Animator = () => {
                 >
                   Save to History
                 </button>
+              </div>
+
+
+              {/* History Browser */}
+              <div className="mt-12">
+                <HistoryBrowser />
               </div>
             </>
           )}
@@ -129,11 +135,6 @@ export const Animator = () => {
           {activeView === "settings" && <Settings />}
 
           {activeView === "export" && <ExportPanel />}
-        </div>
-
-        {/* History Browser */}
-        <div className="mt-12">
-          <HistoryBrowser />
         </div>
       </div>
 

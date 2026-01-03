@@ -359,17 +359,3 @@ export const computeFrameStates = (
 
   return frames;
 };
-
-export const getTotalFrames = (config: AnimationConfig): number => {
-  return Math.ceil((config.duration / 1000) * config.fps);
-};
-
-export const getFrameAtTime = (time: number, config: AnimationConfig): number => {
-  const progress = time / config.duration;
-  return Math.floor(progress * getTotalFrames(config));
-};
-
-export const getTimeAtFrame = (frame: number, config: AnimationConfig): number => {
-  const totalFrames = getTotalFrames(config);
-  return (frame / totalFrames) * config.duration;
-};

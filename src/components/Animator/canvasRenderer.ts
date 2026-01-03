@@ -137,8 +137,8 @@ export const renderFrameToCanvas = (
 
     // Render merged background groups
     ctx.filter = "none";
-    const pxWidthPad = 4;
-    const pxHeightPad = 1;
+    const pxWidthPad = 2;
+    const pxHeightPad = 0;
     const bgHeight = fontSize * lineHeight;
 
     for (const group of backgroundGroups) {
