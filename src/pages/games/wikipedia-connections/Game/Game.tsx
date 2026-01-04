@@ -27,11 +27,10 @@ const SubmitButton = ({
 }: SubmitButtonProps) => {
   return (
     <button
-      className={`p-2 bg-green-500 text-white rounded-lg shadow-md  ${
-        hasWon || !canSubmit
+      className={`p-2 bg-green-500 text-white rounded-lg shadow-md  ${hasWon || !canSubmit
           ? "opacity-50"
           : "hover:bg-green-600 transition-colors duration-200 cursor-pointer"
-      }`}
+        }`}
       onClick={handleSubmit}
       disabled={!canSubmit || hasWon}
     >
@@ -291,14 +290,13 @@ export const Game = ({
         <>
           <div className="flex flex-col bg-white p-4 gap-4 md:gap-2 rounded-lg">
             {rows.map((links, rowIndex) => (
-              <>
+              <div key={rowIndex} className="w-full">
                 <div
                   className="flex gap-1 md:gap-4 flex-col md:flex-row"
-                  key={rowIndex}
                 >
                   {!hasWon &&
-                  correctGuesses[rowIndex] !== undefined &&
-                  correctGuesses[rowIndex] !== null ? (
+                    correctGuesses[rowIndex] !== undefined &&
+                    correctGuesses[rowIndex] !== null ? (
                     <div
                       className={`relative p-2 flex flex-1 items-center justify-center text-center rounded-lg transition-all duration-200 bg-green-400`}
                     >
@@ -319,25 +317,24 @@ export const Game = ({
                         (choice) =>
                           choice[rowIndex] === colIndex &&
                           rows[rowIndex][choice[rowIndex]].index !==
-                            lastItem?.index,
+                          lastItem?.index,
                       );
 
                       return (
                         <div
                           key={colIndex}
-                          className={`p-2 flex flex-1 items-center justify-center text-center rounded-lg cursor-pointer transition-colors duration-200 relative ${
-                            correctGuesses[rowIndex] === colIndex &&
-                            !showWinScreen
+                          className={`p-2 flex flex-1 items-center justify-center text-center rounded-lg cursor-pointer transition-colors duration-200 relative ${correctGuesses[rowIndex] === colIndex &&
+                              !showWinScreen
                               ? "bg-green-400"
                               : hasWon && !showWinScreen
-                              ? colorMap[link.index as keyof typeof colorMap]
-                              : incorrectGuess && !showWinScreen
-                              ? "bg-red-300"
-                              : highlighted[rowIndex] === colIndex &&
-                                !showWinScreen
-                              ? "bg-blue-200"
-                              : "bg-gray-200 hover:bg-gray-300"
-                          }`}
+                                ? colorMap[link.index as keyof typeof colorMap]
+                                : incorrectGuess && !showWinScreen
+                                  ? "bg-red-300"
+                                  : highlighted[rowIndex] === colIndex &&
+                                    !showWinScreen
+                                    ? "bg-blue-200"
+                                    : "bg-gray-200 hover:bg-gray-300"
+                            }`}
                           onClick={() => handleLinkClick(rowIndex, colIndex)}
                         >
                           <b>{link.title}</b>
@@ -373,7 +370,7 @@ export const Game = ({
                     </svg>
                   </div>
                 ) : null}
-              </>
+              </div>
             ))}
           </div>
           <div className="p-3 gap-4 items-center bg-blue-500 text-white rounded-lg relative flex">

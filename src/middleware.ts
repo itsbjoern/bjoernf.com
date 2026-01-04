@@ -8,7 +8,7 @@ export const onRequest = defineMiddleware(async (context, next) => {
     "default-src 'self'",
     "script-src 'self' 'unsafe-inline' 'unsafe-eval' https://unpkg.com https://a.bjoernf.com",
     "style-src 'self' 'unsafe-inline'",
-    "img-src 'self' data: blob:",
+    "img-src 'self' data: blob: https://upload.wikimedia.org",
     "font-src 'self' data:",
     "connect-src 'self' https://unpkg.com https://a.bjoernf.com",
     "worker-src 'self' blob:",

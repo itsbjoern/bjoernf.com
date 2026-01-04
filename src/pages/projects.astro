@@ -2,6 +2,9 @@
 import Divider from "@/components/Divider.astro";
 import Ref from "@/components/Ref/Ref.astro";
 import Layout from "@/layouts/Layout.astro";
+import { Image } from "astro:assets"
+
+import CodeAnimatorGif from "@/images/code-animation.gif";
 ---
 
 <Layout title="Projects">
@@ -45,25 +48,15 @@ import Layout from "@/layouts/Layout.astro";
         </span>
       </div>
       <div class="">
-        <b>Big Brain Sudokus</b>
-         –
-        <Ref
-          text="On the App Store"
-          href="https://apps.apple.com/gb/app/big-brain-sudokus/id1521326123"
-        />
-        <span>
-          A Sudoku application written in React Native and managed via
-          <Ref text="Expo" href="https://expo.dev/" />. The free and shareable
-          Sudokus are available in 9 difficulties.
-        </span>
-      </div>
-      <div class="">
         <b>This website</b>
          –
         <Ref text="On GitHub" href="https://github.com/itsbjoern/bjoernf.com" />
         <span>
-          A custom built website using Astro. Includes server side rendering and
-          a a ProseMirror powered WYSIWYG editor.
+          Astro website including multiple fun components such as the{" "}
+          <Ref
+            text="Code Animator"
+            href="/fun/code-animator"
+          /> for creating code snippet animations.
         </span>
       </div>
       <div class="">
@@ -89,6 +82,45 @@ import Layout from "@/layouts/Layout.astro";
         </span>
       </div>
     </div>
+    <Divider />
+    <span>
+      <h2 class="text-2xl font-bold">Fun</h2>
+    </span>
+    <div class="flex flex-col gap-7">
+      <div class="">
+        <b>Code animation tool</b>
+        –
+        <Ref text="Code animator" href="/fun/code-animator" />
+        –
+        <span>
+          A tool to create animated code snippets for blog posts and
+          presentations. Write multiple code snippets and the tool will create
+          a smooth transition animation between them.
+        </span>
+         <Image src={CodeAnimatorGif} alt="Code Animator Preview" class="w-full mt-2 p-2   rounded border border-gray-300"/>
+      </div>
+      <div class="">
+        <b>Virtual bookshelf</b>
+        –
+        <Ref text="My bookshelf" href="/fun/bookshelf" />
+        –
+        <span>
+          A 3D rendered virtual bookshelf to showcase my physical book
+          collection. Built with <Ref text="Three.js" href="https://threejs.org/" />. I wrote an article about how this works in <Ref text="this blog post" href="/blog/virtual-bookshelf" />.
+        </span>
+      </div>
+      <div class="">
+        <b>Wikipedia daily game</b>
+        –
+        <Ref text="Play now" href="/games/wikipedia-connections" />
+        –
+        <span>
+          A game that challenges you to connect two random Wikipedia articles by
+          navigating through links.
+        </span>
+      </div>
+    </div>
+
     <Divider />
     <span>
       <h2 class="text-2xl font-bold">Research</h2>
