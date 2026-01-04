@@ -3,6 +3,7 @@
 type TemplateProps = {
   title: string;
   url: string;
+  summary?: string;
   tags: string[];
 };
 
@@ -10,25 +11,29 @@ const template = ({
   title,
   url,
   tags,
+  summary,
   type,
 }: TemplateProps & {
   type: string;
 }) => {
-  let add = "";
+  let add = "\n";
   if (tags?.length) {
+    add += ""
     if (tags.length === 1) {
-      add = ` about ${tags[0]}`;
+      add += `[${tags[0]}]`;
     } else {
       const copy = [...tags];
       const last = copy.splice(tags.length - 2, 1);
-      add = " about " + copy.join(", ") + " and " + last;
+      add += `[${copy.join(", ") + " and " + last}]`;
     }
+    add += " by Björn Friedrichs"
   }
 
-  return `You should read this${add}:
-${title}
+  return `${title}
+${summary}
 
-${url}?source=${type}`;
+${url}
+${add}`;
 };
 
 const objectToGetParams = (object: Record<string, string | undefined>) => {
@@ -43,9 +48,10 @@ const objectToGetParams = (object: Record<string, string | undefined>) => {
 };
 
 export const linkedinLink = (input: TemplateProps) => {
+  const templated = template({ type: "linkedin", ...input });
   return (
-    "https://www.linkedin.com/sharing/share-offsite/?url=" +
-    encodeURIComponent(input.url)
+    "https://www.linkedin.com/feed/?shareActive=true&text=" +
+    encodeURIComponent(templated)
   );
 };
 
@@ -69,13 +75,11 @@ export const whatsappLink = (input: TemplateProps, mobile: boolean) => {
 };
 
 export const xComLink = (input: TemplateProps) => {
-  // const _body = template({ type: 'x.com', ...input });
+  const templated = template({ type: 'x.com', ...input });
   return (
     "https://x.com/share" +
     objectToGetParams({
-      url: input.url + "?source=x.com",
-      text: input.title,
-      hashtags: input.tags?.length > 0 ? input.tags.join(",") : undefined,
+      text: templated,
       related: undefined,
     })
   );

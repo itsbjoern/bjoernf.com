@@ -45,22 +45,22 @@ const url = Astro.url.toString();
         <ShareIcon
           size={45}
           icon={EmailIcon}
-          href={emailLink({ title, url, tags })}
+          href={emailLink({ title, url, tags, summary })}
         />
         <ShareIcon
           size={45}
           icon={LinkedinIcon}
-          href={linkedinLink({ title, url, tags })}
+          href={linkedinLink({ title, url, tags, summary })}
         />
         <ShareIcon
           size={45}
           icon={WhatsappIcon}
-          href={whatsappLink({ title, url, tags }, true)}
+          href={whatsappLink({ title, url, tags, summary }, true)}
         />
         <ShareIcon
           size={45}
           icon={XComIcon}
-          href={xComLink({ title, url, tags })}
+          href={xComLink({ title, url, tags, summary })}
         />
       </div>
     </div>
