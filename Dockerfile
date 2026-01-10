@@ -4,16 +4,20 @@ WORKDIR /app
 FROM base AS install
 RUN mkdir -p /temp/dev
 COPY package.json bun.lockb /temp/dev/
+COPY patches /temp/dev/patches
 RUN cd /temp/dev && bun install --frozen-lockfile
 
 # install with --production (exclude devDependencies)
 RUN mkdir -p /temp/prod
 COPY package.json bun.lockb /temp/prod/
+COPY patches /temp/prod/patches
 RUN cd /temp/prod && bun install --frozen-lockfile --production
 
 # copy node_modules from temp directory
 # then copy all (non-ignored) project files into the image
 FROM base AS prerelease
+RUN apt-get update && apt-get install -y libfontconfig1
+
 COPY --from=install /temp/dev/node_modules node_modules
 COPY . .
 
@@ -23,14 +27,12 @@ RUN bun run build
 
 # copy production dependencies and source code into final image
 FROM base AS release
+
 COPY --from=install /temp/prod/node_modules node_modules
-COPY --from=prerelease /app/dist/server .
+COPY --from=prerelease /app/dist/server ./dist/server
 
 # run the app
 USER bun
 
-ENV HOST=0.0.0.0
-ENV PORT=4321
-
 EXPOSE 4321/tcp
-CMD ["bun", "--bun", "./app/entry.mjs"]
+CMD ["bun", "--bun", "./dist/server/entry.mjs"]
