@@ -33,4 +33,4 @@ ENV HOST=0.0.0.0
 ENV PORT=4321
 
 EXPOSE 4321/tcp
-CMD ["bun", "--bun", "./dist/server/entry.mjs"]
+CMD ["bun", "--bun", "./app/entry.mjs"]

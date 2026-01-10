@@ -41,5 +41,8 @@
     "bun-types": "^1.0.7",
     "prettier": "^3.0.3",
     "prettier-plugin-astro": "^0.12.0"
+  },
+  "patchedDependencies": {
+    "astro@5.16.8": "patches/astro@5.16.8.patch"
   }
 }

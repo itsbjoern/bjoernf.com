@@ -3,6 +3,7 @@ import { getCollection } from "astro:content";
 import fs from "node:fs";
 import { createImage } from "@/utils/createImage";
 
+export const prerender = true;
 export const getStaticPaths = async () => {
   const posts = await getCollection("blog");
 
@@ -12,15 +13,16 @@ export const getStaticPaths = async () => {
   }));
 };
 
-export const GET: APIRoute = async ({ props, url }) => {
-  let buffer = null;
+export const GET: APIRoute = async ({ props, url, }) => {
+  let buffer: Buffer | null = null;
   if (props.post.data.image) {
     try {
       const imageUrl = props.post.data.image.src
         .replace("/@fs", "")
-        .replace("/static", "dist/static")
+        .replace("/static", "dist/client/static")
         .split("?")[0];
-      const imageData = fs.readFileSync(imageUrl);
+
+      const imageData = await fs.promises.readFile(imageUrl);
       buffer = imageData;
     } catch (err) {
       console.log(err);
@@ -39,7 +41,7 @@ export const GET: APIRoute = async ({ props, url }) => {
           month: "long",
           day: "numeric",
         }),
-    }),
+    }) as BodyInit,
     {
       headers: {
         "content-type": "image/png",

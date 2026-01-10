@@ -53,8 +53,8 @@ const { input } = Astro.props;
 <script>
   import * as THREE from "three";
   import { OrbitControls } from "three/examples/jsm/controls/OrbitControls";
-  import { createBookGeometry } from "./book";
-  import { createRectangleWithRoundedEdges } from "./helpers";
+  import { createBookGeometry } from "./_book";
+  import { createRectangleWithRoundedEdges } from "./_helpers";
 
   const showEditControls = window.location.search.includes("edit");
   const editControls = document.getElementById("editControls")!;

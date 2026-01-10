@@ -1,4 +1,4 @@
-import { defineConfig } from 'astro/config';
+import { defineConfig } from "astro/config";
 
 import tailwind from "@astrojs/tailwind";
 import mdx from "@astrojs/mdx";
@@ -11,7 +11,7 @@ import node from "@astrojs/node";
 // https://astro.build/config
 export default defineConfig({
   integrations: [tailwind(), mdx(), sitemap(), react()],
-  site: 'https://bjoernf.com',
+  site: "https://bjoernf.com",
   output: "static",
 
   build: {
@@ -19,16 +19,28 @@ export default defineConfig({
   },
 
   vite: {
-    "assetsInclude": ["**/*.xml"],
+    assetsInclude: ["**/*.xml"],
     optimizeDeps: {
-      exclude: ['@ffmpeg/ffmpeg', '@ffmpeg/util']
+      exclude: ["@ffmpeg/ffmpeg", "@ffmpeg/util"],
     },
     worker: {
-      format: 'es'
-    }
+      format: "es",
+    },
+  },
+
+  experimental: {
+    csp: {
+      scriptDirective: {
+        resources: ["https://unpkg.com", "https://a.bjoernf.com"],
+      },
+      directives: [
+        "connect-src 'self' https://unpkg.com https://a.bjoernf.com",
+        "img-src 'self' data: blob: https://upload.wikimedia.org",
+      ],
+    },
   },
 
   adapter: node({
-    mode: "standalone"
-  })
+    mode: "standalone",
+  }),
 });

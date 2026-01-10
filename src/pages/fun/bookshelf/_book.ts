@@ -1,5 +1,5 @@
 import * as THREE from "three";
-import { createRectangleWithRoundedEdges } from "./helpers";
+import { createRectangleWithRoundedEdges } from "./_helpers";
 
 const colors = [
   "141204",

@@ -33,7 +33,7 @@ export const exportGIF = async (
       quality: 11 - settings.quality,
       width: width * scale,
       height: height * scale,
-      workerScript: "/gif.worker.js",
+      workerScript: "scripts/gif.worker.js",
     });
 
     const tempCanvas = document.createElement("canvas");
