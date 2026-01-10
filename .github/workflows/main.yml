@@ -25,7 +25,7 @@ jobs:
           aws-region: eu-west-2
 
       - name: Sync to S3
-        working-directory: dist
+        working-directory: dist/client
         run: aws s3 sync . s3://bjoernf.com --exclude='dynamic/*' --delete
 
       - name: Invalidate cache from CF
