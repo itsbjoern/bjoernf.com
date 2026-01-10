@@ -6,10 +6,6 @@ services:
       - "4321:4321"
     # depends_on:
     # - db
-    labels:
-      - traefik.enable=true
-      - "traefik.http.routers.bjoernf-api.rule=Host(`api.bjoernf.com`) && PathPrefix(`/`)"
-      - traefik.http.routers.bjoernf-api.entryPoints=http
     restart: unless-stopped
 
   # db:
