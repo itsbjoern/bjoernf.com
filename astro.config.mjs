@@ -16,6 +16,8 @@ export default defineConfig({
 
   build: {
     assets: "static",
+    client: "client",
+    server: "server",
   },
 
   vite: {

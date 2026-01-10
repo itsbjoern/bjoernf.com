@@ -19,7 +19,10 @@ export const GET: APIRoute = async ({ props, url, }) => {
     try {
       const imageUrl = props.post.data.image.src
         .replace("/@fs", "")
-        .replace("/static", "dist/client/static")
+        // bit weird but this is an ordering issue
+        // at prebuild time the static folder is not yet in the client but instead in the server dist folder
+        // Only after the server build is it moved to the client folder
+        .replace("/static", "dist/server/static")
         .split("?")[0];
 
       const imageData = await fs.promises.readFile(imageUrl);
