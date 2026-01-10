@@ -6,8 +6,8 @@ index 9474ee2b798e46ce74b13cbad2ce796e9d7882d2..d3d80bace090df8ad743aee7b2d62db5
      settings.timer.end("Static generate");
    } else if (settings.buildOutput === "server") {
      settings.timer.start("Server generate");
-+    await ssrMoveAssets(opts);
      await generatePages(opts, internals);
++    await ssrMoveAssets(opts);
      await cleanStaticOutput(opts, internals);
 -    await ssrMoveAssets(opts);
      settings.timer.end("Server generate");
