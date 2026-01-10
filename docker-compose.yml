@@ -3,7 +3,7 @@ services:
     image: bjoernf.com/api:latest
     build: .
     ports:
-      - "4321:80"
+      - "80:4321"
     depends_on:
       - db
     labels:
