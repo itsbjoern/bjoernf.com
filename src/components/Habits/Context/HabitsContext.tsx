@@ -192,6 +192,7 @@ export const HabitsProvider = ({ children }: { children: ReactNode }) => {
     try {
       await fetch(API_HABITS_URL + '/logout', {
         method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
         credentials: 'include',
       });
 
