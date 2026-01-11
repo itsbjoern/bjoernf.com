@@ -6,12 +6,16 @@ export const SettingsScreen = () => {
   const {
     color,
     updateColor,
+    isPublic,
+    updateIsPublic,
+    trackerId,
     setCurrentView,
     inactiveHabits,
     fetchInactiveHabits,
     restoreHabit,
     deleteHabit,
   } = useHabits();
+  const [copied, setCopied] = useState(false);
 
   useEffect(() => {
     fetchInactiveHabits();
@@ -35,11 +39,77 @@ export const SettingsScreen = () => {
     }
   };
 
+  const handleTogglePublic = async () => {
+    try {
+      await updateIsPublic(!isPublic);
+    } catch (error) {
+      console.error('Error toggling public setting:', error);
+    }
+  };
+
+  const copyEmbedLink = () => {
+    const embedUrl = `${window.location.origin}/fun/habits/embed?tracker=${trackerId}`;
+    navigator.clipboard.writeText(embedUrl);
+    setCopied(true);
+    setTimeout(() => setCopied(false), 2000);
+  };
+
   return (
     <div className="w-full">
       <div className="bg-white dark:bg-black rounded-lg border border-gray-200 dark:border-gray-800 shadow-sm p-6 mb-6">
         <h2 className="text-lg font-semibold text-gray-900 dark:text-gray-100 mb-4">Settings</h2>
-        <ColorPicker selectedColor={color} setSelectedColor={updateColor} />
+
+        <div className="mb-6">
+          <h3 className="text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">Color</h3>
+          <ColorPicker selectedColor={color} setSelectedColor={updateColor} />
+        </div>
+
+        <div className="border-t border-gray-200 dark:border-gray-700 pt-6">
+          <h3 className="text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">Public Sharing</h3>
+          <p className="text-xs text-gray-600 dark:text-gray-400 mb-3">
+            Make your tracker public to embed it on your website. Only completion counts will be visible, not habit names.
+          </p>
+
+          <div className="flex items-center gap-3 mb-3">
+            <button
+              onClick={handleTogglePublic}
+              className={`relative inline-flex h-6 w-11 items-center rounded-full transition-colors ${isPublic ? 'bg-green-600' : 'bg-gray-300 dark:bg-gray-600'
+                }`}
+            >
+              <span
+                className={`inline-block h-4 w-4 transform rounded-full bg-white transition-transform ${isPublic ? 'translate-x-6' : 'translate-x-1'
+                  }`}
+              />
+            </button>
+            <span className="text-sm text-gray-700 dark:text-gray-300">
+              {isPublic ? 'Public' : 'Private'}
+            </span>
+          </div>
+
+          {isPublic && trackerId && (
+            <div className="mt-4 p-3 bg-gray-50 dark:bg-gray-900 rounded-md">
+              <p className="text-xs text-gray-600 dark:text-gray-400 mb-2">Embeddable URL:</p>
+              <div className="flex gap-2">
+                <input
+                  type="text"
+                  readOnly
+                  value={`${window.location.origin}/fun/habits/embed?tracker=${trackerId}`}
+                  className="flex-1 px-3 py-2 text-sm bg-white dark:bg-black border border-gray-300 dark:border-gray-700 rounded-md text-gray-900 dark:text-gray-100 font-mono"
+                  onClick={(e) => e.currentTarget.select()}
+                />
+                <button
+                  onClick={copyEmbedLink}
+                  className="px-4 py-2 bg-gray-900 dark:bg-gray-100 text-white dark:text-gray-900 text-sm rounded-md hover:bg-gray-800 dark:hover:bg-gray-200 transition-colors"
+                >
+                  {copied ? 'Copied!' : 'Copy'}
+                </button>
+              </div>
+              <p className="text-xs text-gray-600 dark:text-gray-400 mt-2">
+                Use this URL in an iframe to embed your tracker on your website.
+              </p>
+            </div>
+          )}
+        </div>
       </div>
 
       {inactiveHabits.length > 0 && (

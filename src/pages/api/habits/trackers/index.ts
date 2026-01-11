@@ -87,6 +87,7 @@ export const POST: APIRoute = async ({ request, cookies }) => {
       JSON.stringify({
         trackerId: newTracker.id,
         color: newTracker.color,
+        isPublic: newTracker.isPublic,
       }),
       {
         status: 201,

@@ -5,6 +5,7 @@ export const trackers = sqliteTable('trackers', {
   id: text('id').primaryKey().$defaultFn(() => crypto.randomUUID()),
   passwordHash: text('password_hash').notNull().unique(),
   color: text('color').notNull().default('#216e39'),
+  isPublic: integer('is_public', { mode: 'boolean' }).notNull().default(false),
   createdAt: integer('created_at', { mode: 'timestamp' }).notNull().$defaultFn(() => new Date()),
 });
 

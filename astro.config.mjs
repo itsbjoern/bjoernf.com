@@ -31,21 +31,6 @@ export default defineConfig({
     },
   },
 
-  experimental: {
-    csp: {
-      scriptDirective: {
-        resources: ["'self'", "https://unpkg.com", "https://a.bjoernf.com"],
-      },
-      styleDirective: {
-        resources: ["'self'", "'unsafe-inline'"],
-      },
-      directives: [
-        "connect-src 'self' https://unpkg.com https://a.bjoernf.com https://api.bjoernf.com",
-        "img-src 'self' data: blob: https://upload.wikimedia.org",
-      ],
-    },
-  },
-
   adapter: node({
     mode: "standalone",
   }),

@@ -32,6 +32,7 @@ export const GET: APIRoute = async ({ cookies }) => {
       JSON.stringify({
         trackerId: tracker.id,
         color: tracker.color,
+        isPublic: tracker.isPublic,
       }),
       {
         status: 200,

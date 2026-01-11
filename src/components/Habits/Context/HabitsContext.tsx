@@ -27,6 +27,7 @@ type HabitsState = {
   isAuthenticated: boolean;
   trackerId: string | null;
   color: string;
+  isPublic: boolean;
 
   // Habit state
   habits: Habit[];
@@ -61,6 +62,7 @@ type HabitsActions = {
 
   // Settings actions
   updateColor: (color: string) => Promise<void>;
+  updateIsPublic: (isPublic: boolean) => Promise<void>;
 
   // UI actions
   setCurrentView: Dispatch<SetStateAction<'auth' | 'tracker' | 'settings'>>;
@@ -76,6 +78,7 @@ export const HabitsProvider = ({ children }: { children: ReactNode }) => {
   const [isAuthenticated, setIsAuthenticated] = useState(false);
   const [trackerId, setTrackerId] = useState<string | null>(null);
   const [color, setColor] = useState<string>(DEFAULT_COLOR);
+  const [isPublic, setIsPublic] = useState<boolean>(false);
   const [habits, setHabits] = useState<Habit[]>([]);
   const [inactiveHabits, setInactiveHabits] = useState<Habit[]>([]);
   const [completions, setCompletions] = useState<Map<string, Set<string>>>(new Map());
@@ -109,6 +112,7 @@ export const HabitsProvider = ({ children }: { children: ReactNode }) => {
       setCurrentView('tracker');
       setTrackerId(data.trackerId);
       setColor(data.color);
+      setIsPublic(data.isPublic || false);
 
       // Fetch habits and completions
       await Promise.all([fetchHabits(), fetchCompletions(new Date().getFullYear())]);
@@ -138,6 +142,7 @@ export const HabitsProvider = ({ children }: { children: ReactNode }) => {
         const data = await response.json();
         setTrackerId(data.trackerId);
         setColor(data.color);
+        setIsPublic(data.isPublic || false);
         setIsAuthenticated(true);
         setCurrentView('tracker');
 
@@ -175,6 +180,7 @@ export const HabitsProvider = ({ children }: { children: ReactNode }) => {
         const data = await response.json();
         setTrackerId(data.trackerId);
         setColor(data.color);
+        setIsPublic(data.isPublic || false);
         setIsAuthenticated(true);
         setCurrentView('tracker');
 
@@ -541,11 +547,44 @@ export const HabitsProvider = ({ children }: { children: ReactNode }) => {
     [addToast]
   );
 
+  const updateIsPublic = useCallback(
+    async (isPublic: boolean) => {
+      try {
+        const response = await fetch(API_HABITS_URL + '/trackers/settings', {
+          method: 'PATCH',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({ isPublic }),
+          credentials: 'include',
+        });
+
+        if (!response.ok) {
+          const error = await response.json();
+          throw new Error(error.error || 'Failed to update public setting');
+        }
+
+        setIsPublic(isPublic);
+        addToast({
+          message: isPublic ? 'Tracker is now public' : 'Tracker is now private',
+          color: 'bg-green-600',
+        });
+      } catch (error) {
+        console.error('Error updating public setting:', error);
+        addToast({
+          message: error instanceof Error ? error.message : 'Failed to update public setting',
+          color: 'bg-red-600',
+        });
+        throw error;
+      }
+    },
+    [addToast]
+  );
+
   const value = {
     // State
     isAuthenticated,
     trackerId,
     color,
+    isPublic,
     habits,
     inactiveHabits,
     completions,
@@ -567,6 +606,7 @@ export const HabitsProvider = ({ children }: { children: ReactNode }) => {
     fetchCompletions,
     toggleCompletion,
     updateColor,
+    updateIsPublic,
     setSelectedDate,
     setCurrentView,
   };

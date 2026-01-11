@@ -65,6 +65,7 @@ export const POST: APIRoute = async ({ request, cookies }) => {
         success: true,
         trackerId: tracker.id,
         color: tracker.color,
+        isPublic: tracker.isPublic,
       }),
       {
         status: 200,

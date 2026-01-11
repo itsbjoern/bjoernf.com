@@ -19,20 +19,35 @@ export const PATCH: APIRoute = async ({ request, cookies }) => {
     }
 
     const body = await request.json();
-    const { color } = body;
+    const { color, isPublic } = body;
 
-    // Validate input
-    if (!color) {
-      return new Response(
-        JSON.stringify({ error: 'Color is required', code: 'INVALID_INPUT' }),
-        { status: 400, headers: { 'Content-Type': 'application/json' } }
-      );
+    // Build update object
+    const updates: { color?: string; isPublic?: boolean } = {};
+
+    if (color !== undefined) {
+      // Validate color
+      if (typeof color !== 'string' || color.length !== 7 || !color.startsWith('#')) {
+        return new Response(
+          JSON.stringify({ error: 'Invalid color', code: 'INVALID_COLOR' }),
+          { status: 400, headers: { 'Content-Type': 'application/json' } }
+        );
+      }
+      updates.color = color;
     }
 
-    // Validate color
-    if (color.length !== 7 || !color.startsWith('#')) {
+    if (isPublic !== undefined) {
+      if (typeof isPublic !== 'boolean') {
+        return new Response(
+          JSON.stringify({ error: 'isPublic must be a boolean', code: 'INVALID_INPUT' }),
+          { status: 400, headers: { 'Content-Type': 'application/json' } }
+        );
+      }
+      updates.isPublic = isPublic;
+    }
+
+    if (Object.keys(updates).length === 0) {
       return new Response(
-        JSON.stringify({ error: 'Invalid color', code: 'INVALID_COLOR' }),
+        JSON.stringify({ error: 'No valid updates provided', code: 'INVALID_INPUT' }),
         { status: 400, headers: { 'Content-Type': 'application/json' } }
       );
     }
@@ -40,7 +55,7 @@ export const PATCH: APIRoute = async ({ request, cookies }) => {
     // Update tracker settings
     const [updatedTracker] = await db
       .update(trackers)
-      .set({ color })
+      .set(updates)
       .where(eq(trackers.id, trackerId))
       .returning();
 
@@ -51,10 +66,13 @@ export const PATCH: APIRoute = async ({ request, cookies }) => {
       );
     }
 
-    return new Response(JSON.stringify({ color }), {
-      status: 200,
-      headers: { 'Content-Type': 'application/json' },
-    });
+    return new Response(
+      JSON.stringify({ color: updatedTracker.color, isPublic: updatedTracker.isPublic }),
+      {
+        status: 200,
+        headers: { 'Content-Type': 'application/json' },
+      }
+    );
   } catch (error) {
     console.error('Error updating settings:', error);
     return new Response(
