@@ -2,7 +2,7 @@
 import Divider from "@/components/Divider.astro";
 import Ref from "@/components/Ref/Ref.astro";
 import Layout from "@/layouts/Layout.astro";
-import { Image } from "astro:assets"
+import { Image } from "astro:assets";
 
 import CodeAnimatorGif from "@/images/code-animation.gif";
 ---
@@ -53,10 +53,8 @@ import CodeAnimatorGif from "@/images/code-animation.gif";
         <Ref text="On GitHub" href="https://github.com/itsbjoern/bjoernf.com" />
         <span>
           Astro website including multiple fun components such as the{" "}
-          <Ref
-            text="Code Animator"
-            href="/fun/code-animator"
-          /> for creating code snippet animations.
+          <Ref text="Code Animator" href="/fun/code-animator" /> for creating
+          code snippet animations.
         </span>
       </div>
       <div class="">
@@ -89,31 +87,59 @@ import CodeAnimatorGif from "@/images/code-animation.gif";
     <div class="flex flex-col gap-7">
       <div class="">
         <b>Code animation tool</b>
-        –
+         –
         <Ref text="Code animator" href="/fun/code-animator" />
-        –
+         –
         <span>
           A tool to create animated code snippets for blog posts and
-          presentations. Write multiple code snippets and the tool will create
-          a smooth transition animation between them.
+          presentations. Write multiple code snippets and the tool will create a
+          smooth transition animation between them.
         </span>
-         <Image src={CodeAnimatorGif} alt="Code Animator Preview" class="w-full mt-2 p-2   rounded border border-gray-300"/>
+        <Image
+          src={CodeAnimatorGif}
+          alt="Code Animator Preview"
+          class="w-full mt-2 p-2 rounded border border-gray-300"
+        />
+      </div>
+      <div class="">
+        <b>Habit tracker</b>
+         –
+        <Ref text="Habit tracker" href="/fun/habits" />
+         –
+        <span>
+          Super easy-to-use habit tracker that you can embed anywhere. Just
+          create a tracker, add your habits, and embed it in your website or
+          blog. No tracking of personal data, all data is stored securely and
+          privately.
+        </span>
+        <iframe
+          src={import.meta.env.PROD
+            ? "https://bjoernf.com/fun/habits/embed?tracker=e25a4788-21a5-40db-9af2-6d20d84010a5"
+            : "http://localhost:4321/fun/habits/embed?tracker=5f6d41c6-a2b4-4674-b7dc-29b2bff3d8e8"}
+          width="100%"
+          style="border:none; min-height: 180px;"></iframe>
       </div>
       <div class="">
         <b>Virtual bookshelf</b>
-        –
+         –
         <Ref text="My bookshelf" href="/fun/bookshelf" />
-        –
+         –
         <span>
           A 3D rendered virtual bookshelf to showcase my physical book
-          collection. Built with <Ref text="Three.js" href="https://threejs.org/" />. I wrote an article about how this works in <Ref text="this blog post" href="/blog/virtual-bookshelf" />.
+          collection. Built with <Ref
+            text="Three.js"
+            href="https://threejs.org/"
+          />. I wrote an article about how this works in <Ref
+            text="this blog post"
+            href="/blog/virtual-bookshelf"
+          />.
         </span>
       </div>
       <div class="">
         <b>Wikipedia daily game</b>
-        –
+         –
         <Ref text="Play now" href="/games/wikipedia-connections" />
-        –
+         –
         <span>
           A game that challenges you to connect two random Wikipedia articles by
           navigating through links.

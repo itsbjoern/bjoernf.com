@@ -79,17 +79,21 @@ interface Props {
       <h3 class="text-xl font-bold">My habit progress</h3>
     </span>
     <span>
-      This is a public view of my habit tracker for this year. You can also <Ref
+      This is a public view of my habit tracker for this year, if you're
+      interested in the same you can <Ref
         text="create your own habit tracker"
         href="/fun/habits"
-      />.
+      /> using my website. Just like this one trackers can be embedded into any
+      website, no information will be shared unless you explicitly choose to do
+      so, and even if you do it will only share the count of completions, not
+      what the habit actually is.
     </span>
     <iframe
       src={import.meta.env.PROD
         ? "https://bjoernf.com/fun/habits/embed?tracker=e25a4788-21a5-40db-9af2-6d20d84010a5"
         : "http://localhost:4321/fun/habits/embed?tracker=5f6d41c6-a2b4-4674-b7dc-29b2bff3d8e8"}
       width="100%"
-      style="border:none; min-height: 160px;"></iframe>
+      style="border:none; min-height: 180px;"></iframe>
     <span>
       <Divider />
     </span>
