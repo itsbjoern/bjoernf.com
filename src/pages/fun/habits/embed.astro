@@ -17,7 +17,9 @@ import "./_embed.css";
       const url = new URL(window.location.href);
       const trackerId = url.searchParams.get("tracker");
 
-      const API_URL = `/api/habits/public/${trackerId}`;
+      const API_BASE_URL =
+        (import.meta.env.DEV ? "" : "https://api.bjoernf.com") + "/api";
+      const API_URL = `${API_BASE_URL}/habits/public/${trackerId}`;
 
       async function loadTracker() {
         const container = document.getElementById("tracker")!;
