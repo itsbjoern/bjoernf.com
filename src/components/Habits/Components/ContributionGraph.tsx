@@ -196,7 +196,7 @@ export const ContributionGraph = () => {
                       }
                     }}
                     onMouseLeave={() => setHoveredDay(null)}
-                    className={`w-${squareSize} h-${squareSize} rounded-sm transition-all hover:ring-2 bg-gray-200 dark:bg-gray-800 hover:ring-blue-500/50   ${isSelected ? 'ring-2 ring-blue-600' : isToday ? 'ring-1 ring-blue-600' : ''}`}
+                    className={`w-${squareSize} h-${squareSize} rounded-sm transition-all hover:ring-2 bg-gray-100 dark:bg-gray-900 hover:ring-blue-500/50   ${isSelected ? 'ring-2 ring-blue-600' : isToday ? 'ring-1 ring-blue-600' : ''}`}
                     style={count === 0 ? undefined : { backgroundColor: countColor }}
                     aria-label={`${formatDisplayDate(day)}: ${count} habit${count !== 1 ? 's' : ''}`}
                   />
