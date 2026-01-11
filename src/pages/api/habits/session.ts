@@ -35,7 +35,7 @@ export const GET: APIRoute = async ({ cookies }) => {
     return new Response(
       JSON.stringify({
         trackerId: tracker.id,
-        colorTheme: tracker.colorTheme,
+        color: tracker.color,
       }),
       {
         status: 200,

@@ -3,13 +3,14 @@ import { db } from '@/db/habits';
 import { trackers } from '@/db/habits/schema';
 import { setTrackerSession } from '@/db/habits/session';
 import bcrypt from 'bcryptjs';
+import { DEFAULT_COLOR } from '@/components/Habits/util';
 
 export const prerender = false;
 
 export const POST: APIRoute = async ({ request, cookies }) => {
   try {
     const body = await request.json();
-    const { password, colorTheme = 'github' } = body;
+    const { password, color = DEFAULT_COLOR } = body;
 
     // Validate input
     if (!password || typeof password !== 'string') {
@@ -26,11 +27,10 @@ export const POST: APIRoute = async ({ request, cookies }) => {
       );
     }
 
-    // Validate color theme
-    const validThemes = ['github', 'ocean', 'forest', 'sunset', 'monochrome'];
-    if (!validThemes.includes(colorTheme)) {
+    // Validate color
+    if (color.length !== 7 || !color.startsWith('#')) {
       return new Response(
-        JSON.stringify({ error: 'Invalid color theme', code: 'INVALID_THEME' }),
+        JSON.stringify({ error: 'Invalid color', code: 'INVALID_COLOR' }),
         { status: 400, headers: { 'Content-Type': 'application/json' } }
       );
     }
@@ -38,14 +38,29 @@ export const POST: APIRoute = async ({ request, cookies }) => {
     // Hash password
     const passwordHash = await bcrypt.hash(password, 10);
 
-    // Create tracker
-    const [newTracker] = await db
-      .insert(trackers)
-      .values({
-        passwordHash,
-        colorTheme,
-      })
-      .returning();
+    // Create tracker (unique constraint on passwordHash will prevent duplicates)
+    let newTracker;
+    try {
+      [newTracker] = await db
+        .insert(trackers)
+        .values({
+          passwordHash,
+          color,
+        })
+        .returning();
+    } catch (error: any) {
+      // Check if it's a unique constraint violation
+      if (error.message && error.message.includes('UNIQUE constraint failed')) {
+        return new Response(
+          JSON.stringify({
+            error: 'This password is already in use. Please choose a different password.',
+            code: 'PASSWORD_ALREADY_EXISTS',
+          }),
+          { status: 409, headers: { 'Content-Type': 'application/json' } }
+        );
+      }
+      throw error;
+    }
 
     // Create session
     await setTrackerSession(cookies, newTracker.id);
@@ -53,7 +68,7 @@ export const POST: APIRoute = async ({ request, cookies }) => {
     return new Response(
       JSON.stringify({
         trackerId: newTracker.id,
-        colorTheme: newTracker.colorTheme,
+        color: newTracker.color,
       }),
       {
         status: 201,

@@ -4,8 +4,8 @@ import { sql } from 'drizzle-orm';
 // Trackers table - represents a user/tracker
 export const trackers = sqliteTable('trackers', {
   id: text('id').primaryKey().$defaultFn(() => crypto.randomUUID()),
-  passwordHash: text('password_hash').notNull(),
-  colorTheme: text('color_theme').notNull().default('github'),
+  passwordHash: text('password_hash').notNull().unique(),
+  color: text('color').notNull().default('#216e39'),
   createdAt: integer('created_at', { mode: 'timestamp' }).notNull().$defaultFn(() => new Date()),
 });
 

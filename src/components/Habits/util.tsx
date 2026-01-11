@@ -1,39 +1,9 @@
-// Color themes for contribution graph
-export const COLOR_THEMES = {
-  github: {
-    name: 'GitHub',
-    colors: [
-      '#ebedf0', // 0 habits
-      '#9be9a8', // 1 habit
-      '#40c463', // 2 habits
-      '#30a14e', // 3 habits
-      '#216e39', // 4+ habits
-    ],
-  },
-  ocean: {
-    name: 'Ocean',
-    colors: ['#e0f2fe', '#7dd3fc', '#38bdf8', '#0284c7', '#0c4a6e'],
-  },
-  forest: {
-    name: 'Forest',
-    colors: ['#d1fae5', '#6ee7b7', '#34d399', '#059669', '#064e3b'],
-  },
-  sunset: {
-    name: 'Sunset',
-    colors: ['#fee2e2', '#fca5a5', '#f87171', '#dc2626', '#7f1d1d'],
-  },
-  monochrome: {
-    name: 'Monochrome',
-    colors: ['#f5f5f5', '#d4d4d4', '#a3a3a3', '#525252', '#171717'],
-  },
-} as const;
-
-export type ColorTheme = keyof typeof COLOR_THEMES;
-
 // Generate a unique ID
 export function generateId(): string {
   return crypto.randomUUID();
 }
+
+export const DEFAULT_COLOR = '#216e39';
 
 // Format date to YYYY-MM-DD
 export function formatDate(date: Date): string {
@@ -48,47 +18,46 @@ export function parseDate(dateStr: string): Date {
   return new Date(dateStr + 'T00:00:00');
 }
 
+function hexToHsl(hex: string): { h: number; s: number; l: number } {
+  // Convert hex to RGB first
+  const r = parseInt(hex.slice(1, 3), 16) / 255;
+  const g = parseInt(hex.slice(3, 5), 16) / 255;
+  const b = parseInt(hex.slice(5, 7), 16) / 255;
+
+  const max = Math.max(r, g, b);
+  const min = Math.min(r, g, b);
+  let h = 0,
+    s = 0,
+    l = (max + min) / 2;
+
+  if (max !== min) {
+    const d = max - min;
+    s = l > 0.5 ? d / (2 - max - min) : d / (max + min);
+    switch (max) {
+      case r:
+        h = (g - b) / d + (g < b ? 6 : 0);
+        break;
+      case g:
+        h = (b - r) / d + 2;
+        break;
+      case b:
+        h = (r - g) / d + 4;
+        break;
+    }
+    h /= 6;
+  }
+
+  return { h: h * 360, s: s * 100, l: l * 100 };
+}
+
 // Get color for completion count
-export function getColorForCount(count: number, theme: ColorTheme): string {
-  const colors = COLOR_THEMES[theme].colors;
-  if (count === 0) return colors[0];
-  if (count === 1) return colors[1];
-  if (count === 2) return colors[2];
-  if (count === 3) return colors[3];
-  return colors[4]; // 4+ habits
-}
+export function getColorForCount(count: number, maxCount: number, color: string): string {
+  const hsl = hexToHsl(color);
+  const availableLightness = 100 - hsl.l;
 
-// LocalStorage helpers
-export function loadFromStorage<T>(key: string, defaultValue: T): T {
-  if (typeof window === 'undefined') return defaultValue;
-
-  try {
-    const item = window.localStorage.getItem(key);
-    return item ? JSON.parse(item) : defaultValue;
-  } catch (error) {
-    console.error(`Error loading ${key} from localStorage:`, error);
-    return defaultValue;
-  }
-}
-
-export function saveToStorage<T>(key: string, value: T): void {
-  if (typeof window === 'undefined') return;
-
-  try {
-    window.localStorage.setItem(key, JSON.stringify(value));
-  } catch (error) {
-    console.error(`Error saving ${key} to localStorage:`, error);
-  }
-}
-
-export function removeFromStorage(key: string): void {
-  if (typeof window === 'undefined') return;
-
-  try {
-    window.localStorage.removeItem(key);
-  } catch (error) {
-    console.error(`Error removing ${key} from localStorage:`, error);
-  }
+  // Calculate lightness based on count
+  const lightness = hsl.l + availableLightness - (count / maxCount) * availableLightness;
+  return `hsl(${hsl.h}, ${hsl.s}%, ${lightness}%)`;
 }
 
 // Get all days in a year

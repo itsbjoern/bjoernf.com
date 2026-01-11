@@ -45,6 +45,7 @@ export const GET: APIRoute = async ({ url, cookies }) => {
       .where(
         and(
           eq(habits.trackerId, trackerId),
+          eq(habits.isActive, true),
           gte(completions.completedAt, yearStart),
           lte(completions.completedAt, yearEnd)
         )

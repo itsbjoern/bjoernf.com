@@ -10,36 +10,32 @@ export const prerender = false;
 export const POST: APIRoute = async ({ request, cookies }) => {
   try {
     const body = await request.json();
-    const { trackerId, password } = body;
+    const { password } = body;
 
     // Validate input
-    if (!trackerId || !password) {
+    if (!password) {
       return new Response(
-        JSON.stringify({ error: 'Tracker ID and password are required', code: 'INVALID_INPUT' }),
+        JSON.stringify({ error: 'Password is required', code: 'INVALID_INPUT' }),
         { status: 400, headers: { 'Content-Type': 'application/json' } }
       );
     }
 
-    // Find tracker
-    const [tracker] = await db
-      .select()
-      .from(trackers)
-      .where(eq(trackers.id, trackerId))
-      .limit(1);
+    // Find all trackers and check password against each
+    // (SQLite doesn't support bcrypt in queries, so we need to check in-app)
+    const allTrackers = await db.select().from(trackers);
+
+    let tracker = null;
+    for (const t of allTrackers) {
+      const isValidPassword = await bcrypt.compare(password, t.passwordHash);
+      if (isValidPassword) {
+        tracker = t;
+        break;
+      }
+    }
 
     if (!tracker) {
       return new Response(
-        JSON.stringify({ error: 'Invalid tracker ID or password', code: 'INVALID_CREDENTIALS' }),
-        { status: 401, headers: { 'Content-Type': 'application/json' } }
-      );
-    }
-
-    // Verify password
-    const isValidPassword = await bcrypt.compare(password, tracker.passwordHash);
-
-    if (!isValidPassword) {
-      return new Response(
-        JSON.stringify({ error: 'Invalid tracker ID or password', code: 'INVALID_CREDENTIALS' }),
+        JSON.stringify({ error: 'Invalid password', code: 'INVALID_CREDENTIALS' }),
         { status: 401, headers: { 'Content-Type': 'application/json' } }
       );
     }
@@ -51,7 +47,7 @@ export const POST: APIRoute = async ({ request, cookies }) => {
       JSON.stringify({
         success: true,
         trackerId: tracker.id,
-        colorTheme: tracker.colorTheme,
+        color: tracker.color,
       }),
       {
         status: 200,

@@ -1,7 +1,7 @@
 {
   "version": "6",
   "dialect": "sqlite",
-  "id": "0bd410a2-f8a2-4bfb-b3fc-a301b0db0a73",
+  "id": "22ae70fe-3058-4e3f-8d2b-be67a84f7902",
   "prevId": "00000000-0000-0000-0000-000000000000",
   "tables": {
     "completions": {
@@ -218,7 +218,15 @@
           "autoincrement": false
         }
       },
-      "indexes": {},
+      "indexes": {
+        "trackers_password_hash_unique": {
+          "name": "trackers_password_hash_unique",
+          "columns": [
+            "password_hash"
+          ],
+          "isUnique": true
+        }
+      },
       "foreignKeys": {},
       "compositePrimaryKeys": {},
       "uniqueConstraints": {},

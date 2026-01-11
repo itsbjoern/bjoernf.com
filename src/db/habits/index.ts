@@ -16,6 +16,7 @@ sqlite.pragma('foreign_keys = ON');
 // Create drizzle instance with schema
 export const db = drizzle(sqlite, { schema });
 
+console.log(path.join(process.cwd(), 'drizzle', 'habits'))
 migrate(db, {
   migrationsFolder: path.join(process.cwd(), 'drizzle', 'habits'),
 });

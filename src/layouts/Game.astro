@@ -49,10 +49,10 @@ const { title, description = "", image = Me.src } = Astro.props;
     <title>{title}</title>
   </head>
   <body>
-    <div class="flex flex-1 bg-default">
+    <div class="flex flex-1 bg-default dark:bg-gray-700">
       <div class="flex flex-1 flex-col">
         <div
-          class="smo:pr0 ml-auto mr-auto box-border flex w-full flex-1 flex-col md:max-w-[700px] smo:pl-0"
+          class="smo:pr0 ml-auto mr-auto box-border flex w-full flex-1 flex-col md:max-w-[800px] smo:pl-0"
         >
           <div class="flex flex-1 flex-col">
             <div
@@ -87,6 +87,7 @@ const { title, description = "", image = Me.src } = Astro.props;
       html,
       body {
         min-height: 100vh;
+        overflow: hidden;
       }
 
       body {

@@ -1,16 +1,17 @@
 import { useState } from 'react';
 import { useHabits } from '../Context/HabitsContext';
-import { COLOR_THEMES, type ColorTheme } from '../util';
+import { ColorPicker } from './ColorPicker';
+import { DEFAULT_COLOR } from '../util';
 
 export const AuthForm = () => {
   const { login, createTracker, isLoading } = useHabits();
-  const [mode, setMode] = useState<'login' | 'create'>('create');
-  const [trackerId, setTrackerId] = useState('');
+  const [step, setStep] = useState<'password' | 'confirm-create'>('password');
   const [password, setPassword] = useState('');
-  const [selectedTheme, setSelectedTheme] = useState<ColorTheme>('github');
+  const [selectedColor, setSelectedColor] = useState<string>(DEFAULT_COLOR);
   const [error, setError] = useState('');
+  const [checking, setChecking] = useState(false);
 
-  const handleSubmit = async (e: React.FormEvent) => {
+  const handlePasswordSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
     setError('');
 
@@ -19,138 +20,131 @@ export const AuthForm = () => {
       return;
     }
 
-    if (mode === 'login' && !trackerId) {
-      setError('Tracker ID is required');
-      return;
-    }
-
+    setChecking(true);
     try {
-      if (mode === 'login') {
-        await login(trackerId, password);
+      // Check if password exists
+      const response = await fetch('/api/habits/check-password', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ password }),
+      });
+
+      if (!response.ok) {
+        throw new Error('Failed to check password');
+      }
+
+      const data = await response.json();
+
+      if (data.exists) {
+        // Password exists, log in automatically
+        await login(password);
       } else {
-        await createTracker(password, selectedTheme);
+        // Password doesn't exist, show confirmation to create new tracker
+        setStep('confirm-create');
       }
     } catch (err) {
-      // Error is already shown via toast
+      setError('Something went wrong. Please try again.');
+    } finally {
+      setChecking(false);
     }
   };
 
-  return (
-    <div className="min-h-screen flex items-center justify-center bg-gradient-to-br from-gray-50 to-gray-100 p-4">
-      <div className="w-full max-w-md">
-        <div className="bg-white rounded-lg border border-gray-200 shadow-sm p-8">
-          <h1 className="text-2xl font-semibold text-gray-900 mb-6 text-center">
-            Habit Tracker
-          </h1>
+  const handleCreateConfirm = async () => {
+    try {
+      await createTracker(password, selectedColor);
+    } catch (err) {
+      // Error is already shown via toast
+      // Go back to password step on error
+      setStep('password');
+    }
+  };
 
-          <div className="flex gap-2 mb-6">
+  const handleCancel = () => {
+    setStep('password');
+    setPassword('');
+    setError('');
+  };
+
+  if (step === 'confirm-create') {
+    return (
+      <div className="w-full max-w-md m-auto bg-white dark:bg-black rounded-lg border border-gray-200 dark:border-gray-800 shadow-sm p-8">
+        <h1 className="text-2xl font-semibold text-gray-900 dark:text-gray-100 mb-2 text-center">
+          Create New Tracker
+        </h1>
+        <p className="text-gray-600 dark:text-gray-400 text-sm text-center mb-6">
+          No tracker found with this password. Create a new one?
+        </p>
+
+        <div className="space-y-4">
+          <div className="flex gap-2">
             <button
-              onClick={() => setMode('create')}
-              className={`flex-1 px-4 py-2 rounded-md transition-colors ${
-                mode === 'create'
-                  ? 'bg-gray-900 text-white'
-                  : 'border border-gray-300 bg-white hover:bg-gray-50'
-              }`}
+              onClick={handleCancel}
+              disabled={isLoading}
+              className="flex-1 px-4 py-2 border border-gray-300 dark:border-gray-700 bg-white dark:bg-black hover:bg-gray-50 dark:hover:bg-gray-900 text-gray-900 dark:text-gray-100 rounded-md transition-colors disabled:opacity-50 disabled:cursor-not-allowed"
             >
-              Create Tracker
+              Cancel
             </button>
             <button
-              onClick={() => setMode('login')}
-              className={`flex-1 px-4 py-2 rounded-md transition-colors ${
-                mode === 'login'
-                  ? 'bg-gray-900 text-white'
-                  : 'border border-gray-300 bg-white hover:bg-gray-50'
-              }`}
+              onClick={handleCreateConfirm}
+              disabled={isLoading}
+              className="flex-1 px-4 py-2 bg-gray-900 text-white rounded-md hover:bg-gray-800 transition-colors disabled:opacity-50 disabled:cursor-not-allowed"
             >
-              Login
+              {isLoading ? 'Creating...' : 'Create Tracker'}
             </button>
           </div>
-
-          <form onSubmit={handleSubmit} className="space-y-4">
-            {mode === 'login' && (
-              <div>
-                <label htmlFor="trackerId" className="block text-sm font-medium text-gray-700 mb-1">
-                  Tracker ID
-                </label>
-                <input
-                  id="trackerId"
-                  type="text"
-                  value={trackerId}
-                  onChange={(e) => setTrackerId(e.target.value)}
-                  className="w-full px-3 py-2 border border-gray-300 rounded-md bg-white focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent transition-all"
-                  placeholder="Enter your tracker ID"
-                  disabled={isLoading}
-                />
-              </div>
-            )}
-
-            <div>
-              <label htmlFor="password" className="block text-sm font-medium text-gray-700 mb-1">
-                Password
-              </label>
-              <input
-                id="password"
-                type="password"
-                value={password}
-                onChange={(e) => setPassword(e.target.value)}
-                className="w-full px-3 py-2 border border-gray-300 rounded-md bg-white focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent transition-all"
-                placeholder="Enter password (min 8 characters)"
-                disabled={isLoading}
-              />
-            </div>
-
-            {mode === 'create' && (
-              <div>
-                <label htmlFor="theme" className="block text-sm font-medium text-gray-700 mb-1">
-                  Color Theme
-                </label>
-                <select
-                  id="theme"
-                  value={selectedTheme}
-                  onChange={(e) => setSelectedTheme(e.target.value as ColorTheme)}
-                  className="w-full px-3 py-2 border border-gray-300 rounded-md bg-white focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent transition-all"
-                  disabled={isLoading}
-                >
-                  {Object.entries(COLOR_THEMES).map(([key, theme]) => (
-                    <option key={key} value={key}>
-                      {theme.name}
-                    </option>
-                  ))}
-                </select>
-                <div className="mt-2 flex gap-1">
-                  {COLOR_THEMES[selectedTheme].colors.map((color, i) => (
-                    <div
-                      key={i}
-                      className="h-6 w-6 rounded"
-                      style={{ backgroundColor: color }}
-                    />
-                  ))}
-                </div>
-              </div>
-            )}
-
-            {error && (
-              <div className="text-sm text-red-600 bg-red-50 border border-red-200 rounded-md p-2">
-                {error}
-              </div>
-            )}
-
-            <button
-              type="submit"
-              disabled={isLoading}
-              className="w-full px-4 py-2 bg-gray-900 text-white rounded-md hover:bg-gray-800 transition-colors disabled:opacity-50 disabled:cursor-not-allowed"
-            >
-              {isLoading ? 'Loading...' : mode === 'login' ? 'Login' : 'Create Tracker'}
-            </button>
-          </form>
-
-          {mode === 'create' && (
-            <p className="mt-4 text-xs text-gray-600 text-center">
-              Save your Tracker ID after creation - you'll need it to log in later
-            </p>
-          )}
         </div>
+
+        <p className="mt-4 text-xs text-gray-600 dark:text-gray-400 text-center">
+          Remember your password - you'll need it to log in later
+        </p>
       </div>
+    );
+  }
+
+  return (
+    <div className="w-full max-w-md m-auto bg-white dark:bg-black rounded-lg border border-gray-200 dark:border-gray-800 shadow-sm p-8">
+      <h1 className="text-2xl font-semibold text-gray-900 dark:text-gray-100 mb-2 text-center">
+        Habit Tracker
+      </h1>
+      <p className="text-gray-600 dark:text-gray-400 text-sm text-center mb-6">
+        Enter your password to continue
+      </p>
+
+      <form onSubmit={handlePasswordSubmit} className="space-y-4">
+        <div>
+          <label htmlFor="password" className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">
+            Password
+          </label>
+          <input
+            id="password"
+            type="password"
+            value={password}
+            onChange={(e) => setPassword(e.target.value)}
+            className="w-full px-3 py-2 border border-gray-300 rounded-md bg-white dark:border-gray-700 dark:bg-black text-gray-900 dark:text-gray-100 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent transition-all"
+            placeholder="Enter password (min 8 characters)"
+            disabled={isLoading || checking}
+            autoFocus
+          />
+        </div>
+
+        {error && (
+          <div className="text-sm text-red-600 dark:text-red-400 bg-red-50 dark:bg-red-900 border border-red-200 dark:border-red-700 rounded-md p-2">
+            {error}
+          </div>
+        )}
+
+        <button
+          type="submit"
+          disabled={isLoading || checking}
+          className="w-full px-4 py-2 bg-gray-900 text-white rounded-md hover:bg-gray-800 transition-colors disabled:opacity-50 disabled:cursor-not-allowed"
+        >
+          {checking ? 'Checking...' : isLoading ? 'Loading...' : 'Continue'}
+        </button>
+      </form>
+
+      <p className="mt-4 text-xs text-gray-600 dark:text-gray-400 text-center">
+        Enter your password to log in or create a new tracker
+      </p>
     </div>
   );
 };

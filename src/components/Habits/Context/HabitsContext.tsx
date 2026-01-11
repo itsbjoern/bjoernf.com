@@ -4,16 +4,12 @@ import {
   useContext,
   useEffect,
   useState,
+  type Dispatch,
   type ReactNode,
+  type SetStateAction,
 } from 'react';
-import {
-  type ColorTheme,
-  formatDate,
-  loadFromStorage,
-  saveToStorage,
-  removeFromStorage,
-} from '../util';
 import { useToast } from '../Toasts';
+import { DEFAULT_COLOR } from '../util';
 
 export type Habit = {
   id: string;
@@ -29,7 +25,7 @@ type HabitsState = {
   // Auth state
   isAuthenticated: boolean;
   trackerId: string | null;
-  colorTheme: ColorTheme;
+  color: string;
 
   // Habit state
   habits: Habit[];
@@ -38,13 +34,13 @@ type HabitsState = {
   // UI state
   selectedDate: Date;
   isLoading: boolean;
-  currentView: 'auth' | 'tracker';
+  currentView: 'auth' | 'tracker' | 'settings';
 };
 
 type HabitsActions = {
   // Auth actions
-  login: (trackerId: string, password: string) => Promise<void>;
-  createTracker: (password: string, theme: ColorTheme) => Promise<void>;
+  login: (password: string) => Promise<void>;
+  createTracker: (password: string, color: string) => Promise<void>;
   logout: () => Promise<void>;
   checkSession: () => Promise<void>;
 
@@ -58,8 +54,12 @@ type HabitsActions = {
   fetchCompletions: (year: number) => Promise<void>;
   toggleCompletion: (habitId: string, date: string) => Promise<void>;
 
+  // Settings actions
+  updateColor: (color: string) => Promise<void>;
+
   // UI actions
-  setSelectedDate: (date: Date) => void;
+  setCurrentView: Dispatch<SetStateAction<'auth' | 'tracker' | 'settings'>>;
+  setSelectedDate: Dispatch<SetStateAction<Date>>;
 };
 
 const HabitsContext = createContext<(HabitsState & HabitsActions) | null>(null);
@@ -70,41 +70,17 @@ export const HabitsProvider = ({ children }: { children: ReactNode }) => {
   // State
   const [isAuthenticated, setIsAuthenticated] = useState(false);
   const [trackerId, setTrackerId] = useState<string | null>(null);
-  const [colorTheme, setColorTheme] = useState<ColorTheme>('github');
+  const [color, setColor] = useState<string>(DEFAULT_COLOR);
   const [habits, setHabits] = useState<Habit[]>([]);
   const [completions, setCompletions] = useState<Map<string, Set<string>>>(new Map());
   const [selectedDate, setSelectedDate] = useState(new Date());
   const [isLoading, setIsLoading] = useState(false);
-  const [currentView, setCurrentView] = useState<'auth' | 'tracker'>('auth');
-
-  // Load from localStorage on mount
-  useEffect(() => {
-    const savedTrackerId = loadFromStorage<string | null>('habit-tracker-session', null);
-    const savedTheme = loadFromStorage<ColorTheme>('habit-tracker-theme', 'github');
-    const savedHabits = loadFromStorage<Habit[]>('habit-tracker-habits', []);
-
-    if (savedTrackerId) {
-      setTrackerId(savedTrackerId);
-      setColorTheme(savedTheme);
-      setHabits(savedHabits);
-    }
-  }, []);
+  const [currentView, setCurrentView] = useState<'auth' | 'tracker' | 'settings'>('auth');
 
   // Check session on mount
   useEffect(() => {
-    if (trackerId) {
-      checkSession();
-    }
+    checkSession();
   }, []);
-
-  // Sync to localStorage
-  useEffect(() => {
-    if (trackerId) {
-      saveToStorage('habit-tracker-session', trackerId);
-      saveToStorage('habit-tracker-theme', colorTheme);
-      saveToStorage('habit-tracker-habits', habits);
-    }
-  }, [trackerId, colorTheme, habits]);
 
   // Auth actions
   const checkSession = useCallback(async () => {
@@ -116,7 +92,6 @@ export const HabitsProvider = ({ children }: { children: ReactNode }) => {
         setIsAuthenticated(false);
         setCurrentView('auth');
         setTrackerId(null);
-        removeFromStorage('habit-tracker-session');
         return;
       }
 
@@ -124,7 +99,7 @@ export const HabitsProvider = ({ children }: { children: ReactNode }) => {
       setIsAuthenticated(true);
       setCurrentView('tracker');
       setTrackerId(data.trackerId);
-      setColorTheme(data.colorTheme);
+      setColor(data.color);
 
       // Fetch habits and completions
       await Promise.all([fetchHabits(), fetchCompletions(new Date().getFullYear())]);
@@ -136,13 +111,13 @@ export const HabitsProvider = ({ children }: { children: ReactNode }) => {
   }, []);
 
   const createTracker = useCallback(
-    async (password: string, theme: ColorTheme) => {
+    async (password: string, color: string) => {
       setIsLoading(true);
       try {
         const response = await fetch('/api/habits/create-tracker', {
           method: 'POST',
           headers: { 'Content-Type': 'application/json' },
-          body: JSON.stringify({ password, colorTheme: theme }),
+          body: JSON.stringify({ password, color }),
         });
 
         if (!response.ok) {
@@ -152,12 +127,9 @@ export const HabitsProvider = ({ children }: { children: ReactNode }) => {
 
         const data = await response.json();
         setTrackerId(data.trackerId);
-        setColorTheme(data.colorTheme);
+        setColor(data.color);
         setIsAuthenticated(true);
         setCurrentView('tracker');
-
-        saveToStorage('habit-tracker-session', data.trackerId);
-        saveToStorage('habit-tracker-theme', data.colorTheme);
 
         addToast({ message: 'Tracker created successfully!', color: 'bg-green-600' });
       } catch (error) {
@@ -175,13 +147,13 @@ export const HabitsProvider = ({ children }: { children: ReactNode }) => {
   );
 
   const login = useCallback(
-    async (trackerId: string, password: string) => {
+    async (password: string) => {
       setIsLoading(true);
       try {
         const response = await fetch('/api/habits/login', {
           method: 'POST',
           headers: { 'Content-Type': 'application/json' },
-          body: JSON.stringify({ trackerId, password }),
+          body: JSON.stringify({ password }),
         });
 
         if (!response.ok) {
@@ -191,17 +163,12 @@ export const HabitsProvider = ({ children }: { children: ReactNode }) => {
 
         const data = await response.json();
         setTrackerId(data.trackerId);
-        setColorTheme(data.colorTheme);
+        setColor(data.color);
         setIsAuthenticated(true);
         setCurrentView('tracker');
 
-        saveToStorage('habit-tracker-session', data.trackerId);
-        saveToStorage('habit-tracker-theme', data.colorTheme);
-
         // Fetch habits and completions
         await Promise.all([fetchHabits(), fetchCompletions(new Date().getFullYear())]);
-
-        addToast({ message: 'Logged in successfully!', color: 'bg-green-600' });
       } catch (error) {
         console.error('Error logging in:', error);
         addToast({
@@ -225,12 +192,6 @@ export const HabitsProvider = ({ children }: { children: ReactNode }) => {
       setTrackerId(null);
       setHabits([]);
       setCompletions(new Map());
-
-      removeFromStorage('habit-tracker-session');
-      removeFromStorage('habit-tracker-theme');
-      removeFromStorage('habit-tracker-habits');
-
-      addToast({ message: 'Logged out successfully', color: 'bg-gray-600' });
     } catch (error) {
       console.error('Error logging out:', error);
       addToast({ message: 'Failed to log out', color: 'bg-red-600' });
@@ -438,11 +399,39 @@ export const HabitsProvider = ({ children }: { children: ReactNode }) => {
     [completions, addToast, fetchCompletions]
   );
 
+  const updateColor = useCallback(
+    async (color: string) => {
+      try {
+        const response = await fetch('/api/habits/update-settings', {
+          method: 'PATCH',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({ color }),
+        });
+
+        if (!response.ok) {
+          const error = await response.json();
+          throw new Error(error.error || 'Failed to update color');
+        }
+
+        setColor(color);
+        addToast({ message: 'Color updated!', color: 'bg-green-600' });
+      } catch (error) {
+        console.error('Error updating color:', error);
+        addToast({
+          message: error instanceof Error ? error.message : 'Failed to update color',
+          color: 'bg-red-600',
+        });
+        throw error;
+      }
+    },
+    [addToast]
+  );
+
   const value = {
     // State
     isAuthenticated,
     trackerId,
-    colorTheme,
+    color,
     habits,
     completions,
     selectedDate,
@@ -459,7 +448,9 @@ export const HabitsProvider = ({ children }: { children: ReactNode }) => {
     deleteHabit,
     fetchCompletions,
     toggleCompletion,
+    updateColor,
     setSelectedDate,
+    setCurrentView,
   };
 
   return <HabitsContext.Provider value={value}>{children}</HabitsContext.Provider>;
