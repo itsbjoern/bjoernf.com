@@ -8,7 +8,7 @@ import path from 'path';
 const dbPath = path.join(process.cwd(), 'data', 'habits.db');
 
 // Create SQLite connection
-const sqlite = new Database(dbPath);
+const sqlite = new Database(dbPath, { create: true });
 
 // Enable foreign keys
 sqlite.exec('PRAGMA foreign_keys = ON;');
