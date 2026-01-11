@@ -26,7 +26,6 @@ export function rateLimit(request: Request, timeWindows: TimeWindow[] = [{
   entry.timestamps = entry.timestamps.filter((timestamp) => now - timestamp < windowSize);
 
   for (const window of timeWindows) {
-    console.log(window)
     const requestsInWindow = entry.timestamps.filter(
       (timestamp) => now - timestamp < window.timeframe * 1000
     ).length;

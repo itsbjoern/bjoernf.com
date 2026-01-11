@@ -3,6 +3,10 @@ import { defineMiddleware } from "astro:middleware";
 
 
 export const onRequest = defineMiddleware(async (context, next) => {
+  const timestamp = new Date().toISOString();
+  const sessionId = context.cookies.get('habits_session')?.value || 'no-session';
+  console.log(`[${timestamp}] ${context.request.method} - ${context.request.url} (Session: ${sessionId})`);
+
   if (context.request.method === 'OPTIONS') {
     let headers = new Headers();
     headers.set('Access-Control-Allow-Origin', 'https://bjoernf.com');
