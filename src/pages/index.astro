@@ -85,7 +85,9 @@ interface Props {
       />.
     </span>
     <iframe
-      src="https://bjoernf.com/fun/habits/embed?tracker=e25a4788-21a5-40db-9af2-6d20d84010a5"
+      src={import.meta.env.PROD
+        ? "https://bjoernf.com/fun/habits/embed?tracker=e25a4788-21a5-40db-9af2-6d20d84010a5"
+        : "http://localhost:4321/fun/habits/embed?tracker=5f6d41c6-a2b4-4674-b7dc-29b2bff3d8e8"}
       width="100%"
       style="border:none; min-height: 160px;"></iframe>
     <span>
