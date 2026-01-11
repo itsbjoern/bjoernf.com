@@ -33,11 +33,10 @@ export default defineConfig({
   experimental: {
     csp: {
       scriptDirective: {
-        resources: [
-          "https://unpkg.com",
-          "https://bjoernf.com",
-          "https://a.bjoernf.com",
-        ],
+        resources: ["self", "https://unpkg.com", "https://a.bjoernf.com"],
+      },
+      styleDirective: {
+        resources: ["self"],
       },
       directives: [
         "connect-src 'self' https://unpkg.com https://a.bjoernf.com",
