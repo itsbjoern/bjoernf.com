@@ -1,6 +1,6 @@
-import { drizzle } from 'drizzle-orm/better-sqlite3';
-import { migrate } from 'drizzle-orm/better-sqlite3/migrator';
-import Database from 'better-sqlite3';
+import { drizzle } from 'drizzle-orm/bun-sqlite';
+import { migrate } from 'drizzle-orm/bun-sqlite/migrator';
+import Database from 'bun:sqlite';
 import * as schema from './schema';
 import path from 'path';
 
@@ -11,7 +11,7 @@ const dbPath = path.join(process.cwd(), 'data', 'habits.db');
 const sqlite = new Database(dbPath);
 
 // Enable foreign keys
-sqlite.pragma('foreign_keys = ON');
+sqlite.exec('PRAGMA foreign_keys = ON;');
 
 // Create drizzle instance with schema
 export const db = drizzle(sqlite, { schema });
