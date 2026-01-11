@@ -5,3 +5,5 @@ services:
     ports:
       - "4321:4321"
     restart: unless-stopped
+    volumes:
+      - ./data:/app/data
