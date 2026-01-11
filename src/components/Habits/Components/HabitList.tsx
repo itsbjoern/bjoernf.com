@@ -80,29 +80,30 @@ export const HabitList = () => {
             return (
               <div
                 key={habit.id}
-                className="flex gap-3 p-3 hover:bg-gray-50 dark:hover:bg-gray-900 rounded-md transition-colors group justify-between items-center"
+                className="flex gap-2 p-3 hover:bg-gray-50 dark:hover:bg-gray-900 rounded-md transition-colors group items-end md:items-start flex-col md:flex-row"
               >
-                <input
-                  id={`habit-checkbox-${habit.id}`}
-                  type="checkbox"
-                  checked={isCompleted}
-                  onChange={() => toggleCompletion(habit.id, dateStr)}
-                  className="h-5 w-5 rounded border-gray-300 dark:border-gray-700 text-blue-600 focus:ring-2 focus:ring-blue-500 cursor-pointer"
-                />
-                <label htmlFor={`habit-checkbox-${habit.id}`} className="flex-1 cursor-pointer">
-                  <div className="flex-1">
+                <div className="flex items-start sm:items-center flex-1 gap-3 w-full">
+                  <input
+                    id={`habit-checkbox-${habit.id}`}
+                    type="checkbox"
+                    checked={isCompleted}
+                    onChange={() => toggleCompletion(habit.id, dateStr)}
+                    className="h-5 w-5 mt-0.5 sm:mt-0 sm:flex-col flex-shrink-0 rounded border-gray-300 dark:border-gray-700 text-blue-600 focus:ring-2 focus:ring-blue-500 cursor-pointer"
+                  />
+                  <label htmlFor={`habit-checkbox-${habit.id}`} className="flex-1 cursor-pointer min-w-0">
                     <div className="font-medium text-gray-900 dark:text-gray-100">{habit.name}</div>
                     {habit.description && (
                       <div className="text-sm text-gray-600 dark:text-gray-400">{habit.description}</div>
                     )}
-                  </div>
-                </label>
-                <div className="flex gap-2">
+                  </label>
+                </div>
+                <div className="flex gap-1.5 flex-shrink-0">
                   <button
                     onClick={() => {
                       setAddForm({ visible: true, id: habit.id, name: habit.name, description: habit.description || '' });
                     }}
-                    className="opacity-0 group-hover:opacity-100 text-sm text-gray-600 dark:text-gray-400 hover:text-gray-700 dark:hover:text-gray-300 transition-opacity"
+                    className="opacity-100 sm:opacity-0 sm:group-hover:opacity-100 px-2 py-1 text-xs sm:text-sm text-gray-600 dark:text-gray-400 hover:text-gray-900 dark:hover:text-gray-100 hover:bg-gray-100 dark:hover:bg-gray-800 rounded transition-all"
+                    aria-label="Edit habit"
                   >
                     Edit
                   </button>
@@ -112,7 +113,8 @@ export const HabitList = () => {
                         deleteHabit(habit.id);
                       }
                     }}
-                    className="opacity-0 group-hover:opacity-100 text-sm text-gray-600 dark:text-gray-400 hover:text-gray-700 dark:hover:text-gray-300 transition-opacity"
+                    className="opacity-100 sm:opacity-0 sm:group-hover:opacity-100 px-2 py-1 text-xs sm:text-sm text-gray-600 dark:text-gray-400 hover:text-gray-900 dark:hover:text-gray-100 hover:bg-gray-100 dark:hover:bg-gray-800 rounded transition-all"
+                    aria-label="Delete habit"
                   >
                     Delete
                   </button>

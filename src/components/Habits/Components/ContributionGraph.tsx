@@ -130,7 +130,7 @@ export const ContributionGraph = () => {
           }}
           className="px-4 py-2 border border-gray-300 dark:border-gray-700 bg-white dark:bg-black hover:bg-gray-50 dark:hover:bg-gray-900 text-gray-800 dark:text-gray-200 rounded-md transition-colors text-sm"
         >
-          &lt; Yesterday
+          <span className="hidden sm:inline">&lt; </span>Yesterday
         </button>
         <button
           onClick={() => setSelectedDate(new Date())}
@@ -146,7 +146,7 @@ export const ContributionGraph = () => {
           }}
           className="px-4 py-2 border border-gray-300 dark:border-gray-700 bg-white dark:bg-black hover:bg-gray-50 dark:hover:bg-gray-900 text-gray-800 dark:text-gray-200 rounded-md transition-colors text-sm"
         >
-          Tomorrow &gt;
+          Tomorrow<span className="hidden sm:inline"> &gt;</span>
         </button>
       </div>
     </div>
