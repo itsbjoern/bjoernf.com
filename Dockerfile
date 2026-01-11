@@ -32,6 +32,7 @@ USER bun
 
 COPY --from=install /temp/prod/node_modules node_modules
 COPY --from=prerelease /app/dist/server ./dist/server
+COPY --from=prerelease /app/drizzle ./drizzle
 
 EXPOSE 4321/tcp
 CMD ["bun", "--bun", "./dist/server/entry.mjs"]
