@@ -2,10 +2,25 @@ import type { APIRoute } from 'astro';
 import { db } from '@/db/habits';
 import { trackers } from '@/db/habits/schema';
 import bcrypt from 'bcryptjs';
+import { rateLimit } from '@/utils/rateLimit';
 
 export const prerender = false;
 
 export const POST: APIRoute = async ({ request }) => {
+  const isInRate = rateLimit(request, [{
+    timeframe: 60,
+    maxRequests: 3,
+  }, {
+    timeframe: 60 * 30,
+    maxRequests: 5,
+  }]);
+  if (!isInRate) {
+    return new Response(
+      JSON.stringify({ error: 'Too many requests, please try again later.', code: 'RATE_LIMIT_EXCEEDED' }),
+      { status: 429, headers: { 'Content-Type': 'application/json' } }
+    );
+  }
+
   try {
     const body = await request.json();
     const { password } = body;

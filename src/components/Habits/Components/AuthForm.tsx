@@ -135,7 +135,7 @@ export const AuthForm = () => {
 
         <button
           type="submit"
-          disabled={isLoading || checking}
+          disabled={isLoading || checking || password.length < 8}
           className="w-full px-4 py-2 bg-gray-900 text-white rounded-md hover:bg-gray-800 transition-colors disabled:opacity-50 disabled:cursor-not-allowed"
         >
           {checking ? 'Checking...' : isLoading ? 'Loading...' : 'Continue'}

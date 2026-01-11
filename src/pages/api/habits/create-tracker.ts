@@ -4,10 +4,25 @@ import { trackers } from '@/db/habits/schema';
 import { setTrackerSession } from '@/db/habits/session';
 import bcrypt from 'bcryptjs';
 import { DEFAULT_COLOR } from '@/components/Habits/util';
+import { rateLimit } from '@/utils/rateLimit';
 
 export const prerender = false;
 
 export const POST: APIRoute = async ({ request, cookies }) => {
+  const isInRate = rateLimit(request, [{
+    timeframe: 60,
+    maxRequests: 2,
+  }, {
+    timeframe: 60 * 60,
+    maxRequests: 5,
+  }]);
+  if (!isInRate) {
+    return new Response(
+      JSON.stringify({ error: 'Too many requests, please try again later.', code: 'RATE_LIMIT_EXCEEDED' }),
+      { status: 429, headers: { 'Content-Type': 'application/json' } }
+    );
+  }
+
   try {
     const body = await request.json();
     const { password, color = DEFAULT_COLOR } = body;
