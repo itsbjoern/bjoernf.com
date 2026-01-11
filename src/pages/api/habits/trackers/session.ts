@@ -19,11 +19,7 @@ export const GET: APIRoute = async ({ cookies }) => {
     }
 
     // Get tracker info
-    const [tracker] = await db
-      .select()
-      .from(trackers)
-      .where(eq(trackers.id, trackerId))
-      .limit(1);
+    const [tracker] = await db.select().from(trackers).where(eq(trackers.id, trackerId)).limit(1);
 
     if (!tracker) {
       return new Response(

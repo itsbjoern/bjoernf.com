@@ -23,7 +23,7 @@ export const AuthForm = () => {
     setChecking(true);
     try {
       // Check if password exists
-      const response = await fetch(API_HABITS_URL + '/check-password', {
+      const response = await fetch(API_HABITS_URL + '/trackers/check-password', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({ password }),

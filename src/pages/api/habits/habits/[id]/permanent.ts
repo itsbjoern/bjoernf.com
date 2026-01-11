@@ -1,12 +1,12 @@
 import type { APIRoute } from 'astro';
 import { db } from '@/db/habits';
-import { completions, habits } from '@/db/habits/schema';
+import { habits } from '@/db/habits/schema';
 import { getTrackerFromSession } from '@/db/habits/session';
 import { eq, and } from 'drizzle-orm';
 
 export const prerender = false;
 
-export const DELETE: APIRoute = async ({ request, cookies }) => {
+export const DELETE: APIRoute = async ({ cookies, params }) => {
   try {
     // Get tracker ID from session
     const trackerId = await getTrackerFromSession(cookies);
@@ -18,47 +18,36 @@ export const DELETE: APIRoute = async ({ request, cookies }) => {
       );
     }
 
-    const body = await request.json();
-    const { habitId, date } = body;
-
-    // Validate input
-    if (!habitId || !date) {
+    const habitId = params.id;
+    if (!habitId) {
       return new Response(
-        JSON.stringify({ error: 'Habit ID and date are required', code: 'INVALID_INPUT' }),
+        JSON.stringify({ error: 'Habit ID is required', code: 'INVALID_INPUT' }),
         { status: 400, headers: { 'Content-Type': 'application/json' } }
       );
     }
 
-    // Verify habit belongs to this tracker
-    const [habit] = await db
-      .select()
-      .from(habits)
+    // Permanently delete habit (only if it belongs to the authenticated tracker)
+    // Completions will be cascade deleted automatically due to foreign key constraint
+    const [deletedHabit] = await db
+      .delete(habits)
       .where(and(eq(habits.id, habitId), eq(habits.trackerId, trackerId)))
-      .limit(1);
+      .returning();
 
-    if (!habit) {
+    if (!deletedHabit) {
       return new Response(
         JSON.stringify({ error: 'Habit not found', code: 'NOT_FOUND' }),
         { status: 404, headers: { 'Content-Type': 'application/json' } }
       );
     }
 
-    // Delete completion
-    await db
-      .delete(completions)
-      .where(and(eq(completions.habitId, habitId), eq(completions.completedAt, date)));
-
-    return new Response(
-      JSON.stringify({ success: true }),
-      {
-        status: 200,
-        headers: { 'Content-Type': 'application/json' },
-      }
-    );
+    return new Response(JSON.stringify({ success: true }), {
+      status: 200,
+      headers: { 'Content-Type': 'application/json' },
+    });
   } catch (error) {
-    console.error('Error unmarking habit completion:', error);
+    console.error('Error permanently deleting habit:', error);
     return new Response(
-      JSON.stringify({ error: 'Failed to unmark habit completion', code: 'SERVER_ERROR' }),
+      JSON.stringify({ error: 'Failed to permanently delete habit', code: 'SERVER_ERROR' }),
       { status: 500, headers: { 'Content-Type': 'application/json' } }
     );
   }

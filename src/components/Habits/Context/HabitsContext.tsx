@@ -30,6 +30,7 @@ type HabitsState = {
 
   // Habit state
   habits: Habit[];
+  inactiveHabits: Habit[];
   completions: Map<string, Set<string>>; // date -> Set of habitIds
 
   // UI state
@@ -47,8 +48,11 @@ type HabitsActions = {
 
   // Habit actions
   fetchHabits: () => Promise<void>;
+  fetchInactiveHabits: () => Promise<void>;
   createHabit: (name: string, description: string) => Promise<void>;
   updateHabit: (id: string, updates: { name?: string; description?: string }) => Promise<void>;
+  archiveHabit: (id: string) => Promise<void>;
+  restoreHabit: (id: string) => Promise<void>;
   deleteHabit: (id: string) => Promise<void>;
 
   // Completion actions
@@ -73,6 +77,7 @@ export const HabitsProvider = ({ children }: { children: ReactNode }) => {
   const [trackerId, setTrackerId] = useState<string | null>(null);
   const [color, setColor] = useState<string>(DEFAULT_COLOR);
   const [habits, setHabits] = useState<Habit[]>([]);
+  const [inactiveHabits, setInactiveHabits] = useState<Habit[]>([]);
   const [completions, setCompletions] = useState<Map<string, Set<string>>>(new Map());
   const [selectedDate, setSelectedDate] = useState(new Date());
   const [isLoading, setIsLoading] = useState(false);
@@ -86,7 +91,8 @@ export const HabitsProvider = ({ children }: { children: ReactNode }) => {
   // Auth actions
   const checkSession = useCallback(async () => {
     try {
-      const response = await fetch(API_HABITS_URL + '/session', {
+      const response = await fetch(API_HABITS_URL + '/trackers/session', {
+        headers: { 'Content-Type': 'application/json' },
         credentials: 'include',
       });
 
@@ -117,7 +123,7 @@ export const HabitsProvider = ({ children }: { children: ReactNode }) => {
     async (password: string, color: string) => {
       setIsLoading(true);
       try {
-        const response = await fetch(API_HABITS_URL + '/create-tracker', {
+        const response = await fetch(API_HABITS_URL + '/trackers', {
           method: 'POST',
           headers: { 'Content-Type': 'application/json' },
           body: JSON.stringify({ password, color }),
@@ -154,7 +160,7 @@ export const HabitsProvider = ({ children }: { children: ReactNode }) => {
     async (password: string) => {
       setIsLoading(true);
       try {
-        const response = await fetch(API_HABITS_URL + '/login', {
+        const response = await fetch(API_HABITS_URL + '/trackers/login', {
           method: 'POST',
           headers: { 'Content-Type': 'application/json' },
           body: JSON.stringify({ password }),
@@ -190,7 +196,7 @@ export const HabitsProvider = ({ children }: { children: ReactNode }) => {
 
   const logout = useCallback(async () => {
     try {
-      await fetch(API_HABITS_URL + '/logout', {
+      await fetch(API_HABITS_URL + '/trackers/logout', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
         credentials: 'include',
@@ -210,7 +216,7 @@ export const HabitsProvider = ({ children }: { children: ReactNode }) => {
   // Habit actions
   const fetchHabits = useCallback(async () => {
     try {
-      const response = await fetch(API_HABITS_URL + '/list', {
+      const response = await fetch(API_HABITS_URL + '/habits?status=active', {
         credentials: 'include',
       });
 
@@ -230,7 +236,7 @@ export const HabitsProvider = ({ children }: { children: ReactNode }) => {
     async (name: string, description: string) => {
       setIsLoading(true);
       try {
-        const response = await fetch(API_HABITS_URL + '/create', {
+        const response = await fetch(API_HABITS_URL + '/habits', {
           method: 'POST',
           headers: { 'Content-Type': 'application/json' },
           body: JSON.stringify({ name, description }),
@@ -264,10 +270,10 @@ export const HabitsProvider = ({ children }: { children: ReactNode }) => {
     async (id: string, updates: { name?: string; description?: string }) => {
       setIsLoading(true);
       try {
-        const response = await fetch(API_HABITS_URL + '/update', {
+        const response = await fetch(API_HABITS_URL + `/habits/${id}`, {
           method: 'PATCH',
           headers: { 'Content-Type': 'application/json' },
-          body: JSON.stringify({ habitId: id, ...updates }),
+          body: JSON.stringify(updates),
           credentials: 'include',
         });
 
@@ -294,14 +300,13 @@ export const HabitsProvider = ({ children }: { children: ReactNode }) => {
     [addToast]
   );
 
-  const deleteHabit = useCallback(
+  const archiveHabit = useCallback(
     async (id: string) => {
       setIsLoading(true);
       try {
-        const response = await fetch(API_HABITS_URL + '/delete', {
+        const response = await fetch(API_HABITS_URL + `/habits/${id}`, {
           method: 'DELETE',
           headers: { 'Content-Type': 'application/json' },
-          body: JSON.stringify({ habitId: id }),
           credentials: 'include',
         });
 
@@ -312,11 +317,100 @@ export const HabitsProvider = ({ children }: { children: ReactNode }) => {
 
         setHabits((prev) => prev.filter((h) => h.id !== id));
 
-        addToast({ message: 'Habit deleted', color: 'bg-gray-600' });
+        addToast({ message: 'Habit archived', color: 'bg-gray-600' });
       } catch (error) {
-        console.error('Error deleting habit:', error);
+        console.error('Error archiving habit:', error);
         addToast({
-          message: error instanceof Error ? error.message : 'Failed to delete habit',
+          message: error instanceof Error ? error.message : 'Failed to archiving habit',
+          color: 'bg-red-600',
+        });
+        throw error;
+      } finally {
+        setIsLoading(false);
+      }
+    },
+    [addToast]
+  );
+
+  const fetchInactiveHabits = useCallback(async () => {
+    try {
+      const response = await fetch(API_HABITS_URL + '/habits?status=inactive', {
+        headers: { 'Content-Type': 'application/json' },
+        credentials: 'include',
+      });
+
+      if (!response.ok) {
+        throw new Error('Failed to fetch inactive habits');
+      }
+
+      const data = await response.json();
+      setInactiveHabits(data.habits);
+    } catch (error) {
+      console.error('Error fetching inactive habits:', error);
+      addToast({ message: 'Failed to fetch inactive habits', color: 'bg-red-600' });
+    }
+  }, [addToast]);
+
+  const restoreHabit = useCallback(
+    async (id: string) => {
+      setIsLoading(true);
+      try {
+        const response = await fetch(API_HABITS_URL + `/habits/${id}/restore`, {
+          method: 'PATCH',
+          headers: { 'Content-Type': 'application/json' },
+          credentials: 'include',
+        });
+
+        if (!response.ok) {
+          const error = await response.json();
+          throw new Error(error.error || 'Failed to restore habit');
+        }
+
+        const data = await response.json();
+
+        // Remove from inactive habits
+        setInactiveHabits((prev) => prev.filter((h) => h.id !== id));
+
+        // Add to active habits
+        setHabits((prev) => [...prev, data.habit]);
+
+        addToast({ message: 'Habit restored!', color: 'bg-green-600' });
+      } catch (error) {
+        console.error('Error restoring habit:', error);
+        addToast({
+          message: error instanceof Error ? error.message : 'Failed to restore habit',
+          color: 'bg-red-600',
+        });
+        throw error;
+      } finally {
+        setIsLoading(false);
+      }
+    },
+    [addToast]
+  );
+
+  const deleteHabit = useCallback(
+    async (id: string) => {
+      setIsLoading(true);
+      try {
+        const response = await fetch(API_HABITS_URL + `/habits/${id}/permanent`, {
+          method: 'DELETE',
+          headers: { 'Content-Type': 'application/json' },
+          credentials: 'include',
+        });
+
+        if (!response.ok) {
+          const error = await response.json();
+          throw new Error(error.error || 'Failed to permanently delete habit');
+        }
+
+        setInactiveHabits((prev) => prev.filter((h) => h.id !== id));
+
+        addToast({ message: 'Habit permanently deleted', color: 'bg-gray-600' });
+      } catch (error) {
+        console.error('Error permanently deleting habit:', error);
+        addToast({
+          message: error instanceof Error ? error.message : 'Failed to permanently delete habit',
           color: 'bg-red-600',
         });
         throw error;
@@ -333,6 +427,7 @@ export const HabitsProvider = ({ children }: { children: ReactNode }) => {
       try {
         const response = await fetch(API_HABITS_URL + `/completions?year=${year}`, {
           credentials: 'include',
+          headers: { 'Content-Type': 'application/json' },
         });
 
         if (!response.ok) {
@@ -384,7 +479,7 @@ export const HabitsProvider = ({ children }: { children: ReactNode }) => {
 
         if (isCompleted) {
           // Uncomplete
-          const response = await fetch(API_HABITS_URL + '/uncomplete', {
+          const response = await fetch(API_HABITS_URL + '/completions', {
             method: 'DELETE',
             headers: { 'Content-Type': 'application/json' },
             body: JSON.stringify({ habitId, date }),
@@ -396,7 +491,7 @@ export const HabitsProvider = ({ children }: { children: ReactNode }) => {
           }
         } else {
           // Complete
-          const response = await fetch(API_HABITS_URL + '/complete', {
+          const response = await fetch(API_HABITS_URL + '/completions', {
             method: 'POST',
             headers: { 'Content-Type': 'application/json' },
             body: JSON.stringify({ habitId, date }),
@@ -420,7 +515,7 @@ export const HabitsProvider = ({ children }: { children: ReactNode }) => {
   const updateColor = useCallback(
     async (color: string) => {
       try {
-        const response = await fetch(API_HABITS_URL + '/update-settings', {
+        const response = await fetch(API_HABITS_URL + '/trackers/settings', {
           method: 'PATCH',
           headers: { 'Content-Type': 'application/json' },
           body: JSON.stringify({ color }),
@@ -452,6 +547,7 @@ export const HabitsProvider = ({ children }: { children: ReactNode }) => {
     trackerId,
     color,
     habits,
+    inactiveHabits,
     completions,
     selectedDate,
     isLoading,
@@ -462,8 +558,11 @@ export const HabitsProvider = ({ children }: { children: ReactNode }) => {
     logout,
     checkSession,
     fetchHabits,
+    fetchInactiveHabits,
     createHabit,
     updateHabit,
+    archiveHabit,
+    restoreHabit,
     deleteHabit,
     fetchCompletions,
     toggleCompletion,

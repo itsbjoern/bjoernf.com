@@ -7,13 +7,16 @@ import { rateLimit } from '@/utils/rateLimit';
 export const prerender = false;
 
 export const POST: APIRoute = async ({ request }) => {
-  const isInRate = rateLimit(request, [{
-    timeframe: 60,
-    maxRequests: 3,
-  }, {
-    timeframe: 60 * 30,
-    maxRequests: 5,
-  }]);
+  const isInRate = rateLimit(request, [
+    {
+      timeframe: 60,
+      maxRequests: 3,
+    },
+    {
+      timeframe: 60 * 30,
+      maxRequests: 5,
+    },
+  ]);
   if (!isInRate) {
     return new Response(
       JSON.stringify({ error: 'Too many requests, please try again later.', code: 'RATE_LIMIT_EXCEEDED' }),
@@ -39,24 +42,18 @@ export const POST: APIRoute = async ({ request }) => {
     for (const tracker of allTrackers) {
       const isValidPassword = await bcrypt.compare(password, tracker.passwordHash);
       if (isValidPassword) {
-        return new Response(
-          JSON.stringify({ exists: true }),
-          {
-            status: 200,
-            headers: { 'Content-Type': 'application/json' },
-          }
-        );
+        return new Response(JSON.stringify({ exists: true }), {
+          status: 200,
+          headers: { 'Content-Type': 'application/json' },
+        });
       }
     }
 
     // No tracker found with this password
-    return new Response(
-      JSON.stringify({ exists: false }),
-      {
-        status: 200,
-        headers: { 'Content-Type': 'application/json' },
-      }
-    );
+    return new Response(JSON.stringify({ exists: false }), {
+      status: 200,
+      headers: { 'Content-Type': 'application/json' },
+    });
   } catch (error) {
     console.error('Error checking password:', error);
     return new Response(

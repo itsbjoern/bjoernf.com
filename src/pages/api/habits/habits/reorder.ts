@@ -6,7 +6,7 @@ import { eq, and } from 'drizzle-orm';
 
 export const prerender = false;
 
-export const POST: APIRoute = async ({ request, cookies }) => {
+export const PATCH: APIRoute = async ({ request, cookies }) => {
   try {
     // Get tracker ID from session
     const trackerId = await getTrackerFromSession(cookies);
@@ -40,13 +40,10 @@ export const POST: APIRoute = async ({ request, cookies }) => {
       )
     );
 
-    return new Response(
-      JSON.stringify({ success: true }),
-      {
-        status: 200,
-        headers: { 'Content-Type': 'application/json' },
-      }
-    );
+    return new Response(JSON.stringify({ success: true }), {
+      status: 200,
+      headers: { 'Content-Type': 'application/json' },
+    });
   } catch (error) {
     console.error('Error reordering habits:', error);
     return new Response(

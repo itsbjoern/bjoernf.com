@@ -6,7 +6,7 @@ import { eq, and } from 'drizzle-orm';
 
 export const prerender = false;
 
-export const DELETE: APIRoute = async ({ request, cookies }) => {
+export const PATCH: APIRoute = async ({ cookies, params }) => {
   try {
     // Get tracker ID from session
     const trackerId = await getTrackerFromSession(cookies);
@@ -18,10 +18,7 @@ export const DELETE: APIRoute = async ({ request, cookies }) => {
       );
     }
 
-    const body = await request.json();
-    const { habitId } = body;
-
-    // Validate input
+    const habitId = params.id;
     if (!habitId) {
       return new Response(
         JSON.stringify({ error: 'Habit ID is required', code: 'INVALID_INPUT' }),
@@ -29,31 +26,28 @@ export const DELETE: APIRoute = async ({ request, cookies }) => {
       );
     }
 
-    // Soft delete habit (only if it belongs to the authenticated tracker)
-    const [deletedHabit] = await db
+    // Restore habit by setting isActive to true (only if it belongs to the authenticated tracker)
+    const [restoredHabit] = await db
       .update(habits)
-      .set({ isActive: false })
+      .set({ isActive: true })
       .where(and(eq(habits.id, habitId), eq(habits.trackerId, trackerId)))
       .returning();
 
-    if (!deletedHabit) {
+    if (!restoredHabit) {
       return new Response(
         JSON.stringify({ error: 'Habit not found', code: 'NOT_FOUND' }),
         { status: 404, headers: { 'Content-Type': 'application/json' } }
       );
     }
 
-    return new Response(
-      JSON.stringify({ success: true }),
-      {
-        status: 200,
-        headers: { 'Content-Type': 'application/json' },
-      }
-    );
+    return new Response(JSON.stringify({ success: true, habit: restoredHabit }), {
+      status: 200,
+      headers: { 'Content-Type': 'application/json' },
+    });
   } catch (error) {
-    console.error('Error deleting habit:', error);
+    console.error('Error restoring habit:', error);
     return new Response(
-      JSON.stringify({ error: 'Failed to delete habit', code: 'SERVER_ERROR' }),
+      JSON.stringify({ error: 'Failed to restore habit', code: 'SERVER_ERROR' }),
       { status: 500, headers: { 'Content-Type': 'application/json' } }
     );
   }

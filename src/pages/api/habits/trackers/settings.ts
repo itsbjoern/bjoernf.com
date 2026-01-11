@@ -51,13 +51,10 @@ export const PATCH: APIRoute = async ({ request, cookies }) => {
       );
     }
 
-    return new Response(
-      JSON.stringify({ color }),
-      {
-        status: 200,
-        headers: { 'Content-Type': 'application/json' },
-      }
-    );
+    return new Response(JSON.stringify({ color }), {
+      status: 200,
+      headers: { 'Content-Type': 'application/json' },
+    });
   } catch (error) {
     console.error('Error updating settings:', error);
     return new Response(

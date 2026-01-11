@@ -3,7 +3,7 @@ import { useHabits } from '../Context/HabitsContext';
 import { formatDate, formatDisplayDate } from '../util';
 
 export const HabitList = () => {
-  const { habits, completions, selectedDate, toggleCompletion, createHabit, updateHabit, deleteHabit } =
+  const { habits, completions, selectedDate, toggleCompletion, createHabit, updateHabit, archiveHabit } =
     useHabits();
 
   const [addForm, setAddForm] = useState<{ visible: boolean; id: string | null; name: string; description: string }>({ visible: false, id: null, name: '', description: '' });
@@ -109,14 +109,12 @@ export const HabitList = () => {
                   </button>
                   <button
                     onClick={() => {
-                      if (confirm(`Delete "${habit.name}"? This will permanently delete it for all dates.`)) {
-                        deleteHabit(habit.id);
-                      }
+                      archiveHabit(habit.id);
                     }}
                     className="opacity-100 sm:opacity-0 sm:group-hover:opacity-100 px-2 py-1 text-xs sm:text-sm text-gray-600 dark:text-gray-400 hover:text-gray-900 dark:hover:text-gray-100 hover:bg-gray-100 dark:hover:bg-gray-800 rounded transition-all"
                     aria-label="Delete habit"
                   >
-                    Delete
+                    Archive
                   </button>
                 </div>
               </div>
