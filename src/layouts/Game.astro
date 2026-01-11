@@ -1,4 +1,5 @@
 ---
+import "./GameStyle.css";
 import Me from "@/images/me.jpg";
 interface Props {
   title: string;
@@ -65,35 +66,5 @@ const { title, description = "", image = Me.src } = Astro.props;
         </div>
       </div>
     </div>
-    <style is:global>
-      :root {
-        --tw-color-primary: theme("colors.primary");
-      }
-
-      * {
-        margin: 0;
-        padding: 0;
-        box-sizing: border-box;
-      }
-
-      html {
-        font-family: system-ui, sans-serif;
-        background: #13151a;
-
-        font-family: "Raleway", "-apple-system", "BlinkMacSystemFont",
-          "Helvetica Neue", "Arial", "sans-serif";
-      }
-
-      html,
-      body {
-        min-height: 100vh;
-        overflow: hidden;
-      }
-
-      body {
-        display: flex;
-        overscroll-behavior-y: none;
-      }
-    </style>
   </body>
 </html>

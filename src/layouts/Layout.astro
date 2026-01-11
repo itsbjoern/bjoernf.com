@@ -1,4 +1,5 @@
 ---
+import "./LayoutStyle.css";
 import Footer from "@/components/Footer.astro";
 import Header from "@/components/Header.astro";
 import Navigation from "@/components/Navigation/Navigation.astro";
@@ -73,82 +74,5 @@ const { title, description = "", image = Me.src, slug } = Astro.props;
         </div>
       </div>
     </div>
-    <style is:global>
-      :root {
-        --tw-color-primary: theme("colors.primary");
-      }
-
-      * {
-        margin: 0;
-        padding: 0;
-        box-sizing: border-box;
-      }
-
-      html {
-        font-family: system-ui, sans-serif;
-        background: #13151a;
-        background-size: 224px;
-
-        font-family: "Raleway", "-apple-system", "BlinkMacSystemFont",
-          "Helvetica Neue", "Arial", "sans-serif";
-      }
-
-      html,
-      body {
-        min-height: 100vh;
-      }
-
-      body {
-        display: flex;
-        overscroll-behavior-y: none;
-      }
-
-      code {
-        font-family: source-code-pro, Menlo, Monaco, Consolas, "Courier New",
-          monospace;
-        overflow-wrap: break-word;
-      }
-
-      .neo-container .neo {
-        box-shadow:
-          -80px -0px 1px 10px rgba(255, 0, 0, 0),
-          50px 50px 1px 10px rgba(0, 255, 0, 0),
-          0px 35px 1px 10px rgba(0, 0, 255, 0);
-      }
-
-      .neo-container:hover .neo {
-        transition: box-shadow 0.4s ease-out;
-        box-shadow:
-          0 0 0 0px rgba(255, 0, 0, 0.4),
-          0 0 0 0px rgba(0, 255, 0, 0.4),
-          0 0 0 0px rgba(0, 0, 255, 0.4),
-          0 0 3px 0px rgba(0, 0, 0, 0.1),
-          1px 3px 3px 0px rgba(0, 0, 0, 0.1);
-      }
-
-      .neo-container .neo.clipped {
-        clip-path: polygon(
-          -100px -100px,
-          calc(100% + 100px) -100px,
-          calc(100% + 100px) 100%,
-          -100px 100%
-        );
-      }
-
-      .neo-text {
-        text-shadow:
-          10px -10px 1px rgba(255, 0, 0, 0),
-          20px 5px 1px rgba(0, 255, 0, 0),
-          -10px 10px 1px rgba(0, 0, 255, 0);
-      }
-
-      .neo-text:hover {
-        transition: text-shadow 0.4s ease-in;
-        text-shadow:
-          0px 0px rgba(255, 0, 0, 0.5),
-          0px 0px rgba(0, 255, 0, 0.5),
-          0px 0px rgba(0, 0, 255, 0.5);
-      }
-    </style>
   </body>
 </html>

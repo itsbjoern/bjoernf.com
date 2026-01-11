@@ -39,7 +39,7 @@ export default defineConfig({
         resources: ["'self'", "'unsafe-inline'"],
       },
       directives: [
-        "connect-src 'self' https://unpkg.com https://a.bjoernf.com https://api.bjoernf.com",
+        "connect-src 'self' https://unpkg.com https://a.bjoernf.com",
         "img-src 'self' data: blob: https://upload.wikimedia.org",
       ],
     },
