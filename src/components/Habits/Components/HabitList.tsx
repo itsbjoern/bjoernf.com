@@ -80,7 +80,7 @@ export const HabitList = () => {
             return (
               <div
                 key={habit.id}
-                className="flex gap-2 p-3 hover:bg-gray-50 dark:hover:bg-gray-900 rounded-md transition-colors group items-end md:items-start flex-col md:flex-row"
+                className="flex gap-2 p-3 hover:bg-gray-50 dark:hover:bg-gray-900 rounded-md transition-colors group items-end sm:items-center flex-col sm:flex-row"
               >
                 <div className="flex items-start sm:items-center flex-1 gap-3 w-full">
                   <input

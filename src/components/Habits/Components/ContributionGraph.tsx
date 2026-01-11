@@ -1,9 +1,11 @@
-import { useMemo } from 'react';
+import { useMemo, useState } from 'react';
 import { useHabits } from '../Context/HabitsContext';
 import { formatDate, getColorForCount, getDaysInYear, formatDisplayDate } from '../util';
 
 export const ContributionGraph = () => {
-  const { color, completions, setSelectedDate, selectedDate } = useHabits();
+  const { color, completions, setSelectedDate, selectedDate, habits } = useHabits();
+  const [hoveredDay, setHoveredDay] = useState<{ date: Date; count: number; x: number; y: number } | null>(null);
+  const [selectedHabitIds, setSelectedHabitIds] = useState<Set<string>>(new Set());
   const today = new Date();
   const todayFmt = formatDate(today);
   const currentYear = today.getFullYear();
@@ -45,21 +47,94 @@ export const ContributionGraph = () => {
     setSelectedDate(day);
   };
 
+  const toggleHabitFilter = (habitId: string) => {
+    setSelectedHabitIds((prev) => {
+      const newSet = new Set(prev);
+      if (newSet.has(habitId)) {
+        newSet.delete(habitId);
+      } else {
+        newSet.add(habitId);
+      }
+      return newSet;
+    });
+  };
+
+  const clearFilters = () => {
+    setSelectedHabitIds(new Set());
+  };
+
   const maxCount = useMemo(() => {
     let max = 0;
-    completions.forEach((set) => {
-      if (set.size > max) {
-        max = set.size;
+    completions.forEach((habitIds) => {
+      let count = 0;
+      if (selectedHabitIds.size > 0) {
+        // Count only selected habits
+        count = Array.from(habitIds).filter(id => selectedHabitIds.has(id)).length;
+      } else {
+        // Count all habits
+        count = habitIds.size;
+      }
+      if (count > max) {
+        max = count;
       }
     });
     return max;
-  }, [completions]);
+  }, [completions, selectedHabitIds]);
 
   const squareSize = 3;
 
   return (
-    <div className="bg-white dark:bg-black rounded-lg border border-gray-200 dark:border-gray-800 shadow-sm p-6">
+    <div className="bg-white dark:bg-black rounded-lg border border-gray-200 dark:border-gray-800 shadow-sm p-6 relative">
       <h2 className="text-lg font-semibold text-gray-900 dark:text-gray-100 mb-4">Activity in {currentYear}</h2>
+
+      {/* Habit Filters */}
+      {habits.length > 0 && (
+        <div className="mb-4 flex flex-wrap gap-2">
+          {habits.map((habit) => {
+            const isSelected = selectedHabitIds.has(habit.id);
+            return (
+              <button
+                key={habit.id}
+                onClick={() => toggleHabitFilter(habit.id)}
+                className={`px-3 py-1.5 text-sm rounded-md transition-all ${isSelected
+                    ? 'bg-gray-900 dark:bg-gray-100 text-white dark:text-gray-900'
+                    : 'bg-gray-100 dark:bg-gray-900 text-gray-700 dark:text-gray-300 hover:bg-gray-200 dark:hover:bg-gray-800'
+                  }`}
+              >
+                {habit.name}
+              </button>
+            );
+          })}
+          {selectedHabitIds.size > 0 && (
+            <button
+              onClick={clearFilters}
+              className="px-3 py-1.5 text-sm rounded-md bg-red-100 dark:bg-red-950 text-red-700 dark:text-red-300 hover:bg-red-200 dark:hover:bg-red-900 transition-all"
+            >
+              Clear filters
+            </button>
+          )}
+        </div>
+      )}
+
+      {/* Tooltip */}
+      {hoveredDay && (
+        <div className="hidden sm:block absolute z-10 pointer-events-none bg-gray-900 dark:bg-gray-100 text-white dark:text-gray-900 px-3 py-2 rounded-md text-sm font-medium shadow-lg whitespace-nowrap"
+          style={{
+            left: `${hoveredDay.x}px`,
+            top: `${hoveredDay.y - 15}px`,
+            transform: 'translate(-50%, -100%)'
+          }}>
+          <div className="text-center">
+            <div className="font-semibold">{formatDisplayDate(hoveredDay.date)}</div>
+            <div className="text-xs opacity-90">
+              {hoveredDay.count} habit{hoveredDay.count !== 1 ? 's' : ''} completed
+              {selectedHabitIds.size > 0 && <span className="opacity-75"> (filtered)</span>}
+            </div>
+          </div>
+          {/* Arrow */}
+          <div className="absolute -bottom-1 left-1/2 -translate-x-1/2 w-2 h-2 bg-gray-900 dark:bg-gray-100 rotate-45" />
+        </div>
+      )}
 
       <div className="overflow-x-auto p-1 pb-4">
         <div className="inline-flex gap-[2px]">
@@ -86,7 +161,19 @@ export const ContributionGraph = () => {
                 }
 
                 const dateStr = formatDate(day);
-                const count = completions.get(dateStr)?.size || 0;
+                const dayCompletions = completions.get(dateStr);
+                let count = 0;
+
+                if (dayCompletions) {
+                  if (selectedHabitIds.size > 0) {
+                    // Count only selected habits
+                    count = Array.from(dayCompletions).filter(id => selectedHabitIds.has(id)).length;
+                  } else {
+                    // Count all habits
+                    count = dayCompletions.size;
+                  }
+                }
+
                 const countColor = getColorForCount(count, maxCount, color);
                 const isSelected =
                   formatDate(selectedDate) === dateStr;
@@ -96,9 +183,22 @@ export const ContributionGraph = () => {
                   <button
                     key={dayIdx}
                     onClick={() => handleDayClick(day)}
+                    onMouseEnter={(e) => {
+                      const rect = e.currentTarget.getBoundingClientRect();
+                      const containerRect = e.currentTarget.closest('.relative')?.getBoundingClientRect();
+                      if (containerRect) {
+                        setHoveredDay({
+                          date: day,
+                          count,
+                          x: rect.left - containerRect.left + rect.width / 2,
+                          y: rect.top - containerRect.top
+                        });
+                      }
+                    }}
+                    onMouseLeave={() => setHoveredDay(null)}
                     className={`w-${squareSize} h-${squareSize} rounded-sm transition-all hover:ring-2 bg-gray-200 dark:bg-gray-800 hover:ring-blue-500/50   ${isSelected ? 'ring-2 ring-blue-600' : isToday ? 'ring-1 ring-blue-600' : ''}`}
                     style={count === 0 ? undefined : { backgroundColor: countColor }}
-                    title={`${formatDisplayDate(day)}: ${count} habit${count !== 1 ? 's' : ''}`}
+                    aria-label={`${formatDisplayDate(day)}: ${count} habit${count !== 1 ? 's' : ''}`}
                   />
                 );
               })}
