@@ -18,6 +18,7 @@ export default defineConfig({
     assets: "static",
     client: "client",
     server: "server",
+    inlineStylesheets: "never",
   },
 
   vite: {
