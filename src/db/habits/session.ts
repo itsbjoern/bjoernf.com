@@ -71,6 +71,7 @@ export async function setTrackerSession(
       secure: import.meta.env.PROD,
       sameSite: 'strict',
       expires: expiresAt,
+      domain: import.meta.env.PROD ? 'bjoernf.com' : undefined,
     });
 
     return sessionId;
