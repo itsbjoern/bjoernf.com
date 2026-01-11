@@ -1,7 +1,7 @@
 import { useState } from 'react';
 import { useHabits } from '../Context/HabitsContext';
-import { ColorPicker } from './ColorPicker';
 import { DEFAULT_COLOR } from '../util';
+import { API_HABITS_URL } from '@/utils/api';
 
 export const AuthForm = () => {
   const { login, createTracker, isLoading } = useHabits();
@@ -23,7 +23,7 @@ export const AuthForm = () => {
     setChecking(true);
     try {
       // Check if password exists
-      const response = await fetch('/api/habits/check-password', {
+      const response = await fetch(API_HABITS_URL + '/check-password', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({ password }),

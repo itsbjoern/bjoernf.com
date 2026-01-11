@@ -10,6 +10,7 @@ import {
 } from 'react';
 import { useToast } from '../Toasts';
 import { DEFAULT_COLOR } from '../util';
+import { API_HABITS_URL } from '@/utils/api';
 
 export type Habit = {
   id: string;
@@ -85,7 +86,7 @@ export const HabitsProvider = ({ children }: { children: ReactNode }) => {
   // Auth actions
   const checkSession = useCallback(async () => {
     try {
-      const response = await fetch('/api/habits/session');
+      const response = await fetch(API_HABITS_URL + '/session');
 
       if (!response.ok) {
         // Session invalid
@@ -114,7 +115,7 @@ export const HabitsProvider = ({ children }: { children: ReactNode }) => {
     async (password: string, color: string) => {
       setIsLoading(true);
       try {
-        const response = await fetch('/api/habits/create-tracker', {
+        const response = await fetch(API_HABITS_URL + '/create-tracker', {
           method: 'POST',
           headers: { 'Content-Type': 'application/json' },
           body: JSON.stringify({ password, color }),
@@ -150,7 +151,7 @@ export const HabitsProvider = ({ children }: { children: ReactNode }) => {
     async (password: string) => {
       setIsLoading(true);
       try {
-        const response = await fetch('/api/habits/login', {
+        const response = await fetch(API_HABITS_URL + '/login', {
           method: 'POST',
           headers: { 'Content-Type': 'application/json' },
           body: JSON.stringify({ password }),
@@ -185,7 +186,7 @@ export const HabitsProvider = ({ children }: { children: ReactNode }) => {
 
   const logout = useCallback(async () => {
     try {
-      await fetch('/api/habits/logout', { method: 'POST' });
+      await fetch(API_HABITS_URL + '/logout', { method: 'POST' });
 
       setIsAuthenticated(false);
       setCurrentView('auth');
@@ -201,7 +202,7 @@ export const HabitsProvider = ({ children }: { children: ReactNode }) => {
   // Habit actions
   const fetchHabits = useCallback(async () => {
     try {
-      const response = await fetch('/api/habits/list');
+      const response = await fetch(API_HABITS_URL + '/list');
 
       if (!response.ok) {
         throw new Error('Failed to fetch habits');
@@ -219,7 +220,7 @@ export const HabitsProvider = ({ children }: { children: ReactNode }) => {
     async (name: string, description: string) => {
       setIsLoading(true);
       try {
-        const response = await fetch('/api/habits/create', {
+        const response = await fetch(API_HABITS_URL + '/create', {
           method: 'POST',
           headers: { 'Content-Type': 'application/json' },
           body: JSON.stringify({ name, description }),
@@ -252,7 +253,7 @@ export const HabitsProvider = ({ children }: { children: ReactNode }) => {
     async (id: string, updates: { name?: string; description?: string }) => {
       setIsLoading(true);
       try {
-        const response = await fetch('/api/habits/update', {
+        const response = await fetch(API_HABITS_URL + '/update', {
           method: 'PATCH',
           headers: { 'Content-Type': 'application/json' },
           body: JSON.stringify({ habitId: id, ...updates }),
@@ -285,7 +286,7 @@ export const HabitsProvider = ({ children }: { children: ReactNode }) => {
     async (id: string) => {
       setIsLoading(true);
       try {
-        const response = await fetch('/api/habits/delete', {
+        const response = await fetch(API_HABITS_URL + '/delete', {
           method: 'DELETE',
           headers: { 'Content-Type': 'application/json' },
           body: JSON.stringify({ habitId: id }),
@@ -317,7 +318,7 @@ export const HabitsProvider = ({ children }: { children: ReactNode }) => {
   const fetchCompletions = useCallback(
     async (year: number) => {
       try {
-        const response = await fetch(`/api/habits/completions?year=${year}`);
+        const response = await fetch(API_HABITS_URL + `/completions?year=${year}`);
 
         if (!response.ok) {
           throw new Error('Failed to fetch completions');
@@ -368,7 +369,7 @@ export const HabitsProvider = ({ children }: { children: ReactNode }) => {
 
         if (isCompleted) {
           // Uncomplete
-          const response = await fetch('/api/habits/uncomplete', {
+          const response = await fetch(API_HABITS_URL + '/uncomplete', {
             method: 'DELETE',
             headers: { 'Content-Type': 'application/json' },
             body: JSON.stringify({ habitId, date }),
@@ -379,7 +380,7 @@ export const HabitsProvider = ({ children }: { children: ReactNode }) => {
           }
         } else {
           // Complete
-          const response = await fetch('/api/habits/complete', {
+          const response = await fetch(API_HABITS_URL + '/complete', {
             method: 'POST',
             headers: { 'Content-Type': 'application/json' },
             body: JSON.stringify({ habitId, date }),
@@ -402,7 +403,7 @@ export const HabitsProvider = ({ children }: { children: ReactNode }) => {
   const updateColor = useCallback(
     async (color: string) => {
       try {
-        const response = await fetch('/api/habits/update-settings', {
+        const response = await fetch(API_HABITS_URL + '/update-settings', {
           method: 'PATCH',
           headers: { 'Content-Type': 'application/json' },
           body: JSON.stringify({ color }),
