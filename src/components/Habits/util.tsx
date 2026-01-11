@@ -3,7 +3,7 @@ export function generateId(): string {
   return crypto.randomUUID();
 }
 
-export const DEFAULT_COLOR = '#216e39';
+export const DEFAULT_COLOR = '#317e49';
 
 // Format date to YYYY-MM-DD
 export function formatDate(date: Date): string {
@@ -50,14 +50,33 @@ function hexToHsl(hex: string): { h: number; s: number; l: number } {
   return { h: h * 360, s: s * 100, l: l * 100 };
 }
 
-// Get color for completion count
+// Get color for completion count with improved visual distribution
 export function getColorForCount(count: number, maxCount: number, color: string): string {
-  const hsl = hexToHsl(color);
-  const availableLightness = 100 - hsl.l;
+  if (count === 0) {
+    return 'transparent'; // No color for zero
+  }
 
-  // Calculate lightness based on count
-  const lightness = hsl.l + availableLightness - (count / maxCount) * availableLightness;
-  return `hsl(${hsl.h}, ${hsl.s}%, ${lightness}%)`;
+  const hsl = hexToHsl(color);
+  const ratio = count / Math.max(maxCount, 1);
+
+  // Use a power curve for better visual distribution (makes lower values more distinct)
+  const adjustedRatio = Math.pow(ratio, 0.9);
+
+  // Define color stops similar to GitHub's approach
+  // Low values: lighter with reduced saturation (subtle)
+  // High values: darker with full saturation (vibrant)
+
+  const minLightness = Math.max(hsl.l - 25, 25); // Don't go too dark
+  const maxLightness = Math.min(hsl.l + 65, 92); // Start lighter
+
+  const minSaturation = Math.max(hsl.s - 65, 10); // Reduce saturation for low values
+  const maxSaturation = Math.min(hsl.s + 10, 100); // Boost saturation for high values
+
+  // Interpolate from light/desaturated to dark/saturated
+  const lightness = maxLightness - adjustedRatio * (maxLightness - minLightness);
+  const saturation = minSaturation + adjustedRatio * (maxSaturation - minSaturation);
+
+  return `hsl(${hsl.h}, ${saturation}%, ${lightness}%)`; // Slightly increase opacity with count
 }
 
 // Get all days in a year

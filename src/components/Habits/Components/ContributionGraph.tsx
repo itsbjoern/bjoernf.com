@@ -97,8 +97,8 @@ export const ContributionGraph = () => {
                 key={habit.id}
                 onClick={() => toggleHabitFilter(habit.id)}
                 className={`px-3 py-1.5 text-sm rounded-md transition-all ${isSelected
-                    ? 'bg-gray-900 dark:bg-gray-100 text-white dark:text-gray-900'
-                    : 'bg-gray-100 dark:bg-gray-900 text-gray-700 dark:text-gray-300 hover:bg-gray-200 dark:hover:bg-gray-800'
+                  ? 'bg-gray-900 dark:bg-gray-100 text-white dark:text-gray-900'
+                  : 'bg-gray-100 dark:bg-gray-900 text-gray-700 dark:text-gray-300 hover:bg-gray-200 dark:hover:bg-gray-800'
                   }`}
               >
                 {habit.name}
@@ -152,9 +152,9 @@ export const ContributionGraph = () => {
             )
           })}
         </div>
-        <div className="inline-flex gap-[2px]">
+        <div className="inline-flex gap-[3px]">
           {weeks.map((week, weekIdx) => (
-            <div key={weekIdx} className="flex flex-col gap-[2px]">
+            <div key={weekIdx} className="flex flex-col gap-[3px]">
               {week.map((day, dayIdx) => {
                 if (day.getTime() === 0) {
                   return <div key={dayIdx} className={`w-${squareSize} h-${squareSize}`} />;
