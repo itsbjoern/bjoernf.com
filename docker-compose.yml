@@ -6,4 +6,4 @@ services:
       - "4321:4321"
     restart: unless-stopped
     volumes:
-      - ./data:/home/bun/app/data
+      - ./data:/app/data
