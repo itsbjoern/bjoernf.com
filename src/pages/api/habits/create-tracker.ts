@@ -1,0 +1,70 @@
+import type { APIRoute } from 'astro';
+import { db } from '@/db/habits';
+import { trackers } from '@/db/habits/schema';
+import { setTrackerSession } from '@/db/habits/session';
+import bcrypt from 'bcryptjs';
+
+export const prerender = false;
+
+export const POST: APIRoute = async ({ request, cookies }) => {
+  try {
+    const body = await request.json();
+    const { password, colorTheme = 'github' } = body;
+
+    // Validate input
+    if (!password || typeof password !== 'string') {
+      return new Response(
+        JSON.stringify({ error: 'Password is required', code: 'INVALID_INPUT' }),
+        { status: 400, headers: { 'Content-Type': 'application/json' } }
+      );
+    }
+
+    if (password.length < 8) {
+      return new Response(
+        JSON.stringify({ error: 'Password must be at least 8 characters', code: 'PASSWORD_TOO_SHORT' }),
+        { status: 400, headers: { 'Content-Type': 'application/json' } }
+      );
+    }
+
+    // Validate color theme
+    const validThemes = ['github', 'ocean', 'forest', 'sunset', 'monochrome'];
+    if (!validThemes.includes(colorTheme)) {
+      return new Response(
+        JSON.stringify({ error: 'Invalid color theme', code: 'INVALID_THEME' }),
+        { status: 400, headers: { 'Content-Type': 'application/json' } }
+      );
+    }
+
+    // Hash password
+    const passwordHash = await bcrypt.hash(password, 10);
+
+    // Create tracker
+    const [newTracker] = await db
+      .insert(trackers)
+      .values({
+        passwordHash,
+        colorTheme,
+      })
+      .returning();
+
+    // Create session
+    await setTrackerSession(cookies, newTracker.id);
+
+    return new Response(
+      JSON.stringify({
+        trackerId: newTracker.id,
+        colorTheme: newTracker.colorTheme,
+      }),
+      {
+        status: 201,
+        headers: { 'Content-Type': 'application/json' },
+      }
+    );
+  } catch (error) {
+    console.error('Error creating tracker:', error);
+    return new Response(
+      JSON.stringify({ error: 'Failed to create tracker', code: 'SERVER_ERROR' }),
+      { status: 500, headers: { 'Content-Type': 'application/json' } }
+    );
+  }
+};

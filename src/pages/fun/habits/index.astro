@@ -1,0 +1,8 @@
+---
+import GameLayout from '@/layouts/Game.astro';
+import Loader from '@/components/Habits/Loader';
+---
+
+<GameLayout title="Habit Tracker">
+  <Loader client:only="react" />
+</GameLayout>
