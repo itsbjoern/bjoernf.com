@@ -8,6 +8,7 @@ export const onRequest = defineMiddleware(async (context, next) => {
     headers.set('Access-Control-Allow-Origin', 'https://bjoernf.com');
     headers.set('Access-Control-Allow-Methods', 'GET,HEAD,POST,PUT,PATCH,DELETE,OPTIONS');
     headers.set('Access-Control-Allow-Headers', 'Origin, X-Requested-With, Content-Type, Accept');
+    headers.set('Access-Control-Allow-Credentials', 'true');
     return new Response(null, { headers });
   }
 
@@ -15,5 +16,6 @@ export const onRequest = defineMiddleware(async (context, next) => {
   response.headers.set('Access-Control-Allow-Origin', 'https://bjoernf.com');
   response.headers.set('Access-Control-Allow-Methods', 'GET,HEAD,POST,PUT,PATCH,DELETE,OPTIONS');
   response.headers.set('Access-Control-Allow-Headers', 'Origin, X-Requested-With, Content-Type, Accept');
+  response.headers.set('Access-Control-Allow-Credentials', 'true');
   return response;
 });

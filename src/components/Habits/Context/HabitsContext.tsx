@@ -86,7 +86,9 @@ export const HabitsProvider = ({ children }: { children: ReactNode }) => {
   // Auth actions
   const checkSession = useCallback(async () => {
     try {
-      const response = await fetch(API_HABITS_URL + '/session');
+      const response = await fetch(API_HABITS_URL + '/session', {
+        credentials: 'include',
+      });
 
       if (!response.ok) {
         // Session invalid
@@ -119,6 +121,7 @@ export const HabitsProvider = ({ children }: { children: ReactNode }) => {
           method: 'POST',
           headers: { 'Content-Type': 'application/json' },
           body: JSON.stringify({ password, color }),
+          credentials: 'include',
         });
 
         if (!response.ok) {
@@ -155,6 +158,7 @@ export const HabitsProvider = ({ children }: { children: ReactNode }) => {
           method: 'POST',
           headers: { 'Content-Type': 'application/json' },
           body: JSON.stringify({ password }),
+          credentials: 'include',
         });
 
         if (!response.ok) {
@@ -186,7 +190,10 @@ export const HabitsProvider = ({ children }: { children: ReactNode }) => {
 
   const logout = useCallback(async () => {
     try {
-      await fetch(API_HABITS_URL + '/logout', { method: 'POST' });
+      await fetch(API_HABITS_URL + '/logout', {
+        method: 'POST',
+        credentials: 'include',
+      });
 
       setIsAuthenticated(false);
       setCurrentView('auth');
@@ -202,7 +209,9 @@ export const HabitsProvider = ({ children }: { children: ReactNode }) => {
   // Habit actions
   const fetchHabits = useCallback(async () => {
     try {
-      const response = await fetch(API_HABITS_URL + '/list');
+      const response = await fetch(API_HABITS_URL + '/list', {
+        credentials: 'include',
+      });
 
       if (!response.ok) {
         throw new Error('Failed to fetch habits');
@@ -224,6 +233,7 @@ export const HabitsProvider = ({ children }: { children: ReactNode }) => {
           method: 'POST',
           headers: { 'Content-Type': 'application/json' },
           body: JSON.stringify({ name, description }),
+          credentials: 'include',
         });
 
         if (!response.ok) {
@@ -257,6 +267,7 @@ export const HabitsProvider = ({ children }: { children: ReactNode }) => {
           method: 'PATCH',
           headers: { 'Content-Type': 'application/json' },
           body: JSON.stringify({ habitId: id, ...updates }),
+          credentials: 'include',
         });
 
         if (!response.ok) {
@@ -290,6 +301,7 @@ export const HabitsProvider = ({ children }: { children: ReactNode }) => {
           method: 'DELETE',
           headers: { 'Content-Type': 'application/json' },
           body: JSON.stringify({ habitId: id }),
+          credentials: 'include',
         });
 
         if (!response.ok) {
@@ -318,7 +330,9 @@ export const HabitsProvider = ({ children }: { children: ReactNode }) => {
   const fetchCompletions = useCallback(
     async (year: number) => {
       try {
-        const response = await fetch(API_HABITS_URL + `/completions?year=${year}`);
+        const response = await fetch(API_HABITS_URL + `/completions?year=${year}`, {
+          credentials: 'include',
+        });
 
         if (!response.ok) {
           throw new Error('Failed to fetch completions');
@@ -373,6 +387,7 @@ export const HabitsProvider = ({ children }: { children: ReactNode }) => {
             method: 'DELETE',
             headers: { 'Content-Type': 'application/json' },
             body: JSON.stringify({ habitId, date }),
+            credentials: 'include',
           });
 
           if (!response.ok) {
@@ -384,6 +399,7 @@ export const HabitsProvider = ({ children }: { children: ReactNode }) => {
             method: 'POST',
             headers: { 'Content-Type': 'application/json' },
             body: JSON.stringify({ habitId, date }),
+            credentials: 'include',
           });
 
           if (!response.ok) {
@@ -407,6 +423,7 @@ export const HabitsProvider = ({ children }: { children: ReactNode }) => {
           method: 'PATCH',
           headers: { 'Content-Type': 'application/json' },
           body: JSON.stringify({ color }),
+          credentials: 'include',
         });
 
         if (!response.ok) {

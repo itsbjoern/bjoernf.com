@@ -35,7 +35,7 @@ export async function getTrackerFromSession(cookies: AstroCookies): Promise<stri
     if (session.expiresAt < new Date()) {
       // Clean up expired session
       await db.delete(sessions).where(eq(sessions.id, sessionId));
-      cookies.delete(SESSION_COOKIE_NAME, { path: '/' });
+      cookies.delete(SESSION_COOKIE_NAME, { path: '/', domain: '.bjoernf.com' });
       return null;
     }
 
@@ -69,9 +69,9 @@ export async function setTrackerSession(
       path: '/',
       httpOnly: true,
       secure: import.meta.env.PROD,
-      sameSite: 'strict',
+      sameSite: import.meta.env.PROD ? 'none' : 'strict',
+      domain: import.meta.env.PROD ? '.bjoernf.com' : undefined,
       expires: expiresAt,
-      domain: import.meta.env.PROD ? 'bjoernf.com' : undefined,
     });
 
     return sessionId;
