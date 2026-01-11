@@ -24,12 +24,14 @@ RUN bun --bun run build
 
 # copy production dependencies and source code into final image
 FROM base AS release
+WORKDIR /home/bun/app
+RUN mkdir data
+RUN chown -R bun:bun /home/bun/app
+
+USER bun
 
 COPY --from=install /temp/prod/node_modules node_modules
 COPY --from=prerelease /app/dist/server ./dist/server
-
-# run the app
-USER bun
 
 EXPOSE 4321/tcp
 CMD ["bun", "--bun", "./dist/server/entry.mjs"]
