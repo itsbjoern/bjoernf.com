@@ -36,10 +36,10 @@ export default defineConfig({
         resources: ["'self'", "https://unpkg.com", "https://a.bjoernf.com"],
       },
       styleDirective: {
-        resources: ["'self'"],
+        resources: ["'self'", "'unsafe-inline'"],
       },
       directives: [
-        "connect-src 'self' https://unpkg.com https://a.bjoernf.com",
+        "connect-src 'self' https://unpkg.com https://a.bjoernf.com https://api.bjoernf.com",
         "img-src 'self' data: blob: https://upload.wikimedia.org",
       ],
     },
