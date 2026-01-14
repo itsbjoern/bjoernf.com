@@ -8,6 +8,13 @@
       "when": 1768421690055,
       "tag": "0000_outgoing_iron_man",
       "breakpoints": true
+    },
+    {
+      "idx": 1,
+      "version": "7",
+      "when": 1768422784510,
+      "tag": "0001_special_shocker",
+      "breakpoints": true
     }
   ]
 }

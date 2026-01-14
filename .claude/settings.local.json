@@ -3,7 +3,8 @@
     "allow": [
       "Bash(find:*)",
       "Bash(bun astro build:*)",
-      "Bash(ls:*)"
+      "Bash(ls:*)",
+      "Bash(bunx tsc:*)"
     ]
   }
 }

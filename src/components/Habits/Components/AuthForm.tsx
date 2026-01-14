@@ -1,102 +1,74 @@
 import { useState } from 'react';
 import { useHabits } from '../Context/HabitsContext';
 import { DEFAULT_COLOR } from '../util';
-import { API_HABITS_URL } from '@/utils/api';
 
 export const AuthForm = () => {
-  const { login, createTracker, isLoading } = useHabits();
-  const [step, setStep] = useState<'password' | 'confirm-create'>('password');
-  const [password, setPassword] = useState('');
+  const { authenticate, register, isLoading } = useHabits();
+  const [step, setStep] = useState<'initial' | 'register'>('initial');
   const [selectedColor, setSelectedColor] = useState<string>(DEFAULT_COLOR);
   const [error, setError] = useState('');
-  const [checking, setChecking] = useState(false);
 
-  const handlePasswordSubmit = async (e: React.FormEvent) => {
-    e.preventDefault();
+  const handleAuthenticate = async () => {
     setError('');
-
-    if (!password || password.length < 8) {
-      setError('Password must be at least 8 characters');
-      return;
-    }
-
-    setChecking(true);
     try {
-      // Check if password exists
-      const response = await fetch(API_HABITS_URL + '/trackers/check-password', {
-        method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ password }),
-        credentials: 'include',
-      });
-
-      if (!response.ok) {
-        throw new Error('Failed to check password');
-      }
-
-      const data = await response.json();
-
-      if (data.exists) {
-        // Password exists, log in automatically
-        await login(password);
+      await authenticate();
+    } catch (err) {
+      // Check if it's because no passkey was found
+      if (err instanceof Error && err.message.includes('passkey')) {
+        setError('No passkey found. Please create a new tracker.');
       } else {
-        // Password doesn't exist, show confirmation to create new tracker
-        setStep('confirm-create');
+        setError(err instanceof Error ? err.message : 'Failed to authenticate');
       }
-    } catch (err) {
-      setError('Something went wrong. Please try again.');
-    } finally {
-      setChecking(false);
     }
   };
 
-  const handleCreateConfirm = async () => {
-    try {
-      await createTracker(password, selectedColor);
-    } catch (err) {
-      // Error is already shown via toast
-      // Go back to password step on error
-      setStep('password');
-    }
-  };
-
-  const handleCancel = () => {
-    setStep('password');
-    setPassword('');
+  const handleRegister = async () => {
     setError('');
+    try {
+      await register(selectedColor);
+    } catch (err) {
+      setError(err instanceof Error ? err.message : 'Failed to create passkey');
+      setStep('initial');
+    }
   };
 
-  if (step === 'confirm-create') {
+  if (step === 'register') {
     return (
       <div className="w-full max-w-md m-auto bg-white dark:bg-black rounded-lg border border-gray-200 dark:border-gray-800 shadow-sm p-8">
         <h1 className="text-2xl font-semibold text-gray-900 dark:text-gray-100 mb-2 text-center">
           Create New Tracker
         </h1>
         <p className="text-gray-600 dark:text-gray-400 text-sm text-center mb-6">
-          No tracker found with this password. Create a new one?
+          Create a passkey to secure your habit tracker
         </p>
+
+        {error && (
+          <div className="mb-4 text-sm text-red-600 dark:text-red-400 bg-red-50 dark:bg-red-900 border border-red-200 dark:border-red-700 rounded-md p-2">
+            {error}
+          </div>
+        )}
 
         <div className="space-y-4">
           <div className="flex gap-2">
             <button
-              onClick={handleCancel}
+              onClick={() => setStep('initial')}
               disabled={isLoading}
               className="flex-1 px-4 py-2 border border-gray-300 dark:border-gray-700 bg-white dark:bg-black hover:bg-gray-50 dark:hover:bg-gray-900 text-gray-900 dark:text-gray-100 rounded-md transition-colors disabled:opacity-50 disabled:cursor-not-allowed"
             >
               Cancel
             </button>
             <button
-              onClick={handleCreateConfirm}
+              onClick={handleRegister}
               disabled={isLoading}
               className="flex-1 px-4 py-2 bg-gray-900 text-white rounded-md hover:bg-gray-800 transition-colors disabled:opacity-50 disabled:cursor-not-allowed"
             >
-              {isLoading ? 'Creating...' : 'Create Tracker'}
+              {isLoading ? 'Creating...' : 'Create Passkey'}
             </button>
           </div>
         </div>
 
         <p className="mt-4 text-xs text-gray-600 dark:text-gray-400 text-center">
-          Remember your password - you'll need it to log in later
+          Your passkey will be securely stored on this device
         </p>
       </div>
     );
@@ -108,43 +80,47 @@ export const AuthForm = () => {
         Habit Tracker
       </h1>
       <p className="text-gray-600 dark:text-gray-400 text-sm text-center mb-6">
-        Enter your password to continue
+        Sign in with your passkey or create a new tracker
       </p>
 
-      <form onSubmit={handlePasswordSubmit} className="space-y-4">
-        <div>
-          <label htmlFor="password" className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">
-            Password
-          </label>
-          <input
-            id="password"
-            type="password"
-            value={password}
-            onChange={(e) => setPassword(e.target.value)}
-            className="w-full px-3 py-2 border border-gray-300 rounded-md bg-white dark:border-gray-700 dark:bg-black text-gray-900 dark:text-gray-100 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent transition-all"
-            placeholder="Enter password (min 8 characters)"
-            disabled={isLoading || checking}
-            autoFocus
-          />
+      {error && (
+        <div className="mb-4 text-sm text-red-600 dark:text-red-400 bg-red-50 dark:bg-red-900 border border-red-200 dark:border-red-700 rounded-md p-2">
+          {error}
+        </div>
+      )}
+
+      <div className="space-y-3">
+        <button
+          onClick={handleAuthenticate}
+          disabled={isLoading}
+          className="w-full px-4 py-3 bg-gray-900 text-white rounded-md hover:bg-gray-800 transition-colors disabled:opacity-50 disabled:cursor-not-allowed font-medium"
+        >
+          {isLoading ? 'Signing in...' : 'Sign in with Passkey'}
+        </button>
+
+        <div className="relative">
+          <div className="absolute inset-0 flex items-center">
+            <div className="w-full border-t border-gray-300 dark:border-gray-700"></div>
+          </div>
+          <div className="relative flex justify-center text-sm">
+            <span className="px-2 bg-white dark:bg-black text-gray-500 dark:text-gray-400">or</span>
+          </div>
         </div>
 
-        {error && (
-          <div className="text-sm text-red-600 dark:text-red-400 bg-red-50 dark:bg-red-900 border border-red-200 dark:border-red-700 rounded-md p-2">
-            {error}
-          </div>
-        )}
-
         <button
-          type="submit"
-          disabled={isLoading || checking || password.length < 8}
-          className="w-full px-4 py-2 bg-gray-900 text-white rounded-md hover:bg-gray-800 transition-colors disabled:opacity-50 disabled:cursor-not-allowed"
+          onClick={() => {
+            setStep('register');
+            setError('');
+          }}
+          disabled={isLoading}
+          className="w-full px-4 py-3 border border-gray-300 dark:border-gray-700 bg-white dark:bg-black hover:bg-gray-50 dark:hover:bg-gray-900 text-gray-900 dark:text-gray-100 rounded-md transition-colors disabled:opacity-50 disabled:cursor-not-allowed font-medium"
         >
-          {checking ? 'Checking...' : isLoading ? 'Loading...' : 'Continue'}
+          Create New Tracker
         </button>
-      </form>
+      </div>
 
-      <p className="mt-4 text-xs text-gray-600 dark:text-gray-400 text-center">
-        Enter your password to log in or create a new tracker
+      <p className="mt-6 text-xs text-gray-600 dark:text-gray-400 text-center">
+        Passkeys use your device's biometric authentication or PIN for secure, passwordless sign-in
       </p>
     </div>
   );

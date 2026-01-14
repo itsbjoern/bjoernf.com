@@ -18,6 +18,8 @@
     "@astrojs/tailwind": "6.0.2",
     "@ffmpeg/ffmpeg": "^0.12.15",
     "@ffmpeg/util": "^0.12.2",
+    "@simplewebauthn/browser": "^13.2.2",
+    "@simplewebauthn/server": "^13.2.2",
     "astro": "5.16.8",
     "bcryptjs": "^3.0.3",
     "canvas-confetti": "^1.9.3",

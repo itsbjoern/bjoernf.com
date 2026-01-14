@@ -8,6 +8,7 @@ import {
   type ReactNode,
   type SetStateAction,
 } from 'react';
+import { startRegistration, startAuthentication } from '@simplewebauthn/browser';
 import { useToast } from '../Toasts';
 import { DEFAULT_COLOR } from '../util';
 import { API_HABITS_URL } from '@/utils/api';
@@ -42,8 +43,8 @@ type HabitsState = {
 
 type HabitsActions = {
   // Auth actions
-  login: (password: string) => Promise<void>;
-  createTracker: (password: string, color: string) => Promise<void>;
+  authenticate: () => Promise<void>;
+  register: (color: string) => Promise<void>;
   logout: () => Promise<void>;
   checkSession: () => Promise<void>;
 
@@ -123,73 +124,52 @@ export const HabitsProvider = ({ children }: { children: ReactNode }) => {
     }
   }, []);
 
-  const createTracker = useCallback(
-    async (password: string, color: string) => {
+  const register = useCallback(
+    async (color: string) => {
       setIsLoading(true);
       try {
-        const response = await fetch(API_HABITS_URL + '/trackers', {
+        // Get registration options from server
+        const optionsResponse = await fetch(API_HABITS_URL + '/auth/register-options', {
           method: 'POST',
           headers: { 'Content-Type': 'application/json' },
-          body: JSON.stringify({ password, color }),
+          body: JSON.stringify({}),
           credentials: 'include',
         });
 
-        if (!response.ok) {
-          const error = await response.json();
-          throw new Error(error.error || 'Failed to create tracker');
+        if (!optionsResponse.ok) {
+          throw new Error('Failed to get registration options');
         }
 
-        const data = await response.json();
+        const options = await optionsResponse.json();
+
+        // Start WebAuthn registration
+        const credential = await startRegistration(options);
+
+        // Send credential to server for verification
+        const verifyResponse = await fetch(API_HABITS_URL + '/auth/register-verify', {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({ credential, color }),
+          credentials: 'include',
+        });
+
+        if (!verifyResponse.ok) {
+          const error = await verifyResponse.json();
+          throw new Error(error.error || 'Failed to register passkey');
+        }
+
+        const data = await verifyResponse.json();
         setTrackerId(data.trackerId);
         setColor(data.color);
         setIsPublic(data.isPublic || false);
         setIsAuthenticated(true);
         setCurrentView('tracker');
 
-        addToast({ message: 'Tracker created successfully!', color: 'bg-green-600' });
+        addToast({ message: 'Passkey created successfully!', color: 'bg-green-600' });
       } catch (error) {
-        console.error('Error creating tracker:', error);
+        console.error('Error registering passkey:', error);
         addToast({
-          message: error instanceof Error ? error.message : 'Failed to create tracker',
-          color: 'bg-red-600',
-        });
-        throw error;
-      } finally {
-        setIsLoading(false);
-      }
-    },
-    [addToast]
-  );
-
-  const login = useCallback(
-    async (password: string) => {
-      setIsLoading(true);
-      try {
-        const response = await fetch(API_HABITS_URL + '/trackers/login', {
-          method: 'POST',
-          headers: { 'Content-Type': 'application/json' },
-          body: JSON.stringify({ password }),
-          credentials: 'include',
-        });
-
-        if (!response.ok) {
-          const error = await response.json();
-          throw new Error(error.error || 'Failed to log in');
-        }
-
-        const data = await response.json();
-        setTrackerId(data.trackerId);
-        setColor(data.color);
-        setIsPublic(data.isPublic || false);
-        setIsAuthenticated(true);
-        setCurrentView('tracker');
-
-        // Fetch habits and completions
-        await Promise.all([fetchHabits(), fetchCompletions(new Date().getFullYear())]);
-      } catch (error) {
-        console.error('Error logging in:', error);
-        addToast({
-          message: error instanceof Error ? error.message : 'Failed to log in',
+          message: error instanceof Error ? error.message : 'Failed to create passkey',
           color: 'bg-red-600',
         });
         throw error;
@@ -518,6 +498,66 @@ export const HabitsProvider = ({ children }: { children: ReactNode }) => {
     [completions, addToast, fetchCompletions]
   );
 
+
+  const authenticate = useCallback(
+    async () => {
+      setIsLoading(true);
+      try {
+        // Get authentication options from server
+        const optionsResponse = await fetch(API_HABITS_URL + '/auth/auth-options', {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          credentials: 'include',
+        });
+
+        if (!optionsResponse.ok) {
+          throw new Error('Failed to get authentication options');
+        }
+
+        const options = await optionsResponse.json();
+
+        // Start WebAuthn authentication
+        const credential = await startAuthentication(options);
+
+        // Send credential to server for verification
+        const verifyResponse = await fetch(API_HABITS_URL + '/auth/auth-verify', {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({ credential }),
+          credentials: 'include',
+        });
+
+        if (!verifyResponse.ok) {
+          const error = await verifyResponse.json();
+          throw new Error(error.error || 'Failed to authenticate');
+        }
+
+        const data = await verifyResponse.json();
+        setTrackerId(data.trackerId);
+        setColor(data.color);
+        setIsPublic(data.isPublic || false);
+        setIsAuthenticated(true);
+        setCurrentView('tracker');
+
+        // Fetch habits and completions
+        await Promise.all([fetchHabits(), fetchCompletions(new Date().getFullYear())]);
+
+        addToast({ message: 'Authenticated successfully!', color: 'bg-green-600' });
+      } catch (error) {
+        console.error('Error authenticating:', error);
+        addToast({
+          message: error instanceof Error ? error.message : 'Failed to authenticate',
+          color: 'bg-red-600',
+        });
+        throw error;
+      } finally {
+        setIsLoading(false);
+      }
+    },
+    [addToast, fetchHabits, fetchCompletions]
+  );
+
+
   const updateColor = useCallback(
     async (color: string) => {
       try {
@@ -592,8 +632,8 @@ export const HabitsProvider = ({ children }: { children: ReactNode }) => {
     isLoading,
     currentView,
     // Actions
-    login,
-    createTracker,
+    authenticate,
+    register,
     logout,
     checkSession,
     fetchHabits,

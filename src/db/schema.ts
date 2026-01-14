@@ -3,9 +3,22 @@ import { pgTable, text, boolean, timestamp, integer, jsonb, uuid } from 'drizzle
 // Trackers table - represents a user/tracker
 export const habitTrackers = pgTable('habit_trackers', {
   id: uuid('id').primaryKey().defaultRandom(),
-  passwordHash: text('password_hash').notNull().unique(),
   color: text('color').notNull().default('#216e39'),
   isPublic: boolean('is_public').notNull().default(false),
+  createdAt: timestamp('created_at').notNull().defaultNow(),
+});
+
+// Passkey credentials table - stores WebAuthn credentials for trackers
+export const habitPasskeys = pgTable('habit_passkeys', {
+  id: text('id').primaryKey(), // credentialID from WebAuthn
+  trackerId: uuid('tracker_id')
+    .notNull()
+    .references(() => habitTrackers.id, { onDelete: 'cascade' }),
+  publicKey: text('public_key').notNull(), // base64 encoded
+  counter: integer('counter').notNull().default(0),
+  deviceType: text('device_type').notNull(), // 'singleDevice' or 'multiDevice'
+  backedUp: boolean('backed_up').notNull().default(false),
+  transports: jsonb('transports'), // ['usb', 'nfc', etc]
   createdAt: timestamp('created_at').notNull().defaultNow(),
 });
 
@@ -45,6 +58,9 @@ export const habitSessions = pgTable('habit_sessions', {
 // Type exports for use in application code
 export type HabitTracker = typeof habitTrackers.$inferSelect;
 export type HabitNewTracker = typeof habitTrackers.$inferInsert;
+
+export type HabitPasskey = typeof habitPasskeys.$inferSelect;
+export type HabitNewPasskey = typeof habitPasskeys.$inferInsert;
 
 export type HabitHabits = typeof habitHabits.$inferSelect;
 export type HabitNewHabit = typeof habitHabits.$inferInsert;
