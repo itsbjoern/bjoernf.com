@@ -1,7 +1,0 @@
-services:
-  api:
-    image: bjoernf.com/api:latest
-    build: .
-    ports:
-      - "4321:4321"
-    restart: unless-stopped
