@@ -1,7 +1,7 @@
 import type { APIRoute } from 'astro';
-import { db } from '@/db/habits';
-import { completions, habits } from '@/db/habits/schema';
-import { getTrackerFromSession } from '@/db/habits/session';
+import { db } from '@/db';
+import { habitCompletions, habitHabits } from '@/db/schema';
+import { getTrackerFromSession } from '@/db/habits';
 import { eq, and, gte, lte } from 'drizzle-orm';
 
 export const prerender = false;
@@ -36,18 +36,18 @@ export const GET: APIRoute = async ({ url, cookies }) => {
     // Join completions with habits to filter by trackerId
     const trackerCompletions = await db
       .select({
-        id: completions.id,
-        habitId: completions.habitId,
-        completedAt: completions.completedAt,
+        id: habitCompletions.id,
+        habitId: habitCompletions.habitId,
+        completedAt: habitCompletions.completedAt,
       })
-      .from(completions)
-      .innerJoin(habits, eq(completions.habitId, habits.id))
+      .from(habitCompletions)
+      .innerJoin(habitHabits, eq(habitCompletions.habitId, habitHabits.id))
       .where(
         and(
-          eq(habits.trackerId, trackerId),
-          eq(habits.isActive, true),
-          gte(completions.completedAt, yearStart),
-          lte(completions.completedAt, yearEnd)
+          eq(habitHabits.trackerId, trackerId),
+          eq(habitHabits.isActive, true),
+          gte(habitCompletions.completedAt, yearStart),
+          lte(habitCompletions.completedAt, yearEnd)
         )
       );
 
@@ -116,8 +116,8 @@ export const POST: APIRoute = async ({ request, cookies }) => {
     // Verify habit belongs to this tracker
     const [habit] = await db
       .select()
-      .from(habits)
-      .where(and(eq(habits.id, habitId), eq(habits.trackerId, trackerId)))
+      .from(habitHabits)
+      .where(and(eq(habitHabits.id, habitId), eq(habitHabits.trackerId, trackerId)))
       .limit(1);
 
     if (!habit) {
@@ -130,8 +130,8 @@ export const POST: APIRoute = async ({ request, cookies }) => {
     // Check if completion already exists
     const [existingCompletion] = await db
       .select()
-      .from(completions)
-      .where(and(eq(completions.habitId, habitId), eq(completions.completedAt, date)))
+      .from(habitCompletions)
+      .where(and(eq(habitCompletions.habitId, habitId), eq(habitCompletions.completedAt, date)))
       .limit(1);
 
     if (existingCompletion) {
@@ -143,7 +143,7 @@ export const POST: APIRoute = async ({ request, cookies }) => {
     }
 
     // Create completion
-    await db.insert(completions).values({
+    await db.insert(habitCompletions).values({
       habitId,
       completedAt: date,
     });
@@ -187,8 +187,8 @@ export const DELETE: APIRoute = async ({ request, cookies }) => {
     // Verify habit belongs to this tracker
     const [habit] = await db
       .select()
-      .from(habits)
-      .where(and(eq(habits.id, habitId), eq(habits.trackerId, trackerId)))
+      .from(habitHabits)
+      .where(and(eq(habitHabits.id, habitId), eq(habitHabits.trackerId, trackerId)))
       .limit(1);
 
     if (!habit) {
@@ -200,8 +200,8 @@ export const DELETE: APIRoute = async ({ request, cookies }) => {
 
     // Delete completion
     await db
-      .delete(completions)
-      .where(and(eq(completions.habitId, habitId), eq(completions.completedAt, date)));
+      .delete(habitCompletions)
+      .where(and(eq(habitCompletions.habitId, habitId), eq(habitCompletions.completedAt, date)));
 
     return new Response(JSON.stringify({ success: true }), {
       status: 200,

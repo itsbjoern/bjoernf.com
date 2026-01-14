@@ -1,7 +1,7 @@
 import type { APIRoute } from 'astro';
-import { db } from '@/db/habits';
-import { trackers } from '@/db/habits/schema';
-import { getTrackerFromSession } from '@/db/habits/session';
+import { db } from '@/db';
+import { habitTrackers } from '@/db/schema';
+import { getTrackerFromSession } from '@/db/habits';
 import { eq } from 'drizzle-orm';
 
 export const prerender = false;
@@ -54,9 +54,9 @@ export const PATCH: APIRoute = async ({ request, cookies }) => {
 
     // Update tracker settings
     const [updatedTracker] = await db
-      .update(trackers)
+      .update(habitTrackers)
       .set(updates)
-      .where(eq(trackers.id, trackerId))
+      .where(eq(habitTrackers.id, trackerId))
       .returning();
 
     if (!updatedTracker) {

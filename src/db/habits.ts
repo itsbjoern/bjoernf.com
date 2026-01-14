@@ -1,6 +1,6 @@
 import type { AstroCookies } from 'astro';
-import { db } from '@/db/habits';
-import { sessions } from '@/db/habits/schema';
+import { db } from '@/db';
+import { habitSessions } from '@/db/schema';
 import { eq, lt } from 'drizzle-orm';
 
 const SESSION_COOKIE_NAME = 'habits_session';
@@ -23,8 +23,8 @@ export async function getTrackerFromSession(cookies: AstroCookies): Promise<stri
     // Find session in database
     const [session] = await db
       .select()
-      .from(sessions)
-      .where(eq(sessions.id, sessionId))
+      .from(habitSessions)
+      .where(eq(habitSessions.id, sessionId))
       .limit(1);
 
     if (!session) {
@@ -34,7 +34,7 @@ export async function getTrackerFromSession(cookies: AstroCookies): Promise<stri
     // Check if session is expired
     if (session.expiresAt < new Date()) {
       // Clean up expired session
-      await db.delete(sessions).where(eq(sessions.id, sessionId));
+      await db.delete(habitSessions).where(eq(habitSessions.id, sessionId));
       cookies.delete(SESSION_COOKIE_NAME, { path: '/', domain: '.bjoernf.com' });
       return null;
     }
@@ -57,7 +57,7 @@ export async function setTrackerSession(
 
   try {
     // Create session in database
-    await db.insert(sessions).values({
+    await db.insert(habitSessions).values({
       id: sessionId,
       trackerId,
       expiresAt,
@@ -88,7 +88,7 @@ export async function clearTrackerSession(cookies: AstroCookies): Promise<void> 
   if (sessionId) {
     try {
       // Delete session from database
-      await db.delete(sessions).where(eq(sessions.id, sessionId));
+      await db.delete(habitSessions).where(eq(habitSessions.id, sessionId));
     } catch (error) {
       console.error('Error deleting session:', error);
     }
@@ -101,7 +101,7 @@ export async function clearTrackerSession(cookies: AstroCookies): Promise<void> 
 // Clean up expired sessions (can be called periodically)
 export async function cleanupExpiredSessions(): Promise<void> {
   try {
-    await db.delete(sessions).where(lt(sessions.expiresAt, new Date()));
+    await db.delete(habitSessions).where(lt(habitSessions.expiresAt, new Date()));
   } catch (error) {
     console.error('Error cleaning up expired sessions:', error);
   }

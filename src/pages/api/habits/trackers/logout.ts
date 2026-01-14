@@ -1,5 +1,5 @@
 import type { APIRoute } from 'astro';
-import { clearTrackerSession } from '@/db/habits/session';
+import { clearTrackerSession } from '@/db/habits';
 
 export const prerender = false;
 

@@ -1,6 +1,6 @@
 import type { APIRoute } from 'astro';
-import { db } from '@/db/habits';
-import { trackers, completions, habits } from '@/db/habits/schema';
+import { db } from '@/db';
+import { habitTrackers, habitCompletions, habitHabits } from '@/db/schema';
 import { eq, and, gte, lte } from 'drizzle-orm';
 
 export const prerender = false;
@@ -17,7 +17,7 @@ export const GET: APIRoute = async ({ params }) => {
     }
 
     // Check if tracker exists and is public
-    const [tracker] = await db.select().from(trackers).where(eq(trackers.id, trackerId)).limit(1);
+    const [tracker] = await db.select().from(habitTrackers).where(eq(habitTrackers.id, trackerId)).limit(1);
 
     if (!tracker) {
       return new Response(
@@ -41,16 +41,16 @@ export const GET: APIRoute = async ({ params }) => {
     // Join completions with habits to filter by trackerId
     const trackerCompletions = await db
       .select({
-        completedAt: completions.completedAt,
+        completedAt: habitCompletions.completedAt,
       })
-      .from(completions)
-      .innerJoin(habits, eq(completions.habitId, habits.id))
+      .from(habitCompletions)
+      .innerJoin(habitHabits, eq(habitCompletions.habitId, habitHabits.id))
       .where(
         and(
-          eq(habits.trackerId, trackerId),
-          eq(habits.isActive, true),
-          gte(completions.completedAt, yearStart),
-          lte(completions.completedAt, yearEnd)
+          eq(habitHabits.trackerId, trackerId),
+          eq(habitHabits.isActive, true),
+          gte(habitCompletions.completedAt, yearStart),
+          lte(habitCompletions.completedAt, yearEnd)
         )
       );
 

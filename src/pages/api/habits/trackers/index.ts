@@ -1,7 +1,7 @@
 import type { APIRoute } from 'astro';
-import { db } from '@/db/habits';
-import { trackers } from '@/db/habits/schema';
-import { setTrackerSession } from '@/db/habits/session';
+import { db } from '@/db';
+import { habitTrackers } from '@/db/schema';
+import { setTrackerSession } from '@/db/habits';
 import bcrypt from 'bcryptjs';
 import { DEFAULT_COLOR } from '@/components/Habits/util';
 import { rateLimit } from '@/utils/rateLimit';
@@ -60,7 +60,7 @@ export const POST: APIRoute = async ({ request, cookies }) => {
     let newTracker;
     try {
       [newTracker] = await db
-        .insert(trackers)
+        .insert(habitTrackers)
         .values({
           passwordHash,
           color,

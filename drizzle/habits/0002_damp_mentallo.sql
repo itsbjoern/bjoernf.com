@@ -1,1 +1,0 @@
-ALTER TABLE `trackers` ADD `is_public` integer DEFAULT false NOT NULL;

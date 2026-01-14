@@ -1,6 +1,6 @@
 import type { APIRoute } from 'astro';
-import { db } from '@/db/habits';
-import { trackers } from '@/db/habits/schema';
+import { db } from '@/db';
+import { habitTrackers } from '@/db/schema';
 import bcrypt from 'bcryptjs';
 import { rateLimit } from '@/utils/rateLimit';
 
@@ -37,7 +37,7 @@ export const POST: APIRoute = async ({ request }) => {
     }
 
     // Check if password matches any tracker
-    const allTrackers = await db.select().from(trackers);
+    const allTrackers = await db.select().from(habitTrackers);
 
     for (const tracker of allTrackers) {
       const isValidPassword = await bcrypt.compare(password, tracker.passwordHash);

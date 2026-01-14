@@ -1,7 +1,7 @@
 import type { APIRoute } from 'astro';
-import { db } from '@/db/habits';
-import { trackers } from '@/db/habits/schema';
-import { setTrackerSession } from '@/db/habits/session';
+import { db } from '@/db';
+import { habitTrackers } from '@/db/schema';
+import { setTrackerSession } from '@/db/habits';
 import bcrypt from 'bcryptjs';
 import { rateLimit } from '@/utils/rateLimit';
 
@@ -39,7 +39,7 @@ export const POST: APIRoute = async ({ request, cookies }) => {
 
     // Find all trackers and check password against each
     // (SQLite doesn't support bcrypt in queries, so we need to check in-app)
-    const allTrackers = await db.select().from(trackers);
+    const allTrackers = await db.select().from(habitTrackers);
 
     let tracker = null;
     for (const t of allTrackers) {

@@ -1,7 +1,7 @@
 import type { APIRoute } from 'astro';
-import { db } from '@/db/habits';
-import { habits } from '@/db/habits/schema';
-import { getTrackerFromSession } from '@/db/habits/session';
+import { db } from '@/db';
+import { habitHabits } from '@/db/schema';
+import { getTrackerFromSession } from '@/db/habits';
 import { eq, and, asc, desc } from 'drizzle-orm';
 
 export const prerender = false;
@@ -25,9 +25,9 @@ export const GET: APIRoute = async ({ cookies, url }) => {
     // Get habits for this tracker
     const trackerHabits = await db
       .select()
-      .from(habits)
-      .where(and(eq(habits.trackerId, trackerId), eq(habits.isActive, isActive)))
-      .orderBy(isActive ? asc(habits.order) : desc(habits.createdAt), asc(habits.createdAt));
+      .from(habitHabits)
+      .where(and(eq(habitHabits.trackerId, trackerId), eq(habitHabits.isActive, isActive)))
+      .orderBy(isActive ? asc(habitHabits.order) : desc(habitHabits.createdAt), asc(habitHabits.createdAt));
 
     return new Response(JSON.stringify({ habits: trackerHabits }), {
       status: 200,
@@ -66,13 +66,13 @@ export const POST: APIRoute = async ({ request, cookies }) => {
     }
 
     // Get count of existing habits to determine order
-    const existingHabits = await db.select().from(habits).where(eq(habits.trackerId, trackerId));
+    const existingHabits = await db.select().from(habitHabits).where(eq(habitHabits.trackerId, trackerId));
 
     const order = existingHabits.length;
 
     // Create habit
     const [newHabit] = await db
-      .insert(habits)
+      .insert(habitHabits)
       .values({
         trackerId,
         name: name.trim(),

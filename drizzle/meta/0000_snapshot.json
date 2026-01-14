@@ -1,47 +1,46 @@
 {
-  "version": "6",
-  "dialect": "sqlite",
-  "id": "dde0404a-0471-43e4-a8ef-ac5e3552a49a",
-  "prevId": "22ae70fe-3058-4e3f-8d2b-be67a84f7902",
+  "id": "409ed9ed-6e4c-4d66-bbc0-713d7f28b68b",
+  "prevId": "00000000-0000-0000-0000-000000000000",
+  "version": "7",
+  "dialect": "postgresql",
   "tables": {
-    "completions": {
-      "name": "completions",
+    "public.habit_completions": {
+      "name": "habit_completions",
+      "schema": "",
       "columns": {
         "id": {
           "name": "id",
-          "type": "text",
+          "type": "uuid",
           "primaryKey": true,
           "notNull": true,
-          "autoincrement": false
+          "default": "gen_random_uuid()"
         },
         "habit_id": {
           "name": "habit_id",
-          "type": "text",
+          "type": "uuid",
           "primaryKey": false,
-          "notNull": true,
-          "autoincrement": false
+          "notNull": true
         },
         "completed_at": {
           "name": "completed_at",
           "type": "text",
           "primaryKey": false,
-          "notNull": true,
-          "autoincrement": false
+          "notNull": true
         },
         "created_at": {
           "name": "created_at",
-          "type": "integer",
+          "type": "timestamp",
           "primaryKey": false,
           "notNull": true,
-          "autoincrement": false
+          "default": "now()"
         }
       },
       "indexes": {},
       "foreignKeys": {
-        "completions_habit_id_habits_id_fk": {
-          "name": "completions_habit_id_habits_id_fk",
-          "tableFrom": "completions",
-          "tableTo": "habits",
+        "habit_completions_habit_id_habit_habits_id_fk": {
+          "name": "habit_completions_habit_id_habit_habits_id_fk",
+          "tableFrom": "habit_completions",
+          "tableTo": "habit_habits",
           "columnsFrom": [
             "habit_id"
           ],
@@ -54,46 +53,45 @@
       },
       "compositePrimaryKeys": {},
       "uniqueConstraints": {},
-      "checkConstraints": {}
+      "policies": {},
+      "checkConstraints": {},
+      "isRLSEnabled": false
     },
-    "habits": {
-      "name": "habits",
+    "public.habit_habits": {
+      "name": "habit_habits",
+      "schema": "",
       "columns": {
         "id": {
           "name": "id",
-          "type": "text",
+          "type": "uuid",
           "primaryKey": true,
           "notNull": true,
-          "autoincrement": false
+          "default": "gen_random_uuid()"
         },
         "tracker_id": {
           "name": "tracker_id",
-          "type": "text",
+          "type": "uuid",
           "primaryKey": false,
-          "notNull": true,
-          "autoincrement": false
+          "notNull": true
         },
         "name": {
           "name": "name",
           "type": "text",
           "primaryKey": false,
-          "notNull": true,
-          "autoincrement": false
+          "notNull": true
         },
         "description": {
           "name": "description",
           "type": "text",
           "primaryKey": false,
           "notNull": true,
-          "autoincrement": false,
           "default": "''"
         },
         "is_active": {
           "name": "is_active",
-          "type": "integer",
+          "type": "boolean",
           "primaryKey": false,
           "notNull": true,
-          "autoincrement": false,
           "default": true
         },
         "order": {
@@ -101,23 +99,22 @@
           "type": "integer",
           "primaryKey": false,
           "notNull": true,
-          "autoincrement": false,
           "default": 0
         },
         "created_at": {
           "name": "created_at",
-          "type": "integer",
+          "type": "timestamp",
           "primaryKey": false,
           "notNull": true,
-          "autoincrement": false
+          "default": "now()"
         }
       },
       "indexes": {},
       "foreignKeys": {
-        "habits_tracker_id_trackers_id_fk": {
-          "name": "habits_tracker_id_trackers_id_fk",
-          "tableFrom": "habits",
-          "tableTo": "trackers",
+        "habit_habits_tracker_id_habit_trackers_id_fk": {
+          "name": "habit_habits_tracker_id_habit_trackers_id_fk",
+          "tableFrom": "habit_habits",
+          "tableTo": "habit_trackers",
           "columnsFrom": [
             "tracker_id"
           ],
@@ -130,47 +127,46 @@
       },
       "compositePrimaryKeys": {},
       "uniqueConstraints": {},
-      "checkConstraints": {}
+      "policies": {},
+      "checkConstraints": {},
+      "isRLSEnabled": false
     },
-    "sessions": {
-      "name": "sessions",
+    "public.habit_sessions": {
+      "name": "habit_sessions",
+      "schema": "",
       "columns": {
         "id": {
           "name": "id",
           "type": "text",
           "primaryKey": true,
-          "notNull": true,
-          "autoincrement": false
+          "notNull": true
         },
         "tracker_id": {
           "name": "tracker_id",
-          "type": "text",
+          "type": "uuid",
           "primaryKey": false,
-          "notNull": true,
-          "autoincrement": false
+          "notNull": true
         },
         "expires_at": {
           "name": "expires_at",
-          "type": "integer",
+          "type": "timestamp",
           "primaryKey": false,
-          "notNull": true,
-          "autoincrement": false
+          "notNull": true
         },
         "data": {
           "name": "data",
-          "type": "text",
+          "type": "jsonb",
           "primaryKey": false,
           "notNull": true,
-          "autoincrement": false,
           "default": "'{}'"
         }
       },
       "indexes": {},
       "foreignKeys": {
-        "sessions_tracker_id_trackers_id_fk": {
-          "name": "sessions_tracker_id_trackers_id_fk",
-          "tableFrom": "sessions",
-          "tableTo": "trackers",
+        "habit_sessions_tracker_id_habit_trackers_id_fk": {
+          "name": "habit_sessions_tracker_id_habit_trackers_id_fk",
+          "tableFrom": "habit_sessions",
+          "tableTo": "habit_trackers",
           "columnsFrom": [
             "tracker_id"
           ],
@@ -183,66 +179,75 @@
       },
       "compositePrimaryKeys": {},
       "uniqueConstraints": {},
-      "checkConstraints": {}
+      "policies": {},
+      "checkConstraints": {},
+      "isRLSEnabled": false
     },
-    "trackers": {
-      "name": "trackers",
+    "public.habit_trackers": {
+      "name": "habit_trackers",
+      "schema": "",
       "columns": {
         "id": {
           "name": "id",
-          "type": "text",
+          "type": "uuid",
           "primaryKey": true,
           "notNull": true,
-          "autoincrement": false
+          "default": "gen_random_uuid()"
         },
         "password_hash": {
           "name": "password_hash",
           "type": "text",
           "primaryKey": false,
-          "notNull": true,
-          "autoincrement": false
+          "notNull": true
         },
         "color": {
           "name": "color",
           "type": "text",
           "primaryKey": false,
           "notNull": true,
-          "autoincrement": false,
           "default": "'#216e39'"
+        },
+        "is_public": {
+          "name": "is_public",
+          "type": "boolean",
+          "primaryKey": false,
+          "notNull": true,
+          "default": false
         },
         "created_at": {
           "name": "created_at",
-          "type": "integer",
+          "type": "timestamp",
           "primaryKey": false,
           "notNull": true,
-          "autoincrement": false
+          "default": "now()"
         }
       },
-      "indexes": {
-        "trackers_password_hash_unique": {
-          "name": "trackers_password_hash_unique",
-          "columns": [
-            "password_hash"
-          ],
-          "isUnique": true
-        }
-      },
+      "indexes": {},
       "foreignKeys": {},
       "compositePrimaryKeys": {},
-      "uniqueConstraints": {},
-      "checkConstraints": {}
+      "uniqueConstraints": {
+        "habit_trackers_password_hash_unique": {
+          "name": "habit_trackers_password_hash_unique",
+          "nullsNotDistinct": false,
+          "columns": [
+            "password_hash"
+          ]
+        }
+      },
+      "policies": {},
+      "checkConstraints": {},
+      "isRLSEnabled": false
     }
   },
-  "views": {},
   "enums": {},
+  "schemas": {},
+  "sequences": {},
+  "roles": {},
+  "policies": {},
+  "views": {},
   "_meta": {
+    "columns": {},
     "schemas": {},
-    "tables": {},
-    "columns": {
-      "\"trackers\".\"color_theme\"": "\"trackers\".\"color\""
-    }
-  },
-  "internal": {
-    "indexes": {}
+    "tables": {}
   }
 }

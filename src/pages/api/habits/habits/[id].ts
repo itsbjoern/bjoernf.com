@@ -1,7 +1,7 @@
 import type { APIRoute } from 'astro';
-import { db } from '@/db/habits';
-import { habits } from '@/db/habits/schema';
-import { getTrackerFromSession } from '@/db/habits/session';
+import { db } from '@/db';
+import { habitHabits } from '@/db/schema';
+import { getTrackerFromSession } from '@/db/habits';
 import { eq, and } from 'drizzle-orm';
 
 export const prerender = false;
@@ -47,9 +47,9 @@ export const PATCH: APIRoute = async ({ request, cookies, params }) => {
 
     // Update habit (only if it belongs to the authenticated tracker)
     const [updatedHabit] = await db
-      .update(habits)
+      .update(habitHabits)
       .set(updates)
-      .where(and(eq(habits.id, habitId), eq(habits.trackerId, trackerId)))
+      .where(and(eq(habitHabits.id, habitId), eq(habitHabits.trackerId, trackerId)))
       .returning();
 
     if (!updatedHabit) {
@@ -94,9 +94,9 @@ export const DELETE: APIRoute = async ({ cookies, params }) => {
 
     // Soft delete habit (only if it belongs to the authenticated tracker)
     const [deletedHabit] = await db
-      .update(habits)
+      .update(habitHabits)
       .set({ isActive: false })
-      .where(and(eq(habits.id, habitId), eq(habits.trackerId, trackerId)))
+      .where(and(eq(habitHabits.id, habitId), eq(habitHabits.trackerId, trackerId)))
       .returning();
 
     if (!deletedHabit) {

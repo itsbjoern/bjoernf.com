@@ -1,7 +1,7 @@
 import type { APIRoute } from 'astro';
-import { db } from '@/db/habits';
-import { habits } from '@/db/habits/schema';
-import { getTrackerFromSession } from '@/db/habits/session';
+import { db } from '@/db';
+import { habitHabits } from '@/db/schema';
+import { getTrackerFromSession } from '@/db/habits';
 import { eq, and } from 'drizzle-orm';
 
 export const prerender = false;
@@ -29,8 +29,8 @@ export const DELETE: APIRoute = async ({ cookies, params }) => {
     // Permanently delete habit (only if it belongs to the authenticated tracker)
     // Completions will be cascade deleted automatically due to foreign key constraint
     const [deletedHabit] = await db
-      .delete(habits)
-      .where(and(eq(habits.id, habitId), eq(habits.trackerId, trackerId)))
+      .delete(habitHabits)
+      .where(and(eq(habitHabits.id, habitId), eq(habitHabits.trackerId, trackerId)))
       .returning();
 
     if (!deletedHabit) {

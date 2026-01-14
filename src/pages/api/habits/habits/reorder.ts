@@ -1,7 +1,7 @@
 import type { APIRoute } from 'astro';
-import { db } from '@/db/habits';
-import { habits } from '@/db/habits/schema';
-import { getTrackerFromSession } from '@/db/habits/session';
+import { db } from '@/db';
+import { habitHabits } from '@/db/schema';
+import { getTrackerFromSession } from '@/db/habits';
 import { eq, and } from 'drizzle-orm';
 
 export const prerender = false;
@@ -34,9 +34,9 @@ export const PATCH: APIRoute = async ({ request, cookies }) => {
     await Promise.all(
       habitIds.map((habitId, index) =>
         db
-          .update(habits)
+          .update(habitHabits)
           .set({ order: index })
-          .where(and(eq(habits.id, habitId), eq(habits.trackerId, trackerId)))
+          .where(and(eq(habitHabits.id, habitId), eq(habitHabits.trackerId, trackerId)))
       )
     );
 

@@ -1,7 +1,7 @@
 import type { APIRoute } from 'astro';
-import { db } from '@/db/habits';
-import { trackers } from '@/db/habits/schema';
-import { getTrackerFromSession } from '@/db/habits/session';
+import { db } from '@/db';
+import { habitTrackers } from '@/db/schema';
+import { getTrackerFromSession } from '@/db/habits';
 import { eq } from 'drizzle-orm';
 
 export const prerender = false;
@@ -19,7 +19,7 @@ export const GET: APIRoute = async ({ cookies }) => {
     }
 
     // Get tracker info
-    const [tracker] = await db.select().from(trackers).where(eq(trackers.id, trackerId)).limit(1);
+    const [tracker] = await db.select().from(habitTrackers).where(eq(habitTrackers.id, trackerId)).limit(1);
 
     if (!tracker) {
       return new Response(

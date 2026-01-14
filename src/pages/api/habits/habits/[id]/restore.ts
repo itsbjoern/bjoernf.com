@@ -1,7 +1,7 @@
 import type { APIRoute } from 'astro';
-import { db } from '@/db/habits';
-import { habits } from '@/db/habits/schema';
-import { getTrackerFromSession } from '@/db/habits/session';
+import { db } from '@/db';
+import { habitHabits } from '@/db/schema';
+import { getTrackerFromSession } from '@/db/habits';
 import { eq, and } from 'drizzle-orm';
 
 export const prerender = false;
@@ -28,9 +28,9 @@ export const PATCH: APIRoute = async ({ cookies, params }) => {
 
     // Restore habit by setting isActive to true (only if it belongs to the authenticated tracker)
     const [restoredHabit] = await db
-      .update(habits)
+      .update(habitHabits)
       .set({ isActive: true })
-      .where(and(eq(habits.id, habitId), eq(habits.trackerId, trackerId)))
+      .where(and(eq(habitHabits.id, habitId), eq(habitHabits.trackerId, trackerId)))
       .returning();
 
     if (!restoredHabit) {
