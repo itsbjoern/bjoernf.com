@@ -5,7 +5,12 @@ import type { Highlighter } from "shiki";
 import type { AnimationConfig } from "./util";
 import { computeFrameStates } from "./animationEngine";
 import { computeDiff } from "./diffEngine";
-import { calculateTimeline, getPhaseAtTime, createRenderConfig, calculateCanvasSize } from "./animationTimeline";
+import {
+  calculateTimeline,
+  getPhaseAtTime,
+  createRenderConfig,
+  calculateCanvasSize,
+} from "./animationTimeline";
 import { renderFrameToCanvas } from "./canvasRenderer";
 
 export type ProgressCallback = (progress: Progress) => void;
@@ -16,7 +21,7 @@ export const exportGIF = async (
   highlighter: Highlighter,
   settings: ExportSettings,
   onProgress: ProgressCallback,
-  language: string = "javascript"
+  language: string = "javascript",
 ): Promise<Blob> => {
   // Dynamic import for gif.js to handle CommonJS module
   const GIFModule = await import("gif.js");
@@ -24,7 +29,11 @@ export const exportGIF = async (
 
   return new Promise((resolve, reject) => {
     // Calculate canvas size based on content
-    const { width, height } = calculateCanvasSize(snippets, config, settings.padding);
+    const { width, height } = calculateCanvasSize(
+      snippets,
+      config,
+      settings.padding,
+    );
 
     // Use 2x resolution for better quality
     const scale = 2;
@@ -33,7 +42,7 @@ export const exportGIF = async (
       quality: 11 - settings.quality,
       width: width * scale,
       height: height * scale,
-      workerScript: "scripts/gif.worker.js",
+      workerScript: "/static/scripts/gif.worker.js",
     });
 
     const tempCanvas = document.createElement("canvas");
@@ -52,14 +61,28 @@ export const exportGIF = async (
     ctx.scale(scale, scale);
 
     // Calculate timeline
-    const timeline = calculateTimeline(config.staticDuration, config.transitionDuration, snippets.length);
-    const totalFrames = Math.ceil((timeline.totalDuration / 1000) * settings.fps);
+    const timeline = calculateTimeline(
+      config.staticDuration,
+      config.transitionDuration,
+      snippets.length,
+    );
+    const totalFrames = Math.ceil(
+      (timeline.totalDuration / 1000) * settings.fps,
+    );
 
     // Calculate max line count for line numbers
-    const maxLineCount = Math.max(...snippets.map((s) => s.code.split("\n").length));
+    const maxLineCount = Math.max(
+      ...snippets.map((s) => s.code.split("\n").length),
+    );
 
     // Create render config (use logical dimensions, context is already scaled)
-    const renderConfig = createRenderConfig(width, height, config, settings.padding, maxLineCount);
+    const renderConfig = createRenderConfig(
+      width,
+      height,
+      config,
+      settings.padding,
+      maxLineCount,
+    );
 
     // Generate frames
     for (let i = 0; i < totalFrames; i++) {
@@ -72,32 +95,60 @@ export const exportGIF = async (
       let frameStates;
       if (phase.isTransitioning) {
         // Transition from current screen to next
-        const diffOps = computeDiff(snippets[phase.currentScreenIndex].code, snippets[phase.currentScreenIndex + 1].code, highlighter, language, "github-dark");
+        const diffOps = computeDiff(
+          snippets[phase.currentScreenIndex].code,
+          snippets[phase.currentScreenIndex + 1].code,
+          highlighter,
+          language,
+          "github-dark",
+        );
         frameStates = computeFrameStates(diffOps, phase.progress, config);
       } else {
         // Static display with background fade-out
         if (phase.currentScreenIndex > 0) {
           // Use transition to current screen with progress > 1 to fade backgrounds
-          const diffOps = computeDiff(snippets[phase.currentScreenIndex - 1].code, snippets[phase.currentScreenIndex].code, highlighter, language, "github-dark");
+          const diffOps = computeDiff(
+            snippets[phase.currentScreenIndex - 1].code,
+            snippets[phase.currentScreenIndex].code,
+            highlighter,
+            language,
+            "github-dark",
+          );
           const extendedProgress = 1 + Math.min(phase.staticProgress, 0.15);
           frameStates = computeFrameStates(diffOps, extendedProgress, config);
         } else {
           // First screen - show as-is
-          const diffOps = computeDiff(snippets[phase.currentScreenIndex].code, snippets[phase.currentScreenIndex].code, highlighter, language, "github-dark");
+          const diffOps = computeDiff(
+            snippets[phase.currentScreenIndex].code,
+            snippets[phase.currentScreenIndex].code,
+            highlighter,
+            language,
+            "github-dark",
+          );
           frameStates = computeFrameStates(diffOps, 1, config);
         }
       }
 
-      renderFrameToCanvas(ctx, frameStates, renderConfig, phase.currentScreenIndex, snippets.length, phase.staticProgress);
+      renderFrameToCanvas(
+        ctx,
+        frameStates,
+        renderConfig,
+        phase.currentScreenIndex,
+        snippets.length,
+        phase.staticProgress,
+      );
 
       // Add frame to GIF
-      gif.addFrame(ctx, { copy: true, delay: (1000 / settings.fps) });
+      gif.addFrame(ctx, { copy: true, delay: 1000 / settings.fps });
 
-      onProgress({ percentage: (i / totalFrames) * 50, message: "Generating frames..." }); // First 50% is frame generation
+      onProgress({
+        percentage: (i / totalFrames) * 50,
+        message: "Generating frames...",
+      }); // First 50% is frame generation
     }
 
     gif.on("progress", (p: number) => {
-      console.log(p)
+      console.log(p);
       onProgress({ percentage: 50 + p * 50, message: "Encoding GIF..." }); // Second 50% is encoding
     });
 
@@ -116,7 +167,9 @@ export const exportGIF = async (
 
 let ffmpegInstance: FFmpeg | null = null;
 
-export const loadFFmpeg = async (onProgress: ProgressCallback): Promise<FFmpeg> => {
+export const loadFFmpeg = async (
+  onProgress: ProgressCallback,
+): Promise<FFmpeg> => {
   if (ffmpegInstance) {
     return ffmpegInstance;
   }
@@ -129,7 +182,10 @@ export const loadFFmpeg = async (onProgress: ProgressCallback): Promise<FFmpeg> 
 
   ffmpeg.on("progress", ({ progress }) => {
     // Simulate slightly faster loading
-    onProgress({ percentage: Math.min(progress * 140, 100), message: "Loading video encoder (this may take a moment)..." });
+    onProgress({
+      percentage: Math.min(progress * 140, 100),
+      message: "Loading video encoder (this may take a moment)...",
+    });
   });
 
   // Load FFmpeg from unpkg CDN
@@ -149,18 +205,26 @@ export const exportMP4 = async (
   highlighter: Highlighter,
   settings: ExportSettings,
   onProgress: ProgressCallback,
-  language: string = "javascript"
+  language: string = "javascript",
 ): Promise<Blob> => {
   const ffmpeg = await loadFFmpeg(onProgress);
 
   // Calculate canvas size based on content (always even integers)
-  const { width, height } = calculateCanvasSize(snippets, config, settings.padding);
+  const { width, height } = calculateCanvasSize(
+    snippets,
+    config,
+    settings.padding,
+  );
 
   // Use 2x resolution for better quality
   const scale = 2;
 
   // Calculate timeline
-  const timeline = calculateTimeline(config.staticDuration, config.transitionDuration, snippets.length);
+  const timeline = calculateTimeline(
+    config.staticDuration,
+    config.transitionDuration,
+    snippets.length,
+  );
   const totalFrames = Math.ceil((timeline.totalDuration / 1000) * settings.fps);
 
   const tempCanvas = document.createElement("canvas");
@@ -178,10 +242,18 @@ export const exportMP4 = async (
   ctx.scale(scale, scale);
 
   // Calculate max line count for line numbers
-  const maxLineCount = Math.max(...snippets.map((s) => s.code.split("\n").length));
+  const maxLineCount = Math.max(
+    ...snippets.map((s) => s.code.split("\n").length),
+  );
 
   // Create render config (use logical dimensions, context is already scaled)
-  const renderConfig = createRenderConfig(width, height, config, settings.padding, maxLineCount);
+  const renderConfig = createRenderConfig(
+    width,
+    height,
+    config,
+    settings.padding,
+    maxLineCount,
+  );
 
   // Generate and write frames
   for (let i = 0; i < totalFrames; i++) {
@@ -194,23 +266,48 @@ export const exportMP4 = async (
     let frameStates;
     if (phase.isTransitioning) {
       // Transition from current screen to next
-      const diffOps = computeDiff(snippets[phase.currentScreenIndex].code, snippets[phase.currentScreenIndex + 1].code, highlighter, language, "github-dark");
+      const diffOps = computeDiff(
+        snippets[phase.currentScreenIndex].code,
+        snippets[phase.currentScreenIndex + 1].code,
+        highlighter,
+        language,
+        "github-dark",
+      );
       frameStates = computeFrameStates(diffOps, phase.progress, config);
     } else {
       // Static display with background fade-out
       if (phase.currentScreenIndex > 0) {
         // Use transition to current screen with progress > 1 to fade backgrounds
-        const diffOps = computeDiff(snippets[phase.currentScreenIndex - 1].code, snippets[phase.currentScreenIndex].code, highlighter, language, "github-dark");
+        const diffOps = computeDiff(
+          snippets[phase.currentScreenIndex - 1].code,
+          snippets[phase.currentScreenIndex].code,
+          highlighter,
+          language,
+          "github-dark",
+        );
         const extendedProgress = 1 + Math.min(phase.staticProgress, 0.15);
         frameStates = computeFrameStates(diffOps, extendedProgress, config);
       } else {
         // First screen - show as-is
-        const diffOps = computeDiff(snippets[phase.currentScreenIndex].code, snippets[phase.currentScreenIndex].code, highlighter, language, "github-dark");
+        const diffOps = computeDiff(
+          snippets[phase.currentScreenIndex].code,
+          snippets[phase.currentScreenIndex].code,
+          highlighter,
+          language,
+          "github-dark",
+        );
         frameStates = computeFrameStates(diffOps, 1, config);
       }
     }
 
-    renderFrameToCanvas(ctx, frameStates, renderConfig, phase.currentScreenIndex, snippets.length, phase.staticProgress);
+    renderFrameToCanvas(
+      ctx,
+      frameStates,
+      renderConfig,
+      phase.currentScreenIndex,
+      snippets.length,
+      phase.staticProgress,
+    );
 
     // Convert canvas to blob
     const blob = await new Promise<Blob>((resolve) => {
@@ -222,7 +319,10 @@ export const exportMP4 = async (
     await ffmpeg.writeFile(frameFileName, await fetchFile(blob));
 
     if (i % 10 === 0) {
-      onProgress({ percentage: (i / totalFrames) * 100, message: "Generating frames..." });
+      onProgress({
+        percentage: (i / totalFrames) * 100,
+        message: "Generating frames...",
+      });
     }
   }
 
@@ -265,7 +365,6 @@ export const exportMP4 = async (
   } catch (e) {
     // Ignore errors
   }
-
 
   return videoBlob;
 };
