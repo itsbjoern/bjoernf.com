@@ -1,0 +1,53 @@
+---
+title: "PDF Interpolator: Replacing text in templated PDFs with spreadsheet data"
+summary: "I built a desktop app for a relative's business that needed to generate individual pricing PDFs for clients while keeping their designs intact and their data entirely offline. Here's the story and some of the technical hurdles along the way."
+tags: [Development, PDF]
+image: ./image.png
+slugs: [pdf-interpolator]
+createdAt: 2026-02-25T19:35:00
+published: true
+---
+import Ref from "@/components/Ref/Ref.astro";
+
+I recently built <Ref text="PDF Interpolator" href="https://github.com/itsbjoern/pdf-interpolator" /> a desktop application that replaces text in PDF files using data from spreadsheets. It started with a simple idea, if you have a templated PDF (a pricing list or invoice) you should be able to automatically fill it using a spreadsheet. Map the columns, hit process, and you get a new PDF with the numbers swapped in. All of it runs locally on your machine. I purposefully wanted to avoid cloud processing to ensure that no data leaves your computer, but more on that in a bit.
+
+My previous work on <Ref text="PDFBlaze" href="https://pdfblaze.com" /> was invaluable to understanding the requirements and issues for this project. PDFs are a notoriously complex format, so it helped a lot that for this project as I already had a good understanding of the underlying structure and how to manipulate it. Just for reference the <Ref text="PDF version 1.7 specification" href="https://opensource.adobe.com/dc-acrobat-sdk-docs/pdfstandards/PDF32000_2008.pdf" /> is over 500 pages long and was released almost 20 years ago, the more recent <Ref text="version 2.0" href="https://developer.adobe.com/document-services/docs/assets/5b15559b96303194340b99820d3a70fa/PDF_ISO_32000-2.pdf" /> (2017) clocks in at almost 1000 pages.
+
+
+**The why: PDF design and data sensitivity**
+
+I built this for a relative who needed it for their business, and their use case turned out to be quite interesting. Because of current market forces they had to recalculate their pricing sheets many times, which forced them to spend a lot of time painstakenly updating hundreds of individual prices and create catered PDFs for different clients. The manual work involved in updating prices, regenerating documents, and making sure everything looked right was eating into their time. They aren't tech-illiterate at all, but it's not their primary job to sit at a computer and it felt like a large burden to spend their energy on this extra task. Additionally, the industry or at least their main pool of sales comes from a pool of clientele that happens to care a lot about the details. Now this is mostly concerning the product, but in such a sector you often require to be very conscious about the image, brand and design you project. As such my relative wanted to use their own design tools (e.g. InDesign, Illustrator, whatever they were comfortable with) to create beautifully laid-out PDFs. Then they just wanted to sub in the prices. A boring or generic template that looks like a generated document was not really an option.
+
+Generally this kind of tool is hard to come by, because it's a niche use case, and also it actually involves some pretty complex technical hurdles to overcome. There are some alternatives floating around online, but all of questionable quality, pricing structures or data security. A web-based PDF generator or a service that processes documents in the cloud was somewhat problematic anyway, for a lot of businesses their pricing data is the anchor of their business. Sending it anywhere, even to a quote-unquote trusted third party, was out of the question. To me a primary requirement was that everything had to run locally and no data to ever leave their computer.
+
+That's what PDF Interpolator does. You pick a spreadsheet, map the source column (the placeholder text in the PDF) to the target column (the value from your sheet), select your PDF, choose an output location, and process. The app preserves the original layout, fonts, and formatting. It just swaps the text. Fully offline, no account required, no telemetry.
+
+---
+
+**The nitty gritty: what I had to deal with under the hood**
+
+As mentioned earlier, PDFs are notoriously messy to work with. I already built <Ref text="PDFBlaze" href="https://pdfblaze.com" /> before as a online-service for templated PDFs. This meant I had at least a rough idea of what I was getting into. PDFBlaze was sadly not suited in this case as since it is run by me the data protection issue was less of a concern, but the templating engine requires the user to create the whole thing in my online editor, which as mentioned before wasn't really an option. Thus, the technical challenges to overcome for this app were the following:
+
+**Fonts and encodings**
+
+PDFs don't store text as plain strings. They store sequences of bytes that map to glyphs via font encodings. And it gets worse: different fonts use different encodings, sometimes the same "base font" can be encoded as multiple fonts with different encodings. WinAnsiEncoding, MacRomanEncoding, custom encodings defined in the font dictionary — you have to handle all of them. When you replace text, you need to encode your replacement string back into the same byte representation the PDF expects, otherwise the glyphs won't render correctly. I had to build a font registry that maps Unicode characters to the correct byte codes for each font, and when a character doesn't exist in the current font (e.g. a particular case is the euro sign in a font that only has ASCII), I fall back to other fonts in the same family.
+
+**Content streams: strings, arrays and split bytes**
+
+PDF content streams are essentially sequences of drawing operations. Text is rendered inside `BT` … `ET` blocks. The tricky part is that text can be specified in multiple ways: as a single string with `Tj`, or as an array with `TJ` where each element can be a string or a spacing adjustment. Sometimes that array is split across multiple operations. Sometimes strings are hex-encoded `<414243>`, sometimes they're encoded in octal notation `\041\042\043` and sometimes they're literal `(ABC)` with escape sequences.
+
+ I had to build a tokenizer that tracks byte positions so I could surgically replace only the text blocks that changed, leaving all the graphics, paths, and images untouched. One wrong splice and the whole page corrupts.
+
+A particularly challenging session was when I discovered that Adobe Acrobat Reader does not like certain representations of text. A hex-encoded string like `<414243>` should be printed with the `Tj` operator, since if `TJ` is used a reader expects the text to be a sequence of strings and spacing adjustments. Interestingly, every reader I tested did not mind the missing spacings except for Acrobat Reader.
+
+And because PDF is a binary-ish format, content streams can be split at what feel like random byte boundaries. This means that I had to ensure that re-writing the content stream does not break the PDF structure and that the resulting PDF is still valid. I also didn't want to unnecessarily bloat the PDF, so I had to be careful about removing unused content after the replacement and re-writing content streams with the appropriate compression filters.
+
+**Number formatting: German vs English**
+
+Spreadsheets, at least when read through libraries like xlsx, unfortunately seem to return numbers in English format without internationalisation: comma as thousands separator, period as decimal. So `1,234.56` means one thousand and change. In German locale it's the opposite: `1.234,56`. My relative's business runs in Germany. Just passing through the values, a price like `1,234.56` is basically nonsensical to a German reader. I had to add locale-aware number formatting that detects the system language and converts between formats when loading from the spreadsheet. It's one of those things you don't think about until you're debugging why all the prices are wrong.
+
+**Putting it together**
+
+The pipeline works like this: load the PDF, parse each page's content stream with position tracking, extract font dictionaries and build character mappings, decode text blocks to Unicode, perform replacements (with font fallback when needed), re-encode to bytes, and patch only the modified `BT` … `ET` blocks back into the stream. Everything else stays byte-for-byte identical. The result is a PDF that renders the same in Adobe Reader and other finicky viewers, with all the original structure preserved.
+
+It was a satisfying project to work on. Solving real problems for someone you know, and learning a lot about a format that most people happily treat as a black box. If you have a similar use case — templated PDFs, local data, design-sensitive output — <Ref text="PDF Interpolator" href="https://github.com/itsbjoern/pdf-interpolator" /> might be worth a look. It's available for Windows, macOS, and Linux.
