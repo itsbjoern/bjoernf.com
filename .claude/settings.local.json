@@ -4,7 +4,8 @@
       "Bash(find:*)",
       "Bash(bun astro build:*)",
       "Bash(ls:*)",
-      "Bash(bunx tsc:*)"
+      "Bash(bunx tsc:*)",
+      "Bash(grep:*)"
     ]
   }
 }
