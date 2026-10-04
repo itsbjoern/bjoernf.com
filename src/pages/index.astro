@@ -76,28 +76,6 @@ interface Props {
       <Divider />
     </span>
     <span>
-      <h3 class="text-xl font-bold">My habit progress</h3>
-    </span>
-    <span>
-      This is a public view of my habit tracker for this year, if you're
-      interested in the same you can <Ref
-        text="create your own habit tracker"
-        href="/fun/habits"
-      /> using my website. Just like this one trackers can be embedded into any
-      website, no information will be shared unless you explicitly choose to do
-      so, and even if you do it will only share the count of completions, not
-      what the habit actually is.
-    </span>
-    <iframe
-      src={import.meta.env.PROD
-        ? "https://bjoernf.com/fun/habits/embed?tracker=09ff0ea7-60bd-40b0-815e-2349bcb9a619"
-        : "http://localhost:4321/fun/habits/embed?tracker=dbc1b4cf-c0ce-4cf7-aea5-0d2f0de7783e"}
-      width="100%"
-      style="border:none; min-height: 180px;"></iframe>
-    <span>
-      <Divider />
-    </span>
-    <span>
       <h3 class="text-xl font-bold">Recent posts</h3>
       <div class="flex flex-col">
         {sortedPosts.slice(0, 3).map((p) => <PostItem post={p} />)}
