@@ -12,7 +12,7 @@ import node from "@astrojs/node";
 export default defineConfig({
   integrations: [tailwind(), mdx(), sitemap(), react()],
   site: "https://bjoernf.com",
-  output: "static", // In new astro there is no "hybrid" mode anymore
+  output: "static",
 
   build: {
     assets: "static",

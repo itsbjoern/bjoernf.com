@@ -27,6 +27,7 @@ FROM base AS release
 USER bun
 
 COPY --from=install /temp/prod/node_modules node_modules
+COPY --from=prerelease /app/dist/client ./dist/client
 COPY --from=prerelease /app/dist/server ./dist/server
 COPY --from=prerelease /app/drizzle ./drizzle
 
