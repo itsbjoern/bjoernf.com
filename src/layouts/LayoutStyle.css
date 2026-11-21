@@ -31,11 +31,11 @@ html {
 html,
 body {
   min-height: 100vh;
+  overscroll-behavior: none;
 }
 
 body {
   display: flex;
-  overscroll-behavior-y: none;
 }
 
 h1,
