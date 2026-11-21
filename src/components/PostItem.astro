@@ -17,11 +17,11 @@ const { title, summary, tags, image, slugs, published, createdAt } = post.data;
     <div class="z-[5] flex flex-row">
       <div class="z-[5] flex flex-row pt-4 pr-5 pb-0 pl-6">
         <div
-          class="neo clipped z-[5] flex flex-row gap-4 rounded-t-md bg-paper pt-2 pr-2 pb-0 pl-3 items-center"
+          class="neo clipped z-[5] flex flex-row gap-4 rounded-t-lg bg-paper py-1.5 pr-1.5 pl-3 items-center"
         >
           <a class="flex flex-row gap-2" href={`/blog/${slugs[0]}`}>
             <div class="flex flex-row">
-              <span style={{ fontSize: "0.75rem" }}>
+              <span class="text-muted" style={{ fontSize: "0.75rem" }}>
                 {formatDate(createdAt)}
               </span>
             </div>
@@ -38,7 +38,7 @@ const { title, summary, tags, image, slugs, published, createdAt } = post.data;
     </div>
   </div>
   <a
-    class="neo relative flex min-h-[100px] flex-1 rounded-md bg-paper smo:pr-2"
+    class="neo relative flex min-h-[100px] flex-1 rounded-lg bg-paper smo:pr-2"
     href={`/blog/${slugs[0]}`}
   >
     <div class="flex flex-row gap-2 pr-3 pb-2 pl-2 pt-2">
@@ -50,11 +50,11 @@ const { title, summary, tags, image, slugs, published, createdAt } = post.data;
         ) : null
       }
       <div class="flex flex-col px-2 py-1 smo:flex-wrap">
-        <h3 class="text-xl font-bold leading-6 text-primary">
+        <h3 class="mb-1 text-lg font-bold leading-6 text-primary">
           {title || "No title"}
         </h3>
         <div
-          class="flex flex-row overflow-hidden text-ellipsis text-sm"
+          class="flex flex-row overflow-hidden text-ellipsis text-sm text-muted"
           style={{
             "-webkit-line-clamp": 3,
             "-webkit-box-orient": "vertical",
@@ -77,11 +77,10 @@ const { title, summary, tags, image, slugs, published, createdAt } = post.data;
     position: relative;
     display: flex;
 
-    border-width: 1px;
-    border-style: solid;
-    border-color: rgba(0, 0, 0, 0.23);
-    border-radius: 4px;
-    padding: 3px;
+    overflow: hidden;
+    border-radius: 6px;
+    box-shadow: 0 0 0 1px var(--color-line);
+    background: white;
 
     align-items: center;
     justify-content: center;

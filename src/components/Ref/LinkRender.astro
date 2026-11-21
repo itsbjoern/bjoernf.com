@@ -10,19 +10,11 @@ const { href, external, rel = "noreferrer noopener" } = Astro.props;
 
 {
   external ? (
-    <a
-      class="neo-text inline text-primary underline decoration-primary hover:decoration-1 underline-offset-1"
-      href={href}
-      rel={rel}
-      target="_blank"
-    >
+    <a class="link inline" href={href} rel={rel} target="_blank">
       <slot />
     </a>
   ) : (
-    <a
-      class="neo-text text-primary underline decoration-primary hover:decoration-1 underline-offset-1"
-      href={href}
-    >
+    <a class="link" href={href}>
       <slot />
     </a>
   )

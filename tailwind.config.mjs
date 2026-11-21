@@ -4,9 +4,11 @@ export default {
 	theme: {
     extend: {
       colors: {
-        default: '#e9e9e9',
-        paper: '#f5f5f5',
-        primary: '#2a2a2a',
+        default: '#ffffff',
+        paper: '#ffffff',
+        primary: '#1c1c1c',
+        muted: '#6b6b6b',
+        accent: '#c2410c',
       },
       screens: {
         smo: { max: '639px' },

@@ -46,9 +46,9 @@ Two main layouts:
 
 ### Styling
 
-- TailwindCSS with custom theme colors (default: #e9e9e9, paper: #f5f5f5, primary: #2a2a2a)
+- TailwindCSS with custom theme colors (default: #ffffff, paper: #ffffff, primary: #1c1c1c, muted: #6b6b6b, accent: #c2410c)
 - Custom responsive breakpoints: `smo` (max: 639px), `lgo` (max: 1023px)
-- Global styles for "neo" glow effects defined in Layout.astro
+- Global styles in `src/layouts/LayoutStyle.css`: `.neo` (card surface: top-lit gradient, hairline ring, soft hover shadow) and `.link` (accent underline)
 - Path alias `@/*` maps to `src/*` (configured in tsconfig.json)
 
 ### Component Patterns

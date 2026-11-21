@@ -15,7 +15,7 @@ import Icon from "./Icon.astro";
 const isLoggedIn = Astro.cookies.has("token");
 ---
 
-<div class="neo flex flex-col gap-4 rounded-b-md bg-paper p-6">
+<div class="neo flex flex-col gap-4 rounded-b-xl bg-paper p-6">
   <div class="flex items-center justify-between">
     <div class="flex flex-row items-center">
       <img
@@ -27,13 +27,15 @@ const isLoggedIn = Astro.cookies.has("token");
       />
       <div class="ml-4 flex flex-col justify-evenly">
         <div>
-          <h2 id="title" class="text-2xl font-bold">Björn Friedrichs</h2>
+          <h2 id="title" class="text-2xl font-bold tracking-tight">Björn Friedrichs</h2>
           <audio id="name-audio">
             <source src="/name.mp3" type="audio/mpeg" />
              Your browser does not support the audio element.
           </audio>
         </div>
-        <div class="flex flex-row items-center gap-1 cursor-pointer">
+        <div
+          class="flex cursor-pointer flex-row items-center gap-1 text-sm text-muted transition-colors hover:text-primary"
+        >
           <Icon icon={ArrowCircleUpIcon} />
           <span id="subtitle">That&apos;s me</span>
         </div>

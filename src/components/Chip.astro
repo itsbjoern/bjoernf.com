@@ -43,30 +43,29 @@ const Wrapped = to ? "a" : "div";
   }
 
   .outlined {
-    border: 1px solid rgb(189, 189, 189);
+    border: 1px solid rgb(0 0 0 / 0.12);
     background-color: transparent;
   }
 
   .contained {
-    background-color: rgba(0, 0, 0, 0.04);
-    border: 1px solid rgba(0, 0, 0, 0.04);
+    background-color: rgb(0 0 0 / 0.05);
+    border: 1px solid transparent;
   }
 
   .container {
     max-width: 100%;
-    font-family: Roboto, Helvetica, Arial, sans-serif;
     display: inline-flex;
     align-items: center;
     justify-content: center;
-    color: #3f403f;
+    color: var(--color-muted);
     white-space: nowrap;
     transition:
-      background-color 300ms cubic-bezier(0.4, 0, 0.2, 1) 0ms,
-      box-shadow 300ms cubic-bezier(0.4, 0, 0.2, 1) 0ms;
+      background-color 150ms ease,
+      color 150ms ease;
     outline: 0px;
     cursor: default;
     text-decoration: none;
-    padding: 4px 0 2px 0;
+    padding: 3px 0;
     vertical-align: middle;
     box-sizing: border-box;
   }
@@ -80,8 +79,7 @@ const Wrapped = to ? "a" : "div";
   }
 
   .container svg {
-    color: #616161;
-    margin-top: -2px;
+    color: currentColor;
     margin-left: 4px;
     margin-right: -6px;
 
@@ -95,7 +93,8 @@ const Wrapped = to ? "a" : "div";
 
   .clickable:hover {
     cursor: pointer;
-    background-color: rgba(0, 0, 0, 0.04);
+    color: var(--tw-color-primary);
+    background-color: rgb(0 0 0 / 0.05);
   }
 
   .clickable .container:hover {

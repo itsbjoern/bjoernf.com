@@ -18,7 +18,7 @@ const { Content } = await render(post);
 const { title, createdAt, tags, image, summary } = post.data;
 ---
 
-<div class="flex flex-col gap-5 smo:px-2">
+<div class="flex flex-col gap-5">
   <div class="flex flex-row items-center gap-5 smo:flex-col">
     {
       image ? (
@@ -38,11 +38,11 @@ const { title, createdAt, tags, image, summary } = post.data;
             </div>
           ) : null
         }
-        <span style={{ fontSize: "0.75rem" }}>
+        <span class="text-muted" style={{ fontSize: "0.75rem" }}>
           Published {formatDate(createdAt ?? new Date())}
         </span>
       </div>
-      <h2 class="text-xl font-bold">{title}</h2>
+      <h1 class="text-2xl font-bold">{title}</h1>
     </div>
   </div>
   <div class="post-content">
@@ -59,11 +59,10 @@ const { title, createdAt, tags, image, summary } = post.data;
     position: relative;
     display: flex;
 
-    border-width: 1px;
-    border-style: solid;
-    border-color: rgba(0, 0, 0, 0.23);
-    border-radius: 4px;
-    padding: 3px;
+    overflow: hidden;
+    border-radius: 6px;
+    box-shadow: 0 0 0 1px var(--color-line);
+    background: white;
 
     align-items: center;
     justify-content: center;
