@@ -55,7 +55,8 @@
     white-space: pre-wrap;
   }
 
-  img {
+  img,
+  iframe {
     max-width: 100%;
     height: auto;
   }
