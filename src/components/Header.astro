@@ -2,7 +2,6 @@
 import Me from "@/images/me.jpg";
 import LogoutIcon from "@/images/icons/Logout.svg?raw";
 import AdminPanelSettingsIcon from "@/images/icons/AdminPanelSettings.svg?raw";
-import ArrowCircleUpIcon from "@/images/icons/ArrowCircleUp.svg?raw";
 import GithubIcon from "@/images/icons/GitHub.svg?raw";
 import BlueskyIcon from "@/images/icons/Bluesky.svg?raw";
 import XIcon from "@/images/icons/XCom.svg?raw";
@@ -10,7 +9,6 @@ import XIcon from "@/images/icons/XCom.svg?raw";
 import Divider from "./Divider.astro";
 import Chip from "./Chip.astro";
 import Navigation from "./Navigation/Navigation.astro";
-import Icon from "./Icon.astro";
 
 const isLoggedIn = Astro.cookies.has("token");
 ---
@@ -26,18 +24,15 @@ const isLoggedIn = Astro.cookies.has("token");
         alt="Picture of myself"
       />
       <div class="ml-4 flex flex-col justify-evenly">
-        <div>
-          <h2 id="title" class="text-2xl font-bold tracking-tight">Björn Friedrichs</h2>
-          <audio id="name-audio">
+        <h2 class="text-2xl font-bold tracking-tight">
+          <span>Bjøːrn Fʁiː.dʁɪçs</span>
+        </h2>
+        <div class="text-sm text-muted">
+          How to say this?
+          <button id="name-play" type="button" class="link">Play sound</button>
+          <audio id="name-audio" preload="none">
             <source src="/name.mp3" type="audio/mpeg" />
-             Your browser does not support the audio element.
           </audio>
-        </div>
-        <div
-          class="flex cursor-pointer flex-row items-center gap-1 text-sm text-muted transition-colors hover:text-primary"
-        >
-          <Icon icon={ArrowCircleUpIcon} />
-          <span id="subtitle">That&apos;s me</span>
         </div>
       </div>
     </div>
@@ -90,55 +85,9 @@ const isLoggedIn = Astro.cookies.has("token");
 </div>
 
 <script>
-  const nameString = "Björn Friedrichs";
-  const phoneticString = "Bjøːrn Fʁiː.dʁɪçs";
-
-  const subtitleString = "That's me";
-  const phoneticSubtitleString = "How do I say that?";
-
-  const nameElement = document.getElementById("title")!;
-  const subtitleElement = document.getElementById("subtitle")!;
-
-  let showingRealName = true;
-
-  const updateName = () => {
-    nameElement.classList.add("glitch");
-    setTimeout(() => {
-      nameElement.textContent = showingRealName ? phoneticString : nameString;
-      subtitleElement.textContent = showingRealName
-        ? phoneticSubtitleString
-        : subtitleString;
-      showingRealName = !showingRealName;
-    }, 500);
-    setTimeout(() => {
-      nameElement.classList.remove("glitch");
-    }, 1000);
-
-    setTimeout(updateName, 15000);
-  };
-
-  setTimeout(updateName, 4000);
-
-  const nameAudio = document.getElementById("name-audio")! as HTMLAudioElement;
-  subtitleElement.addEventListener("click", () => {
+  const nameAudio = document.getElementById("name-audio") as HTMLAudioElement;
+  document.getElementById("name-play")!.addEventListener("click", () => {
+    nameAudio.currentTime = 0;
     nameAudio.play();
   });
 </script>
-
-<style>
-  .glitch {
-    animation: stutter 1s ease 1;
-  }
-
-  @keyframes stutter {
-    0% {
-      opacity: 1;
-    }
-    50% {
-      opacity: 0;
-    }
-    100% {
-      opacity: 1;
-    }
-  }
-</style>
