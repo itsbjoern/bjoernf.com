@@ -61,7 +61,7 @@ const isLoggedIn = Astro.cookies.has("token");
         ) : null
       }
     </div>
-    <div class="flex justify-end gap-3">
+    <div class="flex flex-wrap justify-end gap-3 smo:w-full smo:justify-between smo:gap-1">
       <Chip
         clickable
         icon={GithubIcon}
