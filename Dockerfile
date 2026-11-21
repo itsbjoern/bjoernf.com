@@ -30,6 +30,8 @@ COPY --from=install /temp/prod/node_modules node_modules
 COPY --from=prerelease /app/dist/client ./dist/client
 COPY --from=prerelease /app/dist/server ./dist/server
 COPY --from=prerelease /app/drizzle ./drizzle
+COPY --from=prerelease /app/scripts/migrate.ts ./scripts/migrate.ts
 
 EXPOSE 4321/tcp
-CMD ["bun", "--bun", "./dist/server/entry.mjs"]
+# Apply database migrations, then start the server
+CMD ["sh", "-c", "bun scripts/migrate.ts && exec bun --bun ./dist/server/entry.mjs"]

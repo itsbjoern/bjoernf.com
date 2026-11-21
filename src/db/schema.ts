@@ -70,3 +70,10 @@ export type HabitNewCompletion = typeof habitCompletions.$inferInsert;
 
 export type HabitSession = typeof habitSessions.$inferSelect;
 export type HabitNewSession = typeof habitSessions.$inferInsert;
+
+// Wikipedia Connections - one generated puzzle per day (see src/utils/wikipediaPuzzle.ts)
+export const wikipediaPuzzles = pgTable('wikipedia_puzzles', {
+  date: text('date').primaryKey(), // YYYY-MM-DD (UTC)
+  puzzle: jsonb('puzzle').notNull(),
+  createdAt: timestamp('created_at').notNull().defaultNow(),
+});

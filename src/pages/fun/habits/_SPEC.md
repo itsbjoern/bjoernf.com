@@ -2,7 +2,7 @@ A very simple habit tracker app that helps building daily habits. Every day you 
 
 The frontend is built using Astro components and Tailwind for styling. It interacts with the backend API located in `/api/habits`, which is built using Astro endpoints.
 
-The backend uses a Postgres database to store habit data, managed through the Drizzle ORM. There is no users, authentication is a simple hashed password which creates a "tracker". Each tracker has an ID and a password hash stored in the database. The password is used to authenticate requests to modify habit data. Each tracker can have multiple active sessions, these are synced using the Astro session API. This is defined as the `session` in the astro config and uses db0 (unstorage) under the hood.
+The backend uses a Postgres database (tables `habit_*` in `src/db/schema.ts`), accessed through the Drizzle ORM. There are no user accounts: a "tracker" is created by registering a passkey (WebAuthn, via `@simplewebauthn`), and signing in with that passkey creates a session. Sessions live in the `habit_sessions` table and are referenced by the `habits_session` cookie (see `src/db/habits.ts`). A tracker can have multiple passkeys and sessions.
 
 Each tracker can have multiple habits. Habits are defined by a name and description. Each day, the user can mark which habits they have completed. The backend provides endpoints to create, update, and delete habits, as well as to mark habits as completed for a specific day.
 

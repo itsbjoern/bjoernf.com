@@ -6,11 +6,16 @@ This file provides guidance to Claude Code (claude.ai/code) when working with co
 
 This is a personal website for Björn Friedrichs (bjoernf.com) built with Astro 5. The site features a blog with MDX content, interactive games, and creative projects like a 3D virtual bookshelf.
 
+See README.md for the overall picture: where each feature's data lives, the daily routine, env vars and DB migrations. Keep it up to date when any of those change.
+
+**Runtime:** a single Bun Docker container (`Dockerfile`) serves the prerendered pages (`dist/client`) and the API routes (`dist/server`, everything with `export const prerender = false`, under `src/pages/api/`). The API is same-origin, so call it as `/api/...` (`src/utils/api.ts`). Persistent data lives in Postgres via Drizzle (`src/db/`).
+
 ## Development Commands
 
 Uses Bun as the package manager:
 
-- `bun start` - Start development server (runs on localhost:4321)
+- `bun start` - Apply DB migrations, then start development server (runs on localhost:4321)
+- `bun run migrate` - Apply DB migrations (`scripts/migrate.ts`)
 - `bun run build` - Build production site to ./dist/
 - `bun run preview` - Preview production build locally
 - `bun run astro` - Run Astro CLI commands
@@ -56,12 +61,24 @@ Components are organized by function:
 
 ### Interactive Features
 
-**Wikipedia Connections Game** (`src/pages/games/wikipedia-connections/`):
+**Wikipedia Connections Game** (`src/pages/games/wikipedia-connections/`, `src/components/Game/`):
 - React-based daily puzzle game (no external game libraries)
 - Custom drag-and-drop implementation (no DnD libraries)
-- Uses static JSON data files (no API calls)
-- Game data structure: pages with url, title, summary, and array of links
-- Python scripts in `data/` directory generate game content
+- Puzzle generator: `src/utils/wikipediaPuzzle.ts` (TypeScript, uses the Wikipedia REST API)
+- Stored in the `wikipedia_puzzles` table (one row per UTC date, see `src/db/wikipedia.ts`)
+- `GET /api/wikipedia/today` serves it; the first request of each day generates it (~20s, concurrent requests share one generation), and if generation fails the latest stored puzzle is served
+- No cron jobs: nothing runs on a schedule
+
+**Habit Tracker** (`src/pages/fun/habits/`, `src/components/Habits/`, `src/pages/api/habits/`):
+- Passkey (WebAuthn) auth, sessions in the `habit_sessions` table
+- Public embed at `/fun/habits/embed?tracker=<id>`
+
+### Database
+
+- Postgres + Drizzle. All tables are in `src/db/schema.ts`; queries per feature are in `src/db/<feature>.ts`
+- Migrations in `drizzle/` are applied by `scripts/migrate.ts` before the server starts (Dockerfile CMD, `bun start`); `bun run migrate` runs them by hand
+- Schema change: edit `schema.ts`, then `bunx drizzle-kit generate --name <change>`, then commit the generated SQL
+- Env var: `DATABASE_URL`
 
 **Virtual Bookshelf** (`src/pages/fun/bookshelf/`):
 - Three.js 3D visualization
@@ -76,7 +93,7 @@ Components are organized by function:
 
 ### Build Configuration
 
-- Static site output (`output: "static"`)
+- `output: "static"` with the Node adapter: pages are prerendered and routes with `prerender = false` run on the server
 - Build assets directory: `static/`
 - Vite includes XML files as assets
 - Site URL: https://bjoernf.com

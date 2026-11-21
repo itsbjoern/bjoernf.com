@@ -1,54 +1,58 @@
-# Astro Starter Kit: Basics
+# bjoernf.com
+
+Personal website: blog, small games and fun projects. Built with [Astro](https://astro.build), run with [Bun](https://bun.sh).
+
+## How it fits together
+
+```
+                       ┌──────────────── Docker container (Bun) ────────────────┐
+  visitor ──────────▶  │  dist/client   prerendered pages (blog, projects, …)    │
+                       │  dist/server   API routes under /api                    │──▶ Postgres
+                       │                (habits, wikipedia)                      │
+                       └─────────────────────────────────────────────────────────┘
+```
+
+One container serves everything. Most pages are prerendered at build time, and only `src/pages/api/**` runs on request.
+
+## Where things live
+
+| What                       | Code                                          | Data                                               |
+| -------------------------- | --------------------------------------------- | -------------------------------------------------- |
+| Blog posts                 | `src/blog/YYYY/<slug>/post.mdx`               | the repo                                           |
+| Virtual bookshelf          | `src/pages/fun/bookshelf/`                    | `src/pages/fun/bookshelf/list.xml` (in the repo)   |
+| Code animator              | `src/components/Animator/`                    | the visitor's browser                              |
+| Habit tracker              | `src/components/Habits/`, `src/pages/api/habits/` | Postgres: `habit_*` tables                     |
+| Wikipedia Connections game | `src/components/Game/`, `src/pages/api/wikipedia/` | Postgres: `wikipedia_puzzles` (one row per day) |
+
+Database code is in `src/db/`: `schema.ts` holds all tables, and `habits.ts` / `wikipedia.ts` hold the queries.
+
+## Routines
+
+There are no scheduled jobs. The daily Wikipedia puzzle is created on demand: the first visit to the game each day (UTC) makes `/api/wikipedia/today` build a new puzzle from Wikipedia (`src/utils/wikipediaPuzzle.ts`). That visitor waits about 20 seconds, and everyone after them gets the stored puzzle right away. If generation fails, the most recent stored puzzle is served instead.
+
+`.github/workflows/main.yml` builds the site on every push and PR. It only checks that the build works; deploying is done by the Docker host.
+
+## Database
+
+- Postgres, accessed through [Drizzle](https://orm.drizzle.team).
+- **Migrations run automatically** before the server starts (`scripts/migrate.ts`, called from the Dockerfile and `bun start`), using the SQL files in `drizzle/`. Run them by hand with `bun run migrate`.
+- To change the schema: edit `src/db/schema.ts`, run `bunx drizzle-kit generate --name <what-changed>`, and commit the new file in `drizzle/`.
+
+## Environment variables
+
+| Variable       | Used by                    | Notes                                                                             |
+| -------------- | -------------------------- | --------------------------------------------------------------------------------- |
+| `DATABASE_URL` | everything under `/api`    | Postgres connection string                                                        |
+
+Locally it goes in `.env`.
+
+## Development
 
 ```sh
-npm create astro@latest -- --template basics
+bun install
+bun start            # http://localhost:4321 (needs DATABASE_URL for /api routes)
+bun run build        # builds dist/client + dist/server
+docker build -t bjoernf .
 ```
 
-[![Open in StackBlitz](https://developer.stackblitz.com/img/open_in_stackblitz.svg)](https://stackblitz.com/github/withastro/astro/tree/latest/examples/basics)
-[![Open with CodeSandbox](https://assets.codesandbox.io/github/button-edit-lime.svg)](https://codesandbox.io/p/sandbox/github/withastro/astro/tree/latest/examples/basics)
-[![Open in GitHub Codespaces](https://github.com/codespaces/badge.svg)](https://codespaces.new/withastro/astro?devcontainer_path=.devcontainer/basics/devcontainer.json)
-
-> 🧑‍🚀 **Seasoned astronaut?** Delete this file. Have fun!
-
-![just-the-basics](https://github.com/withastro/astro/assets/2244813/a0a5533c-a856-4198-8470-2d67b1d7c554)
-
-## 🚀 Project Structure
-
-Inside of your Astro project, you'll see the following folders and files:
-
-```text
-/
-├── public/
-│   └── favicon.svg
-├── src/
-│   ├── components/
-│   │   └── Card.astro
-│   ├── layouts/
-│   │   └── Layout.astro
-│   └── pages/
-│       └── index.astro
-└── package.json
-```
-
-Astro looks for `.astro` or `.md` files in the `src/pages/` directory. Each page is exposed as a route based on its file name.
-
-There's nothing special about `src/components/`, but that's where we like to put any Astro/React/Vue/Svelte/Preact components.
-
-Any static assets, like images, can be placed in the `public/` directory.
-
-## 🧞 Commands
-
-All commands are run from the root of the project, from a terminal:
-
-| Command                   | Action                                           |
-| :------------------------ | :----------------------------------------------- |
-| `npm install`             | Installs dependencies                            |
-| `npm run dev`             | Starts local dev server at `localhost:4321`      |
-| `npm run build`           | Build your production site to `./dist/`          |
-| `npm run preview`         | Preview your build locally, before deploying     |
-| `npm run astro ...`       | Run CLI commands like `astro add`, `astro check` |
-| `npm run astro -- --help` | Get help using the Astro CLI                     |
-
-## 👀 Want to learn more?
-
-Feel free to check [our documentation](https://docs.astro.build) or jump into our [Discord server](https://astro.build/chat).
+Locally, opening `/games/wikipedia-connections/` generates a puzzle the same way, as long as `DATABASE_URL` is set.
